@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/exercises/">
+    <Project Path="exercises/FeWoLearning.Exercises.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FeWoLearning.Exercises.Tests.csproj" />
+  </Folder>
+</Solution>

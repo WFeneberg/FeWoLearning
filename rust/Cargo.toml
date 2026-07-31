@@ -1,0 +1,9 @@
+[package]
+name = "fewolearning"
+version = "0.1.0"
+edition = "2021"
+
+# Exercises are wired as modules from exercises/lib.rs so `cargo test` runs them
+# all, and `cargo test ex001` runs a single one.
+[lib]
+path = "exercises/lib.rs"

@@ -1,0 +1,25 @@
+[project]
+name = "fewolearning-python"
+version = "0.1.0"
+description = "Python skills-training exercises"
+requires-python = ">=3.12"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.10"]
+
+[tool.pytest.ini_options]
+testpaths = ["exercises"]
+python_files = ["test_*.py"]
+pythonpath = [
+  "exercises/01-beginner",
+  "exercises/02-intermediate",
+  "exercises/03-advanced",
+  "exercises/04-expert",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.12"
+strict = true

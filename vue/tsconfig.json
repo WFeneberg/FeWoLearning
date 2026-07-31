@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "lib": ["ESNext", "DOM"],
+    "types": ["vitest/globals"],
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["exercises", "solutions"]
+}

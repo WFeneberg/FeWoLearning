@@ -1,0 +1,38 @@
+# ---- .NET ----
+[Bb]in/
+[Oo]bj/
+*.user
+.vs/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- Node (Vue / Angular) ----
+node_modules/
+dist/
+.angular/
+*.local
+coverage/
+
+# ---- Go ----
+/go/**/bin/
+*.test
+*.out
+
+# ---- Rust ----
+target/
+Cargo.lock
+
+# ---- JetBrains IDEs (Rider, PyCharm, GoLand, WebStorm, RustRover) ----
+.idea/
+*.iml
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
