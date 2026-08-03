@@ -15,8 +15,10 @@ _MISSING = object()
 
 class LRUCache(Generic[K, V]):
     def __init__(self, capacity: int) -> None:
-        if capacity <= 0:
-            raise ValueError("capacity must be positive")
+        # The capacity guard belongs here too — reject a non-positive capacity with
+        # ValueError("capacity must be positive") — but it is left to you, so that
+        # every test in this file starts red. A guard shipped in the stub would make
+        # the "rejects a bad capacity" test pass against an unimplemented cache.
         raise NotImplementedError
 
     def get(self, key: K, default: V | None = None) -> V | None:

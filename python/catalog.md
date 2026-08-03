@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 33 ✅ / 67 ⬜**
+**Status: 37 ✅ / 63 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -51,10 +51,10 @@ exceptions, file I/O, `pathlib`, `datetime`, `collections.Counter`, sorting with
 | 029 | math_functions          | `math`: floor/ceil/sqrt/isclose                       | ✅     |
 | 030 | random_sampling         | seeded `random`, `choice`/`sample`/`shuffle`          | ✅     |
 | 031 | nested_data_access      | traversing nested dicts and lists safely              | ✅     |
-| 032 | palindrome              | normalization, reversal, comparison                   | ⬜     |
-| 033 | range_step              | `range` with step, `reversed`                         | ⬜     |
-| 034 | list_rotation           | slicing assignment, rotation in place                 | ⬜     |
-| 035 | matrix_transpose        | nested lists, `zip(*matrix)`                          | ⬜     |
+| 032 | palindrome              | normalization, reversal, comparison                   | ✅     |
+| 033 | range_step              | `range` with step, `reversed`                         | ✅     |
+| 034 | list_rotation           | slicing assignment, rotation in place                 | ✅     |
+| 035 | matrix_transpose        | nested lists, `zip(*matrix)`                          | ✅     |
 
 ## Intermediate (036–070) — idioms & stdlib
 
