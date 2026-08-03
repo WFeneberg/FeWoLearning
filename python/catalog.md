@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 42 ✅ / 58 ⬜**
+**Status: 47 ✅ / 53 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -71,11 +71,11 @@ Generators & `yield`, decorators, context managers, `dataclasses`, `enum`,
 | 039 | yield_from_flatten          | `yield from`, recursive flattening                | ✅     |
 | 040 | decorator_timing            | decorators, `functools.wraps`                     | ✅     |
 | 041 | decorator_with_args         | decorator factories, nested closures              | ✅     |
-| 042 | decorator_retry             | retrying wrappers, exception handling             | ⬜     |
-| 043 | context_manager_class       | `__enter__`/`__exit__`, exception suppression     | ⬜     |
-| 044 | context_manager_contextlib  | `@contextmanager`, `try`/`finally` in generators  | ⬜     |
-| 045 | dataclass_basics            | `@dataclass`, defaults, `__post_init__`           | ⬜     |
-| 046 | dataclass_frozen_order      | `frozen=True`, `order=True`, hashability          | ⬜     |
+| 042 | decorator_retry             | retrying wrappers, exception handling             | ✅     |
+| 043 | context_manager_class       | `__enter__`/`__exit__`, exception suppression     | ✅     |
+| 044 | context_manager_contextlib  | `@contextmanager`, `try`/`finally` in generators  | ✅     |
+| 045 | dataclass_basics            | `@dataclass`, defaults, `__post_init__`           | ✅     |
+| 046 | dataclass_frozen_order      | `frozen=True`, `order=True`, hashability          | ✅     |
 | 047 | enum_basics                 | `Enum`, `auto()`, iteration, lookup by value      | ⬜     |
 | 048 | enum_flag                   | `Flag`/`IntFlag`, bitwise combination             | ⬜     |
 | 049 | typing_generics             | `TypeVar`, `Generic`, a typed container           | ⬜     |

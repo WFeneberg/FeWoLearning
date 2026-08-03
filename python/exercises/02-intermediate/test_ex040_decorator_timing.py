@@ -9,6 +9,12 @@ from ex040_decorator_timing import (
 )
 
 
+# NotImplementedError subclasses RuntimeError, so a test expecting RuntimeError
+# would be satisfied by an unimplemented stub. This type cannot be confused with it.
+class Boom(Exception):
+    pass
+
+
 def test_count_calls_counts() -> None:
     @count_calls
     def add(a: int, b: int) -> int:
@@ -39,9 +45,9 @@ def test_count_calls_preserves_identity() -> None:
 def test_count_calls_counts_a_failing_call_too() -> None:
     @count_calls
     def boom() -> None:
-        raise RuntimeError("boom")
+        raise Boom("boom")
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(Boom):
         boom()
 
     assert boom.calls == 1
