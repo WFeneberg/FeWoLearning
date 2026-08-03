@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 62 ✅ / 38 ⬜**
+**Status: 67 ✅ / 33 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -91,11 +91,11 @@ Generators & `yield`, decorators, context managers, `dataclasses`, `enum`,
 | 059 | regex_named_groups          | `re.match`, named groups, `groupdict`             | ✅     |
 | 060 | regex_substitution          | `re.sub` with a replacement function              | ✅     |
 | 061 | json_roundtrip              | `dumps`/`loads`, `default=`, custom encoder       | ✅     |
-| 062 | csv_dictreader              | `csv.DictReader`/`DictWriter`, quoting            | ⬜     |
-| 063 | argparse_cli                | `argparse`, subcommands, `type=`                  | ⬜     |
-| 064 | custom_exception_hierarchy  | exception base classes, `raise … from`            | ⬜     |
-| 065 | defaultdict_grouping        | `defaultdict(list)`, grouping records             | ⬜     |
-| 066 | chainmap_layers             | `ChainMap`, layered configuration                 | ⬜     |
+| 062 | csv_dictreader              | `csv.DictReader`/`DictWriter`, quoting            | ✅     |
+| 063 | argparse_cli                | `argparse`, subcommands, `type=`                  | ✅     |
+| 064 | custom_exception_hierarchy  | exception base classes, `raise … from`            | ✅     |
+| 065 | defaultdict_grouping        | `defaultdict(list)`, grouping records             | ✅     |
+| 066 | chainmap_layers             | `ChainMap`, layered configuration                 | ✅     |
 | 067 | deque_ring_buffer           | `deque`, `maxlen`, `rotate`                       | ⬜     |
 | 068 | comprehension_vs_generator  | memory behaviour, when each is right              | ⬜     |
 | 069 | unpacking_operators         | `*`/`**` in calls and literals, merging dicts     | ⬜     |
