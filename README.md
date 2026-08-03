@@ -12,7 +12,7 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `dotnet/`   | C# / .NET (Core, WPF, Avalonia, Uno, Blazor) | xUnit | **100 / 100** | ✅ .NET 10 |
 | `go/`       | Go                               | `go test`   | **100 / 100** | ✅ Go 1.26 |
 | `vue/`      | Vue 3 (Composition API, TS)      | Vitest      | **100 / 100** | ✅ Node 26 |
-| `python/`   | Python 3                         | pytest      | 47 / 100  | ✅ Python 3.14 |
+| `python/`   | Python 3                         | pytest      | 52 / 100  | ✅ Python 3.14 |
 | `angular/`  | Angular (standalone, signals, TS)| Jest        | 2 / 100   | ✅ Node 26 |
 | `rust/`     | Rust                             | `cargo test`| 2 / 100   | ✅ Rust 1.97 |
 

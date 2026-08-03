@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 47 ✅ / 53 ⬜**
+**Status: 52 ✅ / 48 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -76,11 +76,11 @@ Generators & `yield`, decorators, context managers, `dataclasses`, `enum`,
 | 044 | context_manager_contextlib  | `@contextmanager`, `try`/`finally` in generators  | ✅     |
 | 045 | dataclass_basics            | `@dataclass`, defaults, `__post_init__`           | ✅     |
 | 046 | dataclass_frozen_order      | `frozen=True`, `order=True`, hashability          | ✅     |
-| 047 | enum_basics                 | `Enum`, `auto()`, iteration, lookup by value      | ⬜     |
-| 048 | enum_flag                   | `Flag`/`IntFlag`, bitwise combination             | ⬜     |
-| 049 | typing_generics             | `TypeVar`, `Generic`, a typed container           | ⬜     |
-| 050 | typing_protocol             | `Protocol`, structural typing                     | ⬜     |
-| 051 | typed_dict                  | `TypedDict`, `total=False`                        | ⬜     |
+| 047 | enum_basics                 | `Enum`, `auto()`, iteration, lookup by value      | ✅     |
+| 048 | enum_flag                   | `Flag`/`IntFlag`, bitwise combination             | ✅     |
+| 049 | typing_generics             | `TypeVar`, `Generic`, a typed container           | ✅     |
+| 050 | typing_protocol             | `Protocol`, structural typing                     | ✅     |
+| 051 | typed_dict                  | `TypedDict`, `total=False`                        | ✅     |
 | 052 | namedtuple_record           | `NamedTuple`, field access, `_replace`            | ⬜     |
 | 053 | itertools_groupby           | `groupby`, sorting before grouping                | ⬜     |
 | 054 | itertools_chain_islice      | `chain`, `islice`, `takewhile`/`dropwhile`        | ⬜     |
