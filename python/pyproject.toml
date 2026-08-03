@@ -1,3 +1,9 @@
+# Without a [build-system] table, `pip install -e ".[dev]"` — the command the
+# README documents — falls back to setuptools' unpinned legacy backend.
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "fewolearning-python"
 version = "0.1.0"
@@ -6,6 +12,11 @@ requires-python = ">=3.12"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.10"]
+
+# There is no importable package here — exercises are loaded via pytest's
+# `pythonpath` below — so tell setuptools not to go looking for one.
+[tool.setuptools]
+packages = []
 
 [tool.pytest.ini_options]
 testpaths = ["exercises"]
