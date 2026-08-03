@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 57 ✅ / 43 ⬜**
+**Status: 62 ✅ / 38 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -86,11 +86,11 @@ Generators & `yield`, decorators, context managers, `dataclasses`, `enum`,
 | 054 | itertools_chain_islice      | `chain`, `islice`, `takewhile`/`dropwhile`        | ✅     |
 | 055 | itertools_combinatorics     | `product`, `combinations`, `permutations`         | ✅     |
 | 056 | functools_reduce            | `reduce` with an initial value, fold semantics    | ✅     |
-| 057 | functools_partial           | partial application, freezing keywords            | ⬜     |
-| 058 | functools_cache             | `cache`/`lru_cache`, memoization                  | ⬜     |
-| 059 | regex_named_groups          | `re.match`, named groups, `groupdict`             | ⬜     |
-| 060 | regex_substitution          | `re.sub` with a replacement function              | ⬜     |
-| 061 | json_roundtrip              | `dumps`/`loads`, `default=`, custom encoder       | ⬜     |
+| 057 | functools_partial           | partial application, freezing keywords            | ✅     |
+| 058 | functools_cache             | `cache`/`lru_cache`, memoization                  | ✅     |
+| 059 | regex_named_groups          | `re.match`, named groups, `groupdict`             | ✅     |
+| 060 | regex_substitution          | `re.sub` with a replacement function              | ✅     |
+| 061 | json_roundtrip              | `dumps`/`loads`, `default=`, custom encoder       | ✅     |
 | 062 | csv_dictreader              | `csv.DictReader`/`DictWriter`, quoting            | ⬜     |
 | 063 | argparse_cli                | `argparse`, subcommands, `type=`                  | ⬜     |
 | 064 | custom_exception_hierarchy  | exception base classes, `raise … from`            | ⬜     |
