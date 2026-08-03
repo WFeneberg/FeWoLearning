@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 13 ✅ / 87 ⬜**
+**Status: 18 ✅ / 82 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -31,11 +31,11 @@ exceptions, file I/O, `pathlib`, `datetime`, `collections.Counter`, sorting with
 | 009 | dict_comprehension      | dict/set comprehensions, inverting a mapping          | ✅     |
 | 010 | slicing                 | slice syntax, negative indices and steps, copies      | ✅     |
 | 011 | enumerate_zip           | `enumerate`, `zip`, strict parallel iteration         | ✅     |
-| 012 | sum_of_digits           | `while`, `divmod`, integer arithmetic                 | ⬜     |
-| 013 | fizz_buzz               | conditionals, modulo, string building                 | ⬜     |
-| 014 | default_arguments       | default parameters, the mutable-default trap          | ⬜     |
-| 015 | args_kwargs             | `*args`, `**kwargs`, argument forwarding              | ⬜     |
-| 016 | keyword_only_params     | keyword-only and positional-only markers              | ⬜     |
+| 012 | sum_of_digits           | `while`, `divmod`, integer arithmetic                 | ✅     |
+| 013 | fizz_buzz               | conditionals, modulo, string building                 | ✅     |
+| 014 | default_arguments       | default parameters, the mutable-default trap          | ✅     |
+| 015 | args_kwargs             | `*args`, `**kwargs`, argument forwarding              | ✅     |
+| 016 | keyword_only_params     | keyword-only and positional-only markers              | ✅     |
 | 017 | exception_handling      | `try`/`except`/`else`/`finally`, re-raising           | ⬜     |
 | 018 | input_validation        | raising `ValueError` with useful messages             | ⬜     |
 | 019 | file_read_lines         | `open`, context manager, iterating lines              | ⬜     |
