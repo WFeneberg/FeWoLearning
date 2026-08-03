@@ -107,8 +107,15 @@ work queue.
 3. For each exercise write the stub (header comment with `Goal:` / `Drills:` /
    `Passes:`), its test, and the reference solution under `solutions/<tier>/`.
    Register Rust exercises in `exercises/lib.rs`.
-4. **Red check**, filtered to the five — and confirm each failure is caused by the
-   TODO, not by an import or compile error. A stub that fails to build is a bug.
+4. **Red check**, filtered to the five. Confirm each failure is caused by the TODO,
+   not by an import or compile error (a stub that fails to build is a bug), and that
+   **no test passes**. Two ways a test accidentally passes against a stub:
+   - Python: `NotImplementedError` **subclasses `RuntimeError`**, so
+     `pytest.raises(RuntimeError)` is satisfied by any stub. Use a locally defined
+     exception type instead.
+   - A test that asserts an error the *signature* produces (wrong call style, wrong
+     arity) passes before the body ever runs. Assert on introspected metadata
+     instead, or leave the signature itself to the learner.
 5. **Green check** by overlaying the solutions:
    - `vue`/`angular`: copy the `*.test.ts` / `*.spec.ts` into the matching
      `solutions/` folder; `vitest.config.ts` already collects them (Jest needs
