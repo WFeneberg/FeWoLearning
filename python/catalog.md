@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 3 ✅ / 97 ⬜**
+**Status: 8 ✅ / 92 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -21,11 +21,11 @@ exceptions, file I/O, `pathlib`, `datetime`, `collections.Counter`, sorting with
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
 | 001 | temperature             | functions, arithmetic, floats                         | ✅     |
-| 002 | string_formatting       | f-strings, format specs, alignment, rounding          | ⬜     |
-| 003 | string_methods          | split/join/strip/replace, case folding                | ⬜     |
-| 004 | list_operations         | append/extend/insert/pop, in-place sorting            | ⬜     |
-| 005 | tuple_unpacking         | packing, star-targets, swapping                       | ⬜     |
-| 006 | set_operations          | set algebra, membership, deduplication                | ⬜     |
+| 002 | string_formatting       | f-strings, format specs, alignment, rounding          | ✅     |
+| 003 | string_methods          | split/join/strip/replace, case folding                | ✅     |
+| 004 | list_operations         | append/extend/insert/pop, in-place sorting            | ✅     |
+| 005 | tuple_unpacking         | packing, star-targets, swapping                       | ✅     |
+| 006 | set_operations          | set algebra, membership, deduplication                | ✅     |
 | 007 | dict_lookup_default     | `dict.get`, `setdefault`, missing keys                | ⬜     |
 | 008 | list_comprehension      | comprehensions with filters, nested iteration         | ⬜     |
 | 009 | dict_comprehension      | dict/set comprehensions, inverting a mapping          | ⬜     |
