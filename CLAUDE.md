@@ -95,12 +95,33 @@ Run every command **from inside the track folder**, not the repo root.
 
 ## Adding or completing exercises
 
-1. Create the stub under `exercises/<tier>/` and its test; confirm the test is red.
-2. Add the mirrored reference under `solutions/<tier>/`; confirm it turns the test
-   green when overlaid.
-3. Register it where the track requires (Rust: `exercises/lib.rs`; others are
-   auto-discovered by the test runner).
-4. Update the track's `catalog.md` row from ⬜ to ✅.
+Work in **batches of five**, and do not re-inventory the disk — `catalog.md` is the
+work queue.
+
+1. Read the track's `catalog.md`; the next five ⬜ rows are the assignment. Their
+   Slug and Concepts columns are the spec.
+2. Read **one** already-finished exercise from the same tier as a style template —
+   once per tier, not once per batch.
+3. For each exercise write the stub (header comment with `Goal:` / `Drills:` /
+   `Passes:`), its test, and the reference solution under `solutions/<tier>/`.
+   Register Rust exercises in `exercises/lib.rs`.
+4. **Red check**, filtered to the five — and confirm each failure is caused by the
+   TODO, not by an import or compile error. A stub that fails to build is a bug.
+5. **Green check** by overlaying the solutions:
+   - `vue`/`angular`: copy the `*.test.ts` / `*.spec.ts` into the matching
+     `solutions/` folder; `vitest.config.ts` already collects them (Jest needs
+     `--testMatch='**/solutions/**/*.spec.ts'`).
+   - `python`/`go`/`rust`/`dotnet`: copy the track into the scratchpad, overlay each
+     solution onto its stub, delete `solutions/`, run the tests there.
+6. Run the track's type gate: `npm run typecheck:solutions` (vue), `go vet ./...`.
+   `solutions/` must stay clean; a couple of errors under `exercises/` are expected
+   and documented.
+7. Flip exactly those five `catalog.md` rows ⬜ → ✅ and update its `**Status:**`
+   line. Beware: some catalogs pad the status cell (`⬜     |`), others do not.
+8. Commit as `<track>: exNNN–exNNN`. Stage explicit paths — `git add -A` has
+   already swept up unrelated files once.
+
+Keep the batch's test run filtered; run the full suite once per completed tier.
 
 ## Current state
 
