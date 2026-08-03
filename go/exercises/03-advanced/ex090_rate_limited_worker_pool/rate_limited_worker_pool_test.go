@@ -2,19 +2,42 @@ package ratelimitedworkerpool
 
 import (
 	"context"
-	"runtime"
 	"testing"
 	"time"
 )
 
-// runCapped drives a Pool of `workers` goroutines over `numJobs` jobs through
-// a RateLimiter of the given burst `capacity`, feeding ticks to the limiter
-// one at a time from the test goroutine (never sleeping or reading the wall
-// clock). It continuously verifies the safety invariant that must hold no
-// matter how goroutines are scheduled: the number of jobs completed so far
-// can never exceed capacity + the number of ticks sent so far, since the
-// limiter can never have issued more permits than that. It returns the final
-// count of completed jobs and ticks sent.
+// recvResult takes the next Result off results, failing the test rather than
+// hanging forever if the pool stops making progress.
+func recvResult(t *testing.T, results <-chan Result) Result {
+	t.Helper()
+	select {
+	case r, ok := <-results:
+		if !ok {
+			t.Fatal("results channel closed before all jobs completed")
+		}
+		return r
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for the next result: the pool made no progress")
+		return Result{}
+	}
+}
+
+// runCapped drives a Pool of `workers` goroutines over `numJobs` jobs through a
+// RateLimiter of burst `capacity`, feeding ticks from the test goroutine
+// without ever sleeping or reading the wall clock.
+//
+// The tick schedule is what makes this deterministic. The limiter starts with
+// `capacity` permits and drops any tick that arrives while the bucket is full,
+// so the test must never tick into a full bucket — otherwise the permit is
+// silently lost, the pool starves, and no number of further ticks recovers a
+// one-permit-per-tick accounting. Therefore:
+//
+//  1. First drain the initial burst: read min(capacity, numJobs) results. Each
+//     result proves a worker consumed one permit, so once they are all in, the
+//     bucket is empty.
+//  2. Then send exactly one tick per remaining job and read exactly one result
+//     for it. With an empty bucket every tick grants exactly one permit, so
+//     completed jobs can never outrun capacity + ticksSent.
 func runCapped(t *testing.T, capacity, workers, numJobs int) (completed, ticksSent int) {
 	t.Helper()
 
@@ -33,36 +56,48 @@ func runCapped(t *testing.T, capacity, workers, numJobs int) (completed, ticksSe
 	results := pool.Run(context.Background(), jobs)
 
 	seen := make(map[int]bool, numJobs)
-
-	for {
-		select {
-		case r, ok := <-results:
-			if !ok {
-				return completed, ticksSent
-			}
-			if seen[r.JobID] {
-				t.Fatalf("job %d completed more than once", r.JobID)
-			}
-			seen[r.JobID] = true
-			if want := r.JobID * r.JobID; r.Value != want {
-				t.Fatalf("job %d value = %d, want %d", r.JobID, r.Value, want)
-			}
-			completed++
-			if completed > capacity+ticksSent {
-				t.Fatalf(
-					"rate cap exceeded: %d jobs completed after only %d ticks (burst capacity %d)",
-					completed, ticksSent, capacity,
-				)
-			}
-		default:
-			if ticksSent < numJobs {
-				ticks <- time.Time{}
-				ticksSent++
-			} else {
-				runtime.Gosched()
-			}
+	record := func(r Result) {
+		if seen[r.JobID] {
+			t.Fatalf("job %d completed more than once", r.JobID)
+		}
+		seen[r.JobID] = true
+		if want := r.JobID * r.JobID; r.Value != want {
+			t.Fatalf("job %d value = %d, want %d", r.JobID, r.Value, want)
+		}
+		completed++
+		if completed > capacity+ticksSent {
+			t.Fatalf(
+				"rate cap exceeded: %d jobs completed after only %d ticks (burst capacity %d)",
+				completed, ticksSent, capacity,
+			)
 		}
 	}
+
+	burst := capacity
+	if numJobs < burst {
+		burst = numJobs
+	}
+	for i := 0; i < burst; i++ {
+		record(recvResult(t, results))
+	}
+
+	for completed < numJobs {
+		ticks <- time.Time{}
+		ticksSent++
+		record(recvResult(t, results))
+	}
+
+	// Every job is accounted for, so the pool must now shut the channel.
+	select {
+	case _, ok := <-results:
+		if ok {
+			t.Fatal("received an extra result after every job had completed")
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("results channel was not closed after all jobs completed")
+	}
+
+	return completed, ticksSent
 }
 
 func TestRateLimiterNeverExceedsCap(t *testing.T) {
@@ -86,12 +121,13 @@ func TestRateLimiterNeverExceedsCap(t *testing.T) {
 				t.Fatalf("completed = %d, want all %d jobs to finish", completed, tc.numJobs)
 			}
 
-			needed := tc.numJobs - tc.capacity
-			if needed > 0 && ticksSent < needed {
-				t.Fatalf(
-					"expected at least %d ticks to drain the backlog beyond the initial burst, only sent %d",
-					needed, ticksSent,
-				)
+			// One tick per job beyond the initial burst — no more, no fewer.
+			wantTicks := tc.numJobs - tc.capacity
+			if wantTicks < 0 {
+				wantTicks = 0
+			}
+			if ticksSent != wantTicks {
+				t.Fatalf("ticksSent = %d, want exactly %d", ticksSent, wantTicks)
 			}
 		})
 	}

@@ -38,14 +38,17 @@ func TestMaxConcurrentHolders(t *testing.T) {
 	var cur int32 // number of goroutines currently holding the semaphore
 	var max int32 // highest value cur has ever reached
 
-	// ready is used as a rendezvous: each goroutine signals it has
-	// acquired the semaphore and is now parked, waiting for the test to
-	// release everyone at once. Because the channel has capacity `limit`
-	// and the semaphore itself only allows `limit` concurrent holders,
-	// draining exactly `limit` values from it deterministically proves
-	// that many goroutines are holding the semaphore simultaneously,
-	// with no sleeps or timing assumptions required.
-	ready := make(chan struct{}, limit)
+	// ready is used as a rendezvous: each goroutine signals it has acquired
+	// the semaphore and is now parked, waiting for the test to release
+	// everyone at once. Draining exactly `limit` values proves that many
+	// goroutines hold the semaphore simultaneously, with no sleeps or timing
+	// assumptions required.
+	//
+	// The capacity must cover *every* worker, not just `limit`: the test only
+	// ever drains the first `limit` sends, so a smaller buffer would leave the
+	// later workers blocked on this send while still holding a semaphore slot,
+	// and wg.Wait() below would deadlock.
+	ready := make(chan struct{}, workers)
 	proceed := make(chan struct{})
 
 	var wg sync.WaitGroup

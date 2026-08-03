@@ -18,6 +18,9 @@ func TestWorker(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
+			// Guarantees the context is released even on the timeout path.
+			// cancel is idempotent, so the explicit calls below stay valid.
+			defer cancel()
 
 			if tc.name == "already_canceled" {
 				cancel()

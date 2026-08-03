@@ -13,7 +13,9 @@ import (
 // BufferPool hands out *bytes.Buffer values for temporary use and reclaims
 // them via Put so their backing array can be reused by a later Get.
 type BufferPool struct {
-	// TODO: add a sync.Pool field
+	// TODO: wire this pool up in NewBufferPool by giving it a New func that
+	// allocates a fresh *bytes.Buffer.
+	pool sync.Pool
 }
 
 // NewBufferPool creates a ready-to-use BufferPool.
