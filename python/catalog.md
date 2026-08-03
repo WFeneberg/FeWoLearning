@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 23 ✅ / 77 ⬜**
+**Status: 28 ✅ / 72 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -41,11 +41,11 @@ exceptions, file I/O, `pathlib`, `datetime`, `collections.Counter`, sorting with
 | 019 | file_read_lines         | `open`, context manager, iterating lines              | ✅     |
 | 020 | file_write_text         | writing text files, newline handling, encodings       | ✅     |
 | 021 | pathlib_paths           | `pathlib.Path`, joining, suffixes, existence          | ✅     |
-| 022 | datetime_arithmetic     | `datetime`, `timedelta`, comparisons                  | ⬜     |
-| 023 | date_parsing            | `strptime`/`strftime`, ISO formats                    | ⬜     |
-| 024 | counter_most_common     | `collections.Counter`, `most_common`                  | ⬜     |
-| 025 | sort_with_key           | `sorted(key=…)`, `reverse`, stability                 | ⬜     |
-| 026 | sort_multiple_keys      | tuple keys, `operator.itemgetter`                     | ⬜     |
+| 022 | datetime_arithmetic     | `datetime`, `timedelta`, comparisons                  | ✅     |
+| 023 | date_parsing            | `strptime`/`strftime`, ISO formats                    | ✅     |
+| 024 | counter_most_common     | `collections.Counter`, `most_common`                  | ✅     |
+| 025 | sort_with_key           | `sorted(key=…)`, `reverse`, stability                 | ✅     |
+| 026 | sort_multiple_keys      | tuple keys, `operator.itemgetter`                     | ✅     |
 | 027 | min_max_key             | `min`/`max` with `key` and `default`                  | ⬜     |
 | 028 | any_all                 | `any`/`all`, generator expressions                    | ⬜     |
 | 029 | math_functions          | `math`: floor/ceil/sqrt/isclose                       | ⬜     |
