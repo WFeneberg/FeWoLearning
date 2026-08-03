@@ -25,4 +25,13 @@ Reference implementations mirror the tree under `solutions/<tier>/`.
 When you add a new exercise, add a matching `#[path = ...] pub mod ...;` line to
 `exercises/lib.rs`.
 
-See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **2 / 100**; the ⬜ rows are the work queue. Note `cargo test` cannot link on this machine yet — see the root `README.md`.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **2 / 100**; the ⬜ rows are the work queue.
+
+## Linking on this machine
+
+[`.cargo/config.toml`](.cargo/config.toml) sets `LIB` to VS 2022's desktop MSVC
+libraries plus the Windows 10 SDK. Without it, rustc picks a Visual Studio install
+that only ships `lib\onecore`, and `link.exe` fails with
+`LNK1104: cannot open file 'msvcrt.lib'`. The MSVC and SDK versions are pinned in
+that file — update them if Visual Studio is upgraded. See
+[`../docs/requirements.md`](../docs/requirements.md).

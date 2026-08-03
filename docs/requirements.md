@@ -21,37 +21,48 @@ Go and Rust are installed but **not on `PATH`** for a plain shell. They live at:
 - `C:\Program Files\Go\bin\go.exe`
 - `%USERPROFILE%\.cargo\bin\` (`cargo`, `rustc`, `rustup`, `clippy`, `rustfmt`)
 
-## Rust cannot link yet
+## Rust linking (fixed — keep in mind if VS is upgraded)
 
-`cargo test` fails with `linker 'link.exe' not found`. The `stable-x86_64-pc-windows-msvc`
-toolchain is the only one installed, and this machine is missing the pieces it
-needs:
+`cargo test` links correctly now, via [`rust/.cargo/config.toml`](../rust/.cargo/config.toml).
+The history matters because the fix is version-pinned.
 
-- `VC\Tools\MSVC\14.51.36231\lib\x64` — **absent** (only the compiler binaries
-  are present, not the libraries)
-- `C:\Program Files (x86)\Windows Kits\10\Lib` — **no Windows SDK**
-- `VC\Auxiliary\Build\vcvars64.bat` exists but calls a `vcvarsall.bat` that does not
+Two Visual Studio installs are present, and rustc auto-detects the **wrong** one:
 
-Fix by adding the C++ workload. This **must run elevated** — with `--passive` from
-a non-elevated shell the installer exits with code `5007` and does nothing:
+| Install                    | MSVC toolset  | Desktop `lib\x64` |
+|----------------------------|---------------|-------------------|
+| VS 18 Professional (picked by rustc) | `14.51.36231` | ❌ only `lib\onecore\{x64,x86}` |
+| VS 2022 Community          | `14.44.35207` | ✅ present        |
 
-```powershell
-& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe" modify `
-  --installPath "C:\Program Files\Microsoft Visual Studio\18\Professional" `
-  --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended
+So `link.exe` ran with a `LIB` that had no desktop `msvcrt.lib` and failed with:
+
+```
+LINK : fatal error LNK1104: cannot open file 'msvcrt.lib'
 ```
 
-Verify afterwards with `cargo test` in `rust/`.
+The Windows 10 SDK **is** installed (`10.0.22621.0` and `10.0.26100.0`, with
+`ucrt\x64` and `um\x64`) — that part of the earlier diagnosis was wrong.
 
-The lighter alternative, if you would rather not install the VS workload, is the
-GNU toolchain — `rustup` ships its own linker for it, so no MSVC or SDK is needed:
+The fix is to point `LIB` at VS 2022's desktop libs plus the SDK. `rust/.cargo/config.toml`
+does this through cargo's `[env]` table, so plain `cargo test` and RustRover both
+work with no developer shell. It is deliberately **not** `force = true`, so a real
+"x64 Native Tools" prompt (which exports its own `LIB`) still wins.
+
+**If either install is upgraded, refresh the two version numbers in that file.**
+Equivalent one-off from a shell:
+
+```powershell
+cmd /c 'call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" && cargo test'
+```
+
+Two alternatives, neither needed today: add
+`Microsoft.VisualStudio.Workload.NativeDesktop` to the VS 18 install via an
+**elevated** `setup.exe modify` (non-elevated `--passive` exits `5007` and does
+nothing), or switch to the GNU toolchain, which ships its own linker:
 
 ```powershell
 rustup toolchain install stable-x86_64-pc-windows-gnu
 rustup default stable-x86_64-pc-windows-gnu
 ```
-
-RustRover then has to be pointed at the `gnu` toolchain as well.
 
 ## Per-track test-runner dependencies
 
@@ -62,7 +73,7 @@ RustRover then has to be pointed at the `gnu` toolchain as well.
 | `vue/`    | `npm install` — done, `node_modules` present               |
 | `angular/`| `npm install` — done, `node_modules` and `package-lock.json` present |
 | `go/`     | none — `go mod download` already ran (`golang.org/x/sync`)  |
-| `rust/`   | blocked on the linker, see above                            |
+| `rust/`   | none — `.cargo/config.toml` supplies `LIB`, see above        |
 
 Set `GOTMPDIR` outside `%TEMP%` when running `go test`: on-access scanning can
 remove a freshly built test binary before Go execs it, which surfaces as

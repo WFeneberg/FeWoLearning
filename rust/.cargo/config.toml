@@ -1,0 +1,15 @@
+# MSVC link libraries for this machine.
+#
+# Two Visual Studio installs are present. The one rustc auto-detects
+# (VS 18 Professional, MSVC 14.51.36231) ships *only* the `lib\onecore`
+# variants — it has no desktop `lib\x64`, so `link.exe` fails with
+# `LNK1104: cannot open file 'msvcrt.lib'`. VS 2022 Community
+# (MSVC 14.44.35207) does have the desktop libs, so point LIB at those
+# plus the Windows 10 SDK.
+#
+# Not `force = true`: a real "x64 Native Tools" developer shell already
+# exports LIB, and that should win over this fallback.
+#
+# Update the two version numbers if either install is upgraded.
+[env]
+LIB = "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.26100.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.26100.0\\um\\x64"
