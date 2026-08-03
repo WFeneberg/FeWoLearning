@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 67 ✅ / 33 ⬜**
+**Status: 71 ✅ / 29 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -96,10 +96,10 @@ Generators & `yield`, decorators, context managers, `dataclasses`, `enum`,
 | 064 | custom_exception_hierarchy  | exception base classes, `raise … from`            | ✅     |
 | 065 | defaultdict_grouping        | `defaultdict(list)`, grouping records             | ✅     |
 | 066 | chainmap_layers             | `ChainMap`, layered configuration                 | ✅     |
-| 067 | deque_ring_buffer           | `deque`, `maxlen`, `rotate`                       | ⬜     |
-| 068 | comprehension_vs_generator  | memory behaviour, when each is right              | ⬜     |
-| 069 | unpacking_operators         | `*`/`**` in calls and literals, merging dicts     | ⬜     |
-| 070 | cmp_to_key_sorting          | `functools.cmp_to_key`, stable multi-key sort     | ⬜     |
+| 067 | deque_ring_buffer           | `deque`, `maxlen`, `rotate`                       | ✅     |
+| 068 | comprehension_vs_generator  | memory behaviour, when each is right              | ✅     |
+| 069 | unpacking_operators         | `*`/`**` in calls and literals, merging dicts     | ✅     |
+| 070 | cmp_to_key_sorting          | `functools.cmp_to_key`, stable multi-key sort     | ✅     |
 
 ## Advanced (071–090) — concurrency, performance, internals
 
