@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 8 ✅ / 92 ⬜**
+**Status: 13 ✅ / 87 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -26,11 +26,11 @@ exceptions, file I/O, `pathlib`, `datetime`, `collections.Counter`, sorting with
 | 004 | list_operations         | append/extend/insert/pop, in-place sorting            | ✅     |
 | 005 | tuple_unpacking         | packing, star-targets, swapping                       | ✅     |
 | 006 | set_operations          | set algebra, membership, deduplication                | ✅     |
-| 007 | dict_lookup_default     | `dict.get`, `setdefault`, missing keys                | ⬜     |
-| 008 | list_comprehension      | comprehensions with filters, nested iteration         | ⬜     |
-| 009 | dict_comprehension      | dict/set comprehensions, inverting a mapping          | ⬜     |
-| 010 | slicing                 | slice syntax, negative indices and steps, copies      | ⬜     |
-| 011 | enumerate_zip           | `enumerate`, `zip`, strict parallel iteration         | ⬜     |
+| 007 | dict_lookup_default     | `dict.get`, `setdefault`, missing keys                | ✅     |
+| 008 | list_comprehension      | comprehensions with filters, nested iteration         | ✅     |
+| 009 | dict_comprehension      | dict/set comprehensions, inverting a mapping          | ✅     |
+| 010 | slicing                 | slice syntax, negative indices and steps, copies      | ✅     |
+| 011 | enumerate_zip           | `enumerate`, `zip`, strict parallel iteration         | ✅     |
 | 012 | sum_of_digits           | `while`, `divmod`, integer arithmetic                 | ⬜     |
 | 013 | fizz_buzz               | conditionals, modulo, string building                 | ⬜     |
 | 014 | default_arguments       | default parameters, the mutable-default trap          | ⬜     |

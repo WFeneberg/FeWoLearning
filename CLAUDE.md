@@ -51,17 +51,19 @@ tests there — do not add `solutions/` to a project/module.
 | `vue/`    | `npm install`                           | `npm test`               | `npm run test:one -- "increments"` |
 | `angular/`| `npm install`                           | `npm test`               | `npm run test:one -- "applies a discount"` |
 | `go/`     | — (deps already downloaded)             | `go test ./...`          | `go test ./exercises/01-beginner/ex001_fizzbuzz/` |
-| `rust/`   | — (⚠️ linker missing, see below)         | `cargo test`             | `cargo test ex001` |
+| `rust/`   | — (`LIB` comes from `.cargo/config.toml`) | `cargo test`           | `cargo test ex001` |
 
 Run every command **from inside the track folder**, not the repo root.
 
 ## Toolchain status (verified 2026-08-03)
 
 - ✅ Verified end-to-end: **.NET 10**, **Python 3.14**, **Node 26 / npm 11**
-  (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**.
-- ⚠️ **Rust cannot link.** `cargo` 1.97.1 is installed, but only the
-  `x86_64-pc-windows-msvc` target, and the MSVC libraries plus the Windows SDK are
-  missing. Needs the VS C++ workload added **elevated** — see
+  (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**, **Rust 1.97.1**.
+- **Rust links via `rust/.cargo/config.toml`.** rustc auto-detects the VS 18
+  Professional toolset, which ships only `lib\onecore` and no desktop `lib\x64`, so
+  `link.exe` died with `LNK1104: cannot open file 'msvcrt.lib'`. That config's
+  `[env]` table points `LIB` at VS 2022 Community's `lib\x64` plus the Windows 10
+  SDK. The MSVC/SDK versions are pinned there — a VS upgrade breaks it. See
   [`docs/requirements.md`](docs/requirements.md).
 - Go and Rust are **not on `PATH`**: prepend `C:\Program Files\Go\bin` and
   `%USERPROFILE%\.cargo\bin` before invoking them from a plain shell.
@@ -134,13 +136,13 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `dotnet/` | 100 / 100  | —         |
 | `go/`     | 100 / 100  | —         |
 | `vue/`    | 100 / 100  | —         |
-| `python/` | 8 / 100    | 92        |
+| `python/` | 13 / 100   | 87        |
 | `angular/`| 2 / 100    | 98        |
 | `rust/`   | 2 / 100    | 98        |
 
 Work order for the remaining exercises: **python → angular → rust**, in
 batches of five, each batch red-verified then green-verified before its catalog
-rows flip. Rust is gated on the linker fix above.
+rows flip. Rust is no longer gated — `cargo test` links and runs.
 
 `dotnet/`, `go/` and `vue/` are content-complete. `go/` was verified by overlaying
 every reference solution onto its stub (`go vet ./...` clean, 100 stubs red, 100

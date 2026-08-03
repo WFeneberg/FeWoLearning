@@ -12,23 +12,18 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `dotnet/`   | C# / .NET (Core, WPF, Avalonia, Uno, Blazor) | xUnit | **100 / 100** | ✅ .NET 10 |
 | `go/`       | Go                               | `go test`   | **100 / 100** | ✅ Go 1.26 |
 | `vue/`      | Vue 3 (Composition API, TS)      | Vitest      | **100 / 100** | ✅ Node 26 |
-| `python/`   | Python 3                         | pytest      | 8 / 100   | ✅ Python 3.14 |
+| `python/`   | Python 3                         | pytest      | 13 / 100  | ✅ Python 3.14 |
 | `angular/`  | Angular (standalone, signals, TS)| Jest        | 2 / 100   | ✅ Node 26 |
-| `rust/`     | Rust                             | `cargo test`| 2 / 100   | ⚠️ cannot link — see below |
+| `rust/`     | Rust                             | `cargo test`| 2 / 100   | ✅ Rust 1.97 |
 
 Each track's `catalog.md` is the authoritative per-exercise ledger: it lists all
 100 entries with ✅ (written and verified) or ⬜ (planned).
 
-**Rust is currently blocked.** The toolchain is installed but only for the
-`x86_64-pc-windows-msvc` target, and the MSVC libraries plus the Windows SDK are
-missing, so nothing links. Add the C++ workload through the Visual Studio
-installer, run **elevated**:
-
-```powershell
-& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe" modify `
-  --installPath "C:\Program Files\Microsoft Visual Studio\18\Professional" `
-  --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended
-```
+Rust needed one machine-local fix to link: rustc auto-detects a Visual Studio
+install that has no desktop `lib\x64`, so
+[`rust/.cargo/config.toml`](rust/.cargo/config.toml) points `LIB` at the install
+that does. Refresh the pinned MSVC/SDK versions there if Visual Studio is
+upgraded — details in [`docs/requirements.md`](docs/requirements.md).
 
 See [`docs/requirements.md`](docs/requirements.md) for exact versions and setup
 per track.
