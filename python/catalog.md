@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 28 ✅ / 72 ⬜**
+**Status: 33 ✅ / 67 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -46,11 +46,11 @@ exceptions, file I/O, `pathlib`, `datetime`, `collections.Counter`, sorting with
 | 024 | counter_most_common     | `collections.Counter`, `most_common`                  | ✅     |
 | 025 | sort_with_key           | `sorted(key=…)`, `reverse`, stability                 | ✅     |
 | 026 | sort_multiple_keys      | tuple keys, `operator.itemgetter`                     | ✅     |
-| 027 | min_max_key             | `min`/`max` with `key` and `default`                  | ⬜     |
-| 028 | any_all                 | `any`/`all`, generator expressions                    | ⬜     |
-| 029 | math_functions          | `math`: floor/ceil/sqrt/isclose                       | ⬜     |
-| 030 | random_sampling         | seeded `random`, `choice`/`sample`/`shuffle`          | ⬜     |
-| 031 | nested_data_access      | traversing nested dicts and lists safely              | ⬜     |
+| 027 | min_max_key             | `min`/`max` with `key` and `default`                  | ✅     |
+| 028 | any_all                 | `any`/`all`, generator expressions                    | ✅     |
+| 029 | math_functions          | `math`: floor/ceil/sqrt/isclose                       | ✅     |
+| 030 | random_sampling         | seeded `random`, `choice`/`sample`/`shuffle`          | ✅     |
+| 031 | nested_data_access      | traversing nested dicts and lists safely              | ✅     |
 | 032 | palindrome              | normalization, reversal, comparison                   | ⬜     |
 | 033 | range_step              | `range` with step, `reversed`                         | ⬜     |
 | 034 | list_rotation           | slicing assignment, rotation in place                 | ⬜     |
