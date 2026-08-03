@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 71 ✅ / 29 ⬜**
+**Status: 76 ✅ / 24 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -110,11 +110,11 @@ metaclasses, `__slots__`, custom iterators, `contextvars`, `heapq`,
 | #   | Slug                          | Concepts                                        | Status |
 |-----|-------------------------------|-------------------------------------------------|--------|
 | 071 | lru_cache                     | OrderedDict, eviction, generics                 | ✅     |
-| 072 | asyncio_gather                | `async def`, `await`, `asyncio.gather`          | ⬜     |
-| 073 | asyncio_timeout_cancel        | `wait_for`, `CancelledError`, cleanup           | ⬜     |
-| 074 | asyncio_queue_workers         | `asyncio.Queue`, worker tasks, `join`           | ⬜     |
-| 075 | asyncio_semaphore             | `Semaphore`, bounded concurrency                | ⬜     |
-| 076 | threading_lock_counter        | `Thread`, `Lock`, data races                    | ⬜     |
+| 072 | asyncio_gather                | `async def`, `await`, `asyncio.gather`          | ✅     |
+| 073 | asyncio_timeout_cancel        | `wait_for`, `CancelledError`, cleanup           | ✅     |
+| 074 | asyncio_queue_workers         | `asyncio.Queue`, worker tasks, `join`           | ✅     |
+| 075 | asyncio_semaphore             | `Semaphore`, bounded concurrency                | ✅     |
+| 076 | threading_lock_counter        | `Thread`, `Lock`, data races                    | ✅     |
 | 077 | futures_as_completed          | `ThreadPoolExecutor`, `as_completed`            | ⬜     |
 | 078 | process_pool_cpu_bound        | `ProcessPoolExecutor`, picklability, the GIL    | ⬜     |
 | 079 | descriptor_validation         | `__get__`/`__set__`/`__set_name__`              | ⬜     |

@@ -31,4 +31,4 @@ Module names are prefixed `exNNN_` so they are importable (Python modules cannot
 start with a digit). Tier folders are on the pytest `pythonpath`, so tests import
 the stub directly: `from ex001_temperature import celsius_to_fahrenheit`.
 
-See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **71 / 100**; the ⬜ rows are the work queue.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **76 / 100**; the ⬜ rows are the work queue.
