@@ -1,4 +1,5 @@
-import { describe, expect, it, nextTick } from "vitest";
+import { describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 import { useWatchBasic } from "./useWatchBasic";
 
 describe("useWatchBasic", () => {

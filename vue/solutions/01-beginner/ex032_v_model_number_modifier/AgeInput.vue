@@ -10,5 +10,7 @@ defineExpose({ age });
 </script>
 
 <template>
-  <input type="number" v-model.number="age" data-testid="age-input" />
+  <!-- .number runs the typed string through parseFloat before assigning it to
+       `age`. Without the modifier this text input would store "42", a string. -->
+  <input type="text" v-model.number="age" data-testid="age-input" />
 </template>

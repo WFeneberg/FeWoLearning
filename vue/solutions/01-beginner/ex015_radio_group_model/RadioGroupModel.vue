@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-export const fruits = ["apple", "banana", "cherry"] as const;
+const fruits = ["apple", "banana", "cherry"] as const;
 
 const choice = ref<string>("apple");
 </script>

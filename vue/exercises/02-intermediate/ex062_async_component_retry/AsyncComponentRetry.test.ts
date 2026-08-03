@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
-import { defineComponent, h } from "vue";
+import { defineComponent, h, type Component } from "vue";
 import { createRetryAsyncComponent } from "./AsyncComponentRetry";
 
 const ResolvedComponent = defineComponent({
@@ -8,11 +8,21 @@ const ResolvedComponent = defineComponent({
   render: () => h("div", { class: "resolved" }, "Loaded!"),
 });
 
+/**
+ * An async component has to be rendered as a *child* to observe its
+ * loading/error/resolved states: mounting one as the root component leaves the
+ * wrapper pinned to the first render, so it would appear stuck on "Loading..."
+ * forever no matter how often you flush.
+ */
+function mountAsChild(AsyncComp: Component) {
+  return mount(defineComponent({ render: () => h(AsyncComp) }));
+}
+
 describe("createRetryAsyncComponent", () => {
   it("shows the loading state while the first load is pending", () => {
-    const loader = vi.fn(() => new Promise(() => {}));
-    const AsyncComp = createRetryAsyncComponent(loader);
-    const wrapper = mount(AsyncComp);
+    const loader = vi.fn(() => new Promise<Component>(() => {}));
+    const wrapper = mountAsChild(createRetryAsyncComponent(loader));
+
     expect(wrapper.text()).toContain("Loading...");
   });
 
@@ -25,10 +35,8 @@ describe("createRetryAsyncComponent", () => {
       }
       return Promise.resolve(ResolvedComponent);
     });
-    const AsyncComp = createRetryAsyncComponent(loader);
-    const wrapper = mount(AsyncComp);
+    const wrapper = mountAsChild(createRetryAsyncComponent(loader));
 
-    await flushPromises();
     await flushPromises();
 
     expect(loader).toHaveBeenCalledTimes(2);
@@ -38,12 +46,11 @@ describe("createRetryAsyncComponent", () => {
 
   it("gives up after a second failure and renders the error component", async () => {
     const loader = vi.fn(() => Promise.reject(new Error("still failing")));
-    const AsyncComp = createRetryAsyncComponent(loader);
-    const wrapper = mount(AsyncComp);
+    const wrapper = mountAsChild(createRetryAsyncComponent(loader));
 
     await flushPromises();
-    await flushPromises();
 
+    // Exactly one retry: the loader runs twice, then `fail()` ends it.
     expect(loader).toHaveBeenCalledTimes(2);
     expect(wrapper.find(".async-error").exists()).toBe(true);
     expect(wrapper.text()).toContain("Failed to load component");
