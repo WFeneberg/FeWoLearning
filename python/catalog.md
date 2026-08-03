@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 37 ✅ / 63 ⬜**
+**Status: 42 ✅ / 58 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -66,11 +66,11 @@ Generators & `yield`, decorators, context managers, `dataclasses`, `enum`,
 | #   | Slug                        | Concepts                                          | Status |
 |-----|-----------------------------|---------------------------------------------------|--------|
 | 036 | word_frequency              | Counter, regex, sort keys                         | ✅     |
-| 037 | generator_fibonacci         | generators, `yield`, laziness                     | ⬜     |
-| 038 | generator_pipeline          | chained generators, streaming transformation      | ⬜     |
-| 039 | yield_from_flatten          | `yield from`, recursive flattening                | ⬜     |
-| 040 | decorator_timing            | decorators, `functools.wraps`                     | ⬜     |
-| 041 | decorator_with_args         | decorator factories, nested closures              | ⬜     |
+| 037 | generator_fibonacci         | generators, `yield`, laziness                     | ✅     |
+| 038 | generator_pipeline          | chained generators, streaming transformation      | ✅     |
+| 039 | yield_from_flatten          | `yield from`, recursive flattening                | ✅     |
+| 040 | decorator_timing            | decorators, `functools.wraps`                     | ✅     |
+| 041 | decorator_with_args         | decorator factories, nested closures              | ✅     |
 | 042 | decorator_retry             | retrying wrappers, exception handling             | ⬜     |
 | 043 | context_manager_class       | `__enter__`/`__exit__`, exception suppression     | ⬜     |
 | 044 | context_manager_contextlib  | `@contextmanager`, `try`/`finally` in generators  | ⬜     |
