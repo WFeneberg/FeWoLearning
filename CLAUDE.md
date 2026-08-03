@@ -112,18 +112,19 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 |-----------|------------|-----------|
 | `dotnet/` | 100 / 100  | —         |
 | `go/`     | 100 / 100  | —         |
-| `vue/`    | 92 / 100   | 093–100   |
+| `vue/`    | 100 / 100  | —         |
 | `python/` | 3 / 100    | 97        |
 | `angular/`| 2 / 100    | 98        |
 | `rust/`   | 2 / 100    | 98        |
 
-Work order for the remaining exercises: **vue → python → angular → rust**, in
+Work order for the remaining exercises: **python → angular → rust**, in
 batches of five, each batch red-verified then green-verified before its catalog
 rows flip. Rust is gated on the linker fix above.
 
-`dotnet/` and `go/` are content-complete and were verified by overlaying every
-reference solution onto its stub: `go vet ./...` clean, 100 stubs red, 100
-solutions green.
+`dotnet/`, `go/` and `vue/` are content-complete. `go/` was verified by overlaying
+every reference solution onto its stub (`go vet ./...` clean, 100 stubs red, 100
+solutions green); `vue/` runs 100 red exercise suites and 72 green solution suites,
+with `npm run typecheck:solutions` at zero errors.
 
 ## Known gaps
 

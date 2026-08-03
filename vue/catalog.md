@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Each exercise is a folder
 `exercises/<tier>/exNNN_<slug>/` holding the stub plus its `*.test.ts`.
 
-**Status: 97 ✅ / 3 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 `vitest.config.ts` collects `solutions/**/*.test.ts` as well, so a test copied
 into a solution folder verifies the reference implementation. That coverage is
@@ -135,6 +135,6 @@ with `vue` alone.
 | 095 | design_system_tokens | token layer, CSS custom properties, provide/inject theming | ✅ |
 | 096 | schema_driven_form_engine | schema to form generation, declarative validation rules, dynamic components | ✅ |
 | 097 | undo_redo_history | history composable, snapshot/patch stack, undo/redo invariants | ✅ |
-| 098 | websocket_live_store | WebSocket-backed reactive store, reconnect, optimistic updates | ⬜ |
-| 099 | micro_frontend_mount | multiple app instances, isolated mounting and teardown | ⬜ |
-| 100 | a11y_audited_widget | ARIA roles and states, keyboard navigation, focus management | ⬜ |
+| 098 | websocket_live_store | WebSocket-backed reactive store, reconnect, optimistic updates | ✅ |
+| 099 | micro_frontend_mount | multiple app instances, isolated mounting and teardown | ✅ |
+| 100 | a11y_audited_widget | ARIA roles and states, keyboard navigation, focus management | ✅ |
