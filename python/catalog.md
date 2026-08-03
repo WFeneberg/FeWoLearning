@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 18 ✅ / 82 ⬜**
+**Status: 23 ✅ / 77 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -36,11 +36,11 @@ exceptions, file I/O, `pathlib`, `datetime`, `collections.Counter`, sorting with
 | 014 | default_arguments       | default parameters, the mutable-default trap          | ✅     |
 | 015 | args_kwargs             | `*args`, `**kwargs`, argument forwarding              | ✅     |
 | 016 | keyword_only_params     | keyword-only and positional-only markers              | ✅     |
-| 017 | exception_handling      | `try`/`except`/`else`/`finally`, re-raising           | ⬜     |
-| 018 | input_validation        | raising `ValueError` with useful messages             | ⬜     |
-| 019 | file_read_lines         | `open`, context manager, iterating lines              | ⬜     |
-| 020 | file_write_text         | writing text files, newline handling, encodings       | ⬜     |
-| 021 | pathlib_paths           | `pathlib.Path`, joining, suffixes, existence          | ⬜     |
+| 017 | exception_handling      | `try`/`except`/`else`/`finally`, re-raising           | ✅     |
+| 018 | input_validation        | raising `ValueError` with useful messages             | ✅     |
+| 019 | file_read_lines         | `open`, context manager, iterating lines              | ✅     |
+| 020 | file_write_text         | writing text files, newline handling, encodings       | ✅     |
+| 021 | pathlib_paths           | `pathlib.Path`, joining, suffixes, existence          | ✅     |
 | 022 | datetime_arithmetic     | `datetime`, `timedelta`, comparisons                  | ⬜     |
 | 023 | date_parsing            | `strptime`/`strftime`, ISO formats                    | ⬜     |
 | 024 | counter_most_common     | `collections.Counter`, `most_common`                  | ⬜     |

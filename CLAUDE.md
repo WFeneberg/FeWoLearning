@@ -136,7 +136,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `dotnet/` | 100 / 100  | —         |
 | `go/`     | 100 / 100  | —         |
 | `vue/`    | 100 / 100  | —         |
-| `python/` | 18 / 100   | 82        |
+| `python/` | 23 / 100   | 77        |
 | `angular/`| 2 / 100    | 98        |
 | `rust/`   | 2 / 100    | 98        |
 
