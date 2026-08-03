@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 52 ✅ / 48 ⬜**
+**Status: 57 ✅ / 43 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -81,11 +81,11 @@ Generators & `yield`, decorators, context managers, `dataclasses`, `enum`,
 | 049 | typing_generics             | `TypeVar`, `Generic`, a typed container           | ✅     |
 | 050 | typing_protocol             | `Protocol`, structural typing                     | ✅     |
 | 051 | typed_dict                  | `TypedDict`, `total=False`                        | ✅     |
-| 052 | namedtuple_record           | `NamedTuple`, field access, `_replace`            | ⬜     |
-| 053 | itertools_groupby           | `groupby`, sorting before grouping                | ⬜     |
-| 054 | itertools_chain_islice      | `chain`, `islice`, `takewhile`/`dropwhile`        | ⬜     |
-| 055 | itertools_combinatorics     | `product`, `combinations`, `permutations`         | ⬜     |
-| 056 | functools_reduce            | `reduce` with an initial value, fold semantics    | ⬜     |
+| 052 | namedtuple_record           | `NamedTuple`, field access, `_replace`            | ✅     |
+| 053 | itertools_groupby           | `groupby`, sorting before grouping                | ✅     |
+| 054 | itertools_chain_islice      | `chain`, `islice`, `takewhile`/`dropwhile`        | ✅     |
+| 055 | itertools_combinatorics     | `product`, `combinations`, `permutations`         | ✅     |
+| 056 | functools_reduce            | `reduce` with an initial value, fold semantics    | ✅     |
 | 057 | functools_partial           | partial application, freezing keywords            | ⬜     |
 | 058 | functools_cache             | `cache`/`lru_cache`, memoization                  | ⬜     |
 | 059 | regex_named_groups          | `re.match`, named groups, `groupdict`             | ⬜     |
