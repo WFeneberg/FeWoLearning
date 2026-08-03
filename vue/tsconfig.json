@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["exercises", "solutions"]
+  "include": ["exercises", "solutions", "jsx-shim.d.ts"]
 }

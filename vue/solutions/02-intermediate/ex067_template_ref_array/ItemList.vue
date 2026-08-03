@@ -2,7 +2,7 @@
   Exercise 067 — ItemList component (reference solution).
 -->
 <script setup lang="ts">
-import { onBeforeUpdate, ref } from "vue";
+import { onBeforeUpdate, ref, type ComponentPublicInstance } from "vue";
 
 const props = defineProps<{
   items: string[];
@@ -15,7 +15,7 @@ onBeforeUpdate(() => {
   itemRefs.value = [];
 });
 
-function setItemRef(el: Element | null): void {
+function setItemRef(el: Element | ComponentPublicInstance | null): void {
   if (el) {
     itemRefs.value.push(el as HTMLLIElement);
   }

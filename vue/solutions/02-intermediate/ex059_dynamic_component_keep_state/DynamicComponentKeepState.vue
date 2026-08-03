@@ -2,25 +2,25 @@
   Exercise 059 — DynamicComponentKeepState component (reference solution).
 -->
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, defineComponent } from "vue";
 
-const PanelA = {
+const PanelA = defineComponent({
   name: "PanelA",
   props: { start: { type: Number, default: 0 } },
   template: `<section><button @click="count++">{{ count }}</button></section>`,
-  data() {
+  data(): { count: number } {
     return { count: this.start };
   },
-};
+});
 
-const PanelB = {
+const PanelB = defineComponent({
   name: "PanelB",
   props: { start: { type: Number, default: 0 } },
   template: `<section><button @click="count++">{{ count }}</button></section>`,
-  data() {
+  data(): { count: number } {
     return { count: this.start };
   },
-};
+});
 
 export type PanelName = "a" | "b";
 

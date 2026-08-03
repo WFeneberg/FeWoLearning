@@ -6,7 +6,7 @@
           ref() array, clearing stale refs on re-render (onBeforeUpdate).
 -->
 <script setup lang="ts">
-import { onBeforeUpdate, ref } from "vue";
+import { onBeforeUpdate, ref, type ComponentPublicInstance } from "vue";
 
 const props = defineProps<{
   items: string[];
@@ -19,7 +19,9 @@ onBeforeUpdate(() => {
   itemRefs.value = [];
 });
 
-function setItemRef(_el: Element | null): void {
+// A `:ref` callback is handed either an Element or, on a component, its public
+// instance — the signature has to admit both to satisfy Vue's VNodeRef type.
+function setItemRef(_el: Element | ComponentPublicInstance | null): void {
   throw new Error("TODO: implement setItemRef to collect the DOM node");
 }
 

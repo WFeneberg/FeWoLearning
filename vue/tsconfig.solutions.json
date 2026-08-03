@@ -1,0 +1,9 @@
+{
+  // The type-clean gate. `exercises/` can never fully type-check while stubs are
+  // unimplemented: ex030's whole task *is* declaring the prop its template reads,
+  // and a stub whose setup() throws has return type `never`, which poisons
+  // mount()/component types downstream. `solutions/` has no such excuse, so that
+  // is what CI-style checking should assert. Run via `npm run typecheck:solutions`.
+  "extends": "./tsconfig.json",
+  "include": ["solutions", "jsx-shim.d.ts"]
+}

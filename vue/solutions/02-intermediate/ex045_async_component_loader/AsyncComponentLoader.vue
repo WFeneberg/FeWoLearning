@@ -2,16 +2,20 @@
   Exercise 045 — AsyncComponentLoader component (reference solution).
 -->
 <script setup lang="ts">
-import { defineAsyncComponent, h } from "vue";
+import { defineAsyncComponent, defineComponent, h } from "vue";
+
+// defineComponent (rather than a bare object literal) is what lets TypeScript
+// infer `props` inside setup from the `props` declaration.
+const RemoteGreeting = defineComponent({
+  name: "RemoteGreeting",
+  props: { name: { type: String, required: true } },
+  setup(props) {
+    return () => h("p", { class: "remote-greeting" }, `Hello, ${props.name}!`);
+  },
+});
 
 function loadRemoteComponent() {
-  return Promise.resolve({
-    name: "RemoteGreeting",
-    props: { name: { type: String, required: true } },
-    setup(props: { name: string }) {
-      return () => h("p", { class: "remote-greeting" }, `Hello, ${props.name}!`);
-    },
-  });
+  return Promise.resolve(RemoteGreeting);
 }
 
 const AsyncGreeting = defineAsyncComponent({

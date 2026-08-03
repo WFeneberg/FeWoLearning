@@ -108,6 +108,20 @@ rm -rf solutions && <the track's test command>
 In Rust the solution files must keep a copy of the stub's `#[cfg(test)] mod tests`
 block, otherwise overlaying deletes the tests along with the stub.
 
+### `exercises/` cannot be type-clean, by design
+
+In the TypeScript tracks a throwing stub has return type `never`, which poisons
+everything downstream — `mount(Stub)` infers `never`, so `wrapper.vm` and
+`wrapper.element` stop type-checking. And some exercises *are* the missing
+declaration: `vue/` ex030 asks the learner to declare the `level` prop that its
+own template reads, so the template cannot type-check until they do.
+
+So `npm run typecheck` reporting a couple of errors under `exercises/` is
+expected. The real gate is `npm run typecheck:solutions` (vue), which must stay at
+zero. When writing a test, prefer `nextTick()` from `vue` over `wrapper.vm.$nextTick()`
+and cast `wrapper.element as HTMLElement` — that keeps a new test type-clean even
+against a throwing stub.
+
 ### Per-track quirks
 
 - **`python/`** — `pyproject.toml` has no `[build-system]` table although the

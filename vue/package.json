@@ -7,7 +7,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:one": "vitest run -t",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "typecheck:solutions": "vue-tsc --noEmit -p tsconfig.solutions.json"
   },
   "dependencies": {
     "vue": "^3.4.0"

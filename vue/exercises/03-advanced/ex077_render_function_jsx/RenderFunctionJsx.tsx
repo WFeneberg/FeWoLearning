@@ -8,16 +8,9 @@
 /** @jsxFrag Fragment */
 import { defineComponent, h, Fragment, type PropType } from "vue";
 
-// Local ambient JSX typings so this file type-checks without a project-wide
-// JSX configuration: Vue's `h()` is used as the classic JSX factory above.
-declare global {
-  namespace JSX {
-    interface Element extends ReturnType<typeof h> {}
-    interface IntrinsicElements {
-      [name: string]: any;
-    }
-  }
-}
+// No local ambient JSX declaration here: @vue/runtime-dom already ships global
+// JSX typings, and re-declaring IntrinsicElements adds a second index signature
+// for `string`, which TypeScript rejects (TS2374).
 
 export type Status = "online" | "offline";
 
