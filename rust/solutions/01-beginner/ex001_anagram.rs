@@ -13,3 +13,22 @@ fn normalize(s: &str) -> Vec<char> {
     chars.sort_unstable();
     chars
 }
+
+// Kept identical to the stub's test module: overlaying this file onto the stub
+// must not remove the tests, otherwise the solution can never be verified.
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn detects_anagrams() {
+        assert!(is_anagram("listen", "silent"));
+        assert!(is_anagram("Dormitory", "dirty room"));
+    }
+
+    #[test]
+    fn rejects_non_anagrams() {
+        assert!(!is_anagram("hello", "world"));
+        assert!(!is_anagram("abc", "abcd"));
+    }
+}

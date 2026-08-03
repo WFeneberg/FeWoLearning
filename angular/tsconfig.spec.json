@@ -1,0 +1,14 @@
+{
+  // jest-preset-angular's default (non-ESM) preset points its ts-jest
+  // transformer at <rootDir>/tsconfig.spec.json. Without this file the preset
+  // falls back to defaults that ignore the decorator and strictTemplates
+  // settings in tsconfig.json, so `npm test` cannot compile the exercises.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Jest runs the compiled output through CommonJS require(), not ESM.
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "types": ["jest", "node"]
+  },
+  "include": ["exercises/**/*.ts", "solutions/**/*.ts", "setup-jest.ts"]
+}
