@@ -14,23 +14,48 @@ Exercises are numbered `001`–`100` per language and grouped into four tiers:
 | `03-advanced`      | 071–090   | Concurrency, performance, memory, advanced patterns|
 | `04-expert`        | 091–100   | Architecture, DSLs, metaprogramming, systems design|
 
-The full per-language list lives in each folder's `catalog.md`.
+The per-language ledger lives in each folder's `catalog.md`, which lists all 100
+entries with a ✅ / ⬜ status. That file is the source of truth for what is done
+and what is next.
+
+## Naming
+
+Identifiers cannot start with a digit in most of these languages, so the number
+is prefixed:
+
+| Track     | Exercise unit                                   | Example                                     |
+|-----------|-------------------------------------------------|---------------------------------------------|
+| `dotnet/` | one file per exercise, tier-wide namespace      | `exercises/01-beginner/Ex001_FizzBuzz.cs`    |
+| `python/` | module file + sibling test module               | `exercises/01-beginner/ex001_temperature.py` |
+| `go/`     | one package per exercise, in its own folder     | `exercises/01-beginner/ex001_fizzbuzz/`      |
+| `rust/`   | one file per exercise, registered in `lib.rs`   | `exercises/01-beginner/ex001_anagram.rs`     |
+| `vue/`    | folder with stub + colocated `*.test.ts`        | `exercises/01-beginner/ex001_use_counter/`   |
+| `angular/`| folder with stub + colocated `*.spec.ts`        | `exercises/01-beginner/ex001_pricing_service/` |
+
+Go package clauses drop the `exNNN_` prefix and the underscores
+(`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
+(`FeWoLearning.Exercises.Beginner`), not the `NN-tier` folder name.
 
 ## Anatomy of one exercise
 
-Each exercise `NNN-slug` exists in two mirrored places:
+Each exercise exists in two mirrored places, at the same relative path:
 
-- `exercises/<tier>/NNN-slug` — the **stub** you edit (contains `TODO`s and a
-  failing test).
-- `solutions/<tier>/NNN-slug` — the **reference** implementation.
+- `exercises/<tier>/…` — the **stub** you edit, plus its failing test.
+- `solutions/<tier>/…` — the **reference** implementation.
 
-Each stub carries a header comment/README stating: the goal, the concepts it
-drills, and the acceptance criteria (what the test verifies).
+Each stub carries a header comment stating the goal, the concepts it drills
+(`Drills:`), and what the test verifies. The `Drills:` line is what populates the
+Concepts column of `catalog.md`, so keep it accurate and on one topic per clause.
+
+Stubs are written so the project still **compiles/imports** while unfinished:
+they `throw` / `panic` / `todo!()` / `raise NotImplementedError` at runtime rather
+than breaking the build. A stub that fails to compile is a bug — the learner
+would get a build error instead of a red test.
 
 ## Test-driven workflow
 
 1. Read the exercise header for the goal and constraints.
-2. Run the test — watch it fail (red).
+2. Run the test — watch it fail (red), **with the TODO message as the cause**.
 3. Implement until the test passes (green).
 4. Compare against the reference solution and note idiomatic differences.
 
@@ -39,6 +64,59 @@ root `CLAUDE.md`.
 
 ## Adding new exercises
 
-Keep the stub/solution pair in sync, register the exercise in the language's
-`catalog.md`, and make sure the stub's test **fails** before the solution is
-applied and **passes** after.
+1. Create the stub and its test under `exercises/<tier>/`; confirm it is red for
+   the right reason.
+2. Add the mirrored reference under `solutions/<tier>/`; confirm it turns the
+   test green when overlaid.
+3. Register it where the track requires it — **Rust needs a `#[path]` `pub mod`
+   line in `exercises/lib.rs`**, or the file is never compiled. The other tracks
+   are auto-discovered by their test runner.
+4. Flip the exercise's `catalog.md` row from ⬜ to ✅.
+
+## Known gaps
+
+These are deliberate, documented limitations rather than oversights. They exist
+because `solutions/` is intentionally kept out of each build (the files reuse the
+stubs' type and module names, so compiling both at once would collide).
+
+### `solutions/` is only partly verified
+
+| Track     | Are the reference solutions checked?                                        |
+|-----------|-----------------------------------------------------------------------------|
+| `dotnet/` | **No.** No project includes `solutions/`, so they are never even compiled.  |
+| `python/` | **No.** `testpaths = ["exercises"]` excludes them from collection.          |
+| `go/`     | Compiled only. They *are* in the module (so `go build`/`go vet` cover them) but ship no `_test.go`. |
+| `angular/`| **No.** `testMatch` covers `exercises/` only.                               |
+| `vue/`    | Partly. `vitest.config.ts` also collects `solutions/**/*.test.ts`, but only some solution folders carry a test copy. |
+| `rust/`   | **No.** Solutions are not registered in `lib.rs`.                            |
+
+Consequence: a reference solution can silently drift until it no longer passes
+its own test, and nothing reports it. This is not hypothetical — an audit found
+five such solutions in `vue/` and four defective tests in `go/`, all of which had
+been committed green-looking because the throwing stub masked the failure in
+`exercises/`.
+
+**Verify manually** by overlaying, never by adding `solutions/` to a build:
+
+```bash
+# copy the track to a throwaway dir, overlay each solution onto its stub, test there
+cp -r <track> /tmp/check && cd /tmp/check
+find solutions -type f | while read -r s; do cp "$s" "exercises/${s#solutions/}"; done
+rm -rf solutions && <the track's test command>
+```
+
+In Rust the solution files must keep a copy of the stub's `#[cfg(test)] mod tests`
+block, otherwise overlaying deletes the tests along with the stub.
+
+### Per-track quirks
+
+- **`python/`** — `pyproject.toml` has no `[build-system]` table although the
+  README documents `pip install -e ".[dev]"`. Modern pip falls back to
+  setuptools' legacy backend, which works but is unpinned.
+- **`go/`** — `go test` writes its test binaries under `%TEMP%`, where on-access
+  scanning can delete them before exec (`fork/exec …: file not found`). Set
+  `GOTMPDIR` elsewhere, or run a `go test -c` binary directly.
+- **`rust/`** — `cargo test` cannot link on this machine: MSVC libraries and the
+  Windows SDK are absent. See the root `README.md` for the installer command.
+- **`vue/`** — the advanced tier hand-rolls minimal Pinia- and Router-shaped
+  helpers rather than depending on `pinia` / `vue-router`.

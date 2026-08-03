@@ -23,7 +23,7 @@ Every track mirrors the same structure:
 <track>/
   exercises/<tier>/…   # stubs you edit — each ships with a FAILING test
   solutions/<tier>/…   # reference implementations (NOT part of the build)
-  catalog.md           # the 100-exercise roadmap for that track
+  catalog.md           # 100-row progress ledger (✅ done / ⬜ planned)
   README.md            # per-track setup + commands
 ```
 
@@ -50,20 +50,23 @@ tests there — do not add `solutions/` to a project/module.
 | `python/` | `pip install -e ".[dev]"`               | `pytest`                 | `pytest exercises/01-beginner/test_ex001_temperature.py` |
 | `vue/`    | `npm install`                           | `npm test`               | `npm run test:one -- "increments"` |
 | `angular/`| `npm install`                           | `npm test`               | `npm run test:one -- "applies a discount"` |
-| `go/`     | — (needs Go installed)                  | `go test ./...`          | `go test ./exercises/01-beginner/ex001_fizzbuzz/` |
-| `rust/`   | — (needs Rust installed)                | `cargo test`             | `cargo test ex001` |
+| `go/`     | — (deps already downloaded)             | `go test ./...`          | `go test ./exercises/01-beginner/ex001_fizzbuzz/` |
+| `rust/`   | — (⚠️ linker missing, see below)         | `cargo test`             | `cargo test ex001` |
 
 Run every command **from inside the track folder**, not the repo root.
 
-## Toolchain status (verified 2026-07-31)
+## Toolchain status (verified 2026-08-03)
 
-- ✅ Installed & verified end-to-end: **.NET 10** (`dotnet test` builds & runs),
-  **Python 3.14** (`pytest` runs), **Node 26 / npm 11** (Vue & Angular configs).
-- ⚠️ **Not installed yet: Go and Rust.** Their source is valid but untested
-  locally. Install via `winget` (Go) and `rustup` (Rust) — see
+- ✅ Verified end-to-end: **.NET 10**, **Python 3.14**, **Node 26 / npm 11**
+  (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**.
+- ⚠️ **Rust cannot link.** `cargo` 1.97.1 is installed, but only the
+  `x86_64-pc-windows-msvc` target, and the MSVC libraries plus the Windows SDK are
+  missing. Needs the VS C++ workload added **elevated** — see
   [`docs/requirements.md`](docs/requirements.md).
-- The Vue and Angular `package.json`s are written but **`npm install` has not been
-  run**, so `node_modules` is absent until the learner installs.
+- Go and Rust are **not on `PATH`**: prepend `C:\Program Files\Go\bin` and
+  `%USERPROFILE%\.cargo\bin` before invoking them from a plain shell.
+- `go test` needs `GOTMPDIR` outside `%TEMP%`, or on-access scanning deletes test
+  binaries before exec (`fork/exec …: file not found`).
 
 ## Track-specific gotchas
 
@@ -101,7 +104,32 @@ Run every command **from inside the track folder**, not the repo root.
 
 ## Current state
 
-Each track is scaffolded and seeded with 2–3 fully-worked exercises spanning the
-tiers (the ✅ rows in each `catalog.md`). The remaining entries toward 100 per
-track are described by theme in the catalogs and are **not yet written** — they
-are the roadmap for future work.
+Each track's `catalog.md` is a **100-row ledger** — one row per exercise, ✅ when
+stub + test + solution exist and are verified, ⬜ when planned. That file is the
+source of truth for what is done and what is next; do not re-inventory the disk.
+
+| Track     | Written    | Remaining |
+|-----------|------------|-----------|
+| `dotnet/` | 100 / 100  | —         |
+| `go/`     | 100 / 100  | —         |
+| `vue/`    | 92 / 100   | 093–100   |
+| `python/` | 3 / 100    | 97        |
+| `angular/`| 2 / 100    | 98        |
+| `rust/`   | 2 / 100    | 98        |
+
+Work order for the remaining exercises: **vue → python → angular → rust**, in
+batches of five, each batch red-verified then green-verified before its catalog
+rows flip. Rust is gated on the linker fix above.
+
+`dotnet/` and `go/` are content-complete and were verified by overlaying every
+reference solution onto its stub: `go vet ./...` clean, 100 stubs red, 100
+solutions green.
+
+## Known gaps
+
+`solutions/` is deliberately outside every build, so reference implementations are
+largely **unverified** and can drift silently — see the "Known gaps" section of
+[`docs/exercise-format.md`](docs/exercise-format.md) for the per-track table and
+the manual overlay recipe. An audit on 2026-08-03 found five broken solutions in
+`vue/` and four defective tests in `go/` that had gone unnoticed for exactly this
+reason.

@@ -27,4 +27,4 @@ npm install
 Service exercises drill DI and pure logic; component exercises drill standalone
 components, signals, inputs/outputs, and template binding via `ComponentFixture`.
 
-See [`catalog.md`](catalog.md) for the full 100-exercise roadmap.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **2 / 100**; the ⬜ rows are the work queue.

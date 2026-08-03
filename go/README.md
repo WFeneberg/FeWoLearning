@@ -24,4 +24,4 @@ Reference implementations live under `solutions/<tier>/exNNN_slug/`. Stubs panic
 rather than returning zero values so an unfinished exercise fails loudly instead
 of silently passing.
 
-See [`catalog.md`](catalog.md) for the full 100-exercise roadmap.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. This track is **complete: 100 / 100**.

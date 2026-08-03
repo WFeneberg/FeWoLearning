@@ -29,4 +29,4 @@ Stubs throw so tests start red. Composable exercises drill reactivity
 (`ref`/`computed`/`watch`); component exercises drill props, events, slots, and
 rendering via `mount()`.
 
-See [`catalog.md`](catalog.md) for the full 100-exercise roadmap.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **92 / 100**; the ⬜ rows (093–100) are the work queue.

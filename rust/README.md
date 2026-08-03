@@ -25,4 +25,4 @@ Reference implementations mirror the tree under `solutions/<tier>/`.
 When you add a new exercise, add a matching `#[path = ...] pub mod ...;` line to
 `exercises/lib.rs`.
 
-See [`catalog.md`](catalog.md) for the full 100-exercise roadmap.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **2 / 100**; the ⬜ rows are the work queue. Note `cargo test` cannot link on this machine yet — see the root `README.md`.

@@ -31,4 +31,4 @@ copy it over the matching stub, or diff against it.
 | Run one tier                 | `dotnet test --filter FullyQualifiedName~Tests.Beginner`           |
 | Build only                   | `dotnet build`                                                     |
 
-See [`catalog.md`](catalog.md) for the full 100-exercise roadmap.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. This track is **complete: 100 / 100**.
