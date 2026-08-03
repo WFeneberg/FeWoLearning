@@ -116,6 +116,12 @@ work queue.
    - A test that asserts an error the *signature* produces (wrong call style, wrong
      arity) passes before the body ever runs. Assert on introspected metadata
      instead, or leave the signature itself to the learner.
+
+   And one way the failure lands in the wrong place: a `@pytest.mark.parametrize`
+   decorator referencing something the stub does not define yet (an enum member, a
+   class attribute) is evaluated at **collection** time, so pytest reports a
+   collection error instead of a failing test. Parametrise on plain data and resolve
+   it inside the test body.
 5. **Green check** by overlaying the solutions:
    - `vue`/`angular`: copy the `*.test.ts` / `*.spec.ts` into the matching
      `solutions/` folder; `vitest.config.ts` already collects them (Jest needs
