@@ -36,3 +36,15 @@ Cargo.lock
 # ---- OS ----
 .DS_Store
 Thumbs.db
+
+# ---- Scratch / debug leftovers ----
+# These patterns exist because backup copies and throwaway verification dirs
+# were committed once already — and they leaked reference solutions next to
+# their own stubs (see docs/exercise-format.md, "Known gaps").
+*.bak
+*.bak_orig
+*.orig
+_tmp_*/
+tmp_*/
+*.tmp.*
+*.tmp*.config.*
