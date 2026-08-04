@@ -5,15 +5,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this repository is
 
 FeWoLearning is a **polyglot skills-training monorepo**, not an application. It
-holds six independent, self-contained learning tracks — `dotnet/`, `python/`,
-`vue/`, `angular/`, `go/`, `rust/` — each with its own toolchain, test runner,
+holds eight independent, self-contained learning tracks — `dotnet/`, `python/`,
+`vue/`, `angular/`, `go/`, `rust/`, `java/`, `kotlin/` — each with its own toolchain, test runner,
 and a graded set of **exercises** (stubs the learner implements) paired with
 reference **solutions**. There is no shared build and no cross-track code. Treat
 each language folder as its own project.
 
 The owner is a senior .NET architect using this repo to keep .NET sharp and to
-learn the other five ecosystems, driven with JetBrains IDEs (Rider, PyCharm,
-GoLand, WebStorm, RustRover).
+learn the other seven ecosystems, driven with JetBrains IDEs (Rider, PyCharm,
+GoLand, WebStorm, RustRover, IntelliJ IDEA).
 
 ## The universal exercise pattern (applies to every track)
 
@@ -52,6 +52,8 @@ tests there — do not add `solutions/` to a project/module.
 | `angular/`| `npm install`                           | `npm test`               | `npm run test:one -- "applies a discount"` |
 | `go/`     | — (deps already downloaded)             | `go test ./...`          | `go test ./exercises/01-beginner/ex001_fizzbuzz/` |
 | `rust/`   | — (`LIB` comes from `.cargo/config.toml`) | `cargo test`           | `cargo test ex001` |
+| `java/`   | planned                                 | planned                  | planned |
+| `kotlin/` | planned                                 | planned                  | planned |
 
 Run every command **from inside the track folder**, not the repo root.
 
@@ -59,6 +61,8 @@ Run every command **from inside the track folder**, not the repo root.
 
 - ✅ Verified end-to-end: **.NET 10**, **Python 3.14**, **Node 26 / npm 11**
   (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**, **Rust 1.97.1**.
+- `java/` and `kotlin/` are currently **catalog-only** additions: their ledgers
+  and README files exist, but the build scaffolding and seeded exercises do not.
 - **Rust links via `rust/.cargo/config.toml`.** rustc auto-detects the VS 18
   Professional toolset, which ships only `lib\onecore` and no desktop `lib\x64`, so
   `link.exe` died with `LNK1104: cannot open file 'msvcrt.lib'`. That config's
@@ -94,6 +98,12 @@ Run every command **from inside the track folder**, not the repo root.
 - **Angular** — Headless testing via **Jest** (`jest-preset-angular`), not
   Karma; tests are `*.spec.ts`. Components are **standalone** and use **signals**.
   Stubs `throw`.
+- **Java** — planned layout is one package folder per exercise containing the
+  stub plus a sibling JUnit test; when unfinished, stubs should `throw` at runtime
+  rather than fail compilation.
+- **Kotlin** — planned layout mirrors Java, but the exercises should prefer
+  top-level functions, data classes, and idiomatic null-safety. Unfinished stubs
+  should `TODO()` at runtime.
 
 ## Adding or completing exercises
 
@@ -126,7 +136,7 @@ work queue.
    - `vue`/`angular`: copy the `*.test.ts` / `*.spec.ts` into the matching
      `solutions/` folder; `vitest.config.ts` already collects them (Jest needs
      `--testMatch='**/solutions/**/*.spec.ts'`).
-   - `python`/`go`/`rust`/`dotnet`: copy the track into the scratchpad, overlay each
+   - `python`/`go`/`rust`/`dotnet`/`java`/`kotlin`: copy the track into the scratchpad, overlay each
      solution onto its stub, delete `solutions/`, run the tests there.
 6. Run the track's type gate: `npm run typecheck:solutions` (vue), `go vet ./...`.
    `solutions/` must stay clean; a couple of errors under `exercises/` are expected
@@ -152,12 +162,15 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `python/` | 76 / 100   | 24        |
 | `angular/`| 2 / 100    | 98        |
 | `rust/`   | 2 / 100    | 98        |
+| `java/`   | 0 / 100    | 100       |
+| `kotlin/` | 0 / 100    | 100       |
 
-Work order for the remaining exercises: **python → angular → rust**, in
+Work order for the remaining exercises: **python → angular → rust → java → kotlin**, in
 batches of five, each batch red-verified then green-verified before its catalog
 rows flip. Rust is no longer gated — `cargo test` links and runs.
 
-`dotnet/`, `go/` and `vue/` are content-complete. `go/` was verified by overlaying
+`dotnet/`, `go/` and `vue/` are content-complete. `java/` and `kotlin/` are cataloged
+but not scaffolded yet. `go/` was verified by overlaying
 every reference solution onto its stub (`go vet ./...` clean, 100 stubs red, 100
 solutions green); `vue/` runs 100 red exercise suites and 72 green solution suites,
 with `npm run typecheck:solutions` at zero errors.

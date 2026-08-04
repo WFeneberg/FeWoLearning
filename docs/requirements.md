@@ -15,6 +15,8 @@ on **2026-08-03**.
 | Git    | `2.55.0`         | all                |
 | Go     | `1.26.5`         | `go/`              |
 | Rust   | `1.97.1` (cargo `1.97.1`) | `rust/`   |
+| JDK    | not installed / unverified | `java/`, `kotlin/` |
+| Kotlin | not installed / unverified | `kotlin/` |
 
 Go and Rust are installed but **not on `PATH`** for a plain shell. They live at:
 
@@ -74,6 +76,8 @@ rustup default stable-x86_64-pc-windows-gnu
 | `angular/`| `npm install` — done, `node_modules` and `package-lock.json` present |
 | `go/`     | none — `go mod download` already ran (`golang.org/x/sync`)  |
 | `rust/`   | none — `.cargo/config.toml` supplies `LIB`, see above        |
+| `java/`   | planned — add JDK 21 and a Gradle wrapper when the track is scaffolded |
+| `kotlin/` | planned — add JDK 21, Kotlin, and a Gradle wrapper when the track is scaffolded |
 
 Set `GOTMPDIR` outside `%TEMP%` when running `go test`: on-access scanning can
 remove a freshly built test binary before Go execs it, which surfaces as
@@ -91,6 +95,12 @@ Open **each language folder as its own project**, not the repo root.
 | `angular/`| WebStorm                 | `angular/` folder           |
 | `go/`     | GoLand                   | `go/` folder                |
 | `rust/`   | RustRover                | `rust/` folder              |
+| `java/`   | IntelliJ IDEA            | `java/` folder              |
+| `kotlin/` | IntelliJ IDEA            | `kotlin/` folder            |
 
 If you use the unified IDE, install the corresponding language plugins and open
 folders as separate windows so each keeps its own SDK/interpreter selection.
+
+Java and Kotlin are **catalog-only** right now: the track folders exist for the
+exercise ledgers, but no Gradle build, stubs, tests, or reference solutions have
+been seeded yet.

@@ -1,7 +1,7 @@
 # FeWoLearning — A Polyglot Skills Training Environment
 
 A personal, self-paced training ground for practicing and expanding programming
-skills across six ecosystems. Each language lives in its own self-contained
+skills across eight ecosystems. Each language lives in its own self-contained
 folder with an isolated toolchain, its own test runner, and a graded set of
 **exercises** paired with reference **solutions**.
 
@@ -15,6 +15,8 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `python/`   | Python 3                         | pytest      | 76 / 100  | ✅ Python 3.14 |
 | `angular/`  | Angular (standalone, signals, TS)| Jest        | 2 / 100   | ✅ Node 26 |
 | `rust/`     | Rust                             | `cargo test`| 2 / 100   | ✅ Rust 1.97 |
+| `java/`     | Java                             | JUnit 5     | 0 / 100   | planned |
+| `kotlin/`   | Kotlin                           | JUnit 5     | 0 / 100   | planned |
 
 Each track's `catalog.md` is the authoritative per-exercise ledger: it lists all
 100 entries with ✅ (written and verified) or ⬜ (planned).
@@ -53,6 +55,7 @@ including the **known gaps** in how `solutions/` gets verified.
 ## Working with JetBrains tools
 
 Open each language folder as its **own project/solution** in the matching JetBrains
-IDE (Rider, PyCharm, GoLand, WebStorm, RustRover, or one unified IDE with plugins).
+IDE (Rider, PyCharm, GoLand, WebStorm, RustRover, IntelliJ IDEA, or one unified
+IDE with plugins).
 Do **not** open the repository root as a single project — the toolchains are
 deliberately isolated. See the per-language `README.md` for the exact IDE mapping.

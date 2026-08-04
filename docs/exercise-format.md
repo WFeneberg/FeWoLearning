@@ -31,6 +31,8 @@ is prefixed:
 | `rust/`   | one file per exercise, registered in `lib.rs`   | `exercises/01-beginner/ex001_anagram.rs`     |
 | `vue/`    | folder with stub + colocated `*.test.ts`        | `exercises/01-beginner/ex001_use_counter/`   |
 | `angular/`| folder with stub + colocated `*.spec.ts`        | `exercises/01-beginner/ex001_pricing_service/` |
+| `java/`   | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_primitive_math/` |
+| `kotlin/` | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_val_var_basics/` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
@@ -89,6 +91,8 @@ stubs' type and module names, so compiling both at once would collide).
 | `angular/`| **No.** `testMatch` covers `exercises/` only.                               |
 | `vue/`    | Partly. `vitest.config.ts` also collects `solutions/**/*.test.ts`, but only some solution folders carry a test copy. |
 | `rust/`   | **No.** Solutions are not registered in `lib.rs`.                            |
+| `java/`   | **No.** The track is catalog-only today; no build includes `solutions/` yet. |
+| `kotlin/` | **No.** The track is catalog-only today; no build includes `solutions/` yet. |
 
 Consequence: a reference solution can silently drift until it no longer passes
 its own test, and nothing reports it. This is not hypothetical — an audit found
@@ -134,3 +138,7 @@ against a throwing stub.
   Windows SDK are absent. See the root `README.md` for the installer command.
 - **`vue/`** — the advanced tier hand-rolls minimal Pinia- and Router-shaped
   helpers rather than depending on `pinia` / `vue-router`.
+- **`java/`** — planned exercise folders should keep one package per exercise,
+  with the test beside the stub so solution overlays stay one-to-one.
+- **`kotlin/`** — planned exercise folders should mirror the Java layout, but the
+  stubs should prefer top-level functions and data classes where idiomatic.
