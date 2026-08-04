@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 12 ✅ / 88 ⬜**
+**Status: 17 ✅ / 83 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -32,11 +32,11 @@ signals (`signal`/`computed`), template refs, built-in pipes, lifecycle hooks.
 | 009 | output_function           | `output()`, typed emit                                | ✅     |
 | 010 | control_flow_if           | `@if` / `@else`, template conditions                  | ✅     |
 | 011 | control_flow_for          | `@for`, `track`, `$index`, `@empty`                   | ✅     |
-| 012 | control_flow_switch       | `@switch` / `@case` / `@default`                      | ⬜     |
-| 013 | class_binding             | `[class.x]`, `[ngClass]`                              | ⬜     |
-| 014 | style_binding             | `[style.x]`, units, `[ngStyle]`                       | ⬜     |
-| 015 | two_way_binding           | `[(ngModel)]`, `FormsModule` import                   | ⬜     |
-| 016 | model_signal              | `model()` two-way signal binding                      | ⬜     |
+| 012 | control_flow_switch       | `@switch` / `@case` / `@default`                      | ✅     |
+| 013 | class_binding             | `[class.x]`, `[ngClass]`                              | ✅     |
+| 014 | style_binding             | `[style.x]`, units, `[ngStyle]`                       | ✅     |
+| 015 | two_way_binding           | `[(ngModel)]`, `FormsModule` import                   | ✅     |
+| 016 | model_signal              | `model()` two-way signal binding                      | ✅     |
 | 017 | service_provided_in_root  | `@Injectable({providedIn:'root'})`, singleton scope    | ⬜     |
 | 018 | inject_function           | the `inject()` function vs constructor injection      | ⬜     |
 | 019 | injection_token_config    | `InjectionToken`, providing configuration values      | ⬜     |
