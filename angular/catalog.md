@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 52 ✅ / 48 ⬜**
+**Status: 57 ✅ / 43 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -82,11 +82,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 050 | rxjs_switch_map            | `switchMap`, cancelling stale inner streams         | ✅     |
 | 051 | rxjs_debounce_distinct     | `debounceTime`, `distinctUntilChanged`              | ✅     |
 | 052 | rxjs_combine_latest        | `combineLatest`, `withLatestFrom`                   | ✅     |
-| 053 | rxjs_subject_state         | `BehaviorSubject`, imperative state pushes          | ⬜     |
-| 054 | rxjs_to_signal             | `toSignal`, `toObservable`, interop                 | ⬜     |
-| 055 | async_pipe_template        | `AsyncPipe`, subscription lifecycle in templates     | ⬜     |
-| 056 | custom_pipe_pure           | a pure `PipeTransform`, memoization                 | ⬜     |
-| 057 | custom_pipe_impure         | `pure: false`, when it is justified                 | ⬜     |
+| 053 | rxjs_subject_state         | `BehaviorSubject`, imperative state pushes          | ✅     |
+| 054 | rxjs_to_signal             | `toSignal`, `toObservable`, interop                 | ✅     |
+| 055 | async_pipe_template        | `AsyncPipe`, subscription lifecycle in templates     | ✅     |
+| 056 | custom_pipe_pure           | a pure `PipeTransform`, memoization                 | ✅     |
+| 057 | custom_pipe_impure         | `pure: false`, when it is justified                 | ✅     |
 | 058 | structural_directive       | a structural directive with `TemplateRef`           | ⬜     |
 | 059 | content_projection_single  | `<ng-content>`, default content                     | ⬜     |
 | 060 | content_projection_select  | `select=` multi-slot projection                     | ⬜     |
