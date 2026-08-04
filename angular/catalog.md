@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 17 ✅ / 83 ⬜**
+**Status: 22 ✅ / 78 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -37,11 +37,11 @@ signals (`signal`/`computed`), template refs, built-in pipes, lifecycle hooks.
 | 014 | style_binding             | `[style.x]`, units, `[ngStyle]`                       | ✅     |
 | 015 | two_way_binding           | `[(ngModel)]`, `FormsModule` import                   | ✅     |
 | 016 | model_signal              | `model()` two-way signal binding                      | ✅     |
-| 017 | service_provided_in_root  | `@Injectable({providedIn:'root'})`, singleton scope    | ⬜     |
-| 018 | inject_function           | the `inject()` function vs constructor injection      | ⬜     |
-| 019 | injection_token_config    | `InjectionToken`, providing configuration values      | ⬜     |
-| 020 | component_provider_scope  | component-level `providers`, per-instance services    | ⬜     |
-| 021 | lifecycle_oninit          | `ngOnInit`, initialization order                      | ⬜     |
+| 017 | service_provided_in_root  | `@Injectable({providedIn:'root'})`, singleton scope    | ✅     |
+| 018 | inject_function           | the `inject()` function vs constructor injection      | ✅     |
+| 019 | injection_token_config    | `InjectionToken`, providing configuration values      | ✅     |
+| 020 | component_provider_scope  | component-level `providers`, per-instance services    | ✅     |
+| 021 | lifecycle_oninit          | `ngOnInit`, initialization order                      | ✅     |
 | 022 | lifecycle_ondestroy       | `ngOnDestroy`, cleanup, `DestroyRef`                  | ⬜     |
 | 023 | template_ref_var          | `#ref` template variables, reading DOM nodes          | ⬜     |
 | 024 | view_child_signal         | `viewChild()`, querying a child component             | ⬜     |
