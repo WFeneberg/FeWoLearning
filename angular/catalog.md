@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 62 ✅ / 38 ⬜**
+**Status: 67 ✅ / 33 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -92,11 +92,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 060 | content_projection_select  | `select=` multi-slot projection                     | ✅     |
 | 061 | content_child_query        | `contentChild()`, querying projected content        | ✅     |
 | 062 | route_params_snapshot      | `ActivatedRoute.snapshot`, reading params           | ✅     |
-| 063 | route_params_observable    | `paramMap` as a stream, reacting to changes         | ⬜     |
-| 064 | router_navigation          | `Router.navigate`, `queryParams`, `RouterLink`      | ⬜     |
-| 065 | effect_side_effects        | `effect()`, cleanup functions, allowed writes       | ⬜     |
-| 066 | linked_signal              | `linkedSignal()`, resettable derived state          | ⬜     |
-| 067 | signal_service_store       | a signal-based service as shared state              | ⬜     |
+| 063 | route_params_observable    | `paramMap` as a stream, reacting to changes         | ✅     |
+| 064 | router_navigation          | `Router.navigate`, `queryParams`, `RouterLink`      | ✅     |
+| 065 | effect_side_effects        | `effect()`, cleanup functions, allowed writes       | ✅     |
+| 066 | linked_signal              | `linkedSignal()`, resettable derived state          | ✅     |
+| 067 | signal_service_store       | a signal-based service as shared state              | ✅     |
 | 068 | injector_hierarchies       | element vs environment injectors, resolution order  | ⬜     |
 | 069 | provide_use_factory        | `useFactory`, `useExisting`, `useValue`             | ⬜     |
 | 070 | testing_signal_component   | asserting signal state through a fixture           | ⬜     |
