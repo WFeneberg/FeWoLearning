@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 37 ✅ / 63 ⬜**
+**Status: 42 ✅ / 58 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -67,11 +67,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 |-----|-----------------------------|-----------------------------------------------------|--------|
 | 036 | counter                     | standalone component, signals                       | ✅     |
 | 037 | form_control_basics         | `FormControl`, value, `setValue`, `valueChanges`     | ✅     |
-| 038 | form_group_nested          | `FormGroup`, nested groups, `patchValue`             | ⬜     |
-| 039 | form_builder               | `FormBuilder`, concise group construction           | ⬜     |
-| 040 | form_sync_validators       | `Validators.required`/`minLength`, error surfacing   | ⬜     |
-| 041 | form_custom_validator      | a `ValidatorFn`, cross-field validation             | ⬜     |
-| 042 | form_async_validator       | `AsyncValidatorFn`, pending state                   | ⬜     |
+| 038 | form_group_nested          | `FormGroup`, nested groups, `patchValue`             | ✅     |
+| 039 | form_builder               | `FormBuilder`, concise group construction           | ✅     |
+| 040 | form_sync_validators       | `Validators.required`/`minLength`, error surfacing   | ✅     |
+| 041 | form_custom_validator      | a `ValidatorFn`, cross-field validation             | ✅     |
+| 042 | form_async_validator       | `AsyncValidatorFn`, pending state                   | ✅     |
 | 043 | form_array                 | `FormArray`, adding and removing controls           | ⬜     |
 | 044 | form_status_flags          | `touched`/`dirty`/`pristine`, submit gating         | ⬜     |
 | 045 | http_get_typed             | `HttpClient.get<T>`, `provideHttpClient`            | ⬜     |
