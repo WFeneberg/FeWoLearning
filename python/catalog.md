@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 76 ✅ / 24 ⬜**
+**Status: 81 ✅ / 19 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -115,11 +115,11 @@ metaclasses, `__slots__`, custom iterators, `contextvars`, `heapq`,
 | 074 | asyncio_queue_workers         | `asyncio.Queue`, worker tasks, `join`           | ✅     |
 | 075 | asyncio_semaphore             | `Semaphore`, bounded concurrency                | ✅     |
 | 076 | threading_lock_counter        | `Thread`, `Lock`, data races                    | ✅     |
-| 077 | futures_as_completed          | `ThreadPoolExecutor`, `as_completed`            | ⬜     |
-| 078 | process_pool_cpu_bound        | `ProcessPoolExecutor`, picklability, the GIL    | ⬜     |
-| 079 | descriptor_validation         | `__get__`/`__set__`/`__set_name__`              | ⬜     |
-| 080 | property_computed             | `property`, setter validation, cached values    | ⬜     |
-| 081 | init_subclass_registry        | `__init_subclass__`, plugin registries          | ⬜     |
+| 077 | futures_as_completed          | `ThreadPoolExecutor`, `as_completed`            | ✅     |
+| 078 | process_pool_cpu_bound        | `ProcessPoolExecutor`, picklability, the GIL    | ✅     |
+| 079 | descriptor_validation         | `__get__`/`__set__`/`__set_name__`              | ✅     |
+| 080 | property_computed             | `property`, setter validation, cached values    | ✅     |
+| 081 | init_subclass_registry        | `__init_subclass__`, plugin registries          | ✅     |
 | 082 | metaclass_enforcement         | metaclasses, class-creation hooks               | ⬜     |
 | 083 | slots_memory                  | `__slots__`, attribute restriction, memory      | ⬜     |
 | 084 | custom_iterator               | `__iter__`/`__next__`, `StopIteration`          | ⬜     |
