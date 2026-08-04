@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 22 ✅ / 78 ⬜**
+**Status: 27 ✅ / 73 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -42,11 +42,11 @@ signals (`signal`/`computed`), template refs, built-in pipes, lifecycle hooks.
 | 019 | injection_token_config    | `InjectionToken`, providing configuration values      | ✅     |
 | 020 | component_provider_scope  | component-level `providers`, per-instance services    | ✅     |
 | 021 | lifecycle_oninit          | `ngOnInit`, initialization order                      | ✅     |
-| 022 | lifecycle_ondestroy       | `ngOnDestroy`, cleanup, `DestroyRef`                  | ⬜     |
-| 023 | template_ref_var          | `#ref` template variables, reading DOM nodes          | ⬜     |
-| 024 | view_child_signal         | `viewChild()`, querying a child component             | ⬜     |
-| 025 | pipe_date_currency        | built-in `DatePipe`, `CurrencyPipe`, locales          | ⬜     |
-| 026 | pipe_json_slice           | `JsonPipe`, `SlicePipe`, `KeyValuePipe`               | ⬜     |
+| 022 | lifecycle_ondestroy       | `ngOnDestroy`, cleanup, `DestroyRef`                  | ✅     |
+| 023 | template_ref_var          | `#ref` template variables, reading DOM nodes          | ✅     |
+| 024 | view_child_signal         | `viewChild()`, querying a child component             | ✅     |
+| 025 | pipe_date_currency        | built-in `DatePipe`, `CurrencyPipe`, locales          | ✅     |
+| 026 | pipe_json_slice           | `JsonPipe`, `SlicePipe`, `KeyValuePipe`               | ✅     |
 | 027 | host_binding              | `host` metadata, `@HostBinding`, `@HostListener`       | ⬜     |
 | 028 | ng_template_outlet        | `ng-template`, `NgTemplateOutlet`, context            | ⬜     |
 | 029 | attribute_directive       | a simple attribute directive with `ElementRef`        | ⬜     |
