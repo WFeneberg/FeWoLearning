@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 47 ✅ / 53 ⬜**
+**Status: 52 ✅ / 48 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -77,11 +77,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 045 | http_get_typed             | `HttpClient.get<T>`, `provideHttpClient`            | ✅     |
 | 046 | http_testing_controller    | `HttpTestingController`, `expectOne`, `flush`        | ✅     |
 | 047 | http_error_handling        | `HttpErrorResponse`, `catchError`, retries          | ✅     |
-| 048 | http_params_headers        | `HttpParams`, `HttpHeaders`, query building         | ⬜     |
-| 049 | rxjs_map_filter            | `map`, `filter`, the pipe operator                  | ⬜     |
-| 050 | rxjs_switch_map            | `switchMap`, cancelling stale inner streams         | ⬜     |
-| 051 | rxjs_debounce_distinct     | `debounceTime`, `distinctUntilChanged`              | ⬜     |
-| 052 | rxjs_combine_latest        | `combineLatest`, `withLatestFrom`                   | ⬜     |
+| 048 | http_params_headers        | `HttpParams`, `HttpHeaders`, query building         | ✅     |
+| 049 | rxjs_map_filter            | `map`, `filter`, the pipe operator                  | ✅     |
+| 050 | rxjs_switch_map            | `switchMap`, cancelling stale inner streams         | ✅     |
+| 051 | rxjs_debounce_distinct     | `debounceTime`, `distinctUntilChanged`              | ✅     |
+| 052 | rxjs_combine_latest        | `combineLatest`, `withLatestFrom`                   | ✅     |
 | 053 | rxjs_subject_state         | `BehaviorSubject`, imperative state pushes          | ⬜     |
 | 054 | rxjs_to_signal             | `toSignal`, `toObservable`, interop                 | ⬜     |
 | 055 | async_pipe_template        | `AsyncPipe`, subscription lifecycle in templates     | ⬜     |
