@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 57 ✅ / 43 ⬜**
+**Status: 62 ✅ / 38 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -87,11 +87,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 055 | async_pipe_template        | `AsyncPipe`, subscription lifecycle in templates     | ✅     |
 | 056 | custom_pipe_pure           | a pure `PipeTransform`, memoization                 | ✅     |
 | 057 | custom_pipe_impure         | `pure: false`, when it is justified                 | ✅     |
-| 058 | structural_directive       | a structural directive with `TemplateRef`           | ⬜     |
-| 059 | content_projection_single  | `<ng-content>`, default content                     | ⬜     |
-| 060 | content_projection_select  | `select=` multi-slot projection                     | ⬜     |
-| 061 | content_child_query        | `contentChild()`, querying projected content        | ⬜     |
-| 062 | route_params_snapshot      | `ActivatedRoute.snapshot`, reading params           | ⬜     |
+| 058 | structural_directive       | a structural directive with `TemplateRef`           | ✅     |
+| 059 | content_projection_single  | `<ng-content>`, default content                     | ✅     |
+| 060 | content_projection_select  | `select=` multi-slot projection                     | ✅     |
+| 061 | content_child_query        | `contentChild()`, querying projected content        | ✅     |
+| 062 | route_params_snapshot      | `ActivatedRoute.snapshot`, reading params           | ✅     |
 | 063 | route_params_observable    | `paramMap` as a stream, reacting to changes         | ⬜     |
 | 064 | router_navigation          | `Router.navigate`, `queryParams`, `RouterLink`      | ⬜     |
 | 065 | effect_side_effects        | `effect()`, cleanup functions, allowed writes       | ⬜     |
