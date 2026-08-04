@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 42 ✅ / 58 ⬜**
+**Status: 47 ✅ / 53 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -72,11 +72,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 040 | form_sync_validators       | `Validators.required`/`minLength`, error surfacing   | ✅     |
 | 041 | form_custom_validator      | a `ValidatorFn`, cross-field validation             | ✅     |
 | 042 | form_async_validator       | `AsyncValidatorFn`, pending state                   | ✅     |
-| 043 | form_array                 | `FormArray`, adding and removing controls           | ⬜     |
-| 044 | form_status_flags          | `touched`/`dirty`/`pristine`, submit gating         | ⬜     |
-| 045 | http_get_typed             | `HttpClient.get<T>`, `provideHttpClient`            | ⬜     |
-| 046 | http_testing_controller    | `HttpTestingController`, `expectOne`, `flush`        | ⬜     |
-| 047 | http_error_handling        | `HttpErrorResponse`, `catchError`, retries          | ⬜     |
+| 043 | form_array                 | `FormArray`, adding and removing controls           | ✅     |
+| 044 | form_status_flags          | `touched`/`dirty`/`pristine`, submit gating         | ✅     |
+| 045 | http_get_typed             | `HttpClient.get<T>`, `provideHttpClient`            | ✅     |
+| 046 | http_testing_controller    | `HttpTestingController`, `expectOne`, `flush`        | ✅     |
+| 047 | http_error_handling        | `HttpErrorResponse`, `catchError`, retries          | ✅     |
 | 048 | http_params_headers        | `HttpParams`, `HttpHeaders`, query building         | ⬜     |
 | 049 | rxjs_map_filter            | `map`, `filter`, the pipe operator                  | ⬜     |
 | 050 | rxjs_switch_map            | `switchMap`, cancelling stale inner streams         | ⬜     |
