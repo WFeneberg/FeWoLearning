@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 2 ✅ / 98 ⬜**
+**Status: 7 ✅ / 93 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -22,11 +22,11 @@ signals (`signal`/`computed`), template refs, built-in pipes, lifecycle hooks.
 | #   | Slug                      | Concepts                                              | Status |
 |-----|---------------------------|-------------------------------------------------------|--------|
 | 001 | pricing_service           | DI, service, validation                               | ✅     |
-| 002 | interpolation_binding     | `{{ }}`, property binding, `[attr.]`                  | ⬜     |
-| 003 | signal_basics             | `signal()`, `set`, `update`, reading in templates      | ⬜     |
-| 004 | computed_signal           | `computed()`, derived state, laziness                 | ⬜     |
-| 005 | event_binding_click       | `(click)`, handler methods, `$event`                  | ⬜     |
-| 006 | input_property            | `@Input()`, required inputs, defaults                 | ⬜     |
+| 002 | interpolation_binding     | `{{ }}`, property binding, `[attr.]`                  | ✅     |
+| 003 | signal_basics             | `signal()`, `set`, `update`, reading in templates      | ✅     |
+| 004 | computed_signal           | `computed()`, derived state, laziness                 | ✅     |
+| 005 | event_binding_click       | `(click)`, handler methods, `$event`                  | ✅     |
+| 006 | input_property            | `@Input()`, required inputs, defaults                 | ✅     |
 | 007 | input_signal              | `input()` signal inputs, transforms                   | ⬜     |
 | 008 | output_emitter            | `@Output()`, `EventEmitter`, parent wiring            | ⬜     |
 | 009 | output_function           | `output()`, typed emit                                | ⬜     |
