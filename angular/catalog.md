@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 32 ✅ / 68 ⬜**
+**Status: 37 ✅ / 63 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -52,10 +52,10 @@ signals (`signal`/`computed`), template refs, built-in pipes, lifecycle hooks.
 | 029 | attribute_directive       | a simple attribute directive with `ElementRef`        | ✅     |
 | 030 | signal_array_update       | immutable array updates in signals                    | ✅     |
 | 031 | signal_object_update      | `update()` with object spread, change detection        | ✅     |
-| 032 | component_composition     | nesting components, passing data down                 | ⬜     |
-| 033 | untracked_read            | `untracked()`, avoiding unwanted dependencies         | ⬜     |
-| 034 | signal_equality_fn        | custom `equal` on a signal, skipping notifications    | ⬜     |
-| 035 | testbed_basics            | `TestBed.configureTestingModule`, `ComponentFixture`   | ⬜     |
+| 032 | component_composition     | nesting components, passing data down                 | ✅     |
+| 033 | untracked_read            | `untracked()`, avoiding unwanted dependencies         | ✅     |
+| 034 | signal_equality_fn        | custom `equal` on a signal, skipping notifications    | ✅     |
+| 035 | testbed_basics            | `TestBed.configureTestingModule`, `ComponentFixture`   | ✅     |
 
 ## Intermediate (036–070) — reactive patterns
 
@@ -66,7 +66,7 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | #   | Slug                        | Concepts                                            | Status |
 |-----|-----------------------------|-----------------------------------------------------|--------|
 | 036 | counter                     | standalone component, signals                       | ✅     |
-| 037 | form_control_basics         | `FormControl`, value, `setValue`, `valueChanges`     | ⬜     |
+| 037 | form_control_basics         | `FormControl`, value, `setValue`, `valueChanges`     | ✅     |
 | 038 | form_group_nested          | `FormGroup`, nested groups, `patchValue`             | ⬜     |
 | 039 | form_builder               | `FormBuilder`, concise group construction           | ⬜     |
 | 040 | form_sync_validators       | `Validators.required`/`minLength`, error surfacing   | ⬜     |
