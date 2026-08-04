@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 7 ✅ / 93 ⬜**
+**Status: 12 ✅ / 88 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -27,11 +27,11 @@ signals (`signal`/`computed`), template refs, built-in pipes, lifecycle hooks.
 | 004 | computed_signal           | `computed()`, derived state, laziness                 | ✅     |
 | 005 | event_binding_click       | `(click)`, handler methods, `$event`                  | ✅     |
 | 006 | input_property            | `@Input()`, required inputs, defaults                 | ✅     |
-| 007 | input_signal              | `input()` signal inputs, transforms                   | ⬜     |
-| 008 | output_emitter            | `@Output()`, `EventEmitter`, parent wiring            | ⬜     |
-| 009 | output_function           | `output()`, typed emit                                | ⬜     |
-| 010 | control_flow_if           | `@if` / `@else`, template conditions                  | ⬜     |
-| 011 | control_flow_for          | `@for`, `track`, `$index`, `@empty`                   | ⬜     |
+| 007 | input_signal              | `input()` signal inputs, transforms                   | ✅     |
+| 008 | output_emitter            | `@Output()`, `EventEmitter`, parent wiring            | ✅     |
+| 009 | output_function           | `output()`, typed emit                                | ✅     |
+| 010 | control_flow_if           | `@if` / `@else`, template conditions                  | ✅     |
+| 011 | control_flow_for          | `@for`, `track`, `$index`, `@empty`                   | ✅     |
 | 012 | control_flow_switch       | `@switch` / `@case` / `@default`                      | ⬜     |
 | 013 | class_binding             | `[class.x]`, `[ngClass]`                              | ⬜     |
 | 014 | style_binding             | `[style.x]`, units, `[ngStyle]`                       | ⬜     |
