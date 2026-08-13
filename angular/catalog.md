@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 97 ✅ / 3 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -137,6 +137,6 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 095 | schema_driven_form_renderer | schema to reactive form, dynamic controls           | ✅     |
 | 096 | design_system_a11y_widget  | ARIA roles and states, keyboard navigation, focus    | ✅     |
 | 097 | plugin_injection_tokens    | multi-provider extension points, `multi: true`       | ✅     |
-| 098 | websocket_live_service     | live data service, reconnect, signal projection      | ⬜     |
-| 099 | micro_frontend_shell       | multiple bootstrapped apps, isolation, teardown      | ⬜     |
-| 100 | i18n_layer                 | message extraction, runtime locale switching         | ⬜     |
+| 098 | websocket_live_service     | live data service, reconnect, signal projection      | ✅     |
+| 099 | micro_frontend_shell       | multiple bootstrapped apps, isolation, teardown      | ✅     |
+| 100 | i18n_layer                 | message extraction, runtime locale switching         | ✅     |

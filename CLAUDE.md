@@ -160,20 +160,23 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `go/`     | 100 / 100  | —         |
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 76 / 100   | 24        |
-| `angular/`| 2 / 100    | 98        |
+| `angular/`| 100 / 100  | —         |
 | `rust/`   | 2 / 100    | 98        |
 | `java/`   | 0 / 100    | 100       |
 | `kotlin/` | 0 / 100    | 100       |
 
-Work order for the remaining exercises: **python → angular → rust → java → kotlin**, in
+Work order for the remaining exercises: **python → rust → java → kotlin**, in
 batches of five, each batch red-verified then green-verified before its catalog
 rows flip. Rust is no longer gated — `cargo test` links and runs.
 
-`dotnet/`, `go/` and `vue/` are content-complete. `java/` and `kotlin/` are cataloged
-but not scaffolded yet. `go/` was verified by overlaying
+`dotnet/`, `go/`, `vue/` and `angular/` are content-complete. `java/` and `kotlin/`
+are cataloged but not scaffolded yet. `go/` was verified by overlaying
 every reference solution onto its stub (`go vet ./...` clean, 100 stubs red, 100
 solutions green); `vue/` runs 100 red exercise suites and 72 green solution suites,
-with `npm run typecheck:solutions` at zero errors.
+with `npm run typecheck:solutions` at zero errors; `angular/` runs 100 red stub
+suites under `npm test` with zero compile errors, and each exercise's solution was
+green-checked individually by overlaying it onto its stub — see Known gaps below
+for the same kind of solutions/ drift found in vue/ and go/.
 
 ## Known gaps
 
