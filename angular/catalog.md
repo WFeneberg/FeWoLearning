@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 72 ✅ / 28 ⬜**
+**Status: 77 ✅ / 23 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -107,11 +107,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 |-----|-----------------------------|-----------------------------------------------------|--------|
 | 071 | route_guard_can_activate    | `CanActivateFn`, redirecting unauthenticated users  | ✅     |
 | 072 | route_guard_can_deactivate  | `CanDeactivateFn`, unsaved-changes prompts         | ✅     |
-| 073 | route_resolver              | `ResolveFn`, pre-loading route data                 | ⬜     |
-| 074 | lazy_loaded_routes          | `loadComponent`, `loadChildren`, code splitting     | ⬜     |
-| 075 | onpush_change_detection     | `OnPush`, immutability requirements                 | ⬜     |
-| 076 | change_detector_ref         | `markForCheck`, `detach`, manual detection          | ⬜     |
-| 077 | http_interceptor_auth       | functional interceptors, attaching headers          | ⬜     |
+| 073 | route_resolver              | `ResolveFn`, pre-loading route data                 | ✅     |
+| 074 | lazy_loaded_routes          | `loadComponent`, `loadChildren`, code splitting     | ✅     |
+| 075 | onpush_change_detection     | `OnPush`, immutability requirements                 | ✅     |
+| 076 | change_detector_ref         | `markForCheck`, `detach`, manual detection          | ✅     |
+| 077 | http_interceptor_auth       | functional interceptors, attaching headers          | ✅     |
 | 078 | http_interceptor_retry      | interceptor-level retry and backoff                 | ⬜     |
 | 079 | control_value_accessor      | `ControlValueAccessor`, a custom form control       | ⬜     |
 | 080 | dynamic_component_loading   | `ViewContainerRef.createComponent`, inputs          | ⬜     |
