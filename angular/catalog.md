@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 87 ✅ / 13 ⬜**
+**Status: 92 ✅ / 8 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -122,16 +122,16 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 085 | signal_store_pattern        | a typed signal store with actions and selectors     | ✅     |
 | 086 | resource_async_signal       | `resource()`, async loading as signal state        | ✅     |
 | 087 | virtual_scroll_list         | windowed rendering over a large list                | ✅     |
-| 088 | error_handler_global        | a custom `ErrorHandler`, reporting                  | ⬜     |
-| 089 | zoneless_change_detection   | `provideExperimentalZonelessChangeDetection`        | ⬜     |
-| 090 | performance_track_by        | `@for` `track` correctness and DOM reuse            | ⬜     |
+| 088 | error_handler_global        | a custom `ErrorHandler`, reporting                  | ✅     |
+| 089 | zoneless_change_detection   | `provideExperimentalZonelessChangeDetection`        | ✅     |
+| 090 | performance_track_by        | `@for` `track` correctness and DOM reuse            | ✅     |
 
 ## Expert (091–100) — systems & design
 
 | #   | Slug                       | Concepts                                             | Status |
 |-----|----------------------------|------------------------------------------------------|--------|
-| 091 | feature_sliced_architecture | feature boundaries, barrel-free imports, layering    | ⬜     |
-| 092 | typed_data_access_layer    | typed repositories, DTO mapping, error envelopes     | ⬜     |
+| 091 | feature_sliced_architecture | feature boundaries, barrel-free imports, layering    | ✅     |
+| 092 | typed_data_access_layer    | typed repositories, DTO mapping, error envelopes     | ✅     |
 | 093 | signal_store_library       | a reusable store factory with typed actions          | ⬜     |
 | 094 | ssr_hydration_component    | SSR-safe rendering, hydration-stable state           | ⬜     |
 | 095 | schema_driven_form_renderer | schema to reactive form, dynamic controls           | ⬜     |
