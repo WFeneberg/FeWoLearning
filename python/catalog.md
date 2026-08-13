@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 96 ✅ / 4 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -140,7 +140,7 @@ metaclasses, `__slots__`, custom iterators, `contextvars`, `heapq`,
 | 094 | async_task_queue         | async worker pool, retries, backpressure             | ✅     |
 | 095 | dsl_interpreter          | tokenizer, parser, evaluator                         | ✅     |
 | 096 | typed_event_bus          | typed pub/sub, handler registry, `Protocol`          | ✅     |
-| 097 | streaming_parser         | incremental parsing, explicit state machine          | ⬜     |
-| 098 | ttl_lru_cache            | combined TTL + LRU eviction, monotonic clock         | ⬜     |
-| 099 | di_container             | dependency injection, lifetimes, resolution graph    | ⬜     |
-| 100 | property_based_tests     | generative testing, invariants, shrinking            | ⬜     |
+| 097 | streaming_parser         | incremental parsing, explicit state machine          | ✅     |
+| 098 | ttl_lru_cache            | combined TTL + LRU eviction, monotonic clock         | ✅     |
+| 099 | di_container             | dependency injection, lifetimes, resolution graph    | ✅     |
+| 100 | property_based_tests     | generative testing, invariants, shrinking            | ✅     |
