@@ -7,7 +7,7 @@
   "compilerOptions": {
     // Jest runs the compiled output through CommonJS require(), not ESM.
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "types": ["jest", "node"]
   },
   "include": ["exercises/**/*.ts", "solutions/**/*.ts", "setup-jest.ts"]
