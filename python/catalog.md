@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 81 ✅ / 19 ⬜**
+**Status: 86 ✅ / 14 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -120,11 +120,11 @@ metaclasses, `__slots__`, custom iterators, `contextvars`, `heapq`,
 | 079 | descriptor_validation         | `__get__`/`__set__`/`__set_name__`              | ✅     |
 | 080 | property_computed             | `property`, setter validation, cached values    | ✅     |
 | 081 | init_subclass_registry        | `__init_subclass__`, plugin registries          | ✅     |
-| 082 | metaclass_enforcement         | metaclasses, class-creation hooks               | ⬜     |
-| 083 | slots_memory                  | `__slots__`, attribute restriction, memory      | ⬜     |
-| 084 | custom_iterator               | `__iter__`/`__next__`, `StopIteration`          | ⬜     |
-| 085 | contextvars_request_id        | `contextvars`, async-safe ambient context       | ⬜     |
-| 086 | heapq_priority_queue          | `heapq`, tuple priorities, tie-breaking         | ⬜     |
+| 082 | metaclass_enforcement         | metaclasses, class-creation hooks               | ✅     |
+| 083 | slots_memory                  | `__slots__`, attribute restriction, memory      | ✅     |
+| 084 | custom_iterator               | `__iter__`/`__next__`, `StopIteration`          | ✅     |
+| 085 | contextvars_request_id        | `contextvars`, async-safe ambient context       | ✅     |
+| 086 | heapq_priority_queue          | `heapq`, tuple priorities, tie-breaking         | ✅     |
 | 087 | singledispatch_dispatch       | `functools.singledispatch`, `register`          | ⬜     |
 | 088 | weakref_cache                 | `WeakValueDictionary`, object lifetime          | ⬜     |
 | 089 | streaming_generator_pipeline   | memory-bounded pipelines over large inputs      | ⬜     |
