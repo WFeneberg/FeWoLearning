@@ -27,8 +27,18 @@ describe("ProductBadgeComponent", () => {
   });
 
   it("re-renders the label when it changes", () => {
+    console.log("DEBUG zonelessEnabled", (fixture as any).zonelessEnabled);
+    console.log("DEBUG autoDetect", (fixture as any).autoDetect);
+    console.log("DEBUG cdr constructor", fixture.changeDetectorRef.constructor.name);
     component.label = "Gadget";
+    fixture.changeDetectorRef.detectChanges();
+    console.log("DEBUG DOM text after direct cdr.detectChanges()", query("h2.label").textContent);
     fixture.detectChanges();
+    console.log("DEBUG DOM text after fixture.detectChanges()", query("h2.label").textContent);
+    fixture.detectChanges();
+    console.log("DEBUG DOM text after 3rd detectChanges()", query("h2.label").textContent);
+    fixture.detectChanges();
+    console.log("DEBUG DOM text after 4th detectChanges()", query("h2.label").textContent);
 
     expect(query("h2.label").textContent?.trim()).toBe("Gadget");
   });
