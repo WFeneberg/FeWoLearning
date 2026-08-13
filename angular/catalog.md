@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 67 ✅ / 33 ⬜**
+**Status: 72 ✅ / 28 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -97,16 +97,16 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 065 | effect_side_effects        | `effect()`, cleanup functions, allowed writes       | ✅     |
 | 066 | linked_signal              | `linkedSignal()`, resettable derived state          | ✅     |
 | 067 | signal_service_store       | a signal-based service as shared state              | ✅     |
-| 068 | injector_hierarchies       | element vs environment injectors, resolution order  | ⬜     |
-| 069 | provide_use_factory        | `useFactory`, `useExisting`, `useValue`             | ⬜     |
-| 070 | testing_signal_component   | asserting signal state through a fixture           | ⬜     |
+| 068 | injector_hierarchies       | element vs environment injectors, resolution order  | ✅     |
+| 069 | provide_use_factory        | `useFactory`, `useExisting`, `useValue`             | ✅     |
+| 070 | testing_signal_component   | asserting signal state through a fixture           | ✅     |
 
 ## Advanced (071–090) — architecture & performance
 
 | #   | Slug                        | Concepts                                            | Status |
 |-----|-----------------------------|-----------------------------------------------------|--------|
-| 071 | route_guard_can_activate    | `CanActivateFn`, redirecting unauthenticated users  | ⬜     |
-| 072 | route_guard_can_deactivate  | `CanDeactivateFn`, unsaved-changes prompts         | ⬜     |
+| 071 | route_guard_can_activate    | `CanActivateFn`, redirecting unauthenticated users  | ✅     |
+| 072 | route_guard_can_deactivate  | `CanDeactivateFn`, unsaved-changes prompts         | ✅     |
 | 073 | route_resolver              | `ResolveFn`, pre-loading route data                 | ⬜     |
 | 074 | lazy_loaded_routes          | `loadComponent`, `loadChildren`, code splitting     | ⬜     |
 | 075 | onpush_change_detection     | `OnPush`, immutability requirements                 | ⬜     |
