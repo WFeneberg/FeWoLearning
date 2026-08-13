@@ -1,11 +1,19 @@
-import { Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { FormArray, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from "@angular/forms";
 
 // Exercise 043 — FormArray (reference solution).
+//
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler compiles an
+// omitted `changeDetection` decorator property as OnPush rather than the intended
+// CheckAlways default (see @angular/compiler's compileComponentFromMetadata). Reactive
+// forms push value changes through RxJS/zone patching, not the signal graph, so the
+// `@for (item of items().controls; ...)` block and `{{ doneCount() }}` need CheckAlways
+// to be re-read after a plain FormArray mutation (push/insert/removeAt/clear).
 @Component({
   selector: "app-checklist-form",
   standalone: true,
   imports: [ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <form [formGroup]="form">
       <input class="title" formControlName="title" />

@@ -1,9 +1,17 @@
-import { Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 
 // Exercise 023 — template reference variables (reference solution).
+//
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler compiles an
+// omitted `changeDetection` decorator property as OnPush rather than the intended
+// CheckAlways default (see @angular/compiler's compileComponentFromMetadata, which only
+// emits a `changeDetection` field for an explicit non-OnPush value). `nameBox.value.length`
+// and `flagBox.checked` are raw DOM reads, not signals, so without this the template never
+// re-evaluates them past the first change-detection pass.
 @Component({
   selector: "app-echo-box",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <input #nameBox class="name" value="" />
     <!-- The reference is passed to a handler on a *different* element. -->

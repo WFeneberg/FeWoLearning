@@ -1,11 +1,18 @@
-import { Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from "@angular/forms";
 
 // Exercise 039 — FormBuilder (reference solution).
+//
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler compiles an
+// omitted `changeDetection` decorator property as OnPush rather than the intended
+// CheckAlways default (see @angular/compiler's compileComponentFromMetadata). Reactive
+// forms push value changes through RxJS/zone patching, not the signal graph, so
+// `{{ tagList().length }}` needs CheckAlways to be re-read after a plain array mutation.
 @Component({
   selector: "app-signup-form",
   standalone: true,
   imports: [ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <form [formGroup]="form">
       <input class="email" formControlName="email" />

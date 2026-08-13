@@ -1,4 +1,12 @@
-import { Component, Directive, Input, TemplateRef, ViewContainerRef, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Directive,
+  Input,
+  TemplateRef,
+  ViewContainerRef,
+  inject,
+} from "@angular/core";
 
 // Exercise 058 — a structural directive (reference solution).
 
@@ -66,10 +74,16 @@ export class UnlessDirective {
   }
 }
 
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler compiles an
+// omitted `changeDetection` decorator property as OnPush rather than the intended
+// CheckAlways default (see @angular/compiler's compileComponentFromMetadata). `count` and
+// `hidden` are plain fields, not signals, so the `*appRepeatTimes`/`*appUnless` structural
+// directives' input bindings need CheckAlways to be re-evaluated after a plain mutation.
 @Component({
   selector: "app-repeat-host",
   standalone: true,
   imports: [RepeatTimesDirective, UnlessDirective],
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <p class="row" *appRepeatTimes="count; let i = index; let isLast = last">
       {{ i }}{{ isLast ? "!" : "" }}

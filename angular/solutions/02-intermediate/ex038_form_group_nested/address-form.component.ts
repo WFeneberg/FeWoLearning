@@ -1,11 +1,18 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 
 // Exercise 038 — nested FormGroups (reference solution).
+//
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler compiles an
+// omitted `changeDetection` decorator property as OnPush rather than the intended
+// CheckAlways default (see @angular/compiler's compileComponentFromMetadata). Reactive
+// forms push value changes through RxJS/zone patching, not the signal graph, so
+// `{{ summary() }}` needs CheckAlways to be re-read after a plain form mutation.
 @Component({
   selector: "app-address-form",
   standalone: true,
   imports: [ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <form [formGroup]="form">
       <input class="name" formControlName="name" />

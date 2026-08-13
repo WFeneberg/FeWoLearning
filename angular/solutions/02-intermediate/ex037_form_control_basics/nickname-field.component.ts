@@ -1,11 +1,18 @@
-import { Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 
 // Exercise 037 — FormControl basics (reference solution).
+//
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler compiles an
+// omitted `changeDetection` decorator property as OnPush rather than the intended
+// CheckAlways default (see @angular/compiler's compileComponentFromMetadata). Reactive
+// forms push value changes through RxJS/zone patching, not the signal graph, so
+// `{{ nickname.value }}` needs CheckAlways to be re-read after a plain setValue().
 @Component({
   selector: "app-nickname-field",
   standalone: true,
   imports: [ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <input class="nickname" [formControl]="nickname" />
     <p class="echo">{{ nickname.value }}</p>

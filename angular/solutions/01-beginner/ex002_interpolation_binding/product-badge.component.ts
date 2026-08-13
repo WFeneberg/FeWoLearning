@@ -1,9 +1,17 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 
 // Exercise 002 — ProductBadgeComponent (reference solution).
+//
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler only emits a
+// `changeDetection` field on the compiled component definition when metadata.changeDetection
+// is an explicit non-OnPush value; an omitted decorator property is compiled as OnPush
+// instead of the intended CheckAlways default (see @angular/compiler's
+// compileComponentFromMetadata). Every binding here reads a plain, non-signal field, so
+// without this the view stops refreshing after its first change-detection pass.
 @Component({
   selector: "app-product-badge",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <h2 class="label">{{ label }}</h2>
     <p class="stock">{{ stockLabel() }}</p>

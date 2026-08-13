@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { VolumeDialComponent } from "./volume-dial.component";
 
@@ -7,6 +7,11 @@ import { VolumeDialComponent } from "./volume-dial.component";
   selector: "app-host",
   standalone: true,
   imports: [VolumeDialComponent],
+  // Explicit: Angular 22.1.1's JIT compiler compiles an omitted `changeDetection` as OnPush
+  // instead of the intended CheckAlways default (an emitted-definition bug, not a signals
+  // opt-in). hostLevel/hostLabel are plain fields, not signals, so without this the second
+  // `host.detectChanges()` below would never push a parent-side write down into the child.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `<app-volume-dial [(level)]="hostLevel" [(label)]="hostLabel" />`,
 })
 class HostComponent {

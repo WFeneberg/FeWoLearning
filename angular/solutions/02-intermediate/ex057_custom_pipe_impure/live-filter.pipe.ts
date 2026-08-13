@@ -1,4 +1,4 @@
-import { Component, computed, Pipe, PipeTransform, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, Pipe, PipeTransform, signal } from "@angular/core";
 
 // Exercise 057 — an impure pipe, and when it is justified (reference solution).
 
@@ -34,10 +34,17 @@ export class StaticFilterPipe implements PipeTransform {
   }
 }
 
+// changeDetection is explicit here because Angular 22.1.1's JIT compiler compiles an
+// omitted `changeDetection` decorator property as OnPush rather than the intended
+// CheckAlways default (see @angular/compiler's compileComponentFromMetadata). An impure
+// pipe is defined to run on *every* change-detection pass regardless of its inputs, which
+// only happens if the host view itself keeps getting checked — exactly what CheckAlways
+// provides and OnPush withholds without a signal/input change.
 @Component({
   selector: "app-live-filter-host",
   standalone: true,
   imports: [LiveFilterPipe, StaticFilterPipe],
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <p class="impure">{{ items | liveFilter: term() }}</p>
     <p class="pure">{{ items | staticFilter: term() }}</p>

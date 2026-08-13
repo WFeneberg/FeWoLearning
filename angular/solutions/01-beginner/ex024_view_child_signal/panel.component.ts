@@ -1,4 +1,4 @@
-import { Component, ElementRef, signal, viewChild, viewChildren } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, signal, viewChild, viewChildren } from "@angular/core";
 
 // Exercise 024 — viewChild() and viewChildren() (reference solution).
 
@@ -19,6 +19,12 @@ export class BadgeComponent {
   selector: "app-panel",
   standalone: true,
   imports: [BadgeComponent],
+  // Explicit: Angular 22.1.1's JIT compiler compiles an omitted `changeDetection` as OnPush
+  // instead of the intended CheckAlways default (see @angular/compiler's
+  // compileComponentFromMetadata). typedLength() reads nameBox()'s *nativeElement.value*,
+  // a raw DOM property the viewChild() signal itself does not track, so without this the
+  // template stops re-evaluating it after the first pass even though nameBox() is a signal.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <input #nameBox class="name" />
     <app-badge />
