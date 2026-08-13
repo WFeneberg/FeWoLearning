@@ -9,7 +9,7 @@ This table is the track's progress ledger: it lists every exercise 001–100, an
 the ⬜ rows are the work queue. Slugs on ⬜ rows are the intended module name
 (`exNNN_<slug>.py`) and may still be adjusted when the exercise is written.
 
-**Status: 86 ✅ / 14 ⬜**
+**Status: 91 ✅ / 9 ⬜**
 
 ## Beginner (001–035) — fundamentals
 
@@ -125,16 +125,16 @@ metaclasses, `__slots__`, custom iterators, `contextvars`, `heapq`,
 | 084 | custom_iterator               | `__iter__`/`__next__`, `StopIteration`          | ✅     |
 | 085 | contextvars_request_id        | `contextvars`, async-safe ambient context       | ✅     |
 | 086 | heapq_priority_queue          | `heapq`, tuple priorities, tie-breaking         | ✅     |
-| 087 | singledispatch_dispatch       | `functools.singledispatch`, `register`          | ⬜     |
-| 088 | weakref_cache                 | `WeakValueDictionary`, object lifetime          | ⬜     |
-| 089 | streaming_generator_pipeline   | memory-bounded pipelines over large inputs      | ⬜     |
-| 090 | abc_abstract_base             | `abc.ABC`, `abstractmethod`, interface checks   | ⬜     |
+| 087 | singledispatch_dispatch       | `functools.singledispatch`, `register`          | ✅     |
+| 088 | weakref_cache                 | `WeakValueDictionary`, object lifetime          | ✅     |
+| 089 | streaming_generator_pipeline   | memory-bounded pipelines over large inputs      | ✅     |
+| 090 | abc_abstract_base             | `abc.ABC`, `abstractmethod`, interface checks   | ✅     |
 
 ## Expert (091–100) — architecture & systems
 
 | #   | Slug                     | Concepts                                             | Status |
 |-----|--------------------------|------------------------------------------------------|--------|
-| 091 | wsgi_micro_framework     | WSGI callable, routing, request/response objects     | ⬜     |
+| 091 | wsgi_micro_framework     | WSGI callable, routing, request/response objects     | ✅     |
 | 092 | orm_query_builder        | fluent builder, SQL generation, parameter binding    | ⬜     |
 | 093 | plugin_entry_points      | plugin discovery, registry, `importlib`              | ⬜     |
 | 094 | async_task_queue         | async worker pool, retries, backpressure             | ⬜     |
