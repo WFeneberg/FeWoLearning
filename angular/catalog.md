@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a folder
 Components are **standalone** and use **signals**; tests run headless through
 Jest (`jest-preset-angular`), not Karma.
 
-**Status: 82 ✅ / 18 ⬜**
+**Status: 87 ✅ / 13 ⬜**
 
 ## Beginner (001–035) — components & DI
 
@@ -117,11 +117,11 @@ Reactive forms, `HttpClient` + `HttpTestingController`, RxJS operators,
 | 080 | dynamic_component_loading   | `ViewContainerRef.createComponent`, inputs          | ✅     |
 | 081 | defer_block                 | `@defer`, triggers, placeholder and loading blocks   | ✅     |
 | 082 | directive_composition       | `hostDirectives`, composing behaviour               | ✅     |
-| 083 | fake_async_tick             | `fakeAsync`, `tick`, `flushMicrotasks`              | ⬜     |
-| 084 | testing_router_harness      | `RouterTestingHarness`, navigating in tests        | ⬜     |
-| 085 | signal_store_pattern        | a typed signal store with actions and selectors     | ⬜     |
-| 086 | resource_async_signal       | `resource()`, async loading as signal state        | ⬜     |
-| 087 | virtual_scroll_list         | windowed rendering over a large list                | ⬜     |
+| 083 | fake_async_tick             | `fakeAsync`, `tick`, `flushMicrotasks`              | ✅     |
+| 084 | testing_router_harness      | `RouterTestingHarness`, navigating in tests        | ✅     |
+| 085 | signal_store_pattern        | a typed signal store with actions and selectors     | ✅     |
+| 086 | resource_async_signal       | `resource()`, async loading as signal state        | ✅     |
+| 087 | virtual_scroll_list         | windowed rendering over a large list                | ✅     |
 | 088 | error_handler_global        | a custom `ErrorHandler`, reporting                  | ⬜     |
 | 089 | zoneless_change_detection   | `provideExperimentalZonelessChangeDetection`        | ⬜     |
 | 090 | performance_track_by        | `@for` `track` correctness and DOM reuse            | ⬜     |
