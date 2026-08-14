@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 5 ✅ / 95 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -19,11 +19,11 @@ scope functions, generics, and introductory JUnit assertions.
 
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
-| 001 | val_var_basics          | `val`, `var`, type inference                          | ⬜     |
-| 002 | string_templates        | string templates, multiline strings                   | ⬜     |
-| 003 | ranges_and_when         | ranges, `when`, exhaustiveness                        | ⬜     |
-| 004 | collection_filter_map   | list transformations, immutable collections           | ⬜     |
-| 005 | nullable_basics         | nullable types, smart casts                           | ⬜     |
+| 001 | val_var_basics          | `val`, `var`, type inference                          | ✅     |
+| 002 | string_templates        | string templates, multiline strings                   | ✅     |
+| 003 | ranges_and_when         | ranges, `when`, exhaustiveness                        | ✅     |
+| 004 | collection_filter_map   | list transformations, immutable collections           | ✅     |
+| 005 | nullable_basics         | nullable types, smart casts                           | ✅     |
 | 006 | elvis_operator          | `?:`, defaults, early returns                         | ⬜     |
 | 007 | safe_calls_chain        | `?.`, chaining, nullable navigation                   | ⬜     |
 | 008 | data_class_point        | data classes, copy, equality                          | ⬜     |
