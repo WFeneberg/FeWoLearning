@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 55 ✅ / 45 ⬜**
+**Status: 60 ✅ / 40 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -82,11 +82,11 @@ basics, and richer test coverage.
 | 053 | sealed_shape_area       | sealed hierarchies, exhaustive branching              | ✅     |
 | 054 | pattern_instanceof      | pattern matching for `instanceof`                     | ✅     |
 | 055 | pattern_switch          | pattern matching `switch`                             | ✅     |
-| 056 | http_client_get         | `HttpClient`, request/response basics                 | ⬜     |
-| 057 | completable_future_chain| async composition, continuations                      | ⬜     |
-| 058 | completable_future_allof| waiting for many tasks                                | ⬜     |
-| 059 | executor_service_batch  | task submission, shutdown                             | ⬜     |
-| 060 | synchronized_counter    | synchronized methods, race conditions                 | ⬜     |
+| 056 | http_client_get         | `HttpClient`, request/response basics                 | ✅     |
+| 057 | completable_future_chain| async composition, continuations                      | ✅     |
+| 058 | completable_future_allof| waiting for many tasks                                | ✅     |
+| 059 | executor_service_batch  | task submission, shutdown                             | ✅     |
+| 060 | synchronized_counter    | synchronized methods, race conditions                 | ✅     |
 | 061 | reentrant_lock_guard    | `ReentrantLock`, `try/finally`                        | ⬜     |
 | 062 | atomic_integer_counter  | atomics, lock-free increments                         | ⬜     |
 | 063 | nio_walk_files          | `Files.walk`, filtering paths                         | ⬜     |
