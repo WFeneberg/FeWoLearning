@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -44,11 +44,11 @@ scope functions, generics, and introductory JUnit assertions.
 | 023 | interface_default_impl  | interfaces, default implementations                   | ✅     |
 | 024 | inheritance_override    | open classes, overriding, `super`                     | ✅     |
 | 025 | generic_box             | generic classes, type parameters                      | ✅     |
-| 026 | reified_type_check      | inline reified generics                               | ⬜     |
-| 027 | sequence_lazy_basics    | sequences, laziness, terminal operations              | ⬜     |
-| 028 | regex_validation        | regular expressions, destructuring matches            | ⬜     |
-| 029 | result_run_catching     | `Result`, `runCatching`, recovery                     | ⬜     |
-| 030 | local_date_parsing      | Java time interop, parsing dates                      | ⬜     |
+| 026 | reified_type_check      | inline reified generics                               | ✅     |
+| 027 | sequence_lazy_basics    | sequences, laziness, terminal operations              | ✅     |
+| 028 | regex_validation        | regular expressions, destructuring matches            | ✅     |
+| 029 | result_run_catching     | `Result`, `runCatching`, recovery                     | ✅     |
+| 030 | local_date_parsing      | Java time interop, parsing dates                      | ✅     |
 | 031 | big_decimal_money       | `BigDecimal`, precision, rounding                     | ⬜     |
 | 032 | junit_assertions        | basic JUnit assertions, AAA                           | ⬜     |
 | 033 | property_custom_getter  | custom getters, derived properties                    | ⬜     |
