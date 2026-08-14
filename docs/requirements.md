@@ -76,7 +76,7 @@ rustup default stable-x86_64-pc-windows-gnu
 | `angular/`| `npm install` — done, `node_modules` and `package-lock.json` present |
 | `go/`     | none — `go mod download` already ran (`golang.org/x/sync`)  |
 | `rust/`   | none — `.cargo/config.toml` supplies `LIB`, see above        |
-| `java/`   | planned — add JDK 21 and a Gradle wrapper when the track is scaffolded |
+| `java/`   | needs JDK 21 + Gradle installed (neither is present on this machine); no wrapper is committed — run `gradle wrapper` once you have Gradle, or just invoke a system `gradle` directly |
 | `kotlin/` | planned — add JDK 21, Kotlin, and a Gradle wrapper when the track is scaffolded |
 
 Set `GOTMPDIR` outside `%TEMP%` when running `go test`: on-access scanning can
@@ -101,6 +101,10 @@ Open **each language folder as its own project**, not the repo root.
 If you use the unified IDE, install the corresponding language plugins and open
 folders as separate windows so each keeps its own SDK/interpreter selection.
 
-Java and Kotlin are **catalog-only** right now: the track folders exist for the
-exercise ledgers, but no Gradle build, stubs, tests, or reference solutions have
-been seeded yet.
+`java/` is fully seeded (100/100 exercises: Gradle build, stubs, JUnit 5 tests,
+reference solutions) but **completely unverified** — this machine has neither a
+JDK nor Gradle, so nothing in it has ever been compiled. Expect real compile
+errors on the first actual `gradle test` run; treat it as much higher-risk than
+every other (verified) track until that first run happens. `kotlin/` is still
+**catalog-only**: the track folder exists for the exercise ledger, but no
+Gradle build, stubs, tests, or reference solutions have been seeded yet.

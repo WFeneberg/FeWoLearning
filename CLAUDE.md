@@ -98,9 +98,19 @@ Run every command **from inside the track folder**, not the repo root.
 - **Angular** — Headless testing via **Jest** (`jest-preset-angular`), not
   Karma; tests are `*.spec.ts`. Components are **standalone** and use **signals**.
   Stubs `throw`.
-- **Java** — planned layout is one package folder per exercise containing the
-  stub plus a sibling JUnit test; when unfinished, stubs should `throw` at runtime
-  rather than fail compilation.
+- **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
+  generated without a JDK/Gradle on this machine — install both, or run
+  `gradle wrapper` once you have Gradle, before first use). One package folder
+  per exercise (`exercises/<tier>/exNNN_slug/`) containing the stub plus a
+  sibling JUnit 5 test — both live in a single Gradle `test` source set rooted
+  at `exercises/` (there is no `src/main`/`src/test` split), so `solutions/`
+  is naturally excluded from the build just by never being referenced by a
+  source set. Package names are `fewolearning.exercises.<tier>.exNNN_slug`.
+  Stubs `throw new UnsupportedOperationException("TODO")`. ex084 additionally
+  needs `java/resources/META-INF/services/...` (a `ServiceLoader` provider-
+  configuration file, at the classpath root — hence its own top-level
+  `resources/` source dir rather than living under `exercises/`). **This
+  entire track is unverified** — see "Current state" above.
 - **Kotlin** — planned layout mirrors Java, but the exercises should prefer
   top-level functions, data classes, and idiomatic null-safety. Unfinished stubs
   should `TODO()` at runtime.
@@ -162,15 +172,24 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
 | `rust/`   | 100 / 100  | —         |
-| `java/`   | 0 / 100    | 100       |
+| `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 0 / 100    | 100       |
 
-Work order for the remaining exercises: **java → kotlin**, in
+Work order for the remaining exercises: **kotlin**, in
 batches of five, each batch red-verified then green-verified before its catalog
 rows flip.
 
-`dotnet/`, `go/`, `vue/`, `python/`, `angular/` and `rust/` are content-complete.
-`java/` and `kotlin/` are cataloged but not scaffolded yet. `go/` was verified by
+`dotnet/`, `go/`, `vue/`, `python/`, `angular/` and `rust/` are content-complete
+**and verified** (every stub confirmed red, every solution confirmed green,
+by actually running that track's test command). `java/` is now also
+content-complete — Gradle scaffold, all 100 stubs' sibling JUnit tests, and
+all 100 reference solutions exist — **but nothing in it has ever been
+compiled or run**: this machine has no JDK or Gradle installed, and the
+track was written by careful manual authorship and self/fork-review instead
+of a red/green test cycle. Treat `java/` as substantially higher-risk than
+every other track until someone with a JDK 21 + Gradle install runs
+`gradle test` against it for the first time — expect to find and fix real
+compile errors then. `kotlin/` is cataloged but not scaffolded yet. `go/` was verified by
 overlaying every reference solution onto its stub (`go vet ./...` clean, 100
 stubs red, 100 solutions green); `vue/` runs 100 red exercise suites and 72
 green solution suites, with `npm run typecheck:solutions` at zero errors;

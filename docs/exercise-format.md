@@ -91,7 +91,7 @@ stubs' type and module names, so compiling both at once would collide).
 | `angular/`| **No.** `testMatch` covers `exercises/` only.                               |
 | `vue/`    | Partly. `vitest.config.ts` also collects `solutions/**/*.test.ts`, but only some solution folders carry a test copy. |
 | `rust/`   | **No.** Solutions are not registered in `lib.rs`.                            |
-| `java/`   | **No.** The track is catalog-only today; no build includes `solutions/` yet. |
+| `java/`   | **No** — not by a build (`solutions/` isn't referenced by any Gradle source set) **and not by anything else either**: this machine has no JDK/Gradle, so the track has never been compiled at all, stubs included. Higher risk than every other row in this table. |
 | `kotlin/` | **No.** The track is catalog-only today; no build includes `solutions/` yet. |
 
 Consequence: a reference solution can silently drift until it no longer passes
@@ -140,7 +140,11 @@ against a throwing stub.
   `%USERPROFILE%\.cargo\bin`.
 - **`vue/`** — the advanced tier hand-rolls minimal Pinia- and Router-shaped
   helpers rather than depending on `pinia` / `vue-router`.
-- **`java/`** — planned exercise folders should keep one package per exercise,
-  with the test beside the stub so solution overlays stay one-to-one.
+- **`java/`** — one package per exercise, with the test beside the stub in a
+  single Gradle `test` source set rooted at `exercises/` (no `src/main`/`src/test`
+  split). ex084 needs a project-level `resources/META-INF/services/...` file for
+  `ServiceLoader` — the one exercise whose fixture can't live inside its own
+  exercise folder, since `ServiceLoader` provider files must sit at the classpath
+  root. Seeded at 100/100 but never compiled (no local JDK/Gradle).
 - **`kotlin/`** — planned exercise folders should mirror the Java layout, but the
   stubs should prefer top-level functions and data classes where idiomatic.
