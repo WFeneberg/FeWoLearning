@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 65 ✅ / 35 ⬜**
+**Status: 70 ✅ / 30 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -92,11 +92,11 @@ basics, and richer test coverage.
 | 063 | nio_walk_files          | `Files.walk`, filtering paths                         | ✅     |
 | 064 | properties_config       | `Properties`, config loading                          | ✅     |
 | 065 | locale_number_format    | locale-aware formatting                               | ✅     |
-| 066 | time_zone_conversion    | `ZonedDateTime`, zone conversions                     | ⬜     |
-| 067 | javadoc_contracts       | API documentation, edge-case contracts                | ⬜     |
-| 068 | junit_parameterized     | parameterized tests, input tables                     | ⬜     |
-| 069 | junit_exception_testing | failure assertions, messages                          | ⬜     |
-| 070 | test_double_handrolled  | hand-rolled test doubles, interaction checks          | ⬜     |
+| 066 | time_zone_conversion    | `ZonedDateTime`, zone conversions                     | ✅     |
+| 067 | javadoc_contracts       | API documentation, edge-case contracts                | ✅     |
+| 068 | junit_parameterized     | parameterized tests, input tables                     | ✅     |
+| 069 | junit_exception_testing | failure assertions, messages                          | ✅     |
+| 070 | test_double_handrolled  | hand-rolled test doubles, interaction checks          | ✅     |
 
 ## Advanced (071–090) — concurrency, JVM features, architecture
 
