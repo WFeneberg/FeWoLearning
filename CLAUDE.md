@@ -161,16 +161,16 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `rust/`   | 2 / 100    | 98        |
+| `rust/`   | 100 / 100  | —         |
 | `java/`   | 0 / 100    | 100       |
 | `kotlin/` | 0 / 100    | 100       |
 
-Work order for the remaining exercises: **rust → java → kotlin**, in
+Work order for the remaining exercises: **java → kotlin**, in
 batches of five, each batch red-verified then green-verified before its catalog
-rows flip. Rust is no longer gated — `cargo test` links and runs.
+rows flip.
 
-`dotnet/`, `go/`, `vue/`, `python/` and `angular/` are content-complete. `java/`
-and `kotlin/` are cataloged but not scaffolded yet. `go/` was verified by
+`dotnet/`, `go/`, `vue/`, `python/`, `angular/` and `rust/` are content-complete.
+`java/` and `kotlin/` are cataloged but not scaffolded yet. `go/` was verified by
 overlaying every reference solution onto its stub (`go vet ./...` clean, 100
 stubs red, 100 solutions green); `vue/` runs 100 red exercise suites and 72
 green solution suites, with `npm run typecheck:solutions` at zero errors;
@@ -180,7 +180,13 @@ onto its stub — see Known gaps below for the same kind of solutions/ drift
 found in vue/ and go/. `python/` ex082–100 (the batch added to close the
 track out) were each verified stub-red/solution-green individually by
 overlaying into a scratch copy; the full 100-exercise suite collects and
-runs red end-to-end with zero collection errors.
+runs red end-to-end with zero collection errors. `rust/` ex002–100 (the
+batch added to close that track out) were likewise verified per-batch
+(stub-red on the real tree, solution-green in a scratch overlay, re-run
+2-3× for any concurrency exercise); the full crate additionally has all
+100 solutions overlaid together at once as an integration check —
+`cargo test` shows 0 passed/100 stubs red on the untouched tree and
+395 passed/0 failed with every solution overlaid, doc-tests included.
 
 ## Known gaps
 

@@ -134,8 +134,10 @@ against a throwing stub.
 - **`go/`** — `go test` writes its test binaries under `%TEMP%`, where on-access
   scanning can delete them before exec (`fork/exec …: file not found`). Set
   `GOTMPDIR` elsewhere, or run a `go test -c` binary directly.
-- **`rust/`** — `cargo test` cannot link on this machine: MSVC libraries and the
-  Windows SDK are absent. See the root `README.md` for the installer command.
+- **`rust/`** — `cargo test` links and runs fine via `rust/.cargo/config.toml`,
+  which pins `LIB` at a VS 2022 Community install (see that file's comment for
+  why). `cargo`/`rustc` are not on `PATH` in a plain shell — prepend
+  `%USERPROFILE%\.cargo\bin`.
 - **`vue/`** — the advanced tier hand-rolls minimal Pinia- and Router-shaped
   helpers rather than depending on `pinia` / `vue-router`.
 - **`java/`** — planned exercise folders should keep one package per exercise,
