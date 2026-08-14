@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -62,21 +62,21 @@ properties, file APIs, coroutines, flows, and time-controlled tests.
 
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
-| 036 | counter_state           | encapsulated mutable state                            | ⬜     |
-| 037 | require_not_null        | `requireNotNull`, fail-fast validation                | ⬜     |
-| 038 | collection_group_by     | `groupBy`, transformation after grouping              | ⬜     |
-| 039 | collection_associate_by | `associateBy`, key collisions                         | ⬜     |
-| 040 | sequence_pipeline       | lazy multi-step transformations                       | ⬜     |
-| 041 | inline_higher_order     | `inline`, non-local returns                           | ⬜     |
-| 042 | tailrec_accumulator     | tail recursion, accumulator threading                 | ⬜     |
-| 043 | nullable_receiver_ext   | extensions on nullable receivers                      | ⬜     |
-| 044 | infix_functions         | infix notation, readability tradeoffs                 | ⬜     |
-| 045 | variance_out            | declaration-site covariance                           | ⬜     |
-| 046 | variance_in             | contravariance, consumers                             | ⬜     |
-| 047 | star_projection         | star projections, safe reads                          | ⬜     |
-| 048 | sealed_ui_state         | state modeling, exhaustive `when`                     | ⬜     |
-| 049 | data_object_singleton   | `data object`, singleton identity                     | ⬜     |
-| 050 | value_class_email       | value classes, validation                             | ⬜     |
+| 036 | counter_state           | encapsulated mutable state                            | ✅     |
+| 037 | require_not_null        | `requireNotNull`, fail-fast validation                | ✅     |
+| 038 | collection_group_by     | `groupBy`, transformation after grouping              | ✅     |
+| 039 | collection_associate_by | `associateBy`, key collisions                         | ✅     |
+| 040 | sequence_pipeline       | lazy multi-step transformations                       | ✅     |
+| 041 | inline_higher_order     | `inline`, non-local returns                           | ✅     |
+| 042 | tailrec_accumulator     | tail recursion, accumulator threading                 | ✅     |
+| 043 | nullable_receiver_ext   | extensions on nullable receivers                      | ✅     |
+| 044 | infix_functions         | infix notation, readability tradeoffs                 | ✅     |
+| 045 | variance_out            | declaration-site covariance                           | ✅     |
+| 046 | variance_in             | contravariance, consumers                             | ✅     |
+| 047 | star_projection         | star projections, safe reads                          | ✅     |
+| 048 | sealed_ui_state         | state modeling, exhaustive `when`                     | ✅     |
+| 049 | data_object_singleton   | `data object`, singleton identity                     | ✅     |
+| 050 | value_class_email       | value classes, validation                             | ✅     |
 | 051 | delegated_observable    | `Delegates.observable`, change hooks                  | ⬜     |
 | 052 | delegated_map_backed    | map-backed properties, dynamic models                 | ⬜     |
 | 053 | comparator_then_by      | comparator composition                                | ⬜     |
