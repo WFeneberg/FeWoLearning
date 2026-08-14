@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 27 ✅ / 73 ⬜**
+**Status: 32 ✅ / 68 ⬜**
 
 > **Toolchain note.** `cargo test` cannot link on this machine yet: Rust is
 > installed with the `x86_64-pc-windows-msvc` target, but the MSVC libraries and
@@ -53,11 +53,11 @@ an unregistered file is never compiled.
 | 024 | struct_update_syntax    | `..base` struct update, field init shorthand          | ✅     |
 | 025 | ownership_move          | moves, why a moved value cannot be reused             | ✅     |
 | 026 | borrow_immutable        | `&T`, many readers, no writers                        | ✅     |
-| 027 | borrow_mutable          | `&mut T`, exclusivity, reborrowing                    | ⬜     |
-| 028 | clone_vs_copy           | `Clone` vs `Copy` semantics                           | ⬜     |
-| 029 | iterator_map_filter     | `map`, `filter`, `collect` into `Vec`                 | ⬜     |
-| 030 | iterator_fold           | `fold`, accumulator threading                         | ⬜     |
-| 031 | iterator_zip_enumerate  | `zip`, `enumerate`, `rev`                             | ⬜     |
+| 027 | borrow_mutable          | `&mut T`, exclusivity, reborrowing                    | ✅     |
+| 028 | clone_vs_copy           | `Clone` vs `Copy` semantics                           | ✅     |
+| 029 | iterator_map_filter     | `map`, `filter`, `collect` into `Vec`                 | ✅     |
+| 030 | iterator_fold           | `fold`, accumulator threading                         | ✅     |
+| 031 | iterator_zip_enumerate  | `zip`, `enumerate`, `rev`                             | ✅     |
 | 032 | sort_by_key             | `sort_by_key`, `sort_unstable`, stability             | ⬜     |
 | 033 | vec_dedup_retain        | `dedup`, `retain`, in-place filtering                 | ⬜     |
 | 034 | fizz_buzz               | control flow, modulo, `String` building               | ⬜     |

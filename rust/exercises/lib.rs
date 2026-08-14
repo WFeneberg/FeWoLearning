@@ -79,5 +79,20 @@ pub mod ex025_ownership_move;
 #[path = "01-beginner/ex026_borrow_immutable.rs"]
 pub mod ex026_borrow_immutable;
 
+#[path = "01-beginner/ex027_borrow_mutable.rs"]
+pub mod ex027_borrow_mutable;
+
+#[path = "01-beginner/ex028_clone_vs_copy.rs"]
+pub mod ex028_clone_vs_copy;
+
+#[path = "01-beginner/ex029_iterator_map_filter.rs"]
+pub mod ex029_iterator_map_filter;
+
+#[path = "01-beginner/ex030_iterator_fold.rs"]
+pub mod ex030_iterator_fold;
+
+#[path = "01-beginner/ex031_iterator_zip_enumerate.rs"]
+pub mod ex031_iterator_zip_enumerate;
+
 #[path = "02-intermediate/ex036_rle.rs"]
 pub mod ex036_rle;
