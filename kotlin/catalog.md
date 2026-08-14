@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -34,16 +34,16 @@ scope functions, generics, and introductory JUnit assertions.
 | 013 | destructuring_pairs     | destructuring, pairs, data classes                    | ✅     |
 | 014 | list_mutability         | `List` vs `MutableList`, copying                      | ✅     |
 | 015 | map_count_words         | maps, `getOrDefault`, counting                        | ✅     |
-| 016 | higher_order_basics     | passing functions, lambdas                            | ⬜     |
-| 017 | lambda_capture          | closures, captured state                              | ⬜     |
-| 018 | scope_let_run           | `let`, `run`, temporary scopes                        | ⬜     |
-| 019 | scope_apply_also        | `apply`, `also`, receiver vs argument                 | ⬜     |
-| 020 | string_builder_dsl      | `buildString`, DSL-like blocks                        | ⬜     |
-| 021 | object_singleton        | `object`, singleton lifetime                          | ⬜     |
-| 022 | companion_factory       | companion objects, factory methods                    | ⬜     |
-| 023 | interface_default_impl  | interfaces, default implementations                   | ⬜     |
-| 024 | inheritance_override    | open classes, overriding, `super`                     | ⬜     |
-| 025 | generic_box             | generic classes, type parameters                      | ⬜     |
+| 016 | higher_order_basics     | passing functions, lambdas                            | ✅     |
+| 017 | lambda_capture          | closures, captured state                              | ✅     |
+| 018 | scope_let_run           | `let`, `run`, temporary scopes                        | ✅     |
+| 019 | scope_apply_also        | `apply`, `also`, receiver vs argument                 | ✅     |
+| 020 | string_builder_dsl      | `buildString`, DSL-like blocks                        | ✅     |
+| 021 | object_singleton        | `object`, singleton lifetime                          | ✅     |
+| 022 | companion_factory       | companion objects, factory methods                    | ✅     |
+| 023 | interface_default_impl  | interfaces, default implementations                   | ✅     |
+| 024 | inheritance_override    | open classes, overriding, `super`                     | ✅     |
+| 025 | generic_box             | generic classes, type parameters                      | ✅     |
 | 026 | reified_type_check      | inline reified generics                               | ⬜     |
 | 027 | sequence_lazy_basics    | sequences, laziness, terminal operations              | ⬜     |
 | 028 | regex_validation        | regular expressions, destructuring matches            | ⬜     |
