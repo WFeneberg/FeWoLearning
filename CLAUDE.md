@@ -111,9 +111,19 @@ Run every command **from inside the track folder**, not the repo root.
   configuration file, at the classpath root — hence its own top-level
   `resources/` source dir rather than living under `exercises/`). **This
   entire track is unverified** — see "Current state" above.
-- **Kotlin** — planned layout mirrors Java, but the exercises should prefer
-  top-level functions, data classes, and idiomatic null-safety. Unfinished stubs
-  should `TODO()` at runtime.
+- **Kotlin** — Gradle Kotlin DSL (`kotlin/build.gradle.kts`), same single-`test`-
+  source-set layout as Java (`exercises/<tier>/exNNN_slug/` holding both the
+  stub and its sibling JUnit 5 test), but favors top-level functions, data
+  classes, and idiomatic null-safety over Java-style wrapper classes. Stubs
+  `TODO()` at runtime. Coroutine-heavy tiers (intermediate onward: channels,
+  `Flow`, `SharedFlow`/`StateFlow`, supervisors, actors) depend on
+  `kotlinx-coroutines-core` and test via `kotlinx-coroutines-test`'s
+  `runTest { ... }` with virtual time — never `Thread.sleep`/wall-clock delays.
+  A recurring bug class here: a test/solution that "passes" regardless of
+  whether the actual mechanism (`supervisorScope`, `combine`, `debounce`,
+  `flatMapLatest`) is even used — always ask whether a naive/wrong
+  implementation would still pass before trusting a coroutine test. **This
+  entire track is unverified** — see "Current state" above.
 
 ## Adding or completing exercises
 
@@ -173,23 +183,30 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `angular/`| 100 / 100  | —         |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
-| `kotlin/` | 0 / 100    | 100       |
+| `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 
-Work order for the remaining exercises: **kotlin**, in
-batches of five, each batch red-verified then green-verified before its catalog
-rows flip.
+All 100-exercise ledgers across all 8 tracks are now written. Nothing is
+"remaining" in the sense of unwritten content; `java/` and `kotlin/` still need
+their first real compile/test run (see below) before they can be trusted the
+way the other six tracks are.
 
 `dotnet/`, `go/`, `vue/`, `python/`, `angular/` and `rust/` are content-complete
 **and verified** (every stub confirmed red, every solution confirmed green,
-by actually running that track's test command). `java/` is now also
-content-complete — Gradle scaffold, all 100 stubs' sibling JUnit tests, and
-all 100 reference solutions exist — **but nothing in it has ever been
-compiled or run**: this machine has no JDK or Gradle installed, and the
-track was written by careful manual authorship and self/fork-review instead
-of a red/green test cycle. Treat `java/` as substantially higher-risk than
-every other track until someone with a JDK 21 + Gradle install runs
-`gradle test` against it for the first time — expect to find and fix real
-compile errors then. `kotlin/` is cataloged but not scaffolded yet. `go/` was verified by
+by actually running that track's test command). `java/` and `kotlin/` are also
+content-complete — Gradle scaffolds, all 100 stubs' sibling JUnit tests, and
+all 100 reference solutions exist for each — **but nothing in either has ever
+been compiled or run**: this machine has no JDK, Gradle, or Kotlin installed,
+and both tracks were written by careful manual authorship and self/fork-review
+instead of a red/green test cycle. Several real bugs were still found this
+way without a compiler (e.g. Kotlin ex063's solution originally swallowed
+every task exception with `runCatching`, which made its test pass under any
+coroutine scope — not just `supervisorScope`, the thing it was supposed to
+prove; ex072's test combined two fully-synchronous flows with no suspension
+points, risking silent conflation of intermediate `combine` emissions).
+Treat `java/` and `kotlin/` as substantially higher-risk than every other
+track until someone with a real JDK 21 + Gradle (+ Kotlin, for `kotlin/`)
+install runs `gradle test` against each for the first time — expect to find
+and fix real compile errors then. `go/` was verified by
 overlaying every reference solution onto its stub (`go vet ./...` clean, 100
 stubs red, 100 solutions green); `vue/` runs 100 red exercise suites and 72
 green solution suites, with `npm run typecheck:solutions` at zero errors;

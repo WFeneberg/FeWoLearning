@@ -92,7 +92,7 @@ stubs' type and module names, so compiling both at once would collide).
 | `vue/`    | Partly. `vitest.config.ts` also collects `solutions/**/*.test.ts`, but only some solution folders carry a test copy. |
 | `rust/`   | **No.** Solutions are not registered in `lib.rs`.                            |
 | `java/`   | **No** — not by a build (`solutions/` isn't referenced by any Gradle source set) **and not by anything else either**: this machine has no JDK/Gradle, so the track has never been compiled at all, stubs included. Higher risk than every other row in this table. |
-| `kotlin/` | **No.** The track is catalog-only today; no build includes `solutions/` yet. |
+| `kotlin/` | **No** — same situation as `java/`: not referenced by any Gradle source set, and not compiled by anything else either, since this machine has no JDK/Gradle/Kotlin at all. Higher risk than every other row in this table. |
 
 Consequence: a reference solution can silently drift until it no longer passes
 its own test, and nothing reports it. This is not hypothetical — an audit found
@@ -146,5 +146,9 @@ against a throwing stub.
   `ServiceLoader` — the one exercise whose fixture can't live inside its own
   exercise folder, since `ServiceLoader` provider files must sit at the classpath
   root. Seeded at 100/100 but never compiled (no local JDK/Gradle).
-- **`kotlin/`** — planned exercise folders should mirror the Java layout, but the
-  stubs should prefer top-level functions and data classes where idiomatic.
+- **`kotlin/`** — mirrors the Java layout (one package per exercise, test beside
+  the stub in a single Gradle `test` source set), but stubs favor top-level
+  functions, data classes, and idiomatic null-safety over classes-for-the-sake-
+  of-classes. Coroutine-heavy tiers add `kotlinx-coroutines-core`/`-test` as
+  dependencies; tests use `runTest { ... }` with virtual time, never real
+  delays. Seeded at 100/100 but never compiled (no local JDK/Gradle/Kotlin).
