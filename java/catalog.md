@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 40 ✅ / 60 ⬜**
+**Status: 45 ✅ / 55 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -67,11 +67,11 @@ basics, and richer test coverage.
 | 038 | generic_pair            | multiple type parameters, tuple-like modeling         | ✅     |
 | 039 | bounded_generic_max     | bounds, `Comparable`, reusable algorithms             | ✅     |
 | 040 | wildcard_read_write     | PECS, wildcards, variance intuition                   | ✅     |
-| 041 | comparable_person       | `Comparable`, consistent ordering                     | ⬜     |
-| 042 | comparator_then_compare | comparator chaining, derived sort keys                | ⬜     |
-| 043 | map_compute_if_absent   | lazy insertion, nested collections                    | ⬜     |
-| 044 | deque_stack_queue       | `Deque`, stack and queue semantics                    | ⬜     |
-| 045 | priority_queue_scheduler| priority queues, natural ordering                     | ⬜     |
+| 041 | comparable_person       | `Comparable`, consistent ordering                     | ✅     |
+| 042 | comparator_then_compare | comparator chaining, derived sort keys                | ✅     |
+| 043 | map_compute_if_absent   | lazy insertion, nested collections                    | ✅     |
+| 044 | deque_stack_queue       | `Deque`, stack and queue semantics                    | ✅     |
+| 045 | priority_queue_scheduler| priority queues, natural ordering                     | ✅     |
 | 046 | stream_flatmap          | flattening nested collections                         | ⬜     |
 | 047 | collector_partitioning  | `partitioningBy`, summarizing                         | ⬜     |
 | 048 | collector_teeing        | combining collectors, dual aggregation                | ⬜     |
