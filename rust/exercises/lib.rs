@@ -49,5 +49,20 @@ pub mod ex015_match_guards;
 #[path = "01-beginner/ex016_if_let_while_let.rs"]
 pub mod ex016_if_let_while_let;
 
+#[path = "01-beginner/ex017_option_map_unwrap_or.rs"]
+pub mod ex017_option_map_unwrap_or;
+
+#[path = "01-beginner/ex018_option_ok_or.rs"]
+pub mod ex018_option_ok_or;
+
+#[path = "01-beginner/ex019_result_basic.rs"]
+pub mod ex019_result_basic;
+
+#[path = "01-beginner/ex020_result_question_mark.rs"]
+pub mod ex020_result_question_mark;
+
+#[path = "01-beginner/ex021_enum_with_data.rs"]
+pub mod ex021_enum_with_data;
+
 #[path = "02-intermediate/ex036_rle.rs"]
 pub mod ex036_rle;

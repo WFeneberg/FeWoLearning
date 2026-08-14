@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 17 ✅ / 83 ⬜**
+**Status: 22 ✅ / 78 ⬜**
 
 > **Toolchain note.** `cargo test` cannot link on this machine yet: Rust is
 > installed with the `x86_64-pc-windows-msvc` target, but the MSVC libraries and
@@ -43,11 +43,11 @@ an unregistered file is never compiled.
 | 014 | match_literals          | `match` on integers and ranges, exhaustiveness        | ✅     |
 | 015 | match_guards            | match guards, binding with `@`                        | ✅     |
 | 016 | if_let_while_let        | `if let`, `while let`, popping until empty            | ✅     |
-| 017 | option_map_unwrap_or    | `Option`, `map`, `unwrap_or`, `and_then`              | ⬜     |
-| 018 | option_ok_or            | `Option` to `Result` conversion                       | ⬜     |
-| 019 | result_basic            | `Result`, `match` on errors, `is_ok`                  | ⬜     |
-| 020 | result_question_mark    | the `?` operator in a fallible function               | ⬜     |
-| 021 | enum_with_data          | data-carrying enum variants, matching them            | ⬜     |
+| 017 | option_map_unwrap_or    | `Option`, `map`, `unwrap_or`, `and_then`              | ✅     |
+| 018 | option_ok_or            | `Option` to `Result` conversion                       | ✅     |
+| 019 | result_basic            | `Result`, `match` on errors, `is_ok`                  | ✅     |
+| 020 | result_question_mark    | the `?` operator in a fallible function               | ✅     |
+| 021 | enum_with_data          | data-carrying enum variants, matching them            | ✅     |
 | 022 | enum_methods            | `impl` on an enum, `Self`                             | ⬜     |
 | 023 | struct_impl_methods     | `impl`, `&self` vs `self`, associated functions       | ⬜     |
 | 024 | struct_update_syntax    | `..base` struct update, field init shorthand          | ⬜     |
