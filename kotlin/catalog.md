@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -49,11 +49,11 @@ scope functions, generics, and introductory JUnit assertions.
 | 028 | regex_validation        | regular expressions, destructuring matches            | ✅     |
 | 029 | result_run_catching     | `Result`, `runCatching`, recovery                     | ✅     |
 | 030 | local_date_parsing      | Java time interop, parsing dates                      | ✅     |
-| 031 | big_decimal_money       | `BigDecimal`, precision, rounding                     | ⬜     |
-| 032 | junit_assertions        | basic JUnit assertions, AAA                           | ⬜     |
-| 033 | property_custom_getter  | custom getters, derived properties                    | ⬜     |
-| 034 | delegated_lazy          | `lazy`, deferred initialization                       | ⬜     |
-| 035 | operator_overloading_pt | operator functions, domain ergonomics                 | ⬜     |
+| 031 | big_decimal_money       | `BigDecimal`, precision, rounding                     | ✅     |
+| 032 | junit_assertions        | basic JUnit assertions, AAA                           | ✅     |
+| 033 | property_custom_getter  | custom getters, derived properties                    | ✅     |
+| 034 | delegated_lazy          | `lazy`, deferred initialization                       | ✅     |
+| 035 | operator_overloading_pt | operator functions, domain ergonomics                 | ✅     |
 
 ## Intermediate (036–070) — idioms, APIs, testing
 
