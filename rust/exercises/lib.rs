@@ -34,5 +34,20 @@ pub mod ex010_vec_push_pop;
 #[path = "01-beginner/ex011_vec_iter_sum.rs"]
 pub mod ex011_vec_iter_sum;
 
+#[path = "01-beginner/ex012_hashmap_word_count.rs"]
+pub mod ex012_hashmap_word_count;
+
+#[path = "01-beginner/ex013_hashmap_iteration.rs"]
+pub mod ex013_hashmap_iteration;
+
+#[path = "01-beginner/ex014_match_literals.rs"]
+pub mod ex014_match_literals;
+
+#[path = "01-beginner/ex015_match_guards.rs"]
+pub mod ex015_match_guards;
+
+#[path = "01-beginner/ex016_if_let_while_let.rs"]
+pub mod ex016_if_let_while_let;
+
 #[path = "02-intermediate/ex036_rle.rs"]
 pub mod ex036_rle;
