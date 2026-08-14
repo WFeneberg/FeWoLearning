@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 76 ✅ / 24 ⬜**
+**Status: 81 ✅ / 19 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -110,11 +110,11 @@ records, and design-level exercises.
 | 073 | spliterator_batching    | custom traversal, characteristics                     | ✅     |
 | 074 | parallel_stream_pitfalls| parallel streams, statefulness, ordering             | ✅     |
 | 075 | fork_join_sum           | fork/join tasks, work splitting                       | ✅     |
-| 076 | producer_consumer_queue | blocking queues, coordination                         | ⬜     |
-| 077 | rate_limiter            | time windows, thread safety                           | ⬜     |
-| 078 | bounded_executor        | semaphore back-pressure, pools                        | ⬜     |
-| 079 | virtual_threads_basics  | virtual threads, blocking style concurrency           | ⬜     |
-| 080 | structured_task_scope   | structured concurrency, cancellation                  | ⬜     |
+| 076 | producer_consumer_queue | blocking queues, coordination                         | ✅     |
+| 077 | rate_limiter            | time windows, thread safety                           | ✅     |
+| 078 | bounded_executor        | semaphore back-pressure, pools                        | ✅     |
+| 079 | virtual_threads_basics  | virtual threads, blocking style concurrency           | ✅     |
+| 080 | structured_task_scope   | structured concurrency, cancellation                  | ✅     |
 | 081 | record_builder          | records, builder ergonomics                           | ⬜     |
 | 082 | annotation_retention    | annotation targets, runtime visibility                | ⬜     |
 | 083 | reflection_method_invoke| reflection, invocation, accessibility                 | ⬜     |
