@@ -64,5 +64,20 @@ pub mod ex020_result_question_mark;
 #[path = "01-beginner/ex021_enum_with_data.rs"]
 pub mod ex021_enum_with_data;
 
+#[path = "01-beginner/ex022_enum_methods.rs"]
+pub mod ex022_enum_methods;
+
+#[path = "01-beginner/ex023_struct_impl_methods.rs"]
+pub mod ex023_struct_impl_methods;
+
+#[path = "01-beginner/ex024_struct_update_syntax.rs"]
+pub mod ex024_struct_update_syntax;
+
+#[path = "01-beginner/ex025_ownership_move.rs"]
+pub mod ex025_ownership_move;
+
+#[path = "01-beginner/ex026_borrow_immutable.rs"]
+pub mod ex026_borrow_immutable;
+
 #[path = "02-intermediate/ex036_rle.rs"]
 pub mod ex036_rle;
