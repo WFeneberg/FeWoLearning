@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 80 ✅ / 20 ⬜**
+**Status: 85 ✅ / 15 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -118,11 +118,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 078 | mpsc_channel_pipeline    | `mpsc` channels, producer/consumer                   | ✅     |
 | 079 | scoped_threads           | `thread::scope`, borrowing locals across threads     | ✅     |
 | 080 | send_sync_bounds         | `Send`/`Sync`, why some types are neither            | ✅     |
-| 081 | atomic_counter           | `AtomicUsize`, `Ordering`, lock-free increment       | ⬜     |
-| 082 | trait_object_vs_generic  | dispatch cost, code size, when each fits             | ⬜     |
-| 083 | deref_smart_pointer      | `Deref`/`DerefMut`, a custom smart pointer           | ⬜     |
-| 084 | drop_order               | `Drop`, deterministic teardown, drop order           | ⬜     |
-| 085 | unsafe_raw_pointer       | raw pointers, invariants an `unsafe` block must hold | ⬜     |
+| 081 | atomic_counter           | `AtomicUsize`, `Ordering`, lock-free increment       | ✅     |
+| 082 | trait_object_vs_generic  | dispatch cost, code size, when each fits             | ✅     |
+| 083 | deref_smart_pointer      | `Deref`/`DerefMut`, a custom smart pointer           | ✅     |
+| 084 | drop_order               | `Drop`, deterministic teardown, drop order           | ✅     |
+| 085 | unsafe_raw_pointer       | raw pointers, invariants an `unsafe` block must hold | ✅     |
 | 086 | macro_rules_basics       | `macro_rules!`, repetition, hygiene                  | ⬜     |
 | 087 | zero_cost_iterator_chain | building an iterator adapter without allocation      | ⬜     |
 | 088 | phantom_data_marker      | `PhantomData`, type-level tagging                    | ⬜     |

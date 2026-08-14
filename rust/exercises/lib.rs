@@ -240,3 +240,18 @@ pub mod ex079_scoped_threads;
 
 #[path = "03-advanced/ex080_send_sync_bounds.rs"]
 pub mod ex080_send_sync_bounds;
+
+#[path = "03-advanced/ex081_atomic_counter.rs"]
+pub mod ex081_atomic_counter;
+
+#[path = "03-advanced/ex082_trait_object_vs_generic.rs"]
+pub mod ex082_trait_object_vs_generic;
+
+#[path = "03-advanced/ex083_deref_smart_pointer.rs"]
+pub mod ex083_deref_smart_pointer;
+
+#[path = "03-advanced/ex084_drop_order.rs"]
+pub mod ex084_drop_order;
+
+#[path = "03-advanced/ex085_unsafe_raw_pointer.rs"]
+pub mod ex085_unsafe_raw_pointer;
