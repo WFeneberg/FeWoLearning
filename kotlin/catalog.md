@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 70 ✅ / 30 ⬜**
+**Status: 80 ✅ / 20 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -105,16 +105,16 @@ design-level Kotlin patterns.
 
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
-| 071 | coroutine_retry_backoff | retry loops, delay policy                             | ⬜     |
-| 072 | flow_combine_latest     | combining streams of state                            | ⬜     |
-| 073 | flow_debounce_search    | debounce, cancellation, latest results                | ⬜     |
-| 074 | flow_flatmap_latest     | `flatMapLatest`, replacing stale work                 | ⬜     |
-| 075 | select_expression       | selecting the first available coroutine event         | ⬜     |
-| 076 | actor_counter           | actor model, serialized state changes                 | ⬜     |
-| 077 | sequence_vs_list_perf   | eager vs lazy pipelines                               | ⬜     |
-| 078 | builder_type_safe_dsl   | receivers, fluent builders                            | ⬜     |
-| 079 | receiver_lambdas_html   | nested receivers, mini DSL                            | ⬜     |
-| 080 | delegate_validation     | custom delegates, centralized validation              | ⬜     |
+| 071 | coroutine_retry_backoff | retry loops, delay policy                             | ✅     |
+| 072 | flow_combine_latest     | combining streams of state                            | ✅     |
+| 073 | flow_debounce_search    | debounce, cancellation, latest results                | ✅     |
+| 074 | flow_flatmap_latest     | `flatMapLatest`, replacing stale work                 | ✅     |
+| 075 | select_expression       | selecting the first available coroutine event         | ✅     |
+| 076 | actor_counter           | actor model, serialized state changes                 | ✅     |
+| 077 | sequence_vs_list_perf   | eager vs lazy pipelines                               | ✅     |
+| 078 | builder_type_safe_dsl   | receivers, fluent builders                            | ✅     |
+| 079 | receiver_lambdas_html   | nested receivers, mini DSL                            | ✅     |
+| 080 | delegate_validation     | custom delegates, centralized validation              | ✅     |
 | 081 | reflection_callable_ref | reflection, callable references                       | ⬜     |
 | 082 | sealed_error_hierarchy  | rich domain errors, matching                          | ⬜     |
 | 083 | dsl_marker_scope        | `@DslMarker`, receiver isolation                      | ⬜     |
