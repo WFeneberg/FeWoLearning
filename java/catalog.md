@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -34,11 +34,11 @@ exceptions, and introductory JUnit assertions.
 | 013 | switch_expression       | switch expressions, exhaustiveness                    | ✅     |
 | 014 | text_block_report       | text blocks, multiline formatting                     | ✅     |
 | 015 | local_date_basics       | `LocalDate`, parsing, date arithmetic                 | ✅     |
-| 016 | big_decimal_money       | `BigDecimal`, scale, rounding                         | ⬜     |
-| 017 | loop_continue_break     | `for`, `while`, `continue`, `break`                   | ⬜     |
-| 018 | method_overloading      | overload resolution, signatures                       | ⬜     |
-| 019 | varargs_join            | varargs, arrays from calls                            | ⬜     |
-| 020 | immutable_list_copy     | defensive copying, `List.copyOf`                      | ⬜     |
+| 016 | big_decimal_money       | `BigDecimal`, scale, rounding                         | ✅     |
+| 017 | loop_continue_break     | `for`, `while`, `continue`, `break`                   | ✅     |
+| 018 | method_overloading      | overload resolution, signatures                       | ✅     |
+| 019 | varargs_join            | varargs, arrays from calls                            | ✅     |
+| 020 | immutable_list_copy     | defensive copying, `List.copyOf`                      | ✅     |
 | 021 | comparator_sort         | comparators, sorting, reversed order                  | ⬜     |
 | 022 | predicate_filter        | predicates, filtering, reusable conditions            | ⬜     |
 | 023 | stream_map_sum          | streams, `mapToInt`, terminal operations              | ⬜     |
