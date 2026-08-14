@@ -138,3 +138,18 @@ pub mod ex045_derive_partialeq_ord;
 
 #[path = "02-intermediate/ex046_display_from_str.rs"]
 pub mod ex046_display_from_str;
+
+#[path = "02-intermediate/ex047_custom_error_enum.rs"]
+pub mod ex047_custom_error_enum;
+
+#[path = "02-intermediate/ex048_error_source_chain.rs"]
+pub mod ex048_error_source_chain;
+
+#[path = "02-intermediate/ex049_from_into_conversion.rs"]
+pub mod ex049_from_into_conversion;
+
+#[path = "02-intermediate/ex050_tryfrom_validation.rs"]
+pub mod ex050_tryfrom_validation;
+
+#[path = "02-intermediate/ex051_closure_fn_traits.rs"]
+pub mod ex051_closure_fn_traits;

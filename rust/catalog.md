@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 46 ✅ / 54 ⬜**
+**Status: 51 ✅ / 49 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -79,11 +79,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 044 | derive_debug_clone        | `#[derive(...)]`, what each derive generates         | ✅     |
 | 045 | derive_partialeq_ord      | `PartialEq`/`Eq`/`PartialOrd`/`Ord` semantics        | ✅     |
 | 046 | display_from_str          | `Display` and `FromStr` implementations             | ✅     |
-| 047 | custom_error_enum         | an error enum with `Display` + `std::error::Error`   | ⬜     |
-| 048 | error_source_chain        | `source()`, wrapping a lower-level error            | ⬜     |
-| 049 | from_into_conversion      | `From`/`Into`, `?` converting error types           | ⬜     |
-| 050 | tryfrom_validation        | `TryFrom`, validated construction                   | ⬜     |
-| 051 | closure_fn_traits         | `Fn`/`FnMut`/`FnOnce`, captures                      | ⬜     |
+| 047 | custom_error_enum         | an error enum with `Display` + `std::error::Error`   | ✅     |
+| 048 | error_source_chain        | `source()`, wrapping a lower-level error            | ✅     |
+| 049 | from_into_conversion      | `From`/`Into`, `?` converting error types           | ✅     |
+| 050 | tryfrom_validation        | `TryFrom`, validated construction                   | ✅     |
+| 051 | closure_fn_traits         | `Fn`/`FnMut`/`FnOnce`, captures                      | ✅     |
 | 052 | closure_returning_boxed   | returning closures, `Box<dyn Fn>`                    | ⬜     |
 | 053 | iterator_impl_custom      | implementing `Iterator` by hand                     | ⬜     |
 | 054 | iterator_chain_flatmap    | `chain`, `flat_map`, `flatten`                        | ⬜     |
