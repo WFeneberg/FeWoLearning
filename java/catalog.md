@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -29,11 +29,11 @@ exceptions, and introductory JUnit assertions.
 | 008 | collatz_steps           | looping, mutation, termination conditions             | ✅     |
 | 009 | grade_classifier        | branching, ranges, validation                         | ✅     |
 | 010 | traffic_light_enum      | enums, `switch`, behavior by variant                  | ✅     |
-| 011 | point_record            | records, value semantics, accessors                   | ⬜     |
-| 012 | optional_basics         | `Optional`, presence checks, defaults                 | ⬜     |
-| 013 | switch_expression       | switch expressions, exhaustiveness                    | ⬜     |
-| 014 | text_block_report       | text blocks, multiline formatting                     | ⬜     |
-| 015 | local_date_basics       | `LocalDate`, parsing, date arithmetic                 | ⬜     |
+| 011 | point_record            | records, value semantics, accessors                   | ✅     |
+| 012 | optional_basics         | `Optional`, presence checks, defaults                 | ✅     |
+| 013 | switch_expression       | switch expressions, exhaustiveness                    | ✅     |
+| 014 | text_block_report       | text blocks, multiline formatting                     | ✅     |
+| 015 | local_date_basics       | `LocalDate`, parsing, date arithmetic                 | ✅     |
 | 016 | big_decimal_money       | `BigDecimal`, scale, rounding                         | ⬜     |
 | 017 | loop_continue_break     | `for`, `while`, `continue`, `break`                   | ⬜     |
 | 018 | method_overloading      | overload resolution, signatures                       | ⬜     |
