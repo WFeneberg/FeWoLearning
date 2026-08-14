@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 50 ✅ / 50 ⬜**
+**Status: 55 ✅ / 45 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -77,11 +77,11 @@ basics, and richer test coverage.
 | 048 | collector_teeing        | combining collectors, dual aggregation                | ✅     |
 | 049 | optional_pipeline       | `map`, `flatMap`, `orElseGet`                         | ✅     |
 | 050 | exception_translation   | wrapping low-level failures                           | ✅     |
-| 051 | checked_vs_unchecked    | exception design, API tradeoffs                       | ⬜     |
-| 052 | enum_strategy           | behavior per enum constant                            | ⬜     |
-| 053 | sealed_shape_area       | sealed hierarchies, exhaustive branching              | ⬜     |
-| 054 | pattern_instanceof      | pattern matching for `instanceof`                     | ⬜     |
-| 055 | pattern_switch          | pattern matching `switch`                             | ⬜     |
+| 051 | checked_vs_unchecked    | exception design, API tradeoffs                       | ✅     |
+| 052 | enum_strategy           | behavior per enum constant                            | ✅     |
+| 053 | sealed_shape_area       | sealed hierarchies, exhaustive branching              | ✅     |
+| 054 | pattern_instanceof      | pattern matching for `instanceof`                     | ✅     |
+| 055 | pattern_switch          | pattern matching `switch`                             | ✅     |
 | 056 | http_client_get         | `HttpClient`, request/response basics                 | ⬜     |
 | 057 | completable_future_chain| async composition, continuations                      | ⬜     |
 | 058 | completable_future_allof| waiting for many tasks                                | ⬜     |
