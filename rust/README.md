@@ -25,7 +25,7 @@ Reference implementations mirror the tree under `solutions/<tier>/`.
 When you add a new exercise, add a matching `#[path = ...] pub mod ...;` line to
 `exercises/lib.rs`.
 
-See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **2 / 100**; the ⬜ rows are the work queue.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **100 / 100**.
 
 ## Linking on this machine
 
