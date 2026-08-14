@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 45 ✅ / 55 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -72,11 +72,11 @@ basics, and richer test coverage.
 | 043 | map_compute_if_absent   | lazy insertion, nested collections                    | ✅     |
 | 044 | deque_stack_queue       | `Deque`, stack and queue semantics                    | ✅     |
 | 045 | priority_queue_scheduler| priority queues, natural ordering                     | ✅     |
-| 046 | stream_flatmap          | flattening nested collections                         | ⬜     |
-| 047 | collector_partitioning  | `partitioningBy`, summarizing                         | ⬜     |
-| 048 | collector_teeing        | combining collectors, dual aggregation                | ⬜     |
-| 049 | optional_pipeline       | `map`, `flatMap`, `orElseGet`                         | ⬜     |
-| 050 | exception_translation   | wrapping low-level failures                           | ⬜     |
+| 046 | stream_flatmap          | flattening nested collections                         | ✅     |
+| 047 | collector_partitioning  | `partitioningBy`, summarizing                         | ✅     |
+| 048 | collector_teeing        | combining collectors, dual aggregation                | ✅     |
+| 049 | optional_pipeline       | `map`, `flatMap`, `orElseGet`                         | ✅     |
+| 050 | exception_translation   | wrapping low-level failures                           | ✅     |
 | 051 | checked_vs_unchecked    | exception design, API tradeoffs                       | ⬜     |
 | 052 | enum_strategy           | behavior per enum constant                            | ⬜     |
 | 053 | sealed_shape_area       | sealed hierarchies, exhaustive branching              | ⬜     |
