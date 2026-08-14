@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 2 ✅ / 98 ⬜**
+**Status: 7 ✅ / 93 ⬜**
 
 > **Toolchain note.** `cargo test` cannot link on this machine yet: Rust is
 > installed with the `x86_64-pc-windows-msvc` target, but the MSVC libraries and
@@ -28,11 +28,11 @@ an unregistered file is never compiled.
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
 | 001 | anagram                 | iterators, chars, sorting                             | ✅     |
-| 002 | let_mut_shadowing       | `let`, `mut`, shadowing, scopes                       | ⬜     |
-| 003 | integer_overflow        | wrapping/checked/saturating arithmetic                | ⬜     |
-| 004 | float_compare           | float precision, `EPSILON` comparisons                | ⬜     |
-| 005 | tuple_struct_point      | tuple structs, field access, destructuring            | ⬜     |
-| 006 | string_vs_str           | `String` vs `&str`, `to_owned`, `as_str`              | ⬜     |
+| 002 | let_mut_shadowing       | `let`, `mut`, shadowing, scopes                       | ✅     |
+| 003 | integer_overflow        | wrapping/checked/saturating arithmetic                | ✅     |
+| 004 | float_compare           | float precision, `EPSILON` comparisons                | ✅     |
+| 005 | tuple_struct_point      | tuple structs, field access, destructuring            | ✅     |
+| 006 | string_vs_str           | `String` vs `&str`, `to_owned`, `as_str`              | ✅     |
 | 007 | string_push_format      | `push_str`, `format!`, capacity                       | ⬜     |
 | 008 | char_classification     | `char` methods, Unicode vs bytes                      | ⬜     |
 | 009 | slice_basics            | slices, ranges, bounds checking                       | ⬜     |
