@@ -1,19 +1,11 @@
 //! Exercise 100 — A `macro_rules!` DSL with nested repetition (expert).
-//! Goal:   `routes! { ... }`, a tiny DSL for declaring a routing table:
-//!
-//!         ```ignore
-//!         let table: Vec<Route> = routes! {
-//!             "users" => {
-//!                 "GET" => "list_users",
-//!                 "POST" => "create_user",
-//!             },
-//!             "posts" => {
-//!                 "GET" => "list_posts",
-//!             },
-//!         };
-//!         ```
-//!
-//!         The macro's MATCHER (which syntax it accepts) is already written
+//! Goal:   `routes! { ... }`, a tiny DSL for declaring a routing table: each
+//!         entry maps a path string to a `{ }`-braced block of
+//!         method-string => handler-string pairs, e.g. one path `"users"`
+//!         with two handlers (`"GET" => "list_users"`, `"POST" =>
+//!         "create_user"`) plus a second path `"posts"` with one handler —
+//!         see the tests below for the exact call shape. The macro's
+//!         MATCHER (which syntax it accepts) is already written
 //!         below — an outer `$(...)* ` repetition over paths, each
 //!         containing an INNER `$(...)* ` repetition over that path's
 //!         method/handler pairs. Your job is the TRANSCRIBER: the nested
