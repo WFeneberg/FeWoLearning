@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -49,11 +49,11 @@ exceptions, and introductory JUnit assertions.
 | 028 | custom_exception        | extending exceptions, meaningful messages             | ✅     |
 | 029 | regex_validation        | regex, matcher groups, validation                     | ✅     |
 | 030 | string_builder          | mutable text assembly, efficiency                     | ✅     |
-| 031 | class_invariant         | constructors, validation, encapsulation               | ⬜     |
-| 032 | inheritance_override    | inheritance, overriding, `super`                      | ⬜     |
-| 033 | interface_default_method| interfaces, default methods                           | ⬜     |
-| 034 | record_validation       | compact constructors, invariants                      | ⬜     |
-| 035 | junit_assertions        | basic JUnit assertions, Arrange-Act-Assert            | ⬜     |
+| 031 | class_invariant         | constructors, validation, encapsulation               | ✅     |
+| 032 | inheritance_override    | inheritance, overriding, `super`                      | ✅     |
+| 033 | interface_default_method| interfaces, default methods                           | ✅     |
+| 034 | record_validation       | compact constructors, invariants                      | ✅     |
+| 035 | junit_assertions        | basic JUnit assertions, Arrange-Act-Assert            | ✅     |
 
 ## Intermediate (036–070) — collections, generics, streams, I/O
 
