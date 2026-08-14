@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 66 ✅ / 34 ⬜**
+**Status: 70 ✅ / 30 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -99,10 +99,10 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 064 | index_trait               | `Index`/`IndexMut` for a custom collection          | ✅     |
 | 065 | pattern_match_nested      | nested destructuring, slice patterns                | ✅     |
 | 066 | matches_macro             | `matches!`, terse predicate matching                 | ✅     |
-| 067 | option_result_combinators | chaining combinators without `unwrap`               | ⬜     |
-| 068 | sort_with_custom_cmp      | `sort_by`, `Ordering`, `then_with`                   | ⬜     |
-| 069 | binary_search_slice       | `binary_search_by`, insertion points                | ⬜     |
-| 070 | integration_test_layout   | `tests/` vs inline `#[cfg(test)]`, visibility        | ⬜     |
+| 067 | option_result_combinators | chaining combinators without `unwrap`               | ✅     |
+| 068 | sort_with_custom_cmp      | `sort_by`, `Ordering`, `then_with`                   | ✅     |
+| 069 | binary_search_slice       | `binary_search_by`, insertion points                | ✅     |
+| 070 | integration_test_layout   | `tests/` vs inline `#[cfg(test)]`, visibility        | ✅     |
 
 ## Advanced (071–090) — ownership at scale, concurrency
 

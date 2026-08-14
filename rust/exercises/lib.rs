@@ -198,3 +198,15 @@ pub mod ex065_pattern_match_nested;
 
 #[path = "02-intermediate/ex066_matches_macro.rs"]
 pub mod ex066_matches_macro;
+
+#[path = "02-intermediate/ex067_option_result_combinators.rs"]
+pub mod ex067_option_result_combinators;
+
+#[path = "02-intermediate/ex068_sort_with_custom_cmp.rs"]
+pub mod ex068_sort_with_custom_cmp;
+
+#[path = "02-intermediate/ex069_binary_search_slice.rs"]
+pub mod ex069_binary_search_slice;
+
+#[path = "02-intermediate/ex070_integration_test_layout.rs"]
+pub mod ex070_integration_test_layout;
