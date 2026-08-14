@@ -270,3 +270,18 @@ pub mod ex089_const_generics_array;
 
 #[path = "03-advanced/ex090_no_std_friendly_module.rs"]
 pub mod ex090_no_std_friendly_module;
+
+#[path = "04-expert/ex091_typestate_builder.rs"]
+pub mod ex091_typestate_builder;
+
+#[path = "04-expert/ex092_arena_allocator.rs"]
+pub mod ex092_arena_allocator;
+
+#[path = "04-expert/ex093_mini_async_executor.rs"]
+pub mod ex093_mini_async_executor;
+
+#[path = "04-expert/ex094_lock_free_stack.rs"]
+pub mod ex094_lock_free_stack;
+
+#[path = "04-expert/ex095_parser_combinators.rs"]
+pub mod ex095_parser_combinators;
