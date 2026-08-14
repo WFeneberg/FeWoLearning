@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 95 ✅ / 5 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -138,8 +138,8 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 093 | mini_async_executor     | `Waker`, task queue, polling to completion            | ✅     |
 | 094 | lock_free_stack         | CAS loops, `AtomicPtr`, ABA hazards                   | ✅     |
 | 095 | parser_combinators      | combinator traits, composition, error positions       | ✅     |
-| 096 | mini_interpreter        | tokenizer, AST, evaluation, environments              | ⬜     |
-| 097 | manual_future_impl      | implementing `Future`, `Poll`, state machines         | ⬜     |
-| 098 | thread_pool             | worker threads, job channel, graceful shutdown        | ⬜     |
-| 099 | zero_copy_binary_decoder | byte slices, alignment, borrowed views                | ⬜     |
-| 100 | declarative_macro_dsl   | a `macro_rules!` DSL with nested repetition           | ⬜     |
+| 096 | mini_interpreter        | tokenizer, AST, evaluation, environments              | ✅     |
+| 097 | manual_future_impl      | implementing `Future`, `Poll`, state machines         | ✅     |
+| 098 | thread_pool             | worker threads, job channel, graceful shutdown        | ✅     |
+| 099 | zero_copy_binary_decoder | byte slices, alignment, borrowed views                | ✅     |
+| 100 | declarative_macro_dsl   | a `macro_rules!` DSL with nested repetition           | ✅     |

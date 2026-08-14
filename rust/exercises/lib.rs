@@ -285,3 +285,18 @@ pub mod ex094_lock_free_stack;
 
 #[path = "04-expert/ex095_parser_combinators.rs"]
 pub mod ex095_parser_combinators;
+
+#[path = "04-expert/ex096_mini_interpreter.rs"]
+pub mod ex096_mini_interpreter;
+
+#[path = "04-expert/ex097_manual_future_impl.rs"]
+pub mod ex097_manual_future_impl;
+
+#[path = "04-expert/ex098_thread_pool.rs"]
+pub mod ex098_thread_pool;
+
+#[path = "04-expert/ex099_zero_copy_binary_decoder.rs"]
+pub mod ex099_zero_copy_binary_decoder;
+
+#[path = "04-expert/ex100_declarative_macro_dsl.rs"]
+pub mod ex100_declarative_macro_dsl;
