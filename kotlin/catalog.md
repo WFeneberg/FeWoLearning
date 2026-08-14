@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 90 ✅ / 10 ⬜**
+**Status: 95 ✅ / 5 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -132,11 +132,11 @@ Infrastructure, worker coordination, interpreters, and type-safe internal DSLs.
 
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
-| 091 | coroutine_worker_pool   | bounded worker pools, graceful shutdown               | ⬜     |
-| 092 | command_bus             | typed command dispatch                                | ⬜     |
-| 093 | schema_form_renderer    | schema-driven rendering, validation                   | ⬜     |
-| 094 | immutable_snapshot_store| persistent-style state snapshots                      | ⬜     |
-| 095 | plugin_registry         | extension points, discovery                           | ⬜     |
+| 091 | coroutine_worker_pool   | bounded worker pools, graceful shutdown               | ✅     |
+| 092 | command_bus             | typed command dispatch                                | ✅     |
+| 093 | schema_form_renderer    | schema-driven rendering, validation                   | ✅     |
+| 094 | immutable_snapshot_store| persistent-style state snapshots                      | ✅     |
+| 095 | plugin_registry         | extension points, discovery                           | ✅     |
 | 096 | expression_evaluator    | tokenization, AST evaluation                          | ⬜     |
 | 097 | retrying_http_client    | policy composition, suspend networking façade         | ⬜     |
 | 098 | markdown_ast_renderer   | tree traversal, rendering                             | ⬜     |
