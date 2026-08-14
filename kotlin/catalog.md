@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 60 ✅ / 40 ⬜**
+**Status: 65 ✅ / 35 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -87,11 +87,11 @@ properties, file APIs, coroutines, flows, and time-controlled tests.
 | 058 | path_copy_move          | NIO path operations                                   | ✅     |
 | 059 | regex_named_groups      | named groups, match extraction                        | ✅     |
 | 060 | junit_parameterized     | parameterized JUnit tests                             | ✅     |
-| 061 | coroutine_launch_join   | structured coroutines, `launch`, `join`               | ⬜     |
-| 062 | coroutine_async_await   | `async`, `await`, concurrency                         | ⬜     |
-| 063 | coroutine_supervisor    | `SupervisorJob`, isolated failures                    | ⬜     |
-| 064 | channel_pipeline        | channels, producer/consumer                           | ⬜     |
-| 065 | flow_map_filter         | cold flows, transformations                           | ⬜     |
+| 061 | coroutine_launch_join   | structured coroutines, `launch`, `join`               | ✅     |
+| 062 | coroutine_async_await   | `async`, `await`, concurrency                         | ✅     |
+| 063 | coroutine_supervisor    | `SupervisorJob`, isolated failures                    | ✅     |
+| 064 | channel_pipeline        | channels, producer/consumer                           | ✅     |
+| 065 | flow_map_filter         | cold flows, transformations                           | ✅     |
 | 066 | state_flow_store        | `StateFlow`, UI-facing state                          | ⬜     |
 | 067 | shared_flow_events      | `SharedFlow`, broadcast events                        | ⬜     |
 | 068 | mutex_protected_state   | `Mutex`, suspending critical sections                 | ⬜     |
