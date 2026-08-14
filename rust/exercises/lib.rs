@@ -123,3 +123,18 @@ pub mod ex040_trait_impl_for_type;
 
 #[path = "02-intermediate/ex041_trait_generic_bounds.rs"]
 pub mod ex041_trait_generic_bounds;
+
+#[path = "02-intermediate/ex042_impl_trait_argument.rs"]
+pub mod ex042_impl_trait_argument;
+
+#[path = "02-intermediate/ex043_box_dyn_trait.rs"]
+pub mod ex043_box_dyn_trait;
+
+#[path = "02-intermediate/ex044_derive_debug_clone.rs"]
+pub mod ex044_derive_debug_clone;
+
+#[path = "02-intermediate/ex045_derive_partialeq_ord.rs"]
+pub mod ex045_derive_partialeq_ord;
+
+#[path = "02-intermediate/ex046_display_from_str.rs"]
+pub mod ex046_display_from_str;

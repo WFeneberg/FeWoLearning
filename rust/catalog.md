@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 41 ✅ / 59 ⬜**
+**Status: 46 ✅ / 54 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -74,11 +74,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 039 | trait_definition          | defining a trait, default methods                   | ✅     |
 | 040 | trait_impl_for_type       | implementing a trait for your own type              | ✅     |
 | 041 | trait_generic_bounds      | `<T: Trait>`, `where` clauses                        | ✅     |
-| 042 | impl_trait_argument       | `impl Trait` in argument and return position        | ⬜     |
-| 043 | box_dyn_trait             | trait objects, dynamic dispatch, object safety      | ⬜     |
-| 044 | derive_debug_clone        | `#[derive(...)]`, what each derive generates         | ⬜     |
-| 045 | derive_partialeq_ord      | `PartialEq`/`Eq`/`PartialOrd`/`Ord` semantics        | ⬜     |
-| 046 | display_from_str          | `Display` and `FromStr` implementations             | ⬜     |
+| 042 | impl_trait_argument       | `impl Trait` in argument and return position        | ✅     |
+| 043 | box_dyn_trait             | trait objects, dynamic dispatch, object safety      | ✅     |
+| 044 | derive_debug_clone        | `#[derive(...)]`, what each derive generates         | ✅     |
+| 045 | derive_partialeq_ord      | `PartialEq`/`Eq`/`PartialOrd`/`Ord` semantics        | ✅     |
+| 046 | display_from_str          | `Display` and `FromStr` implementations             | ✅     |
 | 047 | custom_error_enum         | an error enum with `Display` + `std::error::Error`   | ⬜     |
 | 048 | error_source_chain        | `source()`, wrapping a lower-level error            | ⬜     |
 | 049 | from_into_conversion      | `From`/`Into`, `?` converting error types           | ⬜     |
