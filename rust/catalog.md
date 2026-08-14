@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 85 ✅ / 15 ⬜**
+**Status: 90 ✅ / 10 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -123,11 +123,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 083 | deref_smart_pointer      | `Deref`/`DerefMut`, a custom smart pointer           | ✅     |
 | 084 | drop_order               | `Drop`, deterministic teardown, drop order           | ✅     |
 | 085 | unsafe_raw_pointer       | raw pointers, invariants an `unsafe` block must hold | ✅     |
-| 086 | macro_rules_basics       | `macro_rules!`, repetition, hygiene                  | ⬜     |
-| 087 | zero_cost_iterator_chain | building an iterator adapter without allocation      | ⬜     |
-| 088 | phantom_data_marker      | `PhantomData`, type-level tagging                    | ⬜     |
-| 089 | const_generics_array     | const generics, fixed-size array APIs                | ⬜     |
-| 090 | no_std_friendly_module   | avoiding `std`, `core`-only code                     | ⬜     |
+| 086 | macro_rules_basics       | `macro_rules!`, repetition, hygiene                  | ✅     |
+| 087 | zero_cost_iterator_chain | building an iterator adapter without allocation      | ✅     |
+| 088 | phantom_data_marker      | `PhantomData`, type-level tagging                    | ✅     |
+| 089 | const_generics_array     | const generics, fixed-size array APIs                | ✅     |
+| 090 | no_std_friendly_module   | avoiding `std`, `core`-only code                     | ✅     |
 
 ## Expert (091–100) — systems & abstractions
 

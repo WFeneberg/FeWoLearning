@@ -255,3 +255,18 @@ pub mod ex084_drop_order;
 
 #[path = "03-advanced/ex085_unsafe_raw_pointer.rs"]
 pub mod ex085_unsafe_raw_pointer;
+
+#[path = "03-advanced/ex086_macro_rules_basics.rs"]
+pub mod ex086_macro_rules_basics;
+
+#[path = "03-advanced/ex087_zero_cost_iterator_chain.rs"]
+pub mod ex087_zero_cost_iterator_chain;
+
+#[path = "03-advanced/ex088_phantom_data_marker.rs"]
+pub mod ex088_phantom_data_marker;
+
+#[path = "03-advanced/ex089_const_generics_array.rs"]
+pub mod ex089_const_generics_array;
+
+#[path = "03-advanced/ex090_no_std_friendly_module.rs"]
+pub mod ex090_no_std_friendly_module;
