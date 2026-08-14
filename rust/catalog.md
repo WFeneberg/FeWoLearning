@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 51 ✅ / 49 ⬜**
+**Status: 56 ✅ / 44 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -84,11 +84,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 049 | from_into_conversion      | `From`/`Into`, `?` converting error types           | ✅     |
 | 050 | tryfrom_validation        | `TryFrom`, validated construction                   | ✅     |
 | 051 | closure_fn_traits         | `Fn`/`FnMut`/`FnOnce`, captures                      | ✅     |
-| 052 | closure_returning_boxed   | returning closures, `Box<dyn Fn>`                    | ⬜     |
-| 053 | iterator_impl_custom      | implementing `Iterator` by hand                     | ⬜     |
-| 054 | iterator_chain_flatmap    | `chain`, `flat_map`, `flatten`                        | ⬜     |
-| 055 | iterator_take_skip_while  | `take_while`, `skip_while`, `step_by`                | ⬜     |
-| 056 | iterator_partition        | `partition`, `all`, `any`, `position`                | ⬜     |
+| 052 | closure_returning_boxed   | returning closures, `Box<dyn Fn>`                    | ✅     |
+| 053 | iterator_impl_custom      | implementing `Iterator` by hand                     | ✅     |
+| 054 | iterator_chain_flatmap    | `chain`, `flat_map`, `flatten`                        | ✅     |
+| 055 | iterator_take_skip_while  | `take_while`, `skip_while`, `step_by`                | ✅     |
+| 056 | iterator_partition        | `partition`, `all`, `any`, `position`                | ✅     |
 | 057 | collect_into_hashmap      | `collect` into `HashMap`/`HashSet`/`String`          | ⬜     |
 | 058 | cow_borrowed_owned        | `Cow`, avoiding needless allocation                 | ⬜     |
 | 059 | modules_visibility        | `mod`, `pub`, `pub(crate)`, paths                    | ⬜     |

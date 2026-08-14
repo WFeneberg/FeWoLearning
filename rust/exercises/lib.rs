@@ -153,3 +153,18 @@ pub mod ex050_tryfrom_validation;
 
 #[path = "02-intermediate/ex051_closure_fn_traits.rs"]
 pub mod ex051_closure_fn_traits;
+
+#[path = "02-intermediate/ex052_closure_returning_boxed.rs"]
+pub mod ex052_closure_returning_boxed;
+
+#[path = "02-intermediate/ex053_iterator_impl_custom.rs"]
+pub mod ex053_iterator_impl_custom;
+
+#[path = "02-intermediate/ex054_iterator_chain_flatmap.rs"]
+pub mod ex054_iterator_chain_flatmap;
+
+#[path = "02-intermediate/ex055_iterator_take_skip_while.rs"]
+pub mod ex055_iterator_take_skip_while;
+
+#[path = "02-intermediate/ex056_iterator_partition.rs"]
+pub mod ex056_iterator_partition;
