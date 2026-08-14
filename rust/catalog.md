@@ -11,13 +11,10 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 36 ✅ / 64 ⬜**
+**Status: 41 ✅ / 59 ⬜**
 
-> **Toolchain note.** `cargo test` cannot link on this machine yet: Rust is
-> installed with the `x86_64-pc-windows-msvc` target, but the MSVC libraries and
-> the Windows SDK are missing (`vcvars64.bat` also calls a `vcvarsall.bat` that
-> does not exist). The C++ workload has to be added through the Visual Studio
-> installer, run elevated, before any of these exercises can be verified.
+> **Toolchain note.** `cargo test` links and runs fine on this machine via
+> `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
 
 ## Beginner (001–035) — fundamentals
 
@@ -72,11 +69,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | #   | Slug                      | Concepts                                            | Status |
 |-----|---------------------------|-----------------------------------------------------|--------|
 | 036 | rle                       | peekable, String, round-trip                        | ✅     |
-| 037 | lifetime_longest          | explicit lifetime annotations on returns            | ⬜     |
-| 038 | lifetime_struct_ref       | structs holding references, lifetime elision        | ⬜     |
-| 039 | trait_definition          | defining a trait, default methods                   | ⬜     |
-| 040 | trait_impl_for_type       | implementing a trait for your own type              | ⬜     |
-| 041 | trait_generic_bounds      | `<T: Trait>`, `where` clauses                        | ⬜     |
+| 037 | lifetime_longest          | explicit lifetime annotations on returns            | ✅     |
+| 038 | lifetime_struct_ref       | structs holding references, lifetime elision        | ✅     |
+| 039 | trait_definition          | defining a trait, default methods                   | ✅     |
+| 040 | trait_impl_for_type       | implementing a trait for your own type              | ✅     |
+| 041 | trait_generic_bounds      | `<T: Trait>`, `where` clauses                        | ✅     |
 | 042 | impl_trait_argument       | `impl Trait` in argument and return position        | ⬜     |
 | 043 | box_dyn_trait             | trait objects, dynamic dispatch, object safety      | ⬜     |
 | 044 | derive_debug_clone        | `#[derive(...)]`, what each derive generates         | ⬜     |

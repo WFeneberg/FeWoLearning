@@ -108,3 +108,18 @@ pub mod ex035_matrix_transpose;
 
 #[path = "02-intermediate/ex036_rle.rs"]
 pub mod ex036_rle;
+
+#[path = "02-intermediate/ex037_lifetime_longest.rs"]
+pub mod ex037_lifetime_longest;
+
+#[path = "02-intermediate/ex038_lifetime_struct_ref.rs"]
+pub mod ex038_lifetime_struct_ref;
+
+#[path = "02-intermediate/ex039_trait_definition.rs"]
+pub mod ex039_trait_definition;
+
+#[path = "02-intermediate/ex040_trait_impl_for_type.rs"]
+pub mod ex040_trait_impl_for_type;
+
+#[path = "02-intermediate/ex041_trait_generic_bounds.rs"]
+pub mod ex041_trait_generic_bounds;
