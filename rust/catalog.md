@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 70 ✅ / 30 ⬜**
+**Status: 75 ✅ / 25 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -108,11 +108,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 
 | #   | Slug                     | Concepts                                             | Status |
 |-----|--------------------------|------------------------------------------------------|--------|
-| 071 | lru_cache                | generics, eviction, `HashMap` + list bookkeeping     | ⬜     |
-| 072 | rc_shared_ownership      | `Rc`, strong counts, shared immutable graphs         | ⬜     |
-| 073 | refcell_interior_mut     | `RefCell`, runtime borrow checking, panics           | ⬜     |
-| 074 | rc_refcell_tree          | `Rc<RefCell<T>>`, parent/child trees, `Weak`         | ⬜     |
-| 075 | arc_mutex_counter        | `Arc<Mutex<T>>`, sharing across threads              | ⬜     |
+| 071 | lru_cache                | generics, eviction, `HashMap` + list bookkeeping     | ✅     |
+| 072 | rc_shared_ownership      | `Rc`, strong counts, shared immutable graphs         | ✅     |
+| 073 | refcell_interior_mut     | `RefCell`, runtime borrow checking, panics           | ✅     |
+| 074 | rc_refcell_tree          | `Rc<RefCell<T>>`, parent/child trees, `Weak`         | ✅     |
+| 075 | arc_mutex_counter        | `Arc<Mutex<T>>`, sharing across threads              | ✅     |
 | 076 | rwlock_reader_writer     | `RwLock`, many readers or one writer                 | ⬜     |
 | 077 | thread_spawn_join        | `std::thread`, `join`, moving captures               | ⬜     |
 | 078 | mpsc_channel_pipeline    | `mpsc` channels, producer/consumer                   | ⬜     |

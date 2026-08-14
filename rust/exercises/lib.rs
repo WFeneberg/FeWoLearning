@@ -210,3 +210,18 @@ pub mod ex069_binary_search_slice;
 
 #[path = "02-intermediate/ex070_integration_test_layout.rs"]
 pub mod ex070_integration_test_layout;
+
+#[path = "03-advanced/ex071_lru_cache.rs"]
+pub mod ex071_lru_cache;
+
+#[path = "03-advanced/ex072_rc_shared_ownership.rs"]
+pub mod ex072_rc_shared_ownership;
+
+#[path = "03-advanced/ex073_refcell_interior_mut.rs"]
+pub mod ex073_refcell_interior_mut;
+
+#[path = "03-advanced/ex074_rc_refcell_tree.rs"]
+pub mod ex074_rc_refcell_tree;
+
+#[path = "03-advanced/ex075_arc_mutex_counter.rs"]
+pub mod ex075_arc_mutex_counter;
