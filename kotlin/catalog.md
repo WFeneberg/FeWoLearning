@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 65 ✅ / 35 ⬜**
+**Status: 70 ✅ / 30 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -92,11 +92,11 @@ properties, file APIs, coroutines, flows, and time-controlled tests.
 | 063 | coroutine_supervisor    | `SupervisorJob`, isolated failures                    | ✅     |
 | 064 | channel_pipeline        | channels, producer/consumer                           | ✅     |
 | 065 | flow_map_filter         | cold flows, transformations                           | ✅     |
-| 066 | state_flow_store        | `StateFlow`, UI-facing state                          | ⬜     |
-| 067 | shared_flow_events      | `SharedFlow`, broadcast events                        | ⬜     |
-| 068 | mutex_protected_state   | `Mutex`, suspending critical sections                 | ⬜     |
-| 069 | test_dispatcher_time    | virtual time, coroutine test scheduler                | ⬜     |
-| 070 | json_manual_parser      | parsing, validation, recoverable errors               | ⬜     |
+| 066 | state_flow_store        | `StateFlow`, UI-facing state                          | ✅     |
+| 067 | shared_flow_events      | `SharedFlow`, broadcast events                        | ✅     |
+| 068 | mutex_protected_state   | `Mutex`, suspending critical sections                 | ✅     |
+| 069 | test_dispatcher_time    | virtual time, coroutine test scheduler                | ✅     |
+| 070 | json_manual_parser      | parsing, validation, recoverable errors               | ✅     |
 
 ## Advanced (071–090) — coroutines, DSLs, interop
 
