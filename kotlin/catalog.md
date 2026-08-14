@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 80 ✅ / 20 ⬜**
+**Status: 90 ✅ / 10 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -115,16 +115,16 @@ design-level Kotlin patterns.
 | 078 | builder_type_safe_dsl   | receivers, fluent builders                            | ✅     |
 | 079 | receiver_lambdas_html   | nested receivers, mini DSL                            | ✅     |
 | 080 | delegate_validation     | custom delegates, centralized validation              | ✅     |
-| 081 | reflection_callable_ref | reflection, callable references                       | ⬜     |
-| 082 | sealed_error_hierarchy  | rich domain errors, matching                          | ⬜     |
-| 083 | dsl_marker_scope        | `@DslMarker`, receiver isolation                      | ⬜     |
-| 084 | lazy_thread_safety      | lazy modes, concurrency tradeoffs                     | ⬜     |
-| 085 | java_interop_optionals  | Java interop, `Optional`, platform types              | ⬜     |
-| 086 | annotation_use_site     | use-site targets, annotations                         | ⬜     |
-| 087 | object_expression_listener | anonymous objects, interfaces                      | ⬜     |
-| 088 | map_get_or_put_cache    | caching, mutation, thread-safety caveats              | ⬜     |
-| 089 | result_pipeline         | composing `Result`-like workflows                     | ⬜     |
-| 090 | parser_combinator_mini  | higher-order parsers, composition                     | ⬜     |
+| 081 | reflection_callable_ref | reflection, callable references                       | ✅     |
+| 082 | sealed_error_hierarchy  | rich domain errors, matching                          | ✅     |
+| 083 | dsl_marker_scope        | `@DslMarker`, receiver isolation                      | ✅     |
+| 084 | lazy_thread_safety      | lazy modes, concurrency tradeoffs                     | ✅     |
+| 085 | java_interop_optionals  | Java interop, `Optional`, platform types              | ✅     |
+| 086 | annotation_use_site     | use-site targets, annotations                         | ✅     |
+| 087 | object_expression_listener | anonymous objects, interfaces                      | ✅     |
+| 088 | map_get_or_put_cache    | caching, mutation, thread-safety caveats              | ✅     |
+| 089 | result_pipeline         | composing `Result`-like workflows                     | ✅     |
+| 090 | parser_combinator_mini  | higher-order parsers, composition                     | ✅     |
 
 ## Expert (091–100) — architecture, tooling, domain DSLs
 
