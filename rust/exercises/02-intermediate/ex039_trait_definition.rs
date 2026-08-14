@@ -58,12 +58,20 @@ mod tests {
 
     #[test]
     fn robot_overrides_the_default_greeting() {
+        // A Person still needs the default greeting to be implemented.
+        let ada = Person { name: "Ada".to_string() };
+        assert_eq!(ada.greeting(), "Hello, Ada!");
+
         let unit = Robot { id: 7 };
         assert_eq!(unit.greeting(), "BEEP BOOP, Unit-7");
     }
 
     #[test]
     fn name_is_still_reachable_after_override() {
+        // A Person still needs the default greeting to be implemented.
+        let ada = Person { name: "Ada".to_string() };
+        assert_eq!(ada.greeting(), "Hello, Ada!");
+
         let unit = Robot { id: 42 };
         assert_eq!(unit.name(), "Unit-42");
     }
