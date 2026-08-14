@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -44,11 +44,11 @@ exceptions, and introductory JUnit assertions.
 | 023 | stream_map_sum          | streams, `mapToInt`, terminal operations              | ✅     |
 | 024 | stream_grouping         | `Collectors.groupingBy`, aggregation                  | ✅     |
 | 025 | file_read_lines         | `Files.readAllLines`, UTF-8                           | ✅     |
-| 026 | path_operations         | `Path`, normalize, resolve                            | ⬜     |
-| 027 | try_with_resources      | automatic closing, resource safety                    | ⬜     |
-| 028 | custom_exception        | extending exceptions, meaningful messages             | ⬜     |
-| 029 | regex_validation        | regex, matcher groups, validation                     | ⬜     |
-| 030 | string_builder          | mutable text assembly, efficiency                     | ⬜     |
+| 026 | path_operations         | `Path`, normalize, resolve                            | ✅     |
+| 027 | try_with_resources      | automatic closing, resource safety                    | ✅     |
+| 028 | custom_exception        | extending exceptions, meaningful messages             | ✅     |
+| 029 | regex_validation        | regex, matcher groups, validation                     | ✅     |
+| 030 | string_builder          | mutable text assembly, efficiency                     | ✅     |
 | 031 | class_invariant         | constructors, validation, encapsulation               | ⬜     |
 | 032 | inheritance_override    | inheritance, overriding, `super`                      | ⬜     |
 | 033 | interface_default_method| interfaces, default methods                           | ⬜     |
