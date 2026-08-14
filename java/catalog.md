@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 5 ✅ / 95 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -19,11 +19,11 @@ exceptions, and introductory JUnit assertions.
 
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
-| 001 | primitive_math          | primitives, arithmetic, integer division              | ⬜     |
-| 002 | boolean_logic           | booleans, comparisons, short-circuiting               | ⬜     |
-| 003 | string_formatting       | string methods, formatting, interpolation alternatives| ⬜     |
-| 004 | array_statistics        | arrays, loops, min/max/average                        | ⬜     |
-| 005 | list_operations         | `List`, add/remove, iteration                         | ⬜     |
+| 001 | primitive_math          | primitives, arithmetic, integer division              | ✅     |
+| 002 | boolean_logic           | booleans, comparisons, short-circuiting               | ✅     |
+| 003 | string_formatting       | string methods, formatting, interpolation alternatives| ✅     |
+| 004 | array_statistics        | arrays, loops, min/max/average                        | ✅     |
+| 005 | list_operations         | `List`, add/remove, iteration                         | ✅     |
 | 006 | hashmap_word_count      | `Map`, counting, `merge`                              | ⬜     |
 | 007 | sum_of_digits           | loops, modulo, integer decomposition                  | ⬜     |
 | 008 | collatz_steps           | looping, mutation, termination conditions             | ⬜     |

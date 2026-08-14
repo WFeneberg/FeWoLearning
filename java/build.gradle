@@ -1,0 +1,55 @@
+// FeWoLearning — Java exercises.
+//
+// There is no separate src/main + src/test split: each exercise's stub and its
+// sibling JUnit test live together under exercises/<tier>/exNNN_slug/, so the
+// whole `exercises/` tree is registered as the single `test` source set below
+// (the `test` source set already depends on `main`, and `main` here is empty —
+// there is nothing to compile ahead of it). `solutions/` is never referenced by
+// any source set, so it is never compiled as part of this build; verify a
+// solution by overlaying it onto its stub in a throwaway copy instead (see the
+// root CLAUDE.md's "Adding or completing exercises" workflow).
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = []
+        }
+    }
+    test {
+        java {
+            srcDirs = ['exercises']
+        }
+        resources {
+            // Only used by ex084 (ServiceLoader): resources/META-INF/services/...
+            // must sit at the classpath root, which is why it is a separate
+            // top-level directory rather than nested inside exercises/.
+            srcDirs = ['resources']
+        }
+    }
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
