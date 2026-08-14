@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 90 ✅ / 10 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -133,13 +133,13 @@ cross-cutting patterns.
 
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
-| 091 | mini_di_container       | reflection, constructor wiring, scopes                | ⬜     |
-| 092 | expression_parser       | tokenization, precedence, AST evaluation              | ⬜     |
-| 093 | rule_engine             | predicates, composition, execution order              | ⬜     |
-| 094 | event_bus               | publish/subscribe, synchronous dispatch               | ⬜     |
-| 095 | annotation_processor    | code generation, compile-time validation              | ⬜     |
-| 096 | jdbc_row_mapper         | JDBC basics, mapping rows to objects                  | ⬜     |
-| 097 | batch_file_pipeline     | chunked processing, fault reporting                   | ⬜     |
-| 098 | markdown_table_renderer | text rendering, alignment rules                       | ⬜     |
-| 099 | tiny_template_engine    | placeholders, escaping, rendering contexts            | ⬜     |
-| 100 | command_dispatcher      | command routing, extensibility                        | ⬜     |
+| 091 | mini_di_container       | reflection, constructor wiring, scopes                | ✅     |
+| 092 | expression_parser       | tokenization, precedence, AST evaluation              | ✅     |
+| 093 | rule_engine             | predicates, composition, execution order              | ✅     |
+| 094 | event_bus               | publish/subscribe, synchronous dispatch               | ✅     |
+| 095 | annotation_processor    | code generation, compile-time validation              | ✅     |
+| 096 | jdbc_row_mapper         | JDBC basics, mapping rows to objects                  | ✅     |
+| 097 | batch_file_pipeline     | chunked processing, fault reporting                   | ✅     |
+| 098 | markdown_table_renderer | text rendering, alignment rules                       | ✅     |
+| 099 | tiny_template_engine    | placeholders, escaping, rendering contexts            | ✅     |
+| 100 | command_dispatcher      | command routing, extensibility                        | ✅     |
