@@ -225,3 +225,18 @@ pub mod ex074_rc_refcell_tree;
 
 #[path = "03-advanced/ex075_arc_mutex_counter.rs"]
 pub mod ex075_arc_mutex_counter;
+
+#[path = "03-advanced/ex076_rwlock_reader_writer.rs"]
+pub mod ex076_rwlock_reader_writer;
+
+#[path = "03-advanced/ex077_thread_spawn_join.rs"]
+pub mod ex077_thread_spawn_join;
+
+#[path = "03-advanced/ex078_mpsc_channel_pipeline.rs"]
+pub mod ex078_mpsc_channel_pipeline;
+
+#[path = "03-advanced/ex079_scoped_threads.rs"]
+pub mod ex079_scoped_threads;
+
+#[path = "03-advanced/ex080_send_sync_bounds.rs"]
+pub mod ex080_send_sync_bounds;

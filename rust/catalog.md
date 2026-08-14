@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 75 ✅ / 25 ⬜**
+**Status: 80 ✅ / 20 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -113,11 +113,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 073 | refcell_interior_mut     | `RefCell`, runtime borrow checking, panics           | ✅     |
 | 074 | rc_refcell_tree          | `Rc<RefCell<T>>`, parent/child trees, `Weak`         | ✅     |
 | 075 | arc_mutex_counter        | `Arc<Mutex<T>>`, sharing across threads              | ✅     |
-| 076 | rwlock_reader_writer     | `RwLock`, many readers or one writer                 | ⬜     |
-| 077 | thread_spawn_join        | `std::thread`, `join`, moving captures               | ⬜     |
-| 078 | mpsc_channel_pipeline    | `mpsc` channels, producer/consumer                   | ⬜     |
-| 079 | scoped_threads           | `thread::scope`, borrowing locals across threads     | ⬜     |
-| 080 | send_sync_bounds         | `Send`/`Sync`, why some types are neither            | ⬜     |
+| 076 | rwlock_reader_writer     | `RwLock`, many readers or one writer                 | ✅     |
+| 077 | thread_spawn_join        | `std::thread`, `join`, moving captures               | ✅     |
+| 078 | mpsc_channel_pipeline    | `mpsc` channels, producer/consumer                   | ✅     |
+| 079 | scoped_threads           | `thread::scope`, borrowing locals across threads     | ✅     |
+| 080 | send_sync_bounds         | `Send`/`Sync`, why some types are neither            | ✅     |
 | 081 | atomic_counter           | `AtomicUsize`, `Ordering`, lock-free increment       | ⬜     |
 | 082 | trait_object_vs_generic  | dispatch cost, code size, when each fits             | ⬜     |
 | 083 | deref_smart_pointer      | `Deref`/`DerefMut`, a custom smart pointer           | ⬜     |
