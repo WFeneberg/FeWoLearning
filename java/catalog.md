@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 86 ✅ / 14 ⬜**
+**Status: 90 ✅ / 10 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -121,10 +121,10 @@ records, and design-level exercises.
 | 084 | service_loader_plugin   | `ServiceLoader`, pluggable implementations            | ✅     |
 | 085 | sealed_result_type      | typed success/failure outcomes                        | ✅     |
 | 086 | money_value_object      | equality, precision, domain modeling                  | ✅     |
-| 087 | csv_parser              | parsing, validation, recoverable errors               | ⬜     |
-| 088 | retry_backoff           | retries, jitter/backoff policy                        | ⬜     |
-| 089 | cache_with_expiry       | clocks, stale data, synchronization                   | ⬜     |
-| 090 | hexagonal_port_adapter  | ports/adapters, dependency inversion                  | ⬜     |
+| 087 | csv_parser              | parsing, validation, recoverable errors               | ✅     |
+| 088 | retry_backoff           | retries, jitter/backoff policy                        | ✅     |
+| 089 | cache_with_expiry       | clocks, stale data, synchronization                   | ✅     |
+| 090 | hexagonal_port_adapter  | ports/adapters, dependency inversion                  | ✅     |
 
 ## Expert (091–100) — frameworks, tooling, DSLs
 
