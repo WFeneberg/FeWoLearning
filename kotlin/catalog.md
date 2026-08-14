@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 50 ✅ / 50 ⬜**
+**Status: 55 ✅ / 45 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -77,11 +77,11 @@ properties, file APIs, coroutines, flows, and time-controlled tests.
 | 048 | sealed_ui_state         | state modeling, exhaustive `when`                     | ✅     |
 | 049 | data_object_singleton   | `data object`, singleton identity                     | ✅     |
 | 050 | value_class_email       | value classes, validation                             | ✅     |
-| 051 | delegated_observable    | `Delegates.observable`, change hooks                  | ⬜     |
-| 052 | delegated_map_backed    | map-backed properties, dynamic models                 | ⬜     |
-| 053 | comparator_then_by      | comparator composition                                | ⬜     |
-| 054 | pair_triple_transform   | `Pair`, `Triple`, decomposition                       | ⬜     |
-| 055 | result_recover          | recovering from failures                              | ⬜     |
+| 051 | delegated_observable    | `Delegates.observable`, change hooks                  | ✅     |
+| 052 | delegated_map_backed    | map-backed properties, dynamic models                 | ✅     |
+| 053 | comparator_then_by      | comparator composition                                | ✅     |
+| 054 | pair_triple_transform   | `Pair`, `Triple`, decomposition                       | ✅     |
+| 055 | result_recover          | recovering from failures                              | ✅     |
 | 056 | exception_wrapping      | domain exceptions, causes                             | ⬜     |
 | 057 | file_use_lines          | `useLines`, resource safety                           | ⬜     |
 | 058 | path_copy_move          | NIO path operations                                   | ⬜     |
