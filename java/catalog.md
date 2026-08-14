@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 20 ✅ / 80 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -39,11 +39,11 @@ exceptions, and introductory JUnit assertions.
 | 018 | method_overloading      | overload resolution, signatures                       | ✅     |
 | 019 | varargs_join            | varargs, arrays from calls                            | ✅     |
 | 020 | immutable_list_copy     | defensive copying, `List.copyOf`                      | ✅     |
-| 021 | comparator_sort         | comparators, sorting, reversed order                  | ⬜     |
-| 022 | predicate_filter        | predicates, filtering, reusable conditions            | ⬜     |
-| 023 | stream_map_sum          | streams, `mapToInt`, terminal operations              | ⬜     |
-| 024 | stream_grouping         | `Collectors.groupingBy`, aggregation                  | ⬜     |
-| 025 | file_read_lines         | `Files.readAllLines`, UTF-8                           | ⬜     |
+| 021 | comparator_sort         | comparators, sorting, reversed order                  | ✅     |
+| 022 | predicate_filter        | predicates, filtering, reusable conditions            | ✅     |
+| 023 | stream_map_sum          | streams, `mapToInt`, terminal operations              | ✅     |
+| 024 | stream_grouping         | `Collectors.groupingBy`, aggregation                  | ✅     |
+| 025 | file_read_lines         | `Files.readAllLines`, UTF-8                           | ✅     |
 | 026 | path_operations         | `Path`, normalize, resolve                            | ⬜     |
 | 027 | try_with_resources      | automatic closing, resource safety                    | ⬜     |
 | 028 | custom_exception        | extending exceptions, meaningful messages             | ⬜     |
