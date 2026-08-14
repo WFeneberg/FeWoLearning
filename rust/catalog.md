@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 61 ✅ / 39 ⬜**
+**Status: 66 ✅ / 34 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -94,11 +94,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 059 | modules_visibility        | `mod`, `pub`, `pub(crate)`, paths                    | ✅     |
 | 060 | generic_struct_stack      | a generic `Stack<T>` with bounds                     | ✅     |
 | 061 | generic_two_params        | multiple type parameters, monomorphization           | ✅     |
-| 062 | default_trait             | `Default`, `..Default::default()`                    | ⬜     |
-| 063 | operator_overloading      | `Add`/`Mul` via `std::ops`                           | ⬜     |
-| 064 | index_trait               | `Index`/`IndexMut` for a custom collection          | ⬜     |
-| 065 | pattern_match_nested      | nested destructuring, slice patterns                | ⬜     |
-| 066 | matches_macro             | `matches!`, terse predicate matching                 | ⬜     |
+| 062 | default_trait             | `Default`, `..Default::default()`                    | ✅     |
+| 063 | operator_overloading      | `Add`/`Mul` via `std::ops`                           | ✅     |
+| 064 | index_trait               | `Index`/`IndexMut` for a custom collection          | ✅     |
+| 065 | pattern_match_nested      | nested destructuring, slice patterns                | ✅     |
+| 066 | matches_macro             | `matches!`, terse predicate matching                 | ✅     |
 | 067 | option_result_combinators | chaining combinators without `unwrap`               | ⬜     |
 | 068 | sort_with_custom_cmp      | `sort_by`, `Ordering`, `then_with`                   | ⬜     |
 | 069 | binary_search_slice       | `binary_search_by`, insertion points                | ⬜     |

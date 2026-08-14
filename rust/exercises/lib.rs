@@ -183,3 +183,18 @@ pub mod ex060_generic_struct_stack;
 
 #[path = "02-intermediate/ex061_generic_two_params.rs"]
 pub mod ex061_generic_two_params;
+
+#[path = "02-intermediate/ex062_default_trait.rs"]
+pub mod ex062_default_trait;
+
+#[path = "02-intermediate/ex063_operator_overloading.rs"]
+pub mod ex063_operator_overloading;
+
+#[path = "02-intermediate/ex064_index_trait.rs"]
+pub mod ex064_index_trait;
+
+#[path = "02-intermediate/ex065_pattern_match_nested.rs"]
+pub mod ex065_pattern_match_nested;
+
+#[path = "02-intermediate/ex066_matches_macro.rs"]
+pub mod ex066_matches_macro;
