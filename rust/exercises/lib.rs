@@ -94,5 +94,17 @@ pub mod ex030_iterator_fold;
 #[path = "01-beginner/ex031_iterator_zip_enumerate.rs"]
 pub mod ex031_iterator_zip_enumerate;
 
+#[path = "01-beginner/ex032_sort_by_key.rs"]
+pub mod ex032_sort_by_key;
+
+#[path = "01-beginner/ex033_vec_dedup_retain.rs"]
+pub mod ex033_vec_dedup_retain;
+
+#[path = "01-beginner/ex034_fizz_buzz.rs"]
+pub mod ex034_fizz_buzz;
+
+#[path = "01-beginner/ex035_matrix_transpose.rs"]
+pub mod ex035_matrix_transpose;
+
 #[path = "02-intermediate/ex036_rle.rs"]
 pub mod ex036_rle;

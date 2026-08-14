@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 32 ✅ / 68 ⬜**
+**Status: 36 ✅ / 64 ⬜**
 
 > **Toolchain note.** `cargo test` cannot link on this machine yet: Rust is
 > installed with the `x86_64-pc-windows-msvc` target, but the MSVC libraries and
@@ -58,10 +58,10 @@ an unregistered file is never compiled.
 | 029 | iterator_map_filter     | `map`, `filter`, `collect` into `Vec`                 | ✅     |
 | 030 | iterator_fold           | `fold`, accumulator threading                         | ✅     |
 | 031 | iterator_zip_enumerate  | `zip`, `enumerate`, `rev`                             | ✅     |
-| 032 | sort_by_key             | `sort_by_key`, `sort_unstable`, stability             | ⬜     |
-| 033 | vec_dedup_retain        | `dedup`, `retain`, in-place filtering                 | ⬜     |
-| 034 | fizz_buzz               | control flow, modulo, `String` building               | ⬜     |
-| 035 | matrix_transpose        | nested `Vec`, indexing, allocation                    | ⬜     |
+| 032 | sort_by_key             | `sort_by_key`, `sort_unstable`, stability             | ✅     |
+| 033 | vec_dedup_retain        | `dedup`, `retain`, in-place filtering                 | ✅     |
+| 034 | fizz_buzz               | control flow, modulo, `String` building               | ✅     |
+| 035 | matrix_transpose        | nested `Vec`, indexing, allocation                    | ✅     |
 
 ## Intermediate (036–070) — idioms & the borrow checker
 
