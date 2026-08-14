@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 10 ✅ / 90 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -24,11 +24,11 @@ exceptions, and introductory JUnit assertions.
 | 003 | string_formatting       | string methods, formatting, interpolation alternatives| ✅     |
 | 004 | array_statistics        | arrays, loops, min/max/average                        | ✅     |
 | 005 | list_operations         | `List`, add/remove, iteration                         | ✅     |
-| 006 | hashmap_word_count      | `Map`, counting, `merge`                              | ⬜     |
-| 007 | sum_of_digits           | loops, modulo, integer decomposition                  | ⬜     |
-| 008 | collatz_steps           | looping, mutation, termination conditions             | ⬜     |
-| 009 | grade_classifier        | branching, ranges, validation                         | ⬜     |
-| 010 | traffic_light_enum      | enums, `switch`, behavior by variant                  | ⬜     |
+| 006 | hashmap_word_count      | `Map`, counting, `merge`                              | ✅     |
+| 007 | sum_of_digits           | loops, modulo, integer decomposition                  | ✅     |
+| 008 | collatz_steps           | looping, mutation, termination conditions             | ✅     |
+| 009 | grade_classifier        | branching, ranges, validation                         | ✅     |
+| 010 | traffic_light_enum      | enums, `switch`, behavior by variant                  | ✅     |
 | 011 | point_record            | records, value semantics, accessors                   | ⬜     |
 | 012 | optional_basics         | `Optional`, presence checks, defaults                 | ⬜     |
 | 013 | switch_expression       | switch expressions, exhaustiveness                    | ⬜     |
