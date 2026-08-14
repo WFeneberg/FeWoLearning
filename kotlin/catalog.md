@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Kotlin exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 ## Beginner (001–035) — language fundamentals
 
@@ -24,16 +24,16 @@ scope functions, generics, and introductory JUnit assertions.
 | 003 | ranges_and_when         | ranges, `when`, exhaustiveness                        | ✅     |
 | 004 | collection_filter_map   | list transformations, immutable collections           | ✅     |
 | 005 | nullable_basics         | nullable types, smart casts                           | ✅     |
-| 006 | elvis_operator          | `?:`, defaults, early returns                         | ⬜     |
-| 007 | safe_calls_chain        | `?.`, chaining, nullable navigation                   | ⬜     |
-| 008 | data_class_point        | data classes, copy, equality                          | ⬜     |
-| 009 | enum_when_branch        | enums, `when`, associated behavior                    | ⬜     |
-| 010 | sealed_result           | sealed classes, exhaustive branching                  | ⬜     |
-| 011 | extension_function      | extension functions, receivers                        | ⬜     |
-| 012 | default_named_args      | defaults, named arguments                             | ⬜     |
-| 013 | destructuring_pairs     | destructuring, pairs, data classes                    | ⬜     |
-| 014 | list_mutability         | `List` vs `MutableList`, copying                      | ⬜     |
-| 015 | map_count_words         | maps, `getOrDefault`, counting                        | ⬜     |
+| 006 | elvis_operator          | `?:`, defaults, early returns                         | ✅     |
+| 007 | safe_calls_chain        | `?.`, chaining, nullable navigation                   | ✅     |
+| 008 | data_class_point        | data classes, copy, equality                          | ✅     |
+| 009 | enum_when_branch        | enums, `when`, associated behavior                    | ✅     |
+| 010 | sealed_result           | sealed classes, exhaustive branching                  | ✅     |
+| 011 | extension_function      | extension functions, receivers                        | ✅     |
+| 012 | default_named_args      | defaults, named arguments                             | ✅     |
+| 013 | destructuring_pairs     | destructuring, pairs, data classes                    | ✅     |
+| 014 | list_mutability         | `List` vs `MutableList`, copying                      | ✅     |
+| 015 | map_count_words         | maps, `getOrDefault`, counting                        | ✅     |
 | 016 | higher_order_basics     | passing functions, lambdas                            | ⬜     |
 | 017 | lambda_capture          | closures, captured state                              | ⬜     |
 | 018 | scope_let_run           | `let`, `run`, temporary scopes                        | ⬜     |
