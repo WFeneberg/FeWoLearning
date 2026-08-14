@@ -10,7 +10,7 @@ the ⬜ rows are the work queue. Planned Java exercises live in folders
 `exercises/<tier>/exNNN_<slug>/` that contain the stub plus its sibling JUnit
 test.
 
-**Status: 71 ✅ / 29 ⬜**
+**Status: 76 ✅ / 24 ⬜**
 
 ## Beginner (001–035) — syntax, types, control flow
 
@@ -105,11 +105,11 @@ records, and design-level exercises.
 
 | #   | Slug                    | Concepts                                              | Status |
 |-----|-------------------------|-------------------------------------------------------|--------|
-| 071 | lru_cache               | maps, eviction policy, recency tracking               | ⬜     |
-| 072 | custom_collector        | `Collector` contract, mutable reduction               | ⬜     |
-| 073 | spliterator_batching    | custom traversal, characteristics                     | ⬜     |
-| 074 | parallel_stream_pitfalls| parallel streams, statefulness, ordering             | ⬜     |
-| 075 | fork_join_sum           | fork/join tasks, work splitting                       | ⬜     |
+| 071 | lru_cache               | maps, eviction policy, recency tracking               | ✅     |
+| 072 | custom_collector        | `Collector` contract, mutable reduction               | ✅     |
+| 073 | spliterator_batching    | custom traversal, characteristics                     | ✅     |
+| 074 | parallel_stream_pitfalls| parallel streams, statefulness, ordering             | ✅     |
+| 075 | fork_join_sum           | fork/join tasks, work splitting                       | ✅     |
 | 076 | producer_consumer_queue | blocking queues, coordination                         | ⬜     |
 | 077 | rate_limiter            | time windows, thread safety                           | ⬜     |
 | 078 | bounded_executor        | semaphore back-pressure, pools                        | ⬜     |
