@@ -168,3 +168,18 @@ pub mod ex055_iterator_take_skip_while;
 
 #[path = "02-intermediate/ex056_iterator_partition.rs"]
 pub mod ex056_iterator_partition;
+
+#[path = "02-intermediate/ex057_collect_into_hashmap.rs"]
+pub mod ex057_collect_into_hashmap;
+
+#[path = "02-intermediate/ex058_cow_borrowed_owned.rs"]
+pub mod ex058_cow_borrowed_owned;
+
+#[path = "02-intermediate/ex059_modules_visibility.rs"]
+pub mod ex059_modules_visibility;
+
+#[path = "02-intermediate/ex060_generic_struct_stack.rs"]
+pub mod ex060_generic_struct_stack;
+
+#[path = "02-intermediate/ex061_generic_two_params.rs"]
+pub mod ex061_generic_two_params;

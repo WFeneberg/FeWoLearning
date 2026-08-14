@@ -11,7 +11,7 @@ the ⬜ rows are the work queue. Each exercise is a single file
 **must be registered with a `#[path]` `pub mod` line in `exercises/lib.rs`** —
 an unregistered file is never compiled.
 
-**Status: 56 ✅ / 44 ⬜**
+**Status: 61 ✅ / 39 ⬜**
 
 > **Toolchain note.** `cargo test` links and runs fine on this machine via
 > `rust/.cargo/config.toml`'s `[env]` overrides — no further setup needed.
@@ -89,11 +89,11 @@ macros, error handling with `?` and custom errors, closures & `Fn` traits,
 | 054 | iterator_chain_flatmap    | `chain`, `flat_map`, `flatten`                        | ✅     |
 | 055 | iterator_take_skip_while  | `take_while`, `skip_while`, `step_by`                | ✅     |
 | 056 | iterator_partition        | `partition`, `all`, `any`, `position`                | ✅     |
-| 057 | collect_into_hashmap      | `collect` into `HashMap`/`HashSet`/`String`          | ⬜     |
-| 058 | cow_borrowed_owned        | `Cow`, avoiding needless allocation                 | ⬜     |
-| 059 | modules_visibility        | `mod`, `pub`, `pub(crate)`, paths                    | ⬜     |
-| 060 | generic_struct_stack      | a generic `Stack<T>` with bounds                     | ⬜     |
-| 061 | generic_two_params        | multiple type parameters, monomorphization           | ⬜     |
+| 057 | collect_into_hashmap      | `collect` into `HashMap`/`HashSet`/`String`          | ✅     |
+| 058 | cow_borrowed_owned        | `Cow`, avoiding needless allocation                 | ✅     |
+| 059 | modules_visibility        | `mod`, `pub`, `pub(crate)`, paths                    | ✅     |
+| 060 | generic_struct_stack      | a generic `Stack<T>` with bounds                     | ✅     |
+| 061 | generic_two_params        | multiple type parameters, monomorphization           | ✅     |
 | 062 | default_trait             | `Default`, `..Default::default()`                    | ⬜     |
 | 063 | operator_overloading      | `Add`/`Mul` via `std::ops`                           | ⬜     |
 | 064 | index_trait               | `Index`/`IndexMut` for a custom collection          | ⬜     |
