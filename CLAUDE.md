@@ -5,8 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this repository is
 
 FeWoLearning is a **polyglot skills-training monorepo**, not an application. It
-holds eight independent, self-contained learning tracks — `dotnet/`, `python/`,
-`vue/`, `angular/`, `go/`, `rust/`, `java/`, `kotlin/` — each with its own toolchain, test runner,
+holds nine independent, self-contained learning tracks — `dotnet/`, `python/`,
+`vue/`, `angular/`, `go/`, `rust/`, `java/`, `kotlin/`, `flutter/` — each with its own toolchain, test runner,
 and a graded set of **exercises** (stubs the learner implements) paired with
 reference **solutions**. There is no shared build and no cross-track code. Treat
 each language folder as its own project.
@@ -54,6 +54,7 @@ tests there — do not add `solutions/` to a project/module.
 | `rust/`   | — (`LIB` comes from `.cargo/config.toml`) | `cargo test`           | `cargo test ex001` |
 | `java/`   | planned                                 | planned                  | planned |
 | `kotlin/` | planned                                 | planned                  | planned |
+| `flutter/`| planned                                 | planned                  | planned |
 
 Run every command **from inside the track folder**, not the repo root.
 
@@ -63,6 +64,10 @@ Run every command **from inside the track folder**, not the repo root.
   (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**, **Rust 1.97.1**.
 - `java/` and `kotlin/` are currently **catalog-only** additions: their ledgers
   and README files exist, but the build scaffolding and seeded exercises do not.
+- `flutter/` is content-complete like `java/` and `kotlin/`: `pubspec.yaml`
+  scaffolding, README, a 100-row `catalog.md`, and all 100 exercises (stub +
+  test + solution) exist. No Flutter or Dart SDK is installed on this
+  machine, so none of it has ever been analyzed, compiled, or run.
 - **Rust links via `rust/.cargo/config.toml`.** rustc auto-detects the VS 18
   Professional toolset, which ships only `lib\onecore` and no desktop `lib\x64`, so
   `link.exe` died with `LNK1104: cannot open file 'msvcrt.lib'`. That config's
@@ -124,6 +129,23 @@ Run every command **from inside the track folder**, not the repo root.
   `flatMapLatest`) is even used — always ask whether a naive/wrong
   implementation would still pass before trusting a coroutine test. **This
   entire track is unverified** — see "Current state" above.
+- **Flutter/Dart** — `flutter/pubspec.yaml`, no `test/` root the way a typical
+  Dart package uses; each exercise's stub and its sibling test live together
+  under `exercises/<tier>/exNNN_slug/`, same convention as every other track.
+  `01-beginner` and most of `02-intermediate` are pure Dart and test via
+  `package:test` (plain `dart test`); from ex053 onward exercises build real
+  widgets and test via `package:flutter_test` (`WidgetTester`, `pumpWidget`),
+  which needs the full Flutter SDK, not just Dart. Stubs `throw
+  UnimplementedError('TODO')`. A recurring bug class to watch for once this
+  track is verified: a widget test that "passes" without ever calling
+  `tester.pump()`/`pumpAndSettle()` after a state change, so it's really just
+  asserting on the widget's *initial* build — always check the test actually
+  exercises `setState`/stream/animation timing, not just the first frame.
+  **This entire track is unverified** — see "Current state" above. Three
+  exercises are flagged as extra-risky in `flutter/README.md`: ex069 needs a
+  golden-file baseline generated on a real machine, and ex094/ex095 use
+  plausible-but-unexercised platform-channel-mocking and cross-isolate
+  closure APIs.
 
 ## Adding or completing exercises
 
@@ -156,7 +178,7 @@ work queue.
    - `vue`/`angular`: copy the `*.test.ts` / `*.spec.ts` into the matching
      `solutions/` folder; `vitest.config.ts` already collects them (Jest needs
      `--testMatch='**/solutions/**/*.spec.ts'`).
-   - `python`/`go`/`rust`/`dotnet`/`java`/`kotlin`: copy the track into the scratchpad, overlay each
+   - `python`/`go`/`rust`/`dotnet`/`java`/`kotlin`/`flutter`: copy the track into the scratchpad, overlay each
      solution onto its stub, delete `solutions/`, run the tests there.
 6. Run the track's type gate: `npm run typecheck:solutions` (vue), `go vet ./...`.
    `solutions/` must stay clean; a couple of errors under `exercises/` are expected
@@ -184,11 +206,12 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
+| `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 
-All 100-exercise ledgers across all 8 tracks are now written. Nothing is
-"remaining" in the sense of unwritten content; `java/` and `kotlin/` still need
-their first real compile/test run (see below) before they can be trusted the
-way the other six tracks are.
+All 100-exercise ledgers across all 9 tracks are now written. Nothing is
+"remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
+`flutter/` still need their first real compile/test run (see below) before
+they can be trusted the way the other six tracks are.
 
 `dotnet/`, `go/`, `vue/`, `python/`, `angular/` and `rust/` are content-complete
 **and verified** (every stub confirmed red, every solution confirmed green,
@@ -206,7 +229,13 @@ points, risking silent conflation of intermediate `combine` emissions).
 Treat `java/` and `kotlin/` as substantially higher-risk than every other
 track until someone with a real JDK 21 + Gradle (+ Kotlin, for `kotlin/`)
 install runs `gradle test` against each for the first time — expect to find
-and fix real compile errors then. `go/` was verified by
+and fix real compile errors then. `flutter/` is content-complete the same
+way — all 100 exercises (stub + test + solution), authored by 6 parallel
+agents each covering a batch of the catalog, then spot-checked by hand — but
+carries the same unverified risk: no Flutter/Dart SDK on this machine to run
+`dart analyze`/`dart test`/`flutter test`. See `flutter/README.md` for the
+handful of exercises (ex069, ex094, ex095) flagged as extra-risky by the
+agents that wrote them. `go/` was verified by
 overlaying every reference solution onto its stub (`go vet ./...` clean, 100
 stubs red, 100 solutions green); `vue/` runs 100 red exercise suites and 72
 green solution suites, with `npm run typecheck:solutions` at zero errors;

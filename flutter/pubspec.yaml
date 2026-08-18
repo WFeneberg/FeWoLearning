@@ -1,0 +1,45 @@
+# FeWoLearning — Flutter/Dart exercises.
+#
+# UNVERIFIED: authored on a machine with no Flutter/Dart SDK installed, so
+# this file has never been run through `flutter pub get` or `dart pub get`.
+# Versions below are believed-current as of authoring but could not be
+# checked — bump them if pub reports they don't exist once a real SDK is
+# available (see README.md).
+name: fewolearning_flutter
+description: >-
+  FeWoLearning Flutter/Dart exercise track: stubs under exercises/ paired
+  with reference solutions under solutions/. Not a publishable package.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # State-management exercises (03-advanced: ex071-073, ex089-090).
+  provider: ^6.1.2
+  flutter_riverpod: ^2.5.1
+  flutter_bloc: ^8.1.6
+  # Persistence exercise (03-advanced: ex086).
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # Pure-Dart exercises (01-beginner, most of 02-intermediate) use
+  # package:test directly instead of flutter_test, so they don't need a
+  # widget tree or a Flutter test binding to run.
+  test: ^1.25.0
+  # Mocking a service in a widget test (02-intermediate: ex070).
+  mockito: ^5.4.0
+  # Multi-device golden test matrices (03-advanced: ex087).
+  golden_toolkit: ^0.15.0
+  # End-to-end widget flow (03-advanced: ex088) — SDK package, not pub.dev.
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
