@@ -1,7 +1,7 @@
 # FeWoLearning — A Polyglot Skills Training Environment
 
 A personal, self-paced training ground for practicing and expanding programming
-skills across eight ecosystems. Each language lives in its own self-contained
+skills across nine ecosystems. Each language lives in its own self-contained
 folder with an isolated toolchain, its own test runner, and a graded set of
 **exercises** paired with reference **solutions**.
 
@@ -12,14 +12,21 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `dotnet/`   | C# / .NET (Core, WPF, Avalonia, Uno, Blazor) | xUnit | **100 / 100** | ✅ .NET 10 |
 | `go/`       | Go                               | `go test`   | **100 / 100** | ✅ Go 1.26 |
 | `vue/`      | Vue 3 (Composition API, TS)      | Vitest      | **100 / 100** | ✅ Node 26 |
-| `python/`   | Python 3                         | pytest      | 76 / 100  | ✅ Python 3.14 |
-| `angular/`  | Angular (standalone, signals, TS)| Jest        | 2 / 100   | ✅ Node 26 |
-| `rust/`     | Rust                             | `cargo test`| 2 / 100   | ✅ Rust 1.97 |
-| `java/`     | Java                             | JUnit 5     | 0 / 100   | planned |
-| `kotlin/`   | Kotlin                           | JUnit 5     | 0 / 100   | planned |
+| `python/`   | Python 3                         | pytest      | **100 / 100** | ✅ Python 3.14 |
+| `angular/`  | Angular (standalone, signals, TS)| Jest        | **100 / 100** | ✅ Node 26 |
+| `rust/`     | Rust                             | `cargo test`| **100 / 100** | ✅ Rust 1.97 |
+| `java/`     | Java                             | JUnit 5     | 100 / 100 (unverified) | planned |
+| `kotlin/`   | Kotlin                           | JUnit 5     | 100 / 100 (unverified) | planned |
+| `flutter/`  | Flutter / Dart                   | `package:test` / `flutter_test` | 100 / 100 (unverified) | planned |
 
 Each track's `catalog.md` is the authoritative per-exercise ledger: it lists all
-100 entries with ✅ (written and verified) or ⬜ (planned).
+100 entries with ✅ (written) or ⬜ (planned).
+
+`java/`, `kotlin/`, and `flutter/` are content-complete — every stub, test, and
+reference solution exists — but **unverified**: this machine has no JDK/Gradle
+(+ Kotlin), or Flutter/Dart SDK installed, so none of it has ever been
+compiled or run. See each track's `README.md` for details and known risk
+spots.
 
 Rust needed one machine-local fix to link: rustc auto-detects a Visual Studio
 install that has no desktop `lib\x64`, so
