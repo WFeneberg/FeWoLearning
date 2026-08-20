@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Only `exercises/` is registered as a test suite. `solutions/` is never
+scanned, because solution files deliberately reuse the same namespace and
+class names as their matching stubs (see the root CLAUDE.md's "Adding or
+completing exercises" workflow) -- collecting both at once would collide.
+To check a solution, overlay it onto its stub in a throwaway copy instead.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         displayDetailsOnTestsThatTriggerDeprecations="true">
+    <testsuites>
+        <testsuite name="exercises">
+            <directory suffix="Test.php">exercises</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
