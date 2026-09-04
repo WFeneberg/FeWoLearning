@@ -1,0 +1,15 @@
+<!-- Exercise 012 - TextBoxTwoWay (beginner).
+     Goal:   Bind a single TextBox's Text two-way to a view-model string.
+     Drills: TextBox.Text two-way round-trip.
+     Passes: dotnet test, filtered to Ex012_ (see the exact command in
+     Ex012_TextBoxTwoWay.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex012_TextBoxTwoWay"
+             x:DataType="b:Ex012_TextBoxTwoWayViewModel">
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBox Name="MessageBox" Text="{CompiledBinding Message, Mode=TwoWay}" />
+  </StackPanel>
+</UserControl>

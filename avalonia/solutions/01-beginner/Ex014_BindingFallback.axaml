@@ -1,0 +1,17 @@
+<!-- Exercise 014 - BindingFallback (beginner).
+     Goal:   Show a fallback for an unresolved path and a substitute for a
+             resolved-but-null value - two different failure modes.
+     Drills: FallbackValue, TargetNullValue.
+     Passes: dotnet test, filtered to Ex014_ (see the exact command in
+     Ex014_BindingFallback.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex014_BindingFallback"
+             x:DataType="b:Ex014_BindingFallbackViewModel">
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBlock Name="InnerText" Text="{CompiledBinding Inner.Label, FallbackValue='(fallback)'}" />
+    <TextBlock Name="NullableText" Text="{CompiledBinding NullableLabel, TargetNullValue='(none)'}" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,27 @@
+<!-- Exercise 012 - TextBoxTwoWay (beginner).
+     Goal:   Bind a single TextBox's Text two-way to a view-model string.
+     Drills: TextBox.Text two-way round-trip.
+     Passes: dotnet test, filtered to Ex012_ (see the exact command in
+     Ex012_TextBoxTwoWay.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex012_TextBoxTwoWay"
+             x:DataType="b:Ex012_TextBoxTwoWayViewModel">
+  <!-- TODO: replace this placeholder with a single TextBox named MessageBox,
+       Text bound two-way to Message:
+         <TextBox Name="MessageBox" Text="{CompiledBinding Message, Mode=TwoWay}" />
+       This is NOT the same drill as Ex011's TwoWay case. There, the test sets
+       Text via code, one assignment at a time. Here the test simulates real
+       key input character by character. Know this going in, because it
+       contradicts WPF: Avalonia's TextBox.Text has no UpdateSourceTrigger
+       concept and no LostFocus mode - a TwoWay binding pushes to the view model
+       on every keystroke, immediately, with the box still focused. Nothing
+       extra to write for that - it is Avalonia's default - but the test will
+       prove it by asserting the view model mid-typing, before the box ever
+       loses focus. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBox Text="TODO" />
+  </StackPanel>
+</UserControl>

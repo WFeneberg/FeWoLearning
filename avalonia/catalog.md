@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -38,11 +38,11 @@ not a valid C# identifier.
 | 008 | ObservableViewModel | `INotifyPropertyChanged` by hand, change-only notification | ✅ |
 | 009 | ReactiveObjectBasics | `ReactiveObject`, `RaiseAndSetIfChanged`, `PropertyChanging` ordering | ✅ |
 | 010 | CompiledBinding | nested-path re-resolution: the bound text follows when the intermediate object is replaced, not merely mutated | ✅ |
-| 011 | BindingModes | `OneWay`, `TwoWay`, `OneWayToSource` | ⬜ |
-| 012 | TextBoxTwoWay | `TextBox.Text` two-way round-trip | ⬜ |
-| 013 | BindingStringFormat | `StringFormat`, invariant culture | ⬜ |
-| 014 | BindingFallback | `FallbackValue`, `TargetNullValue` | ⬜ |
-| 015 | ValueConverter | `IValueConverter` both directions | ⬜ |
+| 011 | BindingModes | `OneWay`, `TwoWay`, `OneWayToSource` | ✅ |
+| 012 | TextBoxTwoWay | `TextBox.Text` two-way round-trip | ✅ |
+| 013 | BindingStringFormat | `StringFormat`, invariant culture | ✅ |
+| 014 | BindingFallback | `FallbackValue`, `TargetNullValue` | ✅ |
+| 015 | ValueConverter | `IValueConverter` both directions | ✅ |
 | 016 | ReactiveCommandBasics | `ReactiveCommand.Create`, `RxVoid`, invocation | ⬜ |
 | 017 | CommandCanExecute | `WhenAnyValue` feeding `canExecute`, button enablement | ⬜ |
 | 018 | CommandParameter | `ReactiveCommand<TParam, RxVoid>`, `CommandParameter` | ⬜ |

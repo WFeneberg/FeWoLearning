@@ -1,0 +1,17 @@
+<!-- Exercise 011 - BindingModes (beginner).
+     Goal:   Bind three independent TextBoxes, one per Avalonia binding mode.
+     Drills: OneWay, TwoWay, OneWayToSource.
+     Passes: dotnet test, filtered to Ex011_ (see the exact command in
+     Ex011_BindingModes.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex011_BindingModes"
+             x:DataType="b:Ex011_BindingModesViewModel">
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBox Name="OneWayBox" Text="{CompiledBinding OneWayValue, Mode=OneWay}" />
+    <TextBox Name="TwoWayBox" Text="{CompiledBinding TwoWayValue, Mode=TwoWay}" />
+    <TextBox Name="ToSourceBox" Text="{CompiledBinding ToSourceValue, Mode=OneWayToSource}" />
+  </StackPanel>
+</UserControl>

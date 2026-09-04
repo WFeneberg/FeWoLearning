@@ -18,5 +18,10 @@ public static class GalleryCatalog
         new("006", "AlignmentAndMargin", () => new Ex006()),
         new("007", "LayoutWrapPanel", () => new Ex007()),
         new("010", "CompiledBinding", () => new Ex010()),
+        new("011", "BindingModes", () => new Ex011()),
+        new("012", "TextBoxTwoWay", () => new Ex012()),
+        new("013", "BindingStringFormat", () => new Ex013()),
+        new("014", "BindingFallback", () => new Ex014()),
+        new("015", "ValueConverter", () => new Ex015()),
     ];
 }

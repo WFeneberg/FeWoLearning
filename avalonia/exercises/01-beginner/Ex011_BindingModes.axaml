@@ -1,0 +1,27 @@
+<!-- Exercise 011 - BindingModes (beginner).
+     Goal:   Bind three independent TextBoxes, one per Avalonia binding mode.
+     Drills: OneWay, TwoWay, OneWayToSource.
+     Passes: dotnet test, filtered to Ex011_ (see the exact command in
+     Ex011_BindingModes.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex011_BindingModes"
+             x:DataType="b:Ex011_BindingModesViewModel">
+  <!-- TODO: replace this placeholder with three named TextBoxes, each bound to
+       its OWN source property - do not let two of them share one property, or
+       the OneWayToSource box clobbers it at load and the other two assertions
+       become meaningless:
+         OneWayBox   Text bound to OneWayValue,   Mode=OneWay
+         TwoWayBox   Text bound to TwoWayValue,   Mode=TwoWay
+         ToSourceBox Text bound to ToSourceValue, Mode=OneWayToSource
+       Measured fact worth knowing before you run the test: OneWayToSource pushes
+       the target's own (empty) value into the source the instant the binding is
+       applied - before any typing - so the VM's starting value for that property
+       does not survive past Show(). That is the real, testable difference from
+       both other modes; TwoWay would instead show and keep the VM's own value. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBox Text="TODO" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,31 @@
+<!-- Exercise 014 - BindingFallback (beginner).
+     Goal:   Show a fallback for an unresolved path and a substitute for a
+             resolved-but-null value - two different failure modes.
+     Drills: FallbackValue, TargetNullValue.
+     Passes: dotnet test, filtered to Ex014_ (see the exact command in
+     Ex014_BindingFallback.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex014_BindingFallback"
+             x:DataType="b:Ex014_BindingFallbackViewModel">
+  <!-- TODO: replace this placeholder with two named TextBlocks:
+         InnerText    Text bound to Inner.Label, FallbackValue='(fallback)'
+         NullableText Text bound to NullableLabel, TargetNullValue='(none)'
+       Because x:DataType makes the compiler check paths, an INVALID path is a
+       build error, not a runtime fallback - FallbackValue cannot be
+       demonstrated that way here. What actually triggers it is a VALID path
+       through a null intermediate object: Inner itself is null, so
+       Inner.Label cannot be resolved at all. That is a different failure mode
+       from NullableLabel, whose path always resolves but can itself hold a
+       null value - that is what TargetNullValue is for. Measured fact: each
+       attribute covers ONLY its own case. FallbackValue does not fire when a
+       resolved path's value happens to be null, and TargetNullValue does not
+       fire when the path itself cannot be resolved - so setting only one of
+       the two on the wrong property renders an empty string, not the message
+       you would expect. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

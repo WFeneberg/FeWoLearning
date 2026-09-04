@@ -1,0 +1,26 @@
+<!-- Exercise 013 - BindingStringFormat (beginner).
+     Goal:   Format a bound number with StringFormat.
+     Drills: StringFormat, invariant culture.
+     Passes: dotnet test, filtered to Ex013_ (see the exact command in
+     Ex013_BindingStringFormat.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex013_BindingStringFormat"
+             x:DataType="b:Ex013_BindingStringFormatViewModel">
+  <!-- TODO: replace this placeholder with a TextBlock named AmountText whose
+       Text is bound to Amount with a StringFormat of {0:N2}:
+         <TextBlock Name="AmountText" Text="{CompiledBinding Amount, StringFormat={}{0:N2}}" />
+       Measured fact this exercise exists to teach: StringFormat renders through
+       CultureInfo.CurrentCulture - the AMBIENT culture of the machine running
+       the test, not a fixed one. On a de-CH machine {0:N2} on 1234.5 renders
+       "1'234.50" with U+2019 RIGHT SINGLE QUOTATION MARK as the thousands
+       separator - not a comma, not a plain apostrophe. Nothing in the view
+       needs to change to make the test deterministic (Avalonia's compiled
+       CompiledBinding does not support ConverterCulture as a XAML attribute -
+       try it and see the compiler error); the test pins the culture instead,
+       so it is your job here to make Amount render, not to make it
+       culture-proof. -->
+  <TextBlock Text="TODO" />
+</UserControl>

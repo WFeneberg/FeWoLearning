@@ -1,0 +1,27 @@
+<!-- Exercise 015 - ValueConverter (beginner).
+     Goal:   Write an IValueConverter and bind a TextBox through it, both ways.
+     Drills: IValueConverter both directions.
+     Passes: dotnet test, filtered to Ex015_ (see the exact command in
+     Ex015_ValueConverter.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex015_ValueConverter"
+             x:DataType="b:Ex015_ValueConverterViewModel">
+  <!-- TODO: implement Ex015_CelsiusToFahrenheitConverter in the code-behind
+       (Convert: Celsius double -> Fahrenheit string; ConvertBack: Fahrenheit
+       string -> Celsius double, invariant culture both ways), declare it as a
+       resource, and bind a TextBox named FahrenheitBox through it, two-way,
+       to Celsius:
+         <UserControl.Resources>
+           <b:Ex015_CelsiusToFahrenheitConverter x:Key="C2F" />
+         </UserControl.Resources>
+         <TextBox Name="FahrenheitBox"
+                  Text="{CompiledBinding Celsius, Mode=TwoWay, Converter={StaticResource C2F}}" />
+       A converter that only implements Convert and throws (or no-ops) in
+       ConvertBack passes a test that checks display only - the test here also
+       types into the box and asserts the view model's Celsius afterward, so
+       both directions must actually work. -->
+  <TextBox Text="TODO" />
+</UserControl>
