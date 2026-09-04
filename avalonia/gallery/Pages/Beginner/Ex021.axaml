@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="using:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Gallery.Pages.Beginner.Ex021">
+  <StackPanel Spacing="12">
+    <TextBlock Text="Exercise 021 — RadioGroupBinding" FontSize="18" FontWeight="Bold" />
+    <b:Ex021_RadioGroupBinding Name="Subject" />
+  </StackPanel>
+</UserControl>

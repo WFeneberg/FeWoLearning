@@ -1,0 +1,25 @@
+<!-- Exercise 021 - RadioGroupBinding (beginner).
+     Goal:   Two-way bind a group of RadioButtons to a single enum-typed property.
+     Drills: RadioButton GroupName, enum-backed selection.
+     Passes: dotnet test, filtered to Ex021_ (see the exact command in
+     Ex021_RadioGroupBinding.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex021_RadioGroupBinding"
+             x:DataType="b:Ex021_RadioGroupBindingViewModel">
+  <UserControl.Resources>
+    <b:Ex021_EnumMatchConverter x:Key="Match" />
+  </UserControl.Resources>
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <RadioButton Name="AlphaRadio" GroupName="Choice" Content="Alpha"
+                 Width="160" Height="32"
+                 IsChecked="{CompiledBinding Selected, Converter={StaticResource Match},
+                             ConverterParameter={x:Static b:Ex021_Choice.Alpha}, Mode=TwoWay}" />
+    <RadioButton Name="BetaRadio" GroupName="Choice" Content="Beta"
+                 Width="160" Height="32"
+                 IsChecked="{CompiledBinding Selected, Converter={StaticResource Match},
+                             ConverterParameter={x:Static b:Ex021_Choice.Beta}, Mode=TwoWay}" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,22 @@
+<!-- Exercise 024 - ListBoxSelection (beginner).
+     Goal:   Bind a ListBox's ItemsSource and allow multiple selections.
+     Drills: SelectedIndex, SelectedItems, selection mode.
+     Passes: dotnet test, filtered to Ex024_ (see the exact command in
+     Ex024_ListBoxSelection.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex024_ListBoxSelection"
+             x:DataType="b:Ex024_ListBoxSelectionViewModel">
+  <!-- TODO: replace this placeholder with a single ListBox named ColorsList,
+       its ItemsSource bound to Items, SelectionMode set to Multiple:
+         <ListBox Name="ColorsList" Width="200" Height="120"
+                  ItemsSource="{CompiledBinding Items}"
+                  SelectionMode="Multiple" />
+       The default SelectionMode is Single - the test asserts the mode
+       directly, and separately proves it by adding two items to
+       SelectedItems and checking Count reaches 2, which a single-select
+       ListBox cannot do. -->
+  <ListBox Width="200" Height="120" />
+</UserControl>

@@ -28,5 +28,10 @@ public static class GalleryCatalog
         new("018", "CommandParameter", () => new Ex018()),
         new("019", "ButtonClickEvent", () => new Ex019()),
         new("020", "CheckBoxBinding", () => new Ex020()),
+        new("021", "RadioGroupBinding", () => new Ex021()),
+        new("022", "SliderBinding", () => new Ex022()),
+        new("023", "ComboBoxSelection", () => new Ex023()),
+        new("024", "ListBoxSelection", () => new Ex024()),
+        new("025", "ItemsControlTemplate", () => new Ex025()),
     ];
 }

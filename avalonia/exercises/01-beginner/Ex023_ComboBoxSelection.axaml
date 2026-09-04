@@ -1,0 +1,24 @@
+<!-- Exercise 023 - ComboBoxSelection (beginner).
+     Goal:   Bind a ComboBox's ItemsSource and two-way bind its SelectedItem.
+     Drills: ItemsSource plus SelectedItem.
+     Passes: dotnet test, filtered to Ex023_ (see the exact command in
+     Ex023_ComboBoxSelection.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex023_ComboBoxSelection"
+             x:DataType="b:Ex023_ComboBoxSelectionViewModel">
+  <!-- TODO: replace this placeholder with a single ComboBox named
+       OptionsBox, its ItemsSource bound to Options and its SelectedItem
+       bound two-way to Selected:
+         <ComboBox Name="OptionsBox" Width="160"
+                   ItemsSource="{CompiledBinding Options}"
+                   SelectedItem="{CompiledBinding Selected, Mode=TwoWay}" />
+       A ComboBox with its own hard-coded ComboBoxItem children instead of a
+       bound ItemsSource can look identical when rendered, but its
+       ItemsSource stays null and it never reflects the view model's actual
+       collection - the test checks ItemsSource directly, not just what is
+       on screen. -->
+  <ComboBox Width="160" />
+</UserControl>

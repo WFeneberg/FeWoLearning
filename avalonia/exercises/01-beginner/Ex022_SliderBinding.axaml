@@ -1,0 +1,23 @@
+<!-- Exercise 022 - SliderBinding (beginner).
+     Goal:   Two-way bind a Slider's Value inside a Minimum/Maximum range.
+     Drills: Slider Value/Minimum/Maximum, clamping.
+     Passes: dotnet test, filtered to Ex022_ (see the exact command in
+     Ex022_SliderBinding.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex022_SliderBinding"
+             x:DataType="b:Ex022_SliderBindingViewModel">
+  <!-- TODO: replace this placeholder with a single Slider named ValueSlider,
+       Minimum 10, Maximum 20, Value bound two-way to Value:
+         <Slider Name="ValueSlider" Minimum="10" Maximum="20" Width="200"
+                 Value="{CompiledBinding Value, Mode=TwoWay}" />
+       A Slider clamps any Value assignment (from code, or through a binding)
+       into [Minimum, Maximum] - and because the binding is TwoWay, a clamped
+       assignment writes the CLAMPED value back into the view model, not the
+       value the view model originally asked for. Pushing the view model to
+       99 here must leave BOTH the slider AND the view model at 20, not just
+       the slider - that write-back is the exercise's real subject. -->
+  <Slider Value="0" />
+</UserControl>

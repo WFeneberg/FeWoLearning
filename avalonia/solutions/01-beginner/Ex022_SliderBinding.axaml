@@ -1,0 +1,14 @@
+<!-- Exercise 022 - SliderBinding (beginner).
+     Goal:   Two-way bind a Slider's Value inside a Minimum/Maximum range.
+     Drills: Slider Value/Minimum/Maximum, clamping.
+     Passes: dotnet test, filtered to Ex022_ (see the exact command in
+     Ex022_SliderBinding.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex022_SliderBinding"
+             x:DataType="b:Ex022_SliderBindingViewModel">
+  <Slider Name="ValueSlider" Minimum="10" Maximum="20" Width="200"
+          Value="{CompiledBinding Value, Mode=TwoWay}" />
+</UserControl>

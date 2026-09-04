@@ -1,0 +1,19 @@
+<!-- Exercise 025 - ItemsControlTemplate (beginner).
+     Goal:   Render a bound collection through an ItemsControl and a DataTemplate.
+     Drills: ItemsControl with a DataTemplate.
+     Passes: dotnet test, filtered to Ex025_ (see the exact command in
+     Ex025_ItemsControlTemplate.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex025_ItemsControlTemplate"
+             x:DataType="b:Ex025_ItemsControlTemplateViewModel">
+  <ItemsControl Name="Fruits" ItemsSource="{CompiledBinding Items}">
+    <ItemsControl.ItemTemplate>
+      <DataTemplate x:DataType="x:String">
+        <TextBlock Text="{CompiledBinding}" />
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>
