@@ -69,6 +69,25 @@ template children do not exist yet. Tests are serial
 (`DisableTestParallelization`) because Uno's runtime and the `Application` are
 process-global.
 
+### What the harness cannot do
+
+There is no window, so there is no viewport and nothing is ever *loaded*. Three
+consequences, all of them found by probing rather than by reading docs:
+
+- **`ItemsControl` and `ListView` never realise their items.** They get their
+  default template, but `ItemsPanelRoot` stays null and no item container is
+  built, even with an explicit `ItemsPresenter` template. Collection exercises
+  use `ItemsRepeater` instead.
+- **Virtualising layouts realise one item.** `StackLayout` and friends size their
+  realisation window from the effective viewport, which is empty here. An
+  `ItemsRepeater` with a *non-virtualising* layout realises everything, so that is
+  what the exercises build on; the virtualisation exercises assert on the layout
+  protocol (what the context is asked for) rather than on how many children a
+  viewport happened to produce.
+- **`TransformToVisual` returns the origin.** It needs render state a windowless
+  tree does not have. `UnoTestContext.Offset` reads `ActualOffset` instead, which
+  is accurate.
+
 ### The fragile spot
 
 The two dispatcher hooks are `internal` in `Uno.UI.Dispatching`, so the harness

@@ -18,7 +18,11 @@ reference solutions in `solutions/<tier>/`. Tier namespaces are
 Every test runs headless against the real Skia `Uno.UI` — see `README.md` for how
 that works and what it costs.
 
-**Status: 15 ✅ / 85 ⬜**
+`ItemsControl` and `ListView` never realise their items without a live visual tree,
+so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
+do" in `README.md`.
+
+**Status: 20 ✅ / 80 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -39,11 +43,11 @@ that works and what it costs.
 | 013 | MarginPadding | margin vs padding in the measure pass | ✅ |
 | 014 | AlignmentStretch | `HorizontalAlignment`/`VerticalAlignment` vs `Stretch` | ✅ |
 | 015 | CanvasPositioning | `Canvas.Left`/`Top`/`ZIndex`, no layout negotiation | ✅ |
-| 016 | RelativePanelAlign | `RelativePanel.RightOf`/`AlignBottomWith` constraint solving | ⬜ |
-| 017 | VisibilityCollapsed | `Visibility.Collapsed` leaves layout, `Opacity` does not | ⬜ |
-| 018 | DataContextInheritance | `DataContext` flows down the tree, local override | ⬜ |
-| 019 | DataTemplateBasics | `DataTemplate`, `ContentControl.ContentTemplate` | ⬜ |
-| 020 | ItemsControlBinding | `ItemsSource` + `ItemTemplate`, generated containers | ⬜ |
+| 016 | RelativePanelAlign | `RelativePanel.RightOf`/`AlignBottomWith` constraint solving | ✅ |
+| 017 | VisibilityCollapsed | `Visibility.Collapsed` leaves layout, `Opacity` does not | ✅ |
+| 018 | DataContextInheritance | `DataContext` flows down the tree, local override | ✅ |
+| 019 | DataTemplateBasics | `DataTemplate`, `ContentControl.ContentTemplate` | ✅ |
+| 020 | ItemsRepeaterBinding | `ItemsRepeater`, `ItemsSource` + `ItemTemplate`, one element per item | ✅ |
 | 021 | ObservableCollectionUpdates | `INotifyCollectionChanged` reaching the visual tree | ⬜ |
 | 022 | StaticResource | `ResourceDictionary`, `{StaticResource}` lookup walk | ⬜ |
 | 023 | ThemeResource | `ThemeDictionaries`, `RequestedTheme`, re-evaluation | ⬜ |
@@ -74,8 +78,8 @@ that works and what it costs.
 | 043 | InheritedContext | propagating a value down a subtree without a global | ⬜ |
 | 044 | MarkupExtension | a custom `MarkupExtension` used from XAML | ⬜ |
 | 045 | ItemsRepeaterLayout | `ItemsRepeater` + `ItemsSource` + an explicit `Layout` | ⬜ |
-| 046 | ElementRecycling | `ElementFactory`, recycling containers instead of rebuilding | ⬜ |
-| 047 | SelectionState | a selection model and container state, single vs multiple | ⬜ |
+| 046 | ElementFactoryContract | a custom `ElementFactory`: `GetElement`/`RecycleElement`, reuse over rebuild | ⬜ |
+| 047 | ItemContainerStates | an item container control with Selected/Unselected visual states | ⬜ |
 | 048 | ObservableObjectBase | an INPC base with `[CallerMemberName]` and an equality guard | ⬜ |
 | 049 | AsyncCommand | async `ICommand`, busy flag, exception capture | ⬜ |
 | 050 | InputValidation | `INotifyDataErrorInfo`, per-property errors | ⬜ |
