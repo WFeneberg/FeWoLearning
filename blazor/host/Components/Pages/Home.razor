@@ -19,3 +19,12 @@
         <li><a href="@($"/beginner/{id}")">Exercise @id</a></li>
     }
 </ul>
+
+<h2>Intermediate</h2>
+<ul>
+    @for (var n = 36; n <= 70; n++)
+    {
+        var id = n.ToString("D3");
+        <li><a href="@($"/intermediate/{id}")">Exercise @id</a></li>
+    }
+</ul>
