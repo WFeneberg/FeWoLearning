@@ -18,17 +18,17 @@ reference solutions in `solutions/<tier>/`. Tier namespaces are
 Every test runs headless against the real Skia `Uno.UI` — see `README.md` for how
 that works and what it costs.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 5 ✅ / 95 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 001 | HelloProperty | `DependencyProperty.Register`, `GetValue`/`SetValue`, `partial` requirement | ⬜ |
-| 002 | PropertyChangedCallback | `PropertyMetadata` callback, old vs new value | ⬜ |
-| 003 | AttachedProperty | `RegisterAttached`, static `GetX`/`SetX` accessors | ⬜ |
-| 004 | ObservableModel | `INotifyPropertyChanged`, raise only on a real change | ⬜ |
-| 005 | OneWayBinding | `SetBinding`, `Binding.Path`/`Source`, source pushes to target | ⬜ |
+| 001 | HelloProperty | `DependencyProperty.Register`, `GetValue`/`SetValue`, `partial` requirement | ✅ |
+| 002 | PropertyChangedCallback | `PropertyMetadata` callback, old vs new value | ✅ |
+| 003 | AttachedProperty | `RegisterAttached`, static `GetX`/`SetX` accessors | ✅ |
+| 004 | ObservableModel | `INotifyPropertyChanged`, raise only on a real change | ✅ |
+| 005 | OneWayBinding | `SetBinding`, `Binding.Path`/`Source`, source pushes to target | ✅ |
 | 006 | TwoWayBinding | `BindingMode.TwoWay`, target writes back to the source | ⬜ |
 | 007 | ValueConverter | `IValueConverter`, `Convert`/`ConvertBack`, culture argument | ⬜ |
 | 008 | ConverterParameter | parameter-driven conversion, invariant parsing | ⬜ |
