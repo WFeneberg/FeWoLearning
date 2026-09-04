@@ -1,0 +1,10 @@
+@* Exercise 014 - Attribute Splatting (beginner).
+   Goal:   Forward caller-supplied unmatched attributes onto the rendered button.
+   Drills: CaptureUnmatchedValues, @attributes, splat-order precedence.
+   Passes: dotnet test --filter FullyQualifiedName~Ex014_ *@
+<button id="btn" @attributes="Extra">@Label</button>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? Extra { get; set; }
+}

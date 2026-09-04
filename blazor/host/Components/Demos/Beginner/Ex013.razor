@@ -1,0 +1,18 @@
+@page "/beginner/013"
+
+<h1>Exercise 013 - TemplatedFragment</h1>
+
+<Ex013_TemplatedFragment TItem="string" Items="_items">
+    <Row Context="item">
+        <span class="cell">@item</span>
+    </Row>
+</Ex013_TemplatedFragment>
+
+<Ex013_TemplatedFragment TItem="string" Items="_empty">
+    <Empty><p id="none">Nothing to show.</p></Empty>
+</Ex013_TemplatedFragment>
+
+@code {
+    private readonly string[] _items = ["blazor", "razor", "bunit"];
+    private readonly string[] _empty = [];
+}

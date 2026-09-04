@@ -1,0 +1,20 @@
+@typeparam TItem
+@* Exercise 013 - Templated Fragment (beginner).
+   Goal:   Render a caller-supplied template for each item, with an empty-state fallback.
+   Drills: @typeparam, RenderFragment<TItem>, empty template.
+   Passes: dotnet test --filter FullyQualifiedName~Ex013_ *@
+@* TODO: render
+     <div id="repeater">
+       one <div class="row">@Row(item)</div> per item in Items, in order;
+       when Row is null, render the item's ToString() instead;
+       when Items is empty, render Empty instead (or nothing when Empty is null).
+     </div> *@
+
+@code {
+    [Parameter] public IReadOnlyList<TItem> Items { get; set; } = [];
+    [Parameter] public RenderFragment<TItem>? Row { get; set; }
+    [Parameter] public RenderFragment? Empty { get; set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex013 - render the templated rows");
+}

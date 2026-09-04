@@ -1,0 +1,24 @@
+@* Exercise 012 - Named Fragments (beginner).
+   Goal:   Render three independently-optional named regions of a dialog.
+   Drills: multiple named RenderFragment parameters, per-region omission.
+   Passes: dotnet test --filter FullyQualifiedName~Ex012_ *@
+<div class="dialog">
+    @if (Header is not null)
+    {
+        <div id="dialog-header">@Header</div>
+    }
+    @if (Body is not null)
+    {
+        <div id="dialog-body">@Body</div>
+    }
+    @if (Footer is not null)
+    {
+        <div id="dialog-footer">@Footer</div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? Body { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+}

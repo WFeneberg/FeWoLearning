@@ -1,0 +1,18 @@
+@* Exercise 011 - Child Content (beginner).
+   Goal:   Render a card with a title and an optional body fragment.
+   Drills: RenderFragment, omitting an absent fragment.
+   Passes: dotnet test --filter FullyQualifiedName~Ex011_ *@
+@* TODO: render
+     <section class="card">
+       <h2 class="card-title">@Title</h2>
+       <div class="card-body">@ChildContent</div>
+     </section>
+   with the card-body div present only when ChildContent is not null. *@
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex011 - render the card");
+}

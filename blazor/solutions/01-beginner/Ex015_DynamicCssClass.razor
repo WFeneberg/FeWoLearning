@@ -1,0 +1,29 @@
+@* Exercise 015 - Dynamic CSS Class (beginner).
+   Goal:   Compute the alert's class list from its severity and dismissed state.
+   Drills: computed class strings, enum-driven styling.
+   Passes: dotnet test --filter FullyQualifiedName~Ex015_ *@
+<div id="alert" class="@CssClass">@ChildContent</div>
+
+@code {
+    [Parameter] public AlertSeverity Severity { get; set; }
+    [Parameter] public bool Dismissed { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass
+    {
+        get
+        {
+            var severityClass = Severity switch
+            {
+                AlertSeverity.Info => "alert-info",
+                AlertSeverity.Warning => "alert-warning",
+                AlertSeverity.Danger => "alert-danger",
+                _ => throw new ArgumentOutOfRangeException(nameof(Severity), Severity, null),
+            };
+
+            return Dismissed
+                ? $"alert {severityClass} alert-dismissed"
+                : $"alert {severityClass}";
+        }
+    }
+}

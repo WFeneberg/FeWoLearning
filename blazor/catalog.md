@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -31,11 +31,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 008 | TwoWayBinding | `Value`/`ValueChanged` contract for `@bind-Value` | ✅ |
 | 009 | BindFormat | date formatting and parsing round-trip, invariant culture | ✅ |
 | 010 | BindEventOnInput | `@oninput` vs `@onchange` timing | ✅ |
-| 011 | ChildContent | `RenderFragment`, omitting an absent fragment | ⬜ |
-| 012 | NamedFragments | multiple named `RenderFragment` parameters | ⬜ |
-| 013 | TemplatedFragment | `@typeparam`, `RenderFragment<TItem>`, empty template | ⬜ |
-| 014 | AttributeSplatting | `CaptureUnmatchedValues`, `@attributes` | ⬜ |
-| 015 | DynamicCssClass | computed class strings, enum-driven styling | ⬜ |
+| 011 | ChildContent | `RenderFragment`, omitting an absent fragment | ✅ |
+| 012 | NamedFragments | multiple named `RenderFragment` parameters | ✅ |
+| 013 | TemplatedFragment | `@typeparam`, `RenderFragment<TItem>`, empty template | ✅ |
+| 014 | AttributeSplatting | `CaptureUnmatchedValues`, `@attributes` | ✅ |
+| 015 | DynamicCssClass | computed class strings, enum-driven styling | ✅ |
 | 016 | InlineStyleBinding | computed inline style, clamping, invariant formatting | ⬜ |
 | 017 | OnInitialized | `OnInitialized` runs once, not per parameter change | ⬜ |
 | 018 | OnParametersSet | `OnParametersSet` runs on every parameter change | ⬜ |
