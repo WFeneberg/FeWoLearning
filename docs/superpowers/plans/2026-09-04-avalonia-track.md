@@ -25,7 +25,9 @@ Every task's requirements implicitly include this section. All values are copied
 - **Tier namespaces are pinned**: `FeWoLearning.Avalonia.Exercises.Beginner`, `.Intermediate`, `.Advanced`, `.Expert`. They do not follow the `NN-tier` folder names, because a C# identifier cannot start with a digit. Every `.axaml` states its `x:Class` fully qualified.
 - **Stubs must compile and fail at runtime**, throwing `NotImplementedException("TODO: ExNNN – …")`. A stub that breaks the build or the XAML compiler is a bug.
 - **Never assert `Assert.Throws<NotImplementedException>`** in an exercise test, and never assert an error the signature alone produces. Either passes against the untouched stub.
-- **Commit one batch of five at a time**, message `avalonia: exNNN-exNNN`, staging explicit paths. Never `git add -A` — it has swept up unrelated files in this repo before.
+- **A file whose own namespace starts `FeWoLearning.Avalonia.…` cannot reference an Avalonia type fully qualified.** `Avalonia.Media.TextWrapping.Wrap` inside `namespace FeWoLearning.Avalonia.Gallery` resolves the leading `Avalonia` against the *enclosing* namespace and fails with CS0234. `using` directives are exempt — they resolve from the global namespace. So always `using Avalonia.Media;` plus a bare `TextWrapping.Wrap`, never the qualified form. Measured during Task 1.
+- **Every `DataTemplate` needs an `x:DataType`.** Both content projects and the gallery set `AvaloniaUseCompiledBindingsByDefault=true`, so a `DataTemplate` without `x:DataType` fails the XAML compiler with AVLN2000 — the bindings inside it have no statically known type to resolve against. Measured during Task 1.
+- **Commit one batch of five at a time**, message `avalonia: exNNN-exNNN`, staging explicit paths. Never `git add -A` — it has swept up unrelated files in this repo before. Another session commits to `main` concurrently, so a per-task review range must be computed from the task's own commits, not blindly from `BASE..HEAD`.
 
 ---
 
@@ -546,7 +548,7 @@ internal static class Program
     {
         // Same mandatory ReactiveUI initialization the test harness performs.
         RxAppBuilder.CreateReactiveUIBuilder().WithAvalonia().Build();
-        BuildAvaloniaApp().StartWithClassicDesktopStyleApplicationLifetime(args);
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
     public static AppBuilder BuildAvaloniaApp() =>
@@ -562,6 +564,7 @@ internal static class Program
 ```xml
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:gallery="clr-namespace:FeWoLearning.Avalonia.Gallery"
         x:Class="FeWoLearning.Avalonia.Gallery.MainWindow"
         Width="900" Height="600"
         Title="FeWoLearning — Avalonia Gallery">
@@ -584,7 +587,7 @@ internal static class Program
 The `ItemTemplate` above shows only the id, which is not useful. Use this template body instead:
 
 ```xml
-        <DataTemplate>
+        <DataTemplate x:DataType="gallery:GalleryEntry">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBlock Text="{Binding Id}" FontFamily="monospace" />
             <TextBlock Text="{Binding Title}" />
@@ -596,6 +599,7 @@ The `ItemTemplate` above shows only the id, which is not useful. Use this templa
 
 ```csharp
 using Avalonia.Controls;
+using Avalonia.Media;
 
 namespace FeWoLearning.Avalonia.Gallery;
 
@@ -626,7 +630,7 @@ public partial class MainWindow : Window
                 host.Content = new TextBlock
                 {
                     Text = ex.Message,
-                    TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                    TextWrapping = TextWrapping.Wrap,
                 };
             }
         };
