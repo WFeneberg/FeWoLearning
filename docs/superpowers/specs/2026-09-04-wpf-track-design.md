@@ -330,6 +330,15 @@ directly here and belong in `wpf/README.md`:
 - A test asserting only **rendered text** can be satisfied by a hard-coded
   literal in the XAML. Every binding exercise must mutate the source afterwards,
   `Pump`, and assert the target followed.
+- A test observing a dependency property only through its **CLR wrapper** cannot
+  prove the logic lives in the property system. A hand-rolled clamp in the setter
+  satisfies it, while a binding, style setter or animation — all of which write
+  straight to the store — bypasses that clamp entirely, which is the opposite of
+  what the exercise teaches. So any exercise about metadata, coercion or validation
+  must also write through `SetValue`, read through `GetValue`, and check that
+  `ClearValue` returns to the registered default. Found by review on ex002, which
+  passed all eight of its tests against an implementation whose `DependencyProperty`
+  registrations would have been purely decorative.
 
 ## 6. First delivery
 
