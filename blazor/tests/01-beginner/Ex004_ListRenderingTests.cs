@@ -11,7 +11,7 @@ public class Ex004_ListRenderingTests : BunitContext
     {
         var cut = Render<Ex004_ListRendering>(p => p.Add(c => c.Tags, new[] { "a", "b", "c" }));
 
-        var texts = cut.FindAll("li.tag").Select(e => e.TextContent).ToArray();
+        var texts = cut.FindAll("#tags li.tag").Select(e => e.TextContent).ToArray();
         Assert.Equal(new[] { "a", "b", "c" }, texts);
     }
 
@@ -20,8 +20,8 @@ public class Ex004_ListRenderingTests : BunitContext
     {
         var cut = Render<Ex004_ListRendering>(p => p.Add(c => c.Tags, Array.Empty<string>()));
 
-        Assert.NotNull(cut.Find("#tags"));
-        Assert.Empty(cut.FindAll("li.tag"));
+        Assert.Equal("UL", cut.Find("#tags").TagName);
+        Assert.Empty(cut.FindAll("#tags li.tag"));
     }
 
     [Fact]
@@ -29,6 +29,6 @@ public class Ex004_ListRenderingTests : BunitContext
     {
         var cut = Render<Ex004_ListRendering>(p => p.Add(c => c.Tags, new[] { "x", "x" }));
 
-        Assert.Equal(2, cut.FindAll("li.tag").Count);
+        Assert.Equal(2, cut.FindAll("#tags li.tag").Count);
     }
 }

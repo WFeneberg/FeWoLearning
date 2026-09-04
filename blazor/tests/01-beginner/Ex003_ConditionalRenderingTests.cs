@@ -65,6 +65,19 @@ public class Ex003_ConditionalRenderingTests : BunitContext
     }
 
     [Fact]
+    public void Error_Wins_Over_Content_When_Both_Are_Present()
+    {
+        var cut = Render<Ex003_ConditionalRendering>(p => p
+            .Add(c => c.ErrorMessage, "boom")
+            .Add(c => c.Content, "hi"));
+
+        Assert.Equal("boom", cut.Find("#error").TextContent);
+        Assert.Empty(cut.FindAll("#content"));
+        Assert.Empty(cut.FindAll("#loading"));
+        Assert.Empty(cut.FindAll("#empty"));
+    }
+
+    [Fact]
     public void Blank_Error_And_Content_Count_As_Absent()
     {
         var cut = Render<Ex003_ConditionalRendering>(p => p

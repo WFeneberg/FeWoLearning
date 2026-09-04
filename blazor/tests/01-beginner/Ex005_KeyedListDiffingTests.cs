@@ -17,7 +17,7 @@ public class Ex005_KeyedListDiffingTests : BunitContext
         var cut = Render<Ex005_KeyedListDiffing>(
             p => p.Add(c => c.People, new[] { Ada, Grace, Linus }));
 
-        var names = cut.FindAll("li.row span.entry").Select(e => e.TextContent).ToArray();
+        var names = cut.FindAll("#roster li.row span.entry").Select(e => e.TextContent).ToArray();
         Assert.Equal(new[] { "Ada", "Grace", "Linus" }, names);
     }
 

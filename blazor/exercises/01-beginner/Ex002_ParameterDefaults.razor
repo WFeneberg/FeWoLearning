@@ -1,9 +1,10 @@
 @* Exercise 002 - Parameter Defaults (beginner).
    Goal:   Render a badge that omits an absent or blank title, and a level line.
-   Drills: parameter defaults, nullable and blank parameter handling.
+   Drills: parameter defaults, nullable and blank parameter handling, computed
+           members that read a defaulted parameter.
    Passes: dotnet test --filter FullyQualifiedName~Ex002_ *@
 <span id="badge">@BadgeText</span>
-<span id="level">Level @Level</span>
+<span id="level">@LevelText</span>
 
 @code {
     [Parameter] public string Name { get; set; } = "";
@@ -12,4 +13,7 @@
 
     // TODO: "{Name} ({Title})" when Title has non-whitespace content, otherwise just Name.
     private string BadgeText => throw new NotImplementedException("TODO: Ex002 - build the badge text");
+
+    // TODO: return "Level {Level}"
+    private string LevelText => throw new NotImplementedException("TODO: Ex002 - build the level text");
 }
