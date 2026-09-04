@@ -57,11 +57,12 @@ tests there — do not add `solutions/` to a project/module.
 | `flutter/`| planned                                 | planned                  | planned |
 | `avalonia/`| — (restore on first `dotnet test`)     | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_HelloView` |
 | `blazor/` | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
+| `uno/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 
 Run every command **from inside the track folder**, not the repo root.
 
-For `blazor/`, `dotnet test -p:UseSolutions=true` runs the identical suite
-against the reference solutions instead of the stubs.
+For `blazor/` and `uno/`, `dotnet test -p:UseSolutions=true` runs the identical
+suite against the reference solutions instead of the stubs.
 
 ## Toolchain status (verified 2026-09-04)
 
@@ -297,6 +298,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
 | `blazor/` | 35 / 100 (verified) | 65 |
+| `uno/`    | 100 / 100 (verified) | —         |
 
 Every 100-exercise ledger is fully seeded except `avalonia/` and `blazor/`,
 both still being built out — see the table above for exact counts. Nothing else is
@@ -352,6 +354,34 @@ fields that shape-B stubs declare for the learner to wire up — these are
 intentionally left unsuppressed; `solutions/` builds with 0 warnings. See
 `blazor/README.md` for the full list and for a sharp edge in ex035: a naive,
 unbounded parent-refresh callback hangs the test host rather than failing it.
+
+## The `uno/` track
+
+Uno Platform / WinUI, verified end-to-end on 100 / 100 exercises. Same two-library
+mechanism as `blazor/`: `exercises/` and `solutions/` compile the same type names
+into the same namespaces (`FeWoLearning.Uno.Exercises.<Tier>`) and the xunit project
+references exactly one of them, so `dotnet test` is the red run and
+`dotnet test -p:UseSolutions=true` the green one.
+
+The unusual part is the test harness. Uno's Skia backend has no headless head, so
+`uno/tests/_harness/UnoHeadlessRuntime.cs` installs what a platform head would - the
+two `NativeDispatcher` hooks (by reflection, since they are internal), the ICU data
+an Uno *head* assembly carries, and an `Application` - from a `[ModuleInitializer]`.
+That buys the real thing: compiled XAML, `Measure`/`Arrange` with Skia text metrics,
+the binding engine, Fluent default styles and `AutomationPeer`-driven invocation,
+with no window. `global.json` pins `Uno.Sdk` and the package versions in the test
+project are pinned to match; `HarnessSmokeTests` fails first when a bump breaks the
+reflection.
+
+**Read `uno/README.md` before adding an exercise.** It lists what a windowless tree
+cannot do - `ItemsControl`/`ListView` never realise items, virtualising layouts
+realise one, no input or focus or `Loaded`/`SizeChanged`, `TransformToVisual` returns
+the origin, `await CancellationTokenSource.CancelAsync()` overflows the stack - plus
+the WinUI members Uno leaves unimplemented. Several catalog rows were re-scoped
+around those limits, each with the reason recorded in the commit that did it.
+
+MVUX (`Feed<T>`/`State<T>`) is a deliberate gap, not an oversight: see the note in
+`uno/catalog.md`.
 
 ## Known gaps
 
