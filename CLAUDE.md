@@ -452,21 +452,26 @@ record in the assembly with an `Id`-shaped member that is not `partial`.
 ## The `wpf/` track
 
 WPF on .NET 10, verified end-to-end on its first five exercises (`01-beginner`
-ex001–ex005). Same three-project mechanism as `blazor/`, `uno/` and
-`caliburn/`: `exercises/` and `solutions/` compile the same type names into
-the same namespaces (`FeWoLearning.Wpf.Exercises.<Tier>`) and `tests/`
-references exactly one of them via the `UseSolutions` MSBuild property, so
-`dotnet test` is the red run and `dotnet test -p:UseSolutions=true` the green
-one. Unlike `avalonia/`, there is no `gallery/` project, and unlike `blazor/`,
-no `host/`.
+ex001–ex005). It shares the `UseSolutions` mechanism with `blazor/`, `uno/`,
+`avalonia/` and `caliburn/`: `exercises/` and `solutions/` compile the same
+type names into the same namespaces (`FeWoLearning.Wpf.Exercises.<Tier>`) and
+`tests/` references exactly one of them via the `UseSolutions` MSBuild
+property, so `dotnet test` is the red run and `dotnet test
+-p:UseSolutions=true` the green one. Its project count matches `uno/` and
+`caliburn/` at three, not `blazor/`'s four (the extra one is `host/`) or
+`avalonia/`'s four (`gallery/`): `wpf/` has no fourth runnable project.
 
 The harness is smaller than `uno/`'s: WPF resolves default control templates
 through `SystemResources` with **no `Application` instance needed**, where
 `uno/`'s harness has to construct one. It supplies `[WpfFact]`/`[WpfTheory]`
 from `Xunit.StaFact` 4.0.23 (an STA thread plus a real
-`DispatcherSynchronizationContext`, so `await` resumes on the dispatcher) and
-`WpfTestContext`'s `Layout(...)`/`Pump(...)` to drain the queue. Tests are
-serialised with `[assembly: Parallelization(Mode = ParallelMode.None)]` —
+`DispatcherSynchronizationContext`, so `await` resumes on the dispatcher),
+`WpfTestContext`'s `Layout(...)`/`Pump(...)` to drain the queue, and an opt-in
+`Host(...)` that parks an element in an off-screen window for the few rows
+needing a real `PresentationSource` — `Loaded`, keyboard focus,
+`HwndSource`/`HwndHost` — a capability `uno/`'s windowless harness could not
+offer at all. Tests are serialised with `[assembly: Parallelization(Mode =
+ParallelMode.None)]` —
 `CollectionBehavior(DisableTestParallelization = true)` is
 `Obsolete(error: true)` in xunit.v3 4.0.0 and does not compile. Because
 `Xunit.StaFact` 4.x depends on `xunit.v3.extensibility.core` 4.0.0, the track
