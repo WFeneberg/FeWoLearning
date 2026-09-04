@@ -1,0 +1,16 @@
+@* Exercise 022 - Stop Propagation (beginner).
+   Goal:   Stop an inner button's click from bubbling to its outer div.
+   Drills: @onclick:stopPropagation, nested event handlers.
+   Passes: dotnet test --filter FullyQualifiedName~Ex022_ *@
+<div id="outer" @onclick="HandleOuter">
+    <button id="inner" @onclick="HandleInner" @onclick:stopPropagation>Inner</button>
+    <span id="counts">@OuterClicks/@InnerClicks</span>
+</div>
+
+@code {
+    public int OuterClicks { get; private set; }
+    public int InnerClicks { get; private set; }
+
+    private void HandleOuter() => OuterClicks++;
+    private void HandleInner() => InnerClicks++;
+}

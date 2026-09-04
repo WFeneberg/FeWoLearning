@@ -1,0 +1,17 @@
+@* Exercise 025 - Select Binding (beginner).
+   Goal:   Two-way bind a <select> to a local field, projecting its options.
+   Drills: @bind on <select>, projecting <option> elements from a list.
+   Passes: dotnet test --filter FullyQualifiedName~Ex025_ *@
+<select id="prio" @bind="_selected">
+    @foreach (var o in Options)
+    {
+        <option value="@o">@o</option>
+    }
+</select>
+<span id="chosen">@_selected</span>
+
+@code {
+    [Parameter] public IReadOnlyList<string> Options { get; set; } = [];
+
+    private string _selected = "";
+}

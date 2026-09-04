@@ -1,0 +1,16 @@
+@* Exercise 021 - Event Args Handling (beginner).
+   Goal:   Record the last non-modifier key pressed, upper-cased.
+   Drills: KeyboardEventArgs, @onkeydown, filtering modifier keys.
+   Passes: dotnet test --filter FullyQualifiedName~Ex021_ *@
+<input id="k" @onkeydown="OnKey" /><span id="last">@_last</span>
+
+@code {
+    private string _last = "";
+    private static readonly string[] Modifiers = ["Shift", "Control", "Alt", "Meta"];
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (Modifiers.Contains(e.Key)) return;
+        _last = e.Key.ToUpperInvariant();
+    }
+}

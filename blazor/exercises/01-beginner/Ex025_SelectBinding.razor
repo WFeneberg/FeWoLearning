@@ -1,0 +1,19 @@
+@* Exercise 025 - Select Binding (beginner).
+   Goal:   Two-way bind a <select> to a local field, projecting its options.
+   Drills: @bind on <select>, projecting <option> elements from a list.
+   Passes: dotnet test --filter FullyQualifiedName~Ex025_ *@
+@* TODO: render:
+     <select id="prio" ...>
+       one <option value="@o">@o</option> per entry in Options, in order
+     </select>
+     <span id="chosen">@_selected</span>
+   Two-way bind the select to _selected with @bind. *@
+
+@code {
+    [Parameter] public IReadOnlyList<string> Options { get; set; } = [];
+
+    private string _selected = "";
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex025 - bind the select to the local field");
+}

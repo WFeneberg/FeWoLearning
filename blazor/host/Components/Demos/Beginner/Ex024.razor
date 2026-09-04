@@ -1,0 +1,12 @@
+@page "/beginner/024"
+@rendermode InteractiveServer
+
+<h1>Exercise 024 - NumericInputParsing</h1>
+
+<label>Unit price: <input @bind="_unitPrice" @bind:event="oninput" type="number" step="0.01" /></label>
+
+<Ex024_NumericInputParsing UnitPrice="_unitPrice" />
+
+@code {
+    private decimal _unitPrice = 2.5m;
+}

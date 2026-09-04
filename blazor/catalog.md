@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 20 ✅ / 80 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -41,11 +41,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 018 | OnParametersSet | `OnParametersSet` runs on every parameter change | ✅ |
 | 019 | OnAfterRenderFirst | `OnAfterRender(bool firstRender)`, render counting | ✅ |
 | 020 | DisposableComponent | `@implements IDisposable`, subscribe/unsubscribe symmetry | ✅ |
-| 021 | EventArgsHandling | `KeyboardEventArgs`, filtering modifier keys | ⬜ |
-| 022 | StopPropagation | `@onclick:stopPropagation`, nested handlers | ⬜ |
-| 023 | InputTextBinding | `@bind` to a local field | ⬜ |
-| 024 | NumericInputParsing | `@bind` to `int`, rejecting unparsable input | ⬜ |
-| 025 | SelectBinding | `@bind` on `<select>`, option projection | ⬜ |
+| 021 | EventArgsHandling | `KeyboardEventArgs`, filtering modifier keys | ✅ |
+| 022 | StopPropagation | `@onclick:stopPropagation`, nested handlers | ✅ |
+| 023 | InputTextBinding | `@bind` to a local field | ✅ |
+| 024 | NumericInputParsing | `@bind` to `int`, rejecting unparsable input | ✅ |
+| 025 | SelectBinding | `@bind` on `<select>`, option projection | ✅ |
 | 026 | CheckboxGroup | multi-selection state, stable result ordering | ⬜ |
 | 027 | RadioGroup | single-selection state, mutual exclusion | ⬜ |
 | 028 | CascadingValueBasics | `CascadingValue`/`[CascadingParameter]` | ⬜ |

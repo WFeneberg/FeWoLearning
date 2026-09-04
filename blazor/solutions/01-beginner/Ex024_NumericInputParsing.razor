@@ -1,0 +1,12 @@
+@* Exercise 024 - Numeric Input Parsing (beginner).
+   Goal:   Bind a numeric input to a local int field and show its total.
+   Drills: @bind on an int field, @bind's own rejection of unparsable input.
+   Passes: dotnet test --filter FullyQualifiedName~Ex024_ *@
+<input id="qty" type="number" @bind="_quantity" />
+<span id="total">@((_quantity * UnitPrice).ToString("0.##", CultureInfo.InvariantCulture))</span>
+
+@code {
+    [Parameter] public decimal UnitPrice { get; set; }
+
+    private int _quantity;
+}

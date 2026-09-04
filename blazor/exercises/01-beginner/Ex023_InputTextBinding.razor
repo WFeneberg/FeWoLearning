@@ -1,0 +1,16 @@
+@* Exercise 023 - Input Text Binding (beginner).
+   Goal:   Two-way bind a text input to a local field, not a parameter.
+   Drills: @bind on a local field, the idiomatic default @bind timing.
+   Passes: dotnet test --filter FullyQualifiedName~Ex023_ *@
+@* TODO: render:
+     <input id="note" ... />
+     <span id="echo">@_note</span>
+     <span id="len">@_note.Length</span>
+   Two-way bind the input to _note with @bind (default onchange timing). *@
+
+@code {
+    private string _note = "";
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex023 - bind the input to the local field");
+}
