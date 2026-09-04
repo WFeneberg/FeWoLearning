@@ -142,9 +142,10 @@ consequences, all of them found by probing rather than by reading docs:
 - **`await CancellationTokenSource.CancelAsync()` overflows the stack** and takes
   the test host down with no failing test to point at. A continuation resuming
   inside a cancellation callback re-enters the dispatcher, and the recursion has
-  no floor. Use the synchronous `Cancel()`; ex064 and ex067 say so at the call
-  site. The inline dispatcher in the harness also guards against re-entering
-  Uno's own pump, for the same class of reason.
+  no floor. Use the synchronous `Cancel()` - ex067 is the one exercise that swaps a
+  token source, and it says so at the call site. The inline dispatcher in the
+  harness also guards against re-entering Uno's own pump, for the same class of
+  reason.
 - **xunit waits for the async work a synchronous test started.** A test that
   leaves a `TaskCompletionSource` unsettled hangs the whole run, not just itself
   (ex049, ex067 both learned this). Settle every gate before the test returns.

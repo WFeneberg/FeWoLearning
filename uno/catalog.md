@@ -133,7 +133,7 @@ it says which, and they are still in git history.
 | 083 | EasingFunctions | easing math and where the framework evaluates it | ✅ |
 | 084 | RenderTransforms | `RotateTransform`/`ScaleTransform`, `TransformPoint`, `TransformBounds`, composition order | ✅ |
 | 085 | ClippingGeometry | `Clip`, geometry parsing, bounds arithmetic | ✅ |
-| 086 | DesignTokenSystem | a token resource system with light/dark and `BasedOn` styles | ✅ |
+| 086 | DesignTokens | a token resource system with light/dark and `BasedOn` styles | ✅ |
 | 087 | ControlLibraryStyles | shipping a mergeable `ResourceDictionary` with a control, and the lookup that finds it | ✅ |
 | 088 | RuntimeXamlLoading | `XamlReader.Load`, error handling, dynamic UI | ✅ |
 | 089 | SubscriptionTokens | `Subscribe` returning `IDisposable`, deterministic unsubscription | ✅ |
