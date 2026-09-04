@@ -45,9 +45,11 @@ public abstract class WpfTestContext : IDisposable
     /// Parks <paramref name="content"/> in an off-screen window so it gets a real
     /// <see cref="PresentationSource"/>. Opt-in: only exercises that need <c>Loaded</c>,
     /// keyboard focus or HWND interop should call it, because it really does create a
-    /// window. Closed again by <see cref="Dispose"/>.
+    /// window. Closed again by <see cref="Dispose"/>. Returns the <see cref="Window"/>
+    /// itself, not <paramref name="content"/>, so a caller that needs the window (rows
+    /// 084-088 and any focus row) is not reduced to <c>Window.GetWindow(content)</c>.
     /// </summary>
-    protected FrameworkElement Host(FrameworkElement content)
+    protected Window Show(FrameworkElement content)
     {
         var window = new Window
         {
@@ -65,10 +67,14 @@ public abstract class WpfTestContext : IDisposable
         window.Show();
         Pump();
 
-        return content;
+        return window;
     }
 
-    public void Dispose()
+    // Virtual so a derived test class can add its own teardown without hiding this one -
+    // xunit disposes through the IDisposable interface, so a derived `public new void
+    // Dispose()` would compile, look right, and simply never run. An override must call
+    // base.Dispose(), or the tracked windows never get closed.
+    public virtual void Dispose()
     {
         foreach (var window in _windows)
         {

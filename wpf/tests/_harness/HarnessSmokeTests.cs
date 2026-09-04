@@ -53,9 +53,9 @@ public class HarnessSmokeTests : WpfTestContext
         var panel = new StackPanel();
         panel.Loaded += (_, _) => loaded = true;
 
-        Host(panel);
+        Show(panel);
 
-        Assert.True(loaded, "Host(...) must connect the element to a PresentationSource, which is what raises Loaded.");
+        Assert.True(loaded, "Show(...) must connect the element to a PresentationSource, which is what raises Loaded.");
     }
 
     private sealed class SmokeSource : INotifyPropertyChanged
