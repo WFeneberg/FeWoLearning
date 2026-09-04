@@ -1,0 +1,10 @@
+@page "/intermediate/053"
+@rendermode InteractiveServer
+
+<h1>Exercise 053 - JsInteropUnmatchedInvocation</h1>
+
+@* No window.app.unplanned is defined anywhere on this page - that's the point of the
+   exercise. In a real browser this call fails with a JS-side error (no such function),
+   surfaced back to .NET as a JSException; bUnit's test for this component exercises
+   the mock's Strict/Loose distinction instead, which has no real-browser equivalent. *@
+<Ex053_JsInteropUnmatchedInvocation />

@@ -1,0 +1,13 @@
+@page "/intermediate/052"
+
+<h1>Exercise 052 - JsInteropModule</h1>
+
+@* Same reasoning as Ex050: the module import happens from OnAfterRenderAsync, which
+   Blazor also invokes during the static prerender pass - and there's no live JS
+   runtime to import a module against yet at that point. Prerender is disabled on the
+   COMPONENT, not the page, so the page (this heading) stays statically delivered;
+   only the component's own interactive render is deferred to the circuit. Unlike
+   Ex049/Ex050, the JS side here isn't an inline <script> global - it's a real,
+   separately-served module file at wwwroot/app.js, dynamically imported by
+   IJSRuntime.InvokeAsync<IJSObjectReference>("import", "./app.js"). *@
+<Ex052_JsInteropModule @rendermode="@(new InteractiveServerRenderMode(prerender: false))" />

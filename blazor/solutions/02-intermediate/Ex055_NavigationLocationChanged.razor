@@ -1,0 +1,30 @@
+@implements IDisposable
+@* Exercise 055 - Navigation Location Changed (intermediate).
+   Goal:   Count navigations by subscribing to NavigationManager.LocationChanged, and
+           stop counting once disposed.
+   Drills: NavigationManager.LocationChanged subscribe/unsubscribe symmetry.
+   Passes: dotnet test --filter FullyQualifiedName~Ex055_ *@
+<span id="changes">@LocationChanges</span>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    public int LocationChanges { get; private set; }
+
+    private EventHandler<LocationChangedEventArgs>? _onLocationChanged;
+
+    protected override void OnInitialized()
+    {
+        _onLocationChanged = (_, _) =>
+        {
+            LocationChanges++;
+            StateHasChanged();
+        };
+        Navigation.LocationChanged += _onLocationChanged;
+    }
+
+    public void Dispose()
+    {
+        if (_onLocationChanged is not null) Navigation.LocationChanged -= _onLocationChanged;
+    }
+}

@@ -1,0 +1,30 @@
+@implements IAsyncDisposable
+@* Exercise 052 - JS Interop Module (intermediate).
+   Goal:   Import a JS module exactly once, on first render, and dispose it when done.
+   Drills: IJSRuntime.InvokeAsync<IJSObjectReference>("import", ...), guarding a
+           lifecycle method that reruns on every render pass so it imports only once.
+   Passes: dotnet test --filter FullyQualifiedName~Ex052_ *@
+<span id="ready">@(_module is null ? "no" : "yes")</span>
+
+@code {
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+
+    private IJSObjectReference? _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./app.js");
+            StateHasChanged();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
+    }
+}

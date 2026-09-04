@@ -1,0 +1,14 @@
+@* Exercise 053 - JS Interop Unmatched Invocation (intermediate).
+   Goal:   Call a JS function with no corresponding test setup.
+   Drills: IJSRuntime.InvokeVoidAsync with an identifier the caller never configures.
+   Passes: dotnet test --filter FullyQualifiedName~Ex053_ *@
+<button id="unplanned" @onclick="CallUnplannedAsync">Call</button>
+
+@code {
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+
+    private async Task CallUnplannedAsync()
+    {
+        await JS.InvokeVoidAsync("app.unplanned");
+    }
+}

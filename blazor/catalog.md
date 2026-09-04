@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 50 ✅ / 50 ⬜**
+**Status: 55 ✅ / 45 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -76,11 +76,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 048 | FactoryInjectedComponent | `IServiceProvider`/factory-resolved dependency | ✅ |
 | 049 | JsInteropInvoke | `IJSRuntime.InvokeVoidAsync`, bUnit `JSInterop` mock setup | ✅ |
 | 050 | JsInteropReturnValue | `IJSRuntime.InvokeAsync<T>`, mocked return value | ✅ |
-| 051 | JsInteropElementReference | `ElementReference` passed to JS, mocked interop call | ⬜ |
-| 052 | JsInteropModule | `IJSObjectReference`, JS module isolation, `DisposeAsync` | ⬜ |
-| 053 | JsInteropUnmatchedInvocation | `JSInterop.Mode` Strict vs Loose, asserting an unexpected call fails | ⬜ |
-| 054 | NavigationManagerBasics | `NavigationManager.NavigateTo`, bUnit `FakeNavigationManager` | ⬜ |
-| 055 | NavigationLocationChanged | `NavigationManager.LocationChanged` subscribe/unsubscribe | ⬜ |
+| 051 | JsInteropElementReference | `ElementReference` passed to JS, mocked interop call | ✅ |
+| 052 | JsInteropModule | `IJSObjectReference`, JS module isolation, `DisposeAsync` | ✅ |
+| 053 | JsInteropUnmatchedInvocation | `JSInterop.Mode` Strict vs Loose, asserting an unexpected call fails | ✅ |
+| 054 | NavigationManagerBasics | `NavigationManager.NavigateTo`, bUnit `FakeNavigationManager` | ✅ |
+| 055 | NavigationLocationChanged | `NavigationManager.LocationChanged` subscribe/unsubscribe | ✅ |
 | 056 | QueryStringParsing | `NavigationManager.Uri`, `QueryHelpers.ParseQuery` | ⬜ |
 | 057 | NavigationInterception | `RegisterLocationChangingHandler`, cancelling a navigation | ⬜ |
 | 058 | BindDirectiveModifiers | `@bind:event` (custom update-trigger event), `@bind:format`, `@bind:after` (post-update hook) | ⬜ |

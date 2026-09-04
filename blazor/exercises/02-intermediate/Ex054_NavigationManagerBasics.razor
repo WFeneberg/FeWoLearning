@@ -1,0 +1,22 @@
+@* Exercise 054 - Navigation Manager Basics (intermediate).
+   Goal:   Capture the starting URI once, then navigate elsewhere on demand.
+   Drills: [Inject] NavigationManager, NavigateTo, a lifecycle method that runs once
+           versus one that would rerun and overwrite a captured value.
+   Passes: dotnet test --filter FullyQualifiedName~Ex054_ *@
+<span id="start">@_start</span>
+<button id="go" @onclick="Go">go</button>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+    [Parameter] public string Target { get; set; } = "";
+
+    private string _start = "";
+
+    // TODO: capture Navigation.Uri into _start. Must run once per component instance,
+    // not on every parameter push, or _start would drift to whatever the URI is at
+    // the time of the last render instead of staying pinned to the original one.
+    protected override void OnInitialized() => throw new NotImplementedException("TODO: Ex054 - capture the starting URI");
+
+    // TODO: navigate to Target.
+    private void Go() => throw new NotImplementedException("TODO: Ex054 - navigate to Target");
+}

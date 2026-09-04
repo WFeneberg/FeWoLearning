@@ -1,0 +1,16 @@
+@* Exercise 051 - JS Interop Element Reference (intermediate).
+   Goal:   Capture an element with @ref and hand JS the actual reference, not a selector.
+   Drills: @ref capturing an ElementReference, passing it as an IJSRuntime argument.
+   Passes: dotnet test --filter FullyQualifiedName~Ex051_ *@
+<input id="target" @ref="_target" />
+<button id="focus" @onclick="FocusAsync">Focus</button>
+
+@code {
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+
+    private ElementReference _target;
+
+    // TODO: call JS.InvokeVoidAsync("app.focus", _target), passing the captured
+    // ElementReference itself - not "#target" or any other selector string.
+    private Task FocusAsync() => throw new NotImplementedException("TODO: Ex051 - pass the captured element to JS");
+}

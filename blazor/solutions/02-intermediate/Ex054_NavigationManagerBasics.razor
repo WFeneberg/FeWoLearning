@@ -1,0 +1,24 @@
+@* Exercise 054 - Navigation Manager Basics (intermediate).
+   Goal:   Capture the starting URI once, then navigate elsewhere on demand.
+   Drills: [Inject] NavigationManager, NavigateTo, a lifecycle method that runs once
+           versus one that would rerun and overwrite a captured value.
+   Passes: dotnet test --filter FullyQualifiedName~Ex054_ *@
+<span id="start">@_start</span>
+<button id="go" @onclick="Go">go</button>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+    [Parameter] public string Target { get; set; } = "";
+
+    private string _start = "";
+
+    protected override void OnInitialized()
+    {
+        _start = Navigation.Uri;
+    }
+
+    private void Go()
+    {
+        Navigation.NavigateTo(Target);
+    }
+}
