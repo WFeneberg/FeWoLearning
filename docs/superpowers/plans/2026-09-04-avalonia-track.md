@@ -1909,6 +1909,7 @@ public partial class Ex006_AlignmentAndMargin : UserControl
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using FeWoLearning.Avalonia.Exercises.Beginner;
 using FeWoLearning.Avalonia.Tests;
 
@@ -1939,6 +1940,26 @@ public class Ex006_AlignmentAndMarginTests
         var view = Show();
 
         Assert.Equal(new Rect(80, 65, 40, 20), view.FindControl<Border>("Box")!.Bounds);
+    }
+
+    // A learner could hit that exact rectangle with Stretch alignment and hand-picked
+    // asymmetric margins, never touching the mechanism this exercise drills. Assert
+    // the alignment and margin themselves, not only where they happen to land.
+    [AvaloniaFact]
+    public void Box_Uses_Center_And_Bottom_Alignment_With_A_Five_Pixel_Bottom_Margin()
+    {
+        var box = Show().FindControl<Border>("Box")!;
+
+        Assert.Equal(HorizontalAlignment.Center, box.HorizontalAlignment);
+        Assert.Equal(VerticalAlignment.Bottom, box.VerticalAlignment);
+        Assert.Equal(new Thickness(0, 0, 0, 5), box.Margin);
+    }
+
+    // Likewise the inset must come from the Frame's Padding, not from the Box's Margin.
+    [AvaloniaFact]
+    public void Frame_Applies_Its_Ten_Pixel_Padding()
+    {
+        Assert.Equal(new Thickness(10), Show().FindControl<Border>("Frame")!.Padding);
     }
 }
 ```
@@ -1990,7 +2011,8 @@ public partial class Ex006_AlignmentAndMargin : UserControl
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex007_LayoutWrapPanel">
-  <!-- TODO: replace this placeholder with a horizontal WrapPanel:
+  <!-- TODO: replace this placeholder with a horizontal WrapPanel named "ItemsPanel"
+       (the test looks the panel up by that name):
          Width 200, pinned to the top-left,
          holding four Borders named "Item1".."Item4", each 80 wide and 20 tall.
        Two tiles fit per row at 200 wide (160 fits, 240 does not), so Item3 and
@@ -2054,6 +2076,19 @@ public class Ex007_LayoutWrapPanelTests
         Assert.Equal(new Rect(0, 20, 80, 20), view.FindControl<Border>("Item3")!.Bounds);
         Assert.Equal(new Rect(80, 20, 80, 20), view.FindControl<Border>("Item4")!.Bounds);
     }
+
+    // A Grid or Canvas placing the four tiles by hand reproduces the rectangles above
+    // exactly. The typed lookup is what forces the mechanism: FindControl<WrapPanel>
+    // returns null for any other panel type.
+    [AvaloniaFact]
+    public void Uses_A_Real_WrapPanel_Constrained_To_Two_Hundred()
+    {
+        var panel = Show().FindControl<WrapPanel>("ItemsPanel");
+
+        Assert.NotNull(panel);
+        Assert.Equal(Orientation.Horizontal, panel!.Orientation);
+        Assert.Equal(200, panel.Width);
+    }
 }
 ```
 
@@ -2065,7 +2100,7 @@ public class Ex007_LayoutWrapPanelTests
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex007_LayoutWrapPanel">
-  <WrapPanel Orientation="Horizontal" Width="200"
+  <WrapPanel Name="ItemsPanel" Orientation="Horizontal" Width="200"
              HorizontalAlignment="Left" VerticalAlignment="Top">
     <Border Name="Item1" Width="80" Height="20" Background="#4C8BF5" />
     <Border Name="Item2" Width="80" Height="20" Background="#34A853" />
