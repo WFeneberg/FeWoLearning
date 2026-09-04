@@ -260,7 +260,8 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
 
-All 100-exercise ledgers across all 9 tracks are now written. Nothing is
+Every 100-exercise ledger is fully seeded except `avalonia/`, which is still
+being built out — see the table above for exact counts. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the other six tracks are.

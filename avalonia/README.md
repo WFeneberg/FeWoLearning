@@ -8,8 +8,9 @@ drills belong to the `dotnet/` track; Blazor's component model belongs to
 
 Every exercise is a stub that **fails red** before implementation and **passes
 green** once it matches its reference solution — the same invariant as every
-other track in this repo. All 100 exercises are seeded; none have been
-verified red/green by an actual test run yet (see `catalog.md`'s status line).
+other track in this repo. All 100 exercises are seeded, but only some have
+been confirmed red/green by an actual test run — see `catalog.md`'s status
+line for the current, live count of how many.
 
 The MVVM base is ReactiveUI end to end: the beginner tier (001–035) uses it
 only declaratively (`ReactiveObject`, `RaiseAndSetIfChanged`,
