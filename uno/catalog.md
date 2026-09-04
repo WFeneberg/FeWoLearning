@@ -31,7 +31,7 @@ rather than as current values. Writing exercises against a mental model that has
 been verified would be worse than leaving the gap, so those rows now cover async
 patterns instead. MVUX is the obvious next addition to this track.
 
-**Status: 75 ✅ / 25 ⬜**
+**Status: 80 ✅ / 20 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -122,11 +122,11 @@ patterns instead. MVUX is the obvious next addition to this track.
 | 073 | InvalidationTracking | `InvalidateMeasure`/`InvalidateArrange`, counting passes | ✅ |
 | 074 | LayoutCycles | measuring during arrange, and how to avoid the loop | ✅ |
 | 075 | ComputedValueCaching | caching a derived value, invalidated by the properties it reads | ✅ |
-| 076 | ContainerPooling | pooling visuals, resetting state on reuse | ⬜ |
-| 077 | BindingDiagnostics | `BindingExpression`, `UpdateSource`/`UpdateTarget`, failure surfaces | ⬜ |
-| 078 | TemplatedControlInheritance | subclassing a templated control and extending its states | ⬜ |
-| 079 | CompositeContentModel | building a control from parts with a content model | ⬜ |
-| 080 | CustomAutomationPeer | `AutomationPeer`, patterns, programmatic invocation | ⬜ |
+| 076 | BoundedElementPool | a capped pool: reset on return, eviction, hit and miss counts | ✅ |
+| 077 | BindingDiagnostics | `GetBindingExpression`, `UpdateSourceTrigger.Explicit`, `UpdateSource` | ✅ |
+| 078 | TemplatedControlInheritance | subclassing a templated control and extending its states | ✅ |
+| 079 | CompositeContentModel | building a control from parts with a content model | ✅ |
+| 080 | CustomAutomationPeer | `AutomationPeer`, patterns, programmatic invocation | ✅ |
 | 081 | TemplateSwapping | replacing a `Template` at runtime: re-lookup, re-applied states, old-part cleanup | ⬜ |
 | 082 | StoryboardLogic | `Storyboard`, `DoubleAnimation`, `SkipToFill`, `Completed` | ⬜ |
 | 083 | EasingFunctions | easing math and where the framework evaluates it | ⬜ |
