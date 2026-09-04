@@ -71,9 +71,9 @@ public class Ex026_CheckboxGroupTests : BunitContext
         cut.Find("#feature-2").Change(true);
         cut.Find("#feature-0").Change(true);
 
-        // A captured local, not markup - rule 4 reserves WaitForAssertion for
-        // markup assertions where a stale render frame is possible; wrapping a
-        // local here would only delay reporting a genuine failure.
+        // A captured local, not markup - WaitForAssertion is reserved for markup
+        // assertions where a stale render frame is possible; wrapping a local
+        // here would only delay reporting a genuine failure.
         Assert.Equal(new[] { "a", "c" }, reported);
     }
 }

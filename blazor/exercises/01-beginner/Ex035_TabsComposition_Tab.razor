@@ -9,6 +9,12 @@
     [Parameter] public string Title { get; set; } = "";
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
+    // TODO: register this tab with Parent when initialized; unregister it from
+    // Parent when disposed (implement IDisposable); and tell Parent to Refresh()
+    // whenever this tab's own parameters (e.g. Title) change, so a relabelled or
+    // removed tab is reflected live rather than through a stale snapshot taken
+    // at registration time.
+
     protected override void OnInitialized()
         => throw new NotImplementedException("TODO: Ex035 - register this tab with its parent");
 }

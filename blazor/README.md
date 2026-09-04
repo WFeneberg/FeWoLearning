@@ -37,8 +37,9 @@ There is no separate install step — `dotnet test` restores on first run.
 ## 4. How an exercise works
 
 Every stub compiles while unfinished and throws `NotImplementedException` at
-runtime, carrying a `TODO: ExNNN - ...` message its test asserts against. Two
-shapes exist, depending on where the TODO naturally falls:
+runtime, carrying a `TODO: ExNNN - ...` message that identifies which exercise
+a red failure came from. Two shapes exist, depending on where the TODO
+naturally falls:
 
 - **Shape A — the TODO lives in `@code`.** Markup renders a computed member;
   the member itself throws:
@@ -52,15 +53,17 @@ shapes exist, depending on where the TODO naturally falls:
 
 - **Shape B — the TODO would otherwise have to sit in markup, which is
   illegal.** `throw` is not a valid expression inside Razor markup
-  (`CS8115`: "a throw expression is not allowed in this context"). Where the
+  (`CS8115`: "a throw expression is not allowed in this context"), so the
+  stub throws from a lifecycle method or event handler instead. Where the
   unfinished behavior *is* the markup — e.g. ex032's
-  `@if (AllowHtml) { @((MarkupString)Html) } else { @Html }` — the stub
-  instead declares a field for the learner to use (`_ticks`, `_note`,
-  `_quantity`, `_selected`, `_total`) and throws from a lifecycle method or
-  event handler that would otherwise wire it up. The field exists so the
-  finished markup has something to bind to; until the learner writes that
-  markup, the field is genuinely unused, which is why the stub build carries
-  six warnings (see §9).
+  `@if (AllowHtml) { @((MarkupString)Html) } else { @Html }` — that markup
+  *is* the whole TODO and the stub needs nothing else. Six other shape-B
+  stubs (`Ex020`, `Ex023`, `Ex024`, `Ex025`, `Ex027`, `Ex031`) additionally
+  declare a field for the learner to use (`_ticks`, `_note`, `_quantity`,
+  `_selected` twice, `_total`), because their finished markup needs something
+  to bind to that the stub cannot supply itself. Until the learner writes
+  that markup, the field is genuinely unused, which is why the stub build
+  carries six warnings (see §9).
 
 A reference solution replaces the throwing member/method with the real
 implementation and deletes anything that was there only to throw.
@@ -204,8 +207,12 @@ and Kotlin traps already documented in the repo root `CLAUDE.md`:
 
 - A bUnit test that does not wait for a re-render after a state change
   asserts only on the **first** frame. For `@onclick` and async lifecycle,
-  use `cut.WaitForAssertion(...)` / `InvokeAsync`, never a bare assertion
-  immediately after the trigger.
+  use `cut.WaitForAssertion(...)` / `InvokeAsync` on **markup** assertions,
+  where a stale render frame is possible — never a bare assertion on markup
+  immediately after the trigger. An assertion on a **captured local**
+  (a value an `EventCallback` or delegate handed straight to a test variable)
+  does not need the wrapper: there is no render frame to go stale, and
+  wrapping it only delays reporting a genuine failure by the full timeout.
 - A test that compares `cut.Markup` against a whole string breaks on any
   whitespace change and proves nothing about behavior. Assert through
   `Find`/`FindAll` plus `TextContent` or a specific attribute instead.

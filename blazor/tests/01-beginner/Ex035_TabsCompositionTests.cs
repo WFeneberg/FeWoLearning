@@ -43,8 +43,8 @@ public class Ex035_TabsCompositionTests : BunitContext
     {
         var cut = RenderThreeTabs();
 
-        // Plain initial render, no event dispatch - per rule 4 this needs no
-        // WaitForAssertion.
+        // Plain initial render, no event dispatch, so there is no re-render to
+        // wait for - this needs no WaitForAssertion.
         var headers = cut.FindAll("#tabs button.tab");
         Assert.Equal(3, headers.Count);
         Assert.Equal(new[] { "One", "Two", "Three" }, headers.Select(h => h.TextContent).ToArray());

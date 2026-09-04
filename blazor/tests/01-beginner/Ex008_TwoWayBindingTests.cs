@@ -29,7 +29,7 @@ public class Ex008_TwoWayBindingTests : BunitContext
         // back down as a parameter. Simulate that render here.
         cut.Render(p => p.Add(c => c.Value, current));
 
-        cut.WaitForAssertion(() => Assert.Equal("Grace", cut.Find("#echo").TextContent));
+        Assert.Equal("Grace", cut.Find("#echo").TextContent);
     }
 
     [Fact]

@@ -10,7 +10,9 @@
 
     private string _slug = "";
 
-    // TODO: set _slug from Title on every parameter change: lower-case,
-    // spaces to '-', drop non-alphanumeric characters, collapse runs of '-'.
+    // TODO: set _slug from Title on every parameter change: lower-case, and
+    // collapse each run of one or more non-alphanumeric characters (not just
+    // spaces) into a single '-'. A leading run is dropped entirely (no
+    // leading '-'); a trailing '-' is trimmed.
     protected override void OnParametersSet() => throw new NotImplementedException("TODO: Ex018 - recompute the slug on every parameter change");
 }

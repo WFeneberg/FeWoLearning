@@ -1,6 +1,7 @@
 @* Exercise 009 - Bind Format (beginner).
    Goal:   Format/parse a DateOnly round-trip through an input[type=date].
-   Drills: culture-invariant formatting, TryParseExact, ignoring bad input.
+   Drills: hand-wired value= + @onchange (no @bind directive), culture-invariant
+           formatting, TryParseExact, ignoring bad input.
    Passes: dotnet test --filter FullyQualifiedName~Ex009_ *@
 @* TODO: render:
      <input id="due" type="date" value="@..." />

@@ -11,8 +11,17 @@
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    // TODO: expose Register(Ex035_TabsComposition_Tab tab) and an ordered list of
-    // registered tabs; track which one is active.
+    // TODO: expose Register(Ex035_TabsComposition_Tab tab), Unregister(tab), and an
+    // ordered list of registered tabs; track which one is active. Also expose a
+    // Refresh() a tab can call when its own parameters (e.g. Title) change, so the
+    // parent re-renders with the live value instead of a stale snapshot.
+    //
+    // Hazard: guard Refresh() so it queues at most one extra render pass (e.g. a
+    // "_refreshQueued" flag cleared in OnAfterRender). An unconditional
+    // StateHasChanged() inside Refresh() recurses forever - each render triggers
+    // another Refresh() call, which triggers another render - and HANGS the test
+    // run for 180 seconds instead of failing red. If ex035's tests stall rather
+    // than fail quickly, this unbounded recursion is almost certainly why.
 
     protected override void OnParametersSet()
         => throw new NotImplementedException("TODO: Ex035 - render the tab headers and the active panel");

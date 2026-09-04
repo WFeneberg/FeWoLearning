@@ -80,6 +80,21 @@ Namespaces per tier: `FeWoLearning.Blazor.Exercises.Beginner`, `.Intermediate`,
 namespaces and type names; because it is a separate assembly and no single
 project references both RCLs, there is no collision.
 
+**Multi-file exercises** follow `ExNNN_<Slug>_<Part>.razor` — e.g. ex035's
+parent component is `Ex035_TabsComposition.razor` and the child it cascades to
+is `Ex035_TabsComposition_Tab.razor` (also used by ex028, ex029, ex030). This
+keeps every file belonging to one exercise sorted and grouped together on
+disk, and applies identically in `exercises/`, `solutions/`, and `tests/`.
+
+**`_support/` is a fixture folder, not an exercise.** Both `exercises/` and
+`solutions/` carry an identical `_support/` directory (`Person.cs`,
+`AlertSeverity.cs`, `Ticker.cs`, `AddButton.razor`, `RosterEntry.razor`,
+`Level2.razor`, `Level3.razor`, plus its own `_Imports.razor`) holding types
+and small components that several exercises' tests depend on. The two copies
+must stay byte-identical, or the two build modes stop testing the same
+fixture; it never contains a TODO, is never itself a graded exercise, and
+never gets a `catalog.md` row.
+
 ## 4. The red/green mechanism
 
 `tests/` and `host/` each reference **either** `exercises/` **or** `solutions/`,
@@ -242,7 +257,11 @@ traps already documented in `CLAUDE.md`:
 
 - A bUnit test that does not wait for a re-render after a state change asserts
   only on the **first** frame. For `@onclick` and async lifecycle, use
-  `cut.WaitForAssertion(...)` / `InvokeAsync`, never a bare assertion.
+  `cut.WaitForAssertion(...)` / `InvokeAsync` on **markup** assertions, where a
+  stale render frame is possible — never a bare assertion on markup
+  immediately after the trigger. An assertion on a **captured local** does not
+  need the wrapper: there is no render frame to go stale there, and wrapping
+  it only delays reporting a genuine failure by the full timeout.
 - A test that compares `cut.Markup` against a whole string breaks on any
   whitespace change and proves nothing about behaviour. Assert through
   `Find`/`FindAll` plus `TextContent` or a specific attribute.

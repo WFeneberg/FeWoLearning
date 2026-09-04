@@ -5,11 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this repository is
 
 FeWoLearning is a **polyglot skills-training monorepo**, not an application. It
-holds ten independent, self-contained learning tracks — `dotnet/`, `python/`,
-`vue/`, `angular/`, `go/`, `rust/`, `java/`, `kotlin/`, `flutter/`, `blazor/` — each with its own toolchain, test runner,
-and a graded set of **exercises** (stubs the learner implements) paired with
-reference **solutions**. There is no shared build and no cross-track code. Treat
-each language folder as its own project.
+holds independent, self-contained learning tracks — one per folder below —
+each with its own toolchain, test runner, and a graded set of **exercises**
+(stubs the learner implements) paired with reference **solutions**. There is
+no shared build and no cross-track code. Treat each language folder as its
+own project.
 
 The owner is a senior .NET architect using this repo to keep .NET sharp and to
 learn the other seven ecosystems, driven with JetBrains IDEs (Rider, PyCharm,
@@ -266,6 +266,8 @@ work queue.
      `--testMatch='**/solutions/**/*.spec.ts'`).
    - `python`/`go`/`rust`/`dotnet`/`java`/`kotlin`/`flutter`: copy the track into the scratchpad, overlay each
      solution onto its stub, delete `solutions/`, run the tests there.
+   - `blazor`: no overlay — `dotnet test -p:UseSolutions=true` runs the same
+     suite against `solutions/`.
 6. Run the track's type gate: `npm run typecheck:solutions` (vue), `go vet ./...`.
    `solutions/` must stay clean; a couple of errors under `exercises/` are expected
    and documented.

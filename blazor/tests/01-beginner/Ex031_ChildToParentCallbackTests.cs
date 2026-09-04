@@ -11,8 +11,8 @@ public class Ex031_ChildToParentCallbackTests : BunitContext
     {
         var cut = Render<Ex031_ChildToParentCallback>();
 
-        // Plain initial render, no event dispatch - per rule 4 this needs no
-        // WaitForAssertion.
+        // Plain initial render, no event dispatch, so there is no re-render to
+        // wait for - this needs no WaitForAssertion.
         Assert.Equal("0", cut.Find("#total").TextContent);
         var buttons = cut.FindAll("button.add");
         Assert.Equal(3, buttons.Count);

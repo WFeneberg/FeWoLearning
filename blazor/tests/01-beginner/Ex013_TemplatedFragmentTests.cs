@@ -21,8 +21,7 @@ public class Ex013_TemplatedFragmentTests : BunitContext
             .Add(c => c.Empty, "<p id=\"none\">none</p>"));
 
         Assert.Equal(2, cut.FindAll("#repeater .row").Count);
-        var texts = cut.FindAll("#repeater .row .cell").Select(e => e.TextContent).ToArray();
-        Assert.Equal(new[] { "a", "b" }, texts);
+        Assert.Equal(new[] { "a", "b" }, cut.FindAll("#repeater .row").Select(e => e.TextContent).ToArray());
 
         // Items is non-empty here, so Empty must not render alongside the rows - this
         // is the only configuration that distinguishes "Empty instead of rows" from

@@ -29,8 +29,8 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 006 | ClickEventCallback | `@onclick`, `EventCallback<T>`, stateless child | ✅ |
 | 007 | CounterState | component-owned state, implicit re-render | ✅ |
 | 008 | TwoWayBinding | `Value`/`ValueChanged` contract for `@bind-Value` | ✅ |
-| 009 | BindFormat | date formatting and parsing round-trip, invariant culture | ✅ |
-| 010 | BindEventOnInput | `@oninput` vs `@onchange` timing | ✅ |
+| 009 | BindFormat | hand-wired `value=` + `@onchange` (no `@bind` directive), date formatting/parsing round-trip, invariant culture | ✅ |
+| 010 | BindEventOnInput | hand-wired `@oninput` vs `@onchange` timing (no `@bind` directive) | ✅ |
 | 011 | ChildContent | `RenderFragment`, omitting an absent fragment | ✅ |
 | 012 | NamedFragments | multiple named `RenderFragment` parameters | ✅ |
 | 013 | TemplatedFragment | `@typeparam`, `RenderFragment<TItem>`, empty template | ✅ |
@@ -61,7 +61,7 @@ and friends), because `01-beginner` is not a valid C# identifier.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | EditFormBasics | `EditForm`, `EditContext`, `OnValidSubmit` vs `OnSubmit` | ⬜ |
+| 036 | EditFormBasics | `EditForm`, `EditContext`, `OnValidSubmit` vs `OnSubmit`, `@onsubmit:preventDefault` (the form not re-posting) | ⬜ |
 | 037 | DataAnnotationsValidation | `DataAnnotationsValidator`, `[Required]`/`[Range]`, `ValidationSummary` | ⬜ |
 | 038 | CustomValidationAttribute | custom `ValidationAttribute`, `IsValid` override | ⬜ |
 | 039 | ValidationMessageDisplay | `ValidationMessage<T>`, per-field error display | ⬜ |
@@ -83,10 +83,10 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 055 | NavigationLocationChanged | `NavigationManager.LocationChanged` subscribe/unsubscribe | ⬜ |
 | 056 | QueryStringParsing | `NavigationManager.Uri`, `QueryHelpers.ParseQuery` | ⬜ |
 | 057 | NavigationInterception | `RegisterLocationChangingHandler`, cancelling a navigation | ⬜ |
-| 058 | ProtectedNavigation | `NavigateTo` with `forceLoad`, internal vs external navigation guard | ⬜ |
+| 058 | BindDirectiveModifiers | `@bind:event` (custom update-trigger event), `@bind:format`, `@bind:after` (post-update hook) | ⬜ |
 | 059 | PersistComponentStateBasics | `PersistentComponentState`, `RegisterOnPersisting`, restore on init | ⬜ |
 | 060 | PersistComponentStateRoundtrip | persisting typed state as JSON, subscription disposal | ⬜ |
-| 061 | PersistComponentStateKeyed | keyed persistence across multiple component instances | ⬜ |
+| 061 | RefCaptureBasics | `@ref` capturing an element reference and a component reference, calling a method on a child instance | ⬜ |
 | 062 | AsyncOnInitialized | `async OnInitializedAsync`, loading-state rendering | ⬜ |
 | 063 | CancellationOnDispose | `CancellationTokenSource` created in `OnInitialized`, cancelled in `Dispose` | ⬜ |
 | 064 | SetParametersAsyncOverride | overriding `SetParametersAsync`, calling `base` | ⬜ |

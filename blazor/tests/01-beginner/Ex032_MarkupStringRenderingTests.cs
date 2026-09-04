@@ -26,7 +26,7 @@ public class Ex032_MarkupStringRenderingTests : BunitContext
 
         Assert.Equal("hi", cut.Find("#rich b").TextContent);
 
-        // Folded here per rule 1 (identical premise: AllowHtml=true): an empty Html
+        // Folded here (identical premise: AllowHtml=true): an empty Html
         // value can't discriminate escaped-vs-markup behaviour on its own - a
         // MarkupString("") and an escaped "" both render as empty text - so this
         // isn't a fact worth keeping separate. It only confirms the empty case
