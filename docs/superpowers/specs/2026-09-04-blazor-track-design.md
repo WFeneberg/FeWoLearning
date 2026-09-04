@@ -213,7 +213,12 @@ traps already documented in `CLAUDE.md`:
 3. `dotnet test` — 35 exercise tests, **all red**, every failure traced to its
    `NotImplementedException`.
 4. `dotnet test -p:UseSolutions=true` — the same 35 tests, **all green**.
-5. `dotnet run --project host` serves the 35 demo pages in both modes.
+5. The host builds in both modes, and is verified by starting it and fetching
+   demo pages over HTTP (not by eyeballing a browser): in solutions mode a demo
+   page returns 200 with the expected rendered text; in exercises mode the same
+   page surfaces the exercise's `NotImplementedException`. Spot-checking a
+   handful of pages is sufficient — the per-exercise proof is the test suite,
+   not the host.
 6. `README.md` documents setup, both commands, the deviation of section 5, and
    the non-goals of section 6.
 7. `CLAUDE.md` updated: the track table, the per-track command table, the
