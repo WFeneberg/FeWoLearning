@@ -5,8 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this repository is
 
 FeWoLearning is a **polyglot skills-training monorepo**, not an application. It
-holds nine independent, self-contained learning tracks — `dotnet/`, `python/`,
-`vue/`, `angular/`, `go/`, `rust/`, `java/`, `kotlin/`, `flutter/` — each with its own toolchain, test runner,
+holds ten independent, self-contained learning tracks — `dotnet/`, `python/`,
+`vue/`, `angular/`, `go/`, `rust/`, `java/`, `kotlin/`, `flutter/`, `blazor/` — each with its own toolchain, test runner,
 and a graded set of **exercises** (stubs the learner implements) paired with
 reference **solutions**. There is no shared build and no cross-track code. Treat
 each language folder as its own project.
@@ -56,8 +56,12 @@ tests there — do not add `solutions/` to a project/module.
 | `kotlin/` | planned                                 | planned                  | planned |
 | `flutter/`| planned                                 | planned                  | planned |
 | `avalonia/`| — (restore on first `dotnet test`)     | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_HelloView` |
+| `blazor/` | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 
 Run every command **from inside the track folder**, not the repo root.
+
+For `blazor/`, `dotnet test -p:UseSolutions=true` runs the identical suite
+against the reference solutions instead of the stubs.
 
 ## Toolchain status (verified 2026-08-03)
 
@@ -66,6 +70,10 @@ Run every command **from inside the track folder**, not the repo root.
   **Avalonia 12.1.1 with ReactiveUI 24.1.0 on .NET 10**. The Avalonia set is
   pinned and coherent at 12.1.1 and must not be bumped piecemeal: `ReactiveUI.Avalonia`'s
   12.x line stops at 12.1.1, while Avalonia itself has already released 12.1.2.
+  **Blazor's** beginner tier (35/100) is verified end-to-end as of 2026-09-04 on
+  **.NET 10.0.400 with bUnit 2.9.0**: 115 stub facts red, 0 passed on the
+  untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
+  `java/`, `kotlin/`, `flutter/` and `php/`.
 - `java/` and `kotlin/` are currently **catalog-only** additions: their ledgers
   and README files exist, but the build scaffolding and seeded exercises do not.
 - `flutter/` is content-complete like `java/` and `kotlin/`: `pubspec.yaml`
@@ -197,6 +205,33 @@ Run every command **from inside the track folder**, not the repo root.
   only rendered text can be satisfied by a hard-coded literal in the XAML, so
   every binding exercise must change the view model afterwards, call
   `Dispatcher.UIThread.RunJobs()`, and assert the text followed.
+- **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
+  projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
+  `solutions/` is deliberately **in** the build here (the repo-wide convention
+  above is waived for the same reason: `tests/` and `host/` each reference
+  exactly one of the two RCLs via the `UseSolutions` MSBuild property, never
+  both, so the name collision the convention exists to prevent cannot occur).
+  Things that actually cost time building this track: `-p:UseSolutions=true`
+  swaps which RCL `tests/`/`host/` reference, and `Directory.Build.props` must
+  redirect the solutions build's output via `UseArtifactsOutput`/
+  `ArtifactsPath` — setting `BaseOutputPath`/`BaseIntermediateOutputPath`
+  conditionally inside the `.csproj` body is read too late (before the SDK
+  props import), so the stale default `obj/` gets globbed alongside the new
+  one and the build fails with `CS0579`. Tier namespaces are pinned by a
+  folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
+  and friends), because `01-beginner` is not a valid C# identifier. A Razor
+  component's type name **is its file name** — `Ex001_HelloComponent.razor`
+  declares `Ex001_HelloComponent`. Stubs use one of two shapes: shape A throws
+  from a computed member that markup references (`@Greeting`, where `Greeting`
+  throws); shape B throws from a lifecycle method or event handler instead,
+  because `throw` is illegal directly in Razor markup (`CS8115`). bUnit 2.x
+  renamed `TestContext` to `BunitContext` (the old name collides with
+  `Xunit.TestContext`, `CS0104`) and `SetParametersAndRender` to `cut.Render`.
+  Each RCL needs a `FrameworkReference` to `Microsoft.AspNetCore.App`, or the
+  Razor source generator cannot resolve `Microsoft.AspNetCore.Components` and
+  every `.razor` file fails `CS0234`. `_support/` (identical in both RCLs)
+  holds shared fixtures several exercises' tests depend on — it is never a
+  TODO and never gets a `catalog.md` row.
 
 ## Adding or completing exercises
 
@@ -259,9 +294,10 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
+| `blazor/` | 35 / 100 (verified) | 65 |
 
-Every 100-exercise ledger is fully seeded except `avalonia/`, which is still
-being built out — see the table above for exact counts. Nothing else is
+Every 100-exercise ledger is fully seeded except `avalonia/` and `blazor/`,
+both still being built out — see the table above for exact counts. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the other six tracks are.
@@ -305,6 +341,15 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
+`blazor/`'s 35 written (beginner-tier) exercises carry 115 individual test
+facts; `dotnet test` shows 115 failed/0 passed on the untouched tree, each
+failure traced to its own exercise's `NotImplementedException`, and
+`dotnet test -p:UseSolutions=true` shows 115 passed/0 failed. The `exercises/`
+build itself carries 6 expected `CS0169`/`CS0414`/`CS0649` warnings for
+fields that shape-B stubs declare for the learner to wire up — these are
+intentionally left unsuppressed; `solutions/` builds with 0 warnings. See
+`blazor/README.md` for the full list and for a sharp edge in ex035: a naive,
+unbounded parent-refresh callback hangs the test host rather than failing it.
 
 ## Known gaps
 
@@ -314,3 +359,8 @@ largely **unverified** and can drift silently — see the "Known gaps" section o
 the manual overlay recipe. An audit on 2026-08-03 found five broken solutions in
 `vue/` and four defective tests in `go/` that had gone unnoticed for exactly this
 reason.
+
+`blazor/` — like `avalonia/` — is a deliberate exception: its `solutions/` is
+a real project referenced by `tests/`/`host/` under `UseSolutions=true`, so it
+is compile-checked and test-run on every green check and cannot drift
+silently the way described above.

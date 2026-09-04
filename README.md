@@ -16,12 +16,18 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `angular/`  | Angular (standalone, signals, TS)| Jest        | **100 / 100** | ✅ Node 26 |
 | `rust/`     | Rust                             | `cargo test`| **100 / 100** | ✅ Rust 1.97 |
 | `avalonia/`| Avalonia 12 (ReactiveUI MVVM, C#)| xUnit v3 + Avalonia.Headless | **10 / 100** | ✅ .NET 10 |
+| `blazor/`   | Blazor (Razor components, bUnit) | xUnit + bUnit | **35 / 100** | ✅ .NET 10.0.400 |
 | `java/`     | Java                             | JUnit 5     | 100 / 100 (unverified) | planned |
 | `kotlin/`   | Kotlin                           | JUnit 5     | 100 / 100 (unverified) | planned |
 | `flutter/`  | Flutter / Dart                   | `package:test` / `flutter_test` | 100 / 100 (unverified) | planned |
 
 Each track's `catalog.md` is the authoritative per-exercise ledger: it lists all
 100 entries with ✅ (written) or ⬜ (planned).
+
+`blazor/`'s beginner tier (ex001–ex035) is verified end-to-end — 115 test
+facts red on the stubs, 115 green on the reference solutions; run
+`dotnet test -p:UseSolutions=true` from inside `blazor/` to check the
+solutions instead of the stubs.
 
 `java/`, `kotlin/`, and `flutter/` are content-complete — every stub, test, and
 reference solution exists — but **unverified**: this machine has no JDK/Gradle

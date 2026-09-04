@@ -175,9 +175,48 @@ future reader does not "fix" it back.
     007 CounterState            019 OnAfterRenderFirst      031 ChildToParentCallback
     008 TwoWayBinding           020 DisposableComponent     032 MarkupStringRendering
     009 BindFormat              021 EventArgsHandling       033 EmptyStateFallback
-    010 BindEventOnInput        022 PreventDefault          034 NestedParameterFlow
+    010 BindEventOnInput        022 StopPropagation         034 NestedParameterFlow
     011 ChildContent            023 InputTextBinding        035 TabsComposition
     012 NamedFragments          024 NumericInputParsing
+
+### As built: deviations from the plan above
+
+Eight review rounds moved several exercises away from what this section
+originally specified. The catalog and the code reflect the following; this
+section is corrected to match:
+
+- **022** is `StopPropagation`, not `PreventDefault` (renamed from the
+  original plan). `@onclick:preventDefault` has no observable effect on
+  bUnit's DOM — a test for it would pass whether or not the directive were
+  present — so the slug moved to `StopPropagation`, which bubbling *can*
+  observe. See "Non-goals" below.
+- **023 InputTextBinding** is narrowed to `@bind` against a **local field**
+  (the idiomatic case), kept deliberately distinct from ex008's
+  `Value`/`ValueChanged` parameter contract.
+- **016 InlineStyleBinding** takes a `double Percent`, not an `int`. An `int`
+  formats identically in every culture, which would make an
+  invariant-formatting drill vacuous; a `double` makes `de-DE` format `42.5`
+  as `42,5` against invariant `42.5`, and the real lesson is that
+  `style="width: 42,5%"` is invalid CSS.
+- **024 NumericInputParsing** formats its total with
+  `ToString("0.##", CultureInfo.InvariantCulture)`.
+- **032 MarkupStringRendering** is shape B: the learner writes
+  `@if (AllowHtml) { @((MarkupString)Html) } else { @Html }` directly in
+  markup. An earlier `object`-typed design compiled but never rendered HTML,
+  because a `MarkupString` boxed into `object` is dispatched through
+  `AddContent(object)` and gets `ToString()`'d instead of rendered.
+- **035 TabsComposition** does **not** reuse ex030 `ComponentComposition`'s
+  registration pattern. ex030's registry is init-only and snapshot-based,
+  which is fine for a breadcrumb bar but wrong for tabs whose `Title` can
+  change or which can be removed. ex035 uses an `IDisposable` tab that
+  unregisters itself, with the parent reading `Title`/`ChildContent` live off
+  the stored child instances, and bounds its refresh cascade with a
+  `_refreshQueued` flag cleared in `OnAfterRender`.
+- The **culture-fact idiom** used across the tier: capture
+  `var original = CultureInfo.CurrentCulture;`, set the target culture inside
+  a `try`, and restore `original` in `finally`. If `InvariantGlobalization`
+  is ever switched on for this track, `CultureInfo.GetCultureInfo` degrades
+  to invariant everywhere and these facts go quiet rather than failing loudly.
 
 ### Non-goals
 
@@ -188,6 +227,13 @@ test asserts against bUnit's `JSInterop` mock — which invocation happened with
 which arguments — never against browser behaviour. `blazor/README.md` states
 this explicitly so nobody later mistakes a green test for proof of browser
 behaviour.
+
+`preventDefault` is also a non-goal of this tier specifically, and moves to
+the intermediate tier: `@onclick:preventDefault` is unobservable in bUnit's
+headless DOM (there is no real default browser action to suppress), so a
+bUnit test asserting it would pass identically whether or not the directive
+were present. The intermediate tier's `EditForm` submit gives it an
+observable effect instead (the form not re-posting).
 
 ## 7. Test-quality rules
 
