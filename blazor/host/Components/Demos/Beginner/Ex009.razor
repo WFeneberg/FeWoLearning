@@ -1,0 +1,11 @@
+@page "/beginner/009"
+@rendermode InteractiveServer
+
+<h1>Exercise 009 - BindFormat</h1>
+
+<Ex009_BindFormat @bind-Value="_due" />
+<p>Parent sees: <strong>@_due</strong></p>
+
+@code {
+    private DateOnly _due = new(2026, 9, 4);
+}

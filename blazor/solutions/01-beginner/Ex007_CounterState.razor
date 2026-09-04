@@ -1,0 +1,19 @@
+@* Exercise 007 - Counter State (beginner).
+   Goal:   Own an incrementing/decrementing counter, seeded from Start.
+   Drills: component-owned state, implicit re-render after an event handler.
+   Passes: dotnet test --filter FullyQualifiedName~Ex007_ *@
+<button id="dec" @onclick="Decrement">-</button><span id="value">@Current</span><button id="inc" @onclick="Increment">+</button>
+
+@code {
+    [Parameter] public int Start { get; set; }
+
+    private int _current;
+
+    private int Current => _current;
+
+    private void Increment() => _current++;
+
+    private void Decrement() => _current--;
+
+    protected override void OnInitialized() => _current = Start;
+}

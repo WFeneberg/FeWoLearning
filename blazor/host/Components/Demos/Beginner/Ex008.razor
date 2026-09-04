@@ -1,0 +1,11 @@
+@page "/beginner/008"
+@rendermode InteractiveServer
+
+<h1>Exercise 008 - TwoWayBinding</h1>
+
+<Ex008_TwoWayBinding @bind-Value="_name" />
+<p>Parent sees: <strong>@_name</strong></p>
+
+@code {
+    private string _name = "Ada";
+}

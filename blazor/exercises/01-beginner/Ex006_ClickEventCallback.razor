@@ -1,0 +1,13 @@
+@* Exercise 006 - Click Event Callback (beginner).
+   Goal:   Report the next count through OnLike without storing it.
+   Drills: @onclick, EventCallback<T>, stateless child components.
+   Passes: dotnet test --filter FullyQualifiedName~Ex006_ *@
+<button id="like" @onclick="HandleClickAsync">Like (@Count)</button>
+
+@code {
+    [Parameter] public int Count { get; set; }
+    [Parameter] public EventCallback<int> OnLike { get; set; }
+
+    // TODO: report Count + 1 through OnLike. Do not store any state.
+    private Task HandleClickAsync() => throw new NotImplementedException("TODO: Ex006 - report Count + 1 through OnLike");
+}

@@ -1,0 +1,16 @@
+@* Exercise 009 - Bind Format (beginner).
+   Goal:   Format/parse a DateOnly round-trip through an input[type=date].
+   Drills: culture-invariant formatting, TryParseExact, ignoring bad input.
+   Passes: dotnet test --filter FullyQualifiedName~Ex009_ *@
+@* TODO: render:
+     <input id="due" type="date" value="@..." />
+   The value attribute is Value formatted "yyyy-MM-dd" with CultureInfo.InvariantCulture.
+   On onchange, parse the incoming text back to a DateOnly with the same format/culture
+   and report it through ValueChanged. Unparsable input is ignored (no callback). *@
+
+@code {
+    [Parameter] public DateOnly Value { get; set; }
+    [Parameter] public EventCallback<DateOnly> ValueChanged { get; set; }
+
+    protected override void OnParametersSet() => throw new NotImplementedException("TODO: Ex009 - format and parse the due date");
+}

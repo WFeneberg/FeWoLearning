@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 10 ✅ / 90 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -26,11 +26,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 003 | ConditionalRendering | `@if`/`else if`/`else`, render precedence | ✅ |
 | 004 | ListRendering | `@foreach`, list projection, empty list | ✅ |
 | 005 | KeyedListDiffing | `@key`, component instance identity across reorder | ✅ |
-| 006 | ClickEventCallback | `@onclick`, `EventCallback<T>`, stateless child | ⬜ |
-| 007 | CounterState | component-owned state, implicit re-render | ⬜ |
-| 008 | TwoWayBinding | `Value`/`ValueChanged` contract for `@bind-Value` | ⬜ |
-| 009 | BindFormat | date formatting and parsing round-trip, invariant culture | ⬜ |
-| 010 | BindEventOnInput | `@oninput` vs `@onchange` timing | ⬜ |
+| 006 | ClickEventCallback | `@onclick`, `EventCallback<T>`, stateless child | ✅ |
+| 007 | CounterState | component-owned state, implicit re-render | ✅ |
+| 008 | TwoWayBinding | `Value`/`ValueChanged` contract for `@bind-Value` | ✅ |
+| 009 | BindFormat | date formatting and parsing round-trip, invariant culture | ✅ |
+| 010 | BindEventOnInput | `@oninput` vs `@onchange` timing | ✅ |
 | 011 | ChildContent | `RenderFragment`, omitting an absent fragment | ⬜ |
 | 012 | NamedFragments | multiple named `RenderFragment` parameters | ⬜ |
 | 013 | TemplatedFragment | `@typeparam`, `RenderFragment<TItem>`, empty template | ⬜ |

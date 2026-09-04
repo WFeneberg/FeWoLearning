@@ -1,0 +1,16 @@
+@* Exercise 010 - Bind Event On Input (beginner).
+   Goal:   Report the query on every keystroke instead of on blur.
+   Drills: @oninput vs @onchange timing.
+   Passes: dotnet test --filter FullyQualifiedName~Ex010_ *@
+@* TODO: render:
+     <input id="q" value="@Query" ... />
+     <span id="echo">@Query</span>
+   The input must invoke QueryChanged with the new text on EVERY keystroke -
+   wire @oninput, not @onchange. *@
+
+@code {
+    [Parameter] public string Query { get; set; } = "";
+    [Parameter] public EventCallback<string> QueryChanged { get; set; }
+
+    protected override void OnParametersSet() => throw new NotImplementedException("TODO: Ex010 - report the query on every keystroke");
+}

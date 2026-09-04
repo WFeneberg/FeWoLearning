@@ -1,0 +1,16 @@
+@* Exercise 008 - Two-Way Binding (beginner).
+   Goal:   Implement the Value/ValueChanged contract that @bind-Value relies on.
+   Drills: EventCallback<T> round-trip, never writing to a parameter you own.
+   Passes: dotnet test --filter FullyQualifiedName~Ex008_ *@
+@* TODO: render:
+     <input id="name" value="@Value" ... />
+     <span id="echo">@Value</span>
+   The input must invoke ValueChanged with the new text on onchange.
+   Do NOT assign to Value yourself - a parameter is owned by the parent. *@
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    protected override void OnParametersSet() => throw new NotImplementedException("TODO: Ex008 - render a bindable input");
+}

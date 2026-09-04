@@ -1,0 +1,11 @@
+@page "/beginner/010"
+@rendermode InteractiveServer
+
+<h1>Exercise 010 - BindEventOnInput</h1>
+
+<Ex010_BindEventOnInput @bind-Query="_query" />
+<p>Parent sees: <strong>@_query</strong></p>
+
+@code {
+    private string _query = "ab";
+}

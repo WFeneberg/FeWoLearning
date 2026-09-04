@@ -1,0 +1,13 @@
+@page "/beginner/006"
+@rendermode InteractiveServer
+
+<h1>Exercise 006 - ClickEventCallback</h1>
+
+<Ex006_ClickEventCallback Count="_count" OnLike="HandleLike" />
+<p>Parent's own count: <strong>@_count</strong></p>
+
+@code {
+    private int _count = 4;
+
+    private void HandleLike(int next) => _count = next;
+}

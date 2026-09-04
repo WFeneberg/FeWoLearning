@@ -1,0 +1,13 @@
+@* Exercise 008 - Two-Way Binding (beginner).
+   Goal:   Implement the Value/ValueChanged contract that @bind-Value relies on.
+   Drills: EventCallback<T> round-trip, never writing to a parameter you own.
+   Passes: dotnet test --filter FullyQualifiedName~Ex008_ *@
+<input id="name" value="@Value" @onchange="OnChangedAsync" />
+<span id="echo">@Value</span>
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    private Task OnChangedAsync(ChangeEventArgs e) => ValueChanged.InvokeAsync(e.Value?.ToString() ?? "");
+}

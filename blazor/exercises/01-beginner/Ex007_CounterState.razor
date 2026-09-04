@@ -1,0 +1,20 @@
+@* Exercise 007 - Counter State (beginner).
+   Goal:   Own an incrementing/decrementing counter, seeded from Start.
+   Drills: component-owned state, implicit re-render after an event handler.
+   Passes: dotnet test --filter FullyQualifiedName~Ex007_ *@
+<button id="dec" @onclick="Decrement">-</button><span id="value">@Current</span><button id="inc" @onclick="Increment">+</button>
+
+@code {
+    [Parameter] public int Start { get; set; }
+
+    // TODO: add a backing field, initialised from Start in OnInitialized (not OnParametersSet).
+
+    // TODO: expose the backing field.
+    private int Current => throw new NotImplementedException("TODO: Ex007 - expose the current count");
+
+    // TODO: increment the backing field.
+    private void Increment() => throw new NotImplementedException("TODO: Ex007 - increment the current count");
+
+    // TODO: decrement the backing field.
+    private void Decrement() => throw new NotImplementedException("TODO: Ex007 - decrement the current count");
+}
