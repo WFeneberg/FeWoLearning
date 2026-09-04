@@ -38,14 +38,14 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 2 ✅ / 98 ⬜**
 
 ## 01-beginner (001–035)
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 001 | ClrToDependencyProperty | `DependencyProperty.Register`, metadata default, `GetValue`/`SetValue`, `ClearValue` | ⬜ |
-| 002 | CoerceAndValidate | `ValidateValueCallback`, `CoerceValueCallback`, `PropertyChangedCallback`, `CoerceValue` | ⬜ |
+| 001 | ClrToDependencyProperty | `DependencyProperty.Register`, metadata default, `GetValue`/`SetValue`, `ClearValue` | ✅ |
+| 002 | CoerceAndValidate | `ValidateValueCallback`, `CoerceValueCallback`, `PropertyChangedCallback`, `CoerceValue` | ✅ |
 | 003 | ObservableViewModelBase | `INotifyPropertyChanged`, `SetProperty` + `[CallerMemberName]`, no event without a real change | ⬜ |
 | 004 | CodeBehindToBinding | `SetBinding`, `Binding.Path`, `BindingMode.TwoWay`, `UpdateSourceTrigger` | ⬜ |
 | 005 | RelayCommand | `ICommand`, `CanExecute`, `CommandManager.RequerySuggested` | ⬜ |
