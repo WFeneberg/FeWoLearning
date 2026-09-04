@@ -15,5 +15,8 @@ public static class GalleryCatalog
         new("003", "LayoutGrid", () => new Ex003()),
         new("004", "LayoutGridSpan", () => new Ex004()),
         new("005", "LayoutDockPanel", () => new Ex005()),
+        new("006", "AlignmentAndMargin", () => new Ex006()),
+        new("007", "LayoutWrapPanel", () => new Ex007()),
+        new("010", "CompiledBinding", () => new Ex010()),
     ];
 }

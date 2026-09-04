@@ -1,0 +1,18 @@
+<!-- Exercise 006 - AlignmentAndMargin (beginner).
+     Goal:   Position a small box inside a padded frame using alignment and margin.
+     Drills: HorizontalAlignment/VerticalAlignment, Margin vs Padding.
+     Passes: dotnet test, filtered to Ex006_ (see the exact command in
+     Ex006_AlignmentAndMargin.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex006_AlignmentAndMargin">
+  <Border Name="Frame" Width="200" Height="100" Padding="10"
+          HorizontalAlignment="Left" VerticalAlignment="Top"
+          Background="#11000000">
+    <Border Name="Box" Width="40" Height="20"
+            HorizontalAlignment="Center" VerticalAlignment="Bottom"
+            Margin="0,0,0,5"
+            Background="#4C8BF5" />
+  </Border>
+</UserControl>

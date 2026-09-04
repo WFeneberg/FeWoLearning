@@ -1,0 +1,20 @@
+<!-- Exercise 007 - LayoutWrapPanel (beginner).
+     Goal:   Let four fixed-width tiles wrap onto two rows.
+     Drills: WrapPanel wrapping at a constrained width.
+     Passes: dotnet test, filtered to Ex007_ (see the exact command in
+     Ex007_LayoutWrapPanel.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex007_LayoutWrapPanel">
+  <!-- TODO: replace this placeholder with a horizontal WrapPanel named "ItemsPanel":
+         Width 200, pinned to the top-left,
+         holding four Borders named "Item1".."Item4", each 80 wide and 20 tall.
+       Two tiles fit per row at 200 wide (160 fits, 240 does not), so Item3 and
+       Item4 must wrap onto a second row.
+       The test looks up the panel by that name and checks it really is a
+       WrapPanel constrained to 200 wide - a Grid or Canvas with hand-picked
+       positions could otherwise reproduce the same four rectangles without
+       ever using wrapping, the mechanism this exercise drills. -->
+  <TextBlock Text="TODO" />
+</UserControl>

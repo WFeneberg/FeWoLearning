@@ -1,0 +1,17 @@
+<!-- Exercise 007 - LayoutWrapPanel (beginner).
+     Goal:   Let four fixed-width tiles wrap onto two rows.
+     Drills: WrapPanel wrapping at a constrained width.
+     Passes: dotnet test, filtered to Ex007_ (see the exact command in
+     Ex007_LayoutWrapPanel.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex007_LayoutWrapPanel">
+  <WrapPanel Name="ItemsPanel" Orientation="Horizontal" Width="200"
+             HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Border Name="Item1" Width="80" Height="20" Background="#4C8BF5" />
+    <Border Name="Item2" Width="80" Height="20" Background="#34A853" />
+    <Border Name="Item3" Width="80" Height="20" Background="#FBBC05" />
+    <Border Name="Item4" Width="80" Height="20" Background="#EA4335" />
+  </WrapPanel>
+</UserControl>

@@ -1,0 +1,16 @@
+<!-- Exercise 010 - CompiledBinding (beginner).
+     Goal:   Bind a direct and a nested path with explicit compiled bindings.
+     Drills: explicit {CompiledBinding}, nested path re-resolution.
+     Passes: dotnet test, filtered to Ex010_ (see the exact command in
+     Ex010_CompiledBinding.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex010_CompiledBinding"
+             x:DataType="b:Ex010_BookViewModel">
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBlock Name="TitleText" Text="{CompiledBinding Title}" FontSize="18" />
+    <TextBlock Name="AuthorText" Text="{CompiledBinding Author.Name}" Opacity="0.7" />
+  </StackPanel>
+</UserControl>
