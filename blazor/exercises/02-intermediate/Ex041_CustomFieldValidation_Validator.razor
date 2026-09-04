@@ -14,9 +14,16 @@
     // field is fixed - then, if the model's Name equals "admin" (any case), add the
     // message "Name must not be \"admin\"" for the FieldIdentifier the bound
     // <InputText @bind-Value="Model.Name" /> actually uses (the model instance plus
-    // nameof(ContactModel.Name), not a nested path). Finish by calling
-    // EditContext.NotifyValidationStateChanged() so ValidationSummary/ValidationMessage
-    // consumers and the parent's own counts see the change.
+    // nameof(ContactModel.Name), not a nested path) - get that identifier wrong and
+    // #name-errors below stops showing the message even though the unscoped #errors
+    // list still does. Finish by calling EditContext.NotifyValidationStateChanged(),
+    // the same call DataAnnotationsValidator makes: it is what a validator triggered
+    // by something other than this component's own submit event (a second field
+    // changing independently, for instance) would rely on to reach any
+    // ValidationMessage/ValidationSummary consumer - here the parent's own submit
+    // handler already re-renders the whole tree regardless, so it is the idiomatic,
+    // forward-compatible call to make rather than one this exercise's own facts can
+    // observe failing to happen.
     protected override void OnInitialized()
         => throw new NotImplementedException("TODO: Ex041 - wire a validation message store into the EditContext");
 }

@@ -15,7 +15,12 @@ public class Ex043_ScopedStateContainerTests : BunitContext
 
         var cut = Render<Ex043_ScopedStateContainer>();
 
-        Assert.All(cut.FindAll(".reading"), span => Assert.Equal("0", span.TextContent));
+        // Assert.All passes vacuously on an empty collection, so the count is checked
+        // first; scoped to #both (the stub's own contractual wrapper) rather than
+        // ".reading" everywhere, in case some other part of the page ever adds its own.
+        var spans = cut.FindAll("#both .reading");
+        Assert.Equal(2, spans.Count);
+        Assert.All(spans, span => Assert.Equal("0", span.TextContent));
     }
 
     // Non-vacuity: a reader that never subscribes to Store.Changed keeps rendering
@@ -30,7 +35,11 @@ public class Ex043_ScopedStateContainerTests : BunitContext
         cut.Find("#bump").Click();
 
         cut.WaitForAssertion(() =>
-            Assert.All(cut.FindAll(".reading"), span => Assert.Equal("1", span.TextContent)));
+        {
+            var spans = cut.FindAll("#both .reading");
+            Assert.Equal(2, spans.Count);
+            Assert.All(spans, span => Assert.Equal("1", span.TextContent));
+        });
     }
 
     [Fact]

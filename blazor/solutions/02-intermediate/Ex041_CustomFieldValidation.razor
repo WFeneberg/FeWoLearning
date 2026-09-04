@@ -5,6 +5,9 @@
 <EditForm Model="Model" OnValidSubmit="HandleValid" OnInvalidSubmit="HandleInvalid">
     <Ex041_CustomFieldValidation_Validator />
     <InputText id="name" @bind-Value="Model.Name" />
+    <div id="name-errors">
+        <ValidationMessage For="() => Model.Name" />
+    </div>
     <button id="submit" type="submit">Save</button>
 </EditForm>
 <ul id="errors">

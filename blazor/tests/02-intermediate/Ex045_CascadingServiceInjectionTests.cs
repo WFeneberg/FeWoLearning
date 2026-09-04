@@ -9,19 +9,28 @@ namespace FeWoLearning.Blazor.Tests.Intermediate;
 
 public class Ex045_CascadingServiceInjectionTests : BunitContext
 {
+    // Cascades a store that is DIFFERENT from the one registered in DI, so
+    // #via-property and #via-cascade reading different values is what actually shows
+    // the two mechanisms are independent - registering and cascading the very same
+    // instance would make them agree by object identity alone and prove nothing.
     [Fact]
-    public void With_A_Cascaded_Store_Both_Spans_Read_The_Same_Value()
+    public void With_A_Cascaded_Store_Each_Span_Reads_Its_Own_Source()
     {
-        var store = new CounterStore();
-        store.Increment();
-        Services.AddSingleton(store);
+        var injected = new CounterStore();
+        injected.Increment();
+        Services.AddSingleton(injected);
+
+        var cascaded = new CounterStore();
+        cascaded.Increment();
+        cascaded.Increment();
+        cascaded.Increment();
 
         var cut = Render<CascadingValue<CounterStore>>(p => p
-            .Add(c => c.Value, store)
+            .Add(c => c.Value, cascaded)
             .AddChildContent<Ex045_CascadingServiceInjection>());
 
         Assert.Equal("1", cut.Find("#via-property").TextContent);
-        Assert.Equal("1", cut.Find("#via-cascade").TextContent);
+        Assert.Equal("3", cut.Find("#via-cascade").TextContent);
     }
 
     [Fact]

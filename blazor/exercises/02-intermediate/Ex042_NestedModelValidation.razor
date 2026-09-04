@@ -10,7 +10,8 @@
    own Address by hand (see ContactModel's comment - there is no supported
    [ValidateComplexType] in .NET 10) and that nested check only runs once Name and Age
    already pass on their own: a missing Name short-circuits with just "Name is
-   required" and never reaches the City check at all. *@
+   required" and never reaches the City check - which, once reached, reports
+   "City is required" - at all. *@
 
 @code {
     [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;

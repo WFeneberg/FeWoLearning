@@ -40,23 +40,32 @@ public class Ex042_NestedModelValidationTests : BunitContext
         });
     }
 
-    // Non-vacuity for the nested check specifically: ContactModel only runs its
+    // Non-vacuity for the nested check specifically (verified live: with City left
+    // set, this fact could never distinguish a real short-circuit from one that
+    // still reached the nested check, since neither path would ever produce "City is
+    // required" - the fix is leaving City null too). ContactModel only runs its
     // hand-written Address recursion once its OWN properties (Name, Age) already
-    // pass, so a missing Name must short-circuit to just "Name is required" and
-    // never surface "City is required" too, even though the city really is unset.
+    // pass, so a missing Name must short-circuit to just "Name is required" and never
+    // reach the nested City check at all, even though the city really is unset and
+    // would fail it if reached.
     [Fact]
-    public void An_Empty_Name_With_A_City_Set_Reports_Only_The_Name_Error()
+    public void An_Empty_Name_Short_Circuits_Before_The_Nested_City_Check_Even_Though_City_Is_Also_Unset()
     {
-        var model = new ContactModel { Name = null, Address = new AddressModel { City = "Springfield" } };
+        var model = new ContactModel { Name = null };
         var cut = Render<Ex042_NestedModelValidation>(p => p.Add(x => x.Model, model));
 
         cut.Find("form").Submit();
+
+        // Negative assertion - stays bare per README §11 (see Ex041's tests for the
+        // same reasoning): WaitForAssertion cannot help it, and if the nested check
+        // genuinely ran anyway, wrapping would only delay catching that by the full
+        // timeout.
+        Assert.DoesNotContain("City is required", cut.FindAll("#errors li").Select(li => li.TextContent));
 
         cut.WaitForAssertion(() =>
         {
             var items = cut.FindAll("#errors li").Select(li => li.TextContent).ToList();
             Assert.Contains("Name is required", items);
-            Assert.DoesNotContain("City is required", items);
             Assert.Equal("0/1", cut.Find("#counts").TextContent);
         });
     }

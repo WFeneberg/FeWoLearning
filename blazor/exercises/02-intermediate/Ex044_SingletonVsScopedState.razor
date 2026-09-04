@@ -10,9 +10,12 @@
     [Inject] public ScopedCounter Scoped { get; set; } = default!;
     [Inject] public SingletonCounter Singleton { get; set; } = default!;
 
-    // TODO: combine both lifetimes' current values. ScopedCounter and SingletonCounter
-    // are deliberately two distinct types (not two instances of one shared type) -
-    // resolving one of each proves the two lifetimes really are two different
-    // instances, not a shared counter wearing two labels.
+    // TODO: combine both lifetimes' current values - just add whatever each one
+    // currently holds. ScopedCounter and SingletonCounter are two distinct types, each
+    // registered under its own lifetime (AddScoped/AddSingleton) by the caller; the
+    // lifetime difference itself is proven by resolving each type from two separate DI
+    // scopes and comparing instances - not by anything Combined does, since Combined
+    // would read the same either way regardless of which lifetime either service was
+    // registered with.
     private int Combined => throw new NotImplementedException("TODO: Ex044 - combine the two lifetimes' values");
 }

@@ -14,11 +14,11 @@ public class Ex041_CustomFieldValidationTests : BunitContext
 
         cut.Find("form").Submit();
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Empty(cut.FindAll("#errors li"));
-            Assert.Equal("1/0", cut.Find("#counts").TextContent);
-        });
+        // Negative assertion - stays bare per README §11: WaitForAssertion cannot help
+        // it, and if this genuinely stayed non-empty, wrapping would only delay
+        // catching that by the full timeout.
+        Assert.Empty(cut.FindAll("#errors li"));
+        cut.WaitForAssertion(() => Assert.Equal("1/0", cut.Find("#counts").TextContent));
     }
 
     [Fact]
@@ -37,6 +37,22 @@ public class Ex041_CustomFieldValidationTests : BunitContext
         });
     }
 
+    // Exercises the FieldIdentifier the validator actually used, not just that a
+    // message exists somewhere: ValidationMessage's For="() => Model.Name" only
+    // renders a message added under that exact FieldIdentifier. A validator that adds
+    // its message under any other identifier (e.g. a nested "Address.Bogus" path)
+    // still satisfies the unscoped #errors list above, but leaves #name-errors empty.
+    [Fact]
+    public void An_Admin_Name_Also_Shows_Its_Message_Next_To_The_Field()
+    {
+        var cut = Render<Ex041_CustomFieldValidation>(p => p.Add(x => x.Model, new ContactModel { Name = "admin" }));
+
+        cut.Find("form").Submit();
+
+        cut.WaitForAssertion(() =>
+            Assert.Equal("Name must not be \"admin\"", cut.Find("#name-errors").TextContent));
+    }
+
     [Fact]
     public void The_Admin_Check_Is_Case_Insensitive()
     {
@@ -52,9 +68,10 @@ public class Ex041_CustomFieldValidationTests : BunitContext
         });
     }
 
-    // Non-vacuity: a validator that never clears its ValidationMessageStore at the
-    // start of a validation request would leave this first, stale message behind
-    // forever - #errors would still show it, and the counts would never reach 1/1.
+    // Non-vacuity (verified live by breaking the solution and restoring it): a
+    // validator that never clears its ValidationMessageStore at the start of a
+    // validation request leaves this first, stale message behind forever - #errors
+    // would still show it, and the counts would never reach 1/1.
     [Fact]
     public void Fixing_The_Name_After_A_Rejected_Submit_Clears_The_Error()
     {
@@ -67,10 +84,8 @@ public class Ex041_CustomFieldValidationTests : BunitContext
         model.Name = "Ada";
         cut.Find("form").Submit();
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Empty(cut.FindAll("#errors li"));
-            Assert.Equal("1/1", cut.Find("#counts").TextContent);
-        });
+        // Negative assertion - stays bare per README §11 (see the first fact above).
+        Assert.Empty(cut.FindAll("#errors li"));
+        cut.WaitForAssertion(() => Assert.Equal("1/1", cut.Find("#counts").TextContent));
     }
 }

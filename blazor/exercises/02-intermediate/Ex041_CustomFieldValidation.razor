@@ -4,12 +4,17 @@
    Passes: dotnet test --filter FullyQualifiedName~Ex041_ *@
 @* TODO: render <EditForm Model="Model" OnValidSubmit="HandleValid" OnInvalidSubmit="HandleInvalid">
    containing <Ex041_CustomFieldValidation_Validator />, an <InputText id="name"
-   @bind-Value="Model.Name" />, and a submit button #submit; below the form a
-   <ul id="errors"> with one <li> per message from the EditContext's
-   GetValidationMessages(), and a <span id="counts">@ValidCount/@InvalidCount</span>.
-   Both OnValidSubmit and OnInvalidSubmit are EventCallback<EditContext> - each hands
-   you the very EditContext that was just validated, so capture it in a field rather
-   than building or requesting one of your own. *@
+   @bind-Value="Model.Name" />, a <div id="name-errors"><ValidationMessage For="() =>
+   Model.Name" /></div>, and a submit button #submit; below the form a <ul id="errors">
+   with one <li> per message from the EditContext's GetValidationMessages(), and a
+   <span id="counts">@ValidCount/@InvalidCount</span>. Both OnValidSubmit and
+   OnInvalidSubmit are EventCallback<EditContext> - each hands you the very EditContext
+   that was just validated, so capture it in a field rather than building or requesting
+   one of your own. The #name-errors div is what actually exercises the validator's
+   FieldIdentifier choice: ValidationMessage only shows a message that was added under
+   the exact FieldIdentifier its For expression resolves to - get that identifier wrong
+   in the validator and #name-errors stays empty even though the unscoped #errors list
+   still shows it. *@
 
 @code {
     [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
