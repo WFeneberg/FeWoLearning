@@ -1,0 +1,31 @@
+@* Exercise 041 - Custom Field Validation (intermediate), part 2 of 2.
+   Goal:   Plug a custom validator into an EditContext, the way DataAnnotationsValidator does.
+   Drills: ValidationMessageStore, EditContext.OnValidationRequested, FieldIdentifier.
+   Passes: dotnet test --filter FullyQualifiedName~Ex041_ *@
+@* This component renders nothing itself - it only wires validation logic into the
+   cascaded EditContext. *@
+
+@code {
+    [CascadingParameter] public EditContext EditContext { get; set; } = default!;
+
+    private ValidationMessageStore? _messages;
+
+    protected override void OnInitialized()
+    {
+        _messages = new ValidationMessageStore(EditContext);
+        EditContext.OnValidationRequested += HandleValidationRequested;
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs e)
+    {
+        _messages!.Clear();
+
+        if (EditContext.Model is ContactModel model &&
+            string.Equals(model.Name, "admin", StringComparison.OrdinalIgnoreCase))
+        {
+            _messages.Add(new FieldIdentifier(model, nameof(ContactModel.Name)), "Name must not be \"admin\"");
+        }
+
+        EditContext.NotifyValidationStateChanged();
+    }
+}

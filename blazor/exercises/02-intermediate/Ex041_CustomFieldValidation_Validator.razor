@@ -1,0 +1,22 @@
+@* Exercise 041 - Custom Field Validation (intermediate), part 2 of 2.
+   Goal:   Plug a custom validator into an EditContext, the way DataAnnotationsValidator does.
+   Drills: ValidationMessageStore, EditContext.OnValidationRequested, FieldIdentifier.
+   Passes: dotnet test --filter FullyQualifiedName~Ex041_ *@
+@* This component renders nothing itself - it only wires validation logic into the
+   cascaded EditContext. *@
+
+@code {
+    [CascadingParameter] public EditContext EditContext { get; set; } = default!;
+
+    // TODO: create a ValidationMessageStore over EditContext and subscribe to
+    // EditContext.OnValidationRequested. On every request: clear the store FIRST -
+    // a validator that never clears it leaves a stale message behind even after the
+    // field is fixed - then, if the model's Name equals "admin" (any case), add the
+    // message "Name must not be \"admin\"" for the FieldIdentifier the bound
+    // <InputText @bind-Value="Model.Name" /> actually uses (the model instance plus
+    // nameof(ContactModel.Name), not a nested path). Finish by calling
+    // EditContext.NotifyValidationStateChanged() so ValidationSummary/ValidationMessage
+    // consumers and the parent's own counts see the change.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex041 - wire a validation message store into the EditContext");
+}

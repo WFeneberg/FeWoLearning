@@ -1,0 +1,16 @@
+@page "/intermediate/045"
+@rendermode InteractiveServer
+
+<h1>Exercise 045 - CascadingServiceInjection</h1>
+
+<h2>Without a cascaded value</h2>
+<Ex045_CascadingServiceInjection />
+
+<h2>With a cascaded value</h2>
+<CascadingValue Value="_cascaded">
+    <Ex045_CascadingServiceInjection />
+</CascadingValue>
+
+@code {
+    private readonly CounterStore _cascaded = new();
+}

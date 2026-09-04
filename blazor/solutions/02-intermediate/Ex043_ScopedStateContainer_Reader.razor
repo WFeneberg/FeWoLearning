@@ -1,0 +1,20 @@
+@implements IDisposable
+@* Exercise 043 - Scoped State Container (intermediate), part 2 of 2.
+   Goal:   Stay in sync with a DI-registered store's live value.
+   Drills: [Inject], subscribing to a service event, disposal symmetry.
+   Passes: dotnet test --filter FullyQualifiedName~Ex043_ *@
+<span class="reading">@Store.Value</span>
+
+@code {
+    [Inject] public CounterStore Store { get; set; } = default!;
+
+    private Action? _handler;
+
+    protected override void OnInitialized()
+    {
+        _handler = StateHasChanged;
+        Store.Changed += _handler;
+    }
+
+    public void Dispose() => Store.Changed -= _handler;
+}

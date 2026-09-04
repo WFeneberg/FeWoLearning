@@ -1,0 +1,24 @@
+@* Exercise 042 - Nested Model Validation (intermediate).
+   Goal:   Validate a model whose complex Address property has its own required field.
+   Drills: nested-object validation, DataAnnotationsValidator, ValidationSummary.
+   Passes: dotnet test --filter FullyQualifiedName~Ex042_ *@
+<EditForm Model="Model" OnValidSubmit="HandleValid" OnInvalidSubmit="HandleInvalid">
+    <DataAnnotationsValidator />
+    <div id="errors">
+        <ValidationSummary />
+    </div>
+    <InputText id="name" @bind-Value="Model.Name" />
+    <InputText id="city" @bind-Value="Model.Address.City" />
+    <button id="submit" type="submit">Save</button>
+</EditForm>
+<span id="counts">@ValidCount/@InvalidCount</span>
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+
+    public int ValidCount { get; private set; }
+    public int InvalidCount { get; private set; }
+
+    private void HandleValid() => ValidCount++;
+    private void HandleInvalid() => InvalidCount++;
+}

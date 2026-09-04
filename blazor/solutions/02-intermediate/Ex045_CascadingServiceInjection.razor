@@ -1,0 +1,15 @@
+@* Exercise 045 - Cascading Service Injection (intermediate).
+   Goal:   Read one service via DI and, independently, via a cascaded value.
+   Drills: [Inject] vs [CascadingParameter], each resolving through a separate mechanism.
+   Passes: dotnet test --filter FullyQualifiedName~Ex045_ *@
+<span id="via-property">@_fromProperty</span>
+<span id="via-cascade">@FromCascade?.Value</span>
+
+@code {
+    [Inject] public CounterStore Store { get; set; } = default!;
+    [CascadingParameter] public CounterStore? FromCascade { get; set; }
+
+    private string? _fromProperty;
+
+    protected override void OnInitialized() => _fromProperty = Store.Value.ToString();
+}

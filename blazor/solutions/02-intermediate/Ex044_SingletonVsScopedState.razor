@@ -1,0 +1,14 @@
+@* Exercise 044 - Singleton vs Scoped State (intermediate).
+   Goal:   Combine values coming from two independently-lifetimed services.
+   Drills: [Inject], AddScoped vs AddSingleton, resolving two distinct service types.
+   Passes: dotnet test --filter FullyQualifiedName~Ex044_ *@
+<span id="scoped">@Scoped.Value</span>
+<span id="singleton">@Singleton.Value</span>
+<span id="combined">@Combined</span>
+
+@code {
+    [Inject] public ScopedCounter Scoped { get; set; } = default!;
+    [Inject] public SingletonCounter Singleton { get; set; } = default!;
+
+    private int Combined => Scoped.Value + Singleton.Value;
+}

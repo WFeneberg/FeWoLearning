@@ -1,0 +1,21 @@
+@* Exercise 045 - Cascading Service Injection (intermediate).
+   Goal:   Read one service via DI and, independently, via a cascaded value.
+   Drills: [Inject] vs [CascadingParameter], each resolving through a separate mechanism.
+   Passes: dotnet test --filter FullyQualifiedName~Ex045_ *@
+<span id="via-property">@_fromProperty</span>
+<span id="via-cascade">@FromCascade?.Value</span>
+
+@code {
+    [Inject] public CounterStore Store { get; set; } = default!;
+    [CascadingParameter] public CounterStore? FromCascade { get; set; }
+
+    private string? _fromProperty;
+
+    // TODO: read Store.Value into _fromProperty. Do this in OnInitialized, which
+    // runs exactly once - not OnParametersSet, which runs again on every parameter
+    // update and would keep re-capturing a value that is supposed to be a one-time
+    // snapshot. FromCascade is independent of Store: it resolves from an ancestor's
+    // CascadingValue (or stays null with none present), never from DI.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex045 - read the store from both injection paths");
+}

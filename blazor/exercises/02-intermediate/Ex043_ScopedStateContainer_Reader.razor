@@ -1,0 +1,21 @@
+@implements IDisposable
+@* Exercise 043 - Scoped State Container (intermediate), part 2 of 2.
+   Goal:   Stay in sync with a DI-registered store's live value.
+   Drills: [Inject], subscribing to a service event, disposal symmetry.
+   Passes: dotnet test --filter FullyQualifiedName~Ex043_ *@
+<span class="reading">@Store.Value</span>
+
+@code {
+    [Inject] public CounterStore Store { get; set; } = default!;
+
+    // TODO: subscribe to Store.Changed with a handler that calls StateHasChanged().
+    // Store that handler (an Action) in a field so Dispose() below can unsubscribe
+    // the exact same delegate instance - not a fresh lambda that happens to look
+    // the same, which would never actually detach.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex043 - keep this reader in sync with the store");
+
+    // TODO: unsubscribe the same delegate instance that OnInitialized subscribed.
+    public void Dispose()
+        => throw new NotImplementedException("TODO: Ex043 - unsubscribe the same delegate from the store");
+}

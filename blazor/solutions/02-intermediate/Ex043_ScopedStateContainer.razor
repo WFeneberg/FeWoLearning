@@ -1,0 +1,15 @@
+@* Exercise 043 - Scoped State Container (intermediate), part 1 of 2.
+   Goal:   Advance a DI-registered store that two sibling readers already display.
+   Drills: [Inject], a scoped service shared by sibling components, EventCallback-free state sharing.
+   Passes: dotnet test --filter FullyQualifiedName~Ex043_ *@
+<div id="both">
+    <Ex043_ScopedStateContainer_Reader />
+    <Ex043_ScopedStateContainer_Reader />
+</div>
+<button id="bump" @onclick="Bump">+</button>
+
+@code {
+    [Inject] public CounterStore Store { get; set; } = default!;
+
+    private void Bump() => Store.Increment();
+}

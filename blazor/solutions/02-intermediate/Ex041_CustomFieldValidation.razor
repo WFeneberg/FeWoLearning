@@ -1,0 +1,40 @@
+@* Exercise 041 - Custom Field Validation (intermediate), part 1 of 2.
+   Goal:   Host a custom validator component and surface its own messages.
+   Drills: EditForm hosting a validator, OnValidSubmit/OnInvalidSubmit(EditContext), tallying submits.
+   Passes: dotnet test --filter FullyQualifiedName~Ex041_ *@
+<EditForm Model="Model" OnValidSubmit="HandleValid" OnInvalidSubmit="HandleInvalid">
+    <Ex041_CustomFieldValidation_Validator />
+    <InputText id="name" @bind-Value="Model.Name" />
+    <button id="submit" type="submit">Save</button>
+</EditForm>
+<ul id="errors">
+    @if (_context is not null)
+    {
+        @foreach (var message in _context.GetValidationMessages())
+        {
+            <li>@message</li>
+        }
+    }
+</ul>
+<span id="counts">@ValidCount/@InvalidCount</span>
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+
+    private EditContext? _context;
+
+    public int ValidCount { get; private set; }
+    public int InvalidCount { get; private set; }
+
+    private void HandleValid(EditContext context)
+    {
+        _context = context;
+        ValidCount++;
+    }
+
+    private void HandleInvalid(EditContext context)
+    {
+        _context = context;
+        InvalidCount++;
+    }
+}
