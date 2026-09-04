@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>FeWoLearning.Caliburn.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Xunit.StaFact supplies [WpfFact]: an STA thread with a real WPF Dispatcher.
+       Version 3.0.13, NOT 4.x - 4.x depends on xunit.v3 4.0.0, which has dropped the
+       VSTest bridge, and `dotnet test` then fails on the .NET 10 SDK. 3.0.13 depends on
+       xunit.v3.extensibility.core 3.0.0, so it sits on the same xunit.v3 3.2.2 that
+       avalonia/ already runs. -->
+  <ItemGroup>
+    <PackageReference Include="Xunit.StaFact" Version="3.0.13" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Exactly one of the two content projects, never both: that is what keeps the
+       identical namespaces and type names from colliding. `dotnet test` is the red run
+       against the stubs, `dotnet test -p:UseSolutions=true` the green run against the
+       reference implementations. Same mechanism as avalonia/, blazor/ and uno/. -->
+  <ItemGroup Condition="'$(UseSolutions)' != 'true'">
+    <ProjectReference Include="..\exercises\FeWoLearning.Caliburn.Exercises.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseSolutions)' == 'true'">
+    <ProjectReference Include="..\solutions\FeWoLearning.Caliburn.Solutions.csproj" />
+  </ItemGroup>
+
+</Project>

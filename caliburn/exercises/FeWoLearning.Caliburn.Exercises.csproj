@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>FeWoLearning.Caliburn.Exercises</RootNamespace>
+    <AssemblyName>FeWoLearning.Caliburn.Exercises</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Caliburn.Micro" Version="5.0.258" />
+  </ItemGroup>
+
+</Project>
