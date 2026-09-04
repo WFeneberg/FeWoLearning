@@ -31,7 +31,7 @@ rather than as current values. Writing exercises against a mental model that has
 been verified would be worse than leaving the gap, so those rows now cover async
 patterns instead. MVUX is the obvious next addition to this track.
 
-**Status: 80 ✅ / 20 ⬜**
+**Status: 85 ✅ / 15 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -127,11 +127,11 @@ patterns instead. MVUX is the obvious next addition to this track.
 | 078 | TemplatedControlInheritance | subclassing a templated control and extending its states | ✅ |
 | 079 | CompositeContentModel | building a control from parts with a content model | ✅ |
 | 080 | CustomAutomationPeer | `AutomationPeer`, patterns, programmatic invocation | ✅ |
-| 081 | TemplateSwapping | replacing a `Template` at runtime: re-lookup, re-applied states, old-part cleanup | ⬜ |
-| 082 | StoryboardLogic | `Storyboard`, `DoubleAnimation`, `SkipToFill`, `Completed` | ⬜ |
-| 083 | EasingFunctions | easing math and where the framework evaluates it | ⬜ |
-| 084 | RenderTransforms | `RotateTransform`/`ScaleTransform`, `TransformToVisual` | ⬜ |
-| 085 | ClippingGeometry | `Clip`, geometry parsing, bounds arithmetic | ⬜ |
+| 081 | TemplateSwapping | replacing a `Template` at runtime: re-lookup, re-applied states, old-part cleanup | ✅ |
+| 082 | StoryboardLogic | `Storyboard`, `DoubleAnimation`, `SkipToFill`, `Completed` | ✅ |
+| 083 | EasingFunctions | easing math and where the framework evaluates it | ✅ |
+| 084 | RenderTransforms | `RotateTransform`/`ScaleTransform`, `TransformPoint`, `TransformBounds`, composition order | ✅ |
+| 085 | ClippingGeometry | `Clip`, geometry parsing, bounds arithmetic | ✅ |
 | 086 | DesignTokenSystem | a token resource system with light/dark and `BasedOn` styles | ⬜ |
 | 087 | ControlLibraryStyles | `Themes/Generic.xaml`, default style lookup from a library | ⬜ |
 | 088 | RuntimeXamlLoading | `XamlReader.Load`, error handling, dynamic UI | ⬜ |
