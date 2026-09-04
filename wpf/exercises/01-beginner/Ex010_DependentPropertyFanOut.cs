@@ -12,10 +12,11 @@ namespace FeWoLearning.Wpf.Exercises.Beginner;
 
 public class Ex010_TemperatureViewModel : INotifyPropertyChanged
 {
-    // Explicit "= 0.0" initializer, matching the registered default: the setter below
-    // throws before it ever assigns this field, and without an initializer that makes
-    // the compiler warn CS0649 ("field is never assigned"). Same value it would have had
-    // anyway - this is a warning workaround, not part of the exercise.
+    // Explicit "= 0.0" initializer: the setter below throws before it ever assigns this
+    // field, and without an initializer that makes the compiler warn CS0649 ("field is
+    // never assigned"). Same value it would have had anyway - this is a warning
+    // workaround, not part of the exercise. There is no dependency property or
+    // registration here at all - Ex010 is a plain INotifyPropertyChanged view model.
     private double _celsius = 0.0;
 
     public event PropertyChangedEventHandler? PropertyChanged;

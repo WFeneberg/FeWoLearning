@@ -10,6 +10,14 @@ public class Ex008_MetadataInheritanceTests : WpfTestContext
         => DependencyPropertyReflection.Property(typeof(Ex008_MetadataInheritance), "IndentProperty");
 
     [WpfFact]
+    public void Registers_Under_The_Expected_Name_And_Owner()
+    {
+        Assert.Equal("Indent", IndentProperty.Name);
+        Assert.Equal(typeof(double), IndentProperty.PropertyType);
+        Assert.Equal(typeof(Ex008_MetadataInheritance), IndentProperty.OwnerType);
+    }
+
+    [WpfFact]
     public void Registration_Carries_Inherits_And_AffectsMeasure()
     {
         // A rectangle further down cannot prove which flag produced it - only the

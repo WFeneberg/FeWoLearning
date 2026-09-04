@@ -10,6 +10,14 @@ public class Ex007_AttachedPropertyTests : WpfTestContext
         => DependencyPropertyReflection.Property(typeof(Ex007_AttachedProperty), "SectionProperty");
 
     [WpfFact]
+    public void Registers_Under_The_Expected_Name_And_Owner()
+    {
+        Assert.Equal("Section", SectionProperty.Name);
+        Assert.Equal(typeof(string), SectionProperty.PropertyType);
+        Assert.Equal(typeof(Ex007_AttachedProperty), SectionProperty.OwnerType);
+    }
+
+    [WpfFact]
     public void Nothing_Attached_Reads_Back_As_Null()
     {
         var element = new Border();
@@ -69,19 +77,22 @@ public class Ex007_AttachedPropertyTests : WpfTestContext
     }
 
     [WpfFact]
-    public void GetEffectiveSection_Keeps_Walking_Past_A_Parent_With_Nothing_Set()
+    public void GetEffectiveSection_Keeps_Walking_Past_Two_Levels_With_Nothing_Set()
     {
-        var grandparent = new Grid();
-        var parent = new Border();
+        // Four levels deep, value only on the outermost: a walk hard-coded to stop
+        // after one or two hops passes a shallower tree by accident and only fails
+        // here.
+        var root = new Grid();
+        var middle = new Border();
+        var inner = new Border();
         var child = new TextBlock();
 
-        grandparent.Children.Add(parent);
-        parent.Child = child;
+        root.Children.Add(middle);
+        middle.Child = inner;
+        inner.Child = child;
 
-        Ex007_AttachedProperty.SetSection(grandparent, "Root");
+        Ex007_AttachedProperty.SetSection(root, "Root");
 
-        // parent carries no Section of its own - a walk that stops after one hop instead
-        // of continuing to the root would miss this and return null.
         Assert.Equal("Root", Ex007_AttachedProperty.GetEffectiveSection(child));
     }
 

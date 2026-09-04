@@ -24,4 +24,8 @@ public class Ex009_Badge : FrameworkElement
         get => (string)GetValue(ToneProperty);
         set => SetValue(ToneProperty, value);
     }
+
+    /// <summary>Which rung of the precedence ladder is currently supplying <paramref name="badge"/>'s Tone.</summary>
+    public static BaseValueSource SourceOf(Ex009_Badge badge)
+        => DependencyPropertyHelper.GetValueSource(badge, ToneProperty).BaseValueSource;
 }

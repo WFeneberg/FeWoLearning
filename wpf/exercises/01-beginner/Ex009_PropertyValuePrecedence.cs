@@ -6,10 +6,6 @@
 //         same property, and DependencyPropertyHelper.GetValueSource to find out which
 //         one actually won.
 // Passes: dotnet test --filter FullyQualifiedName~Ex009_
-//
-// Note: there is nothing new to implement here beyond a plain registration - precedence
-// is a mechanism WPF already runs for every dependency property. The exercise is in the
-// test file: proving it, not building it.
 
 using System.Windows;
 
@@ -29,4 +25,9 @@ public class Ex009_Badge : FrameworkElement
         // TODO: write Tone into the dependency property.
         set => throw new NotImplementedException("TODO: Ex009 - write Tone into the dependency property");
     }
+
+    /// <summary>Which rung of the precedence ladder is currently supplying <paramref name="badge"/>'s Tone.</summary>
+    public static BaseValueSource SourceOf(Ex009_Badge badge)
+        // TODO: return DependencyPropertyHelper.GetValueSource(badge, ToneProperty).BaseValueSource.
+        => throw new NotImplementedException("TODO: Ex009 - ask DependencyPropertyHelper.GetValueSource which rung won");
 }

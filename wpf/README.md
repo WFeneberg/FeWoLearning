@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Three things that bite
+### Four things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -83,6 +83,15 @@ no `Application` either; WPF resolves default control templates through
   reference to the delegate can have it collected before the event fires; keep the
   delegate in a local. And `InvalidateRequerySuggested()` posts at
   `DispatcherPriority.Background`, so `Pump()` before asserting.
+- **`FrameworkPropertyMetadataOptions.Inherits` only actually propagates when the
+  property is attached.** A plain `Register` flagged `Inherits` reads back `0.0`/
+  `null`/whatever the registered default is on every descendant — even one of the
+  *same* owning type as the ancestor that set it — because WPF's inheritance-context
+  walk only fires for properties registered via `RegisterAttached`. Row 008
+  (`MetadataInheritance`) and any later row that touches inheritance (016
+  `DataContextInheritance`, 060 `AttachedBehavior`) depend on this: register the
+  inheritable property as attached, the way `FontSize` and `DataContext` are, not as
+  an instance property on the class that happens to consume it.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 
@@ -143,18 +152,18 @@ narrow question — does the WPF mechanism work — and deliberately does not at
   for the rest of the run, so no later exercise may assert an *exact* count of global
   `RequerySuggested`/`CanExecuteChanged` events — other tests' commands are still
   subscribed.
-- **The shared-fixture convention.** ex001 and ex002 each need the same kind of
+- **The shared-fixture convention.** ex001 and ex002 each needed the same kind of
   dependency-property reflection helper, and wrote it two different ways — a private
   static property in `Ex001_ClrToDependencyPropertyTests`, a private static method in
   `Ex002_CoerceAndValidateTests` — and row 006 (`RegisterReadOnly`,
-  `DependencyPropertyKey`) needs a third shape again: a private
-  `DependencyPropertyKey` field. `exercises/_support/` is for *content* fixtures both
-  libraries compile, not test code — a test-only reflection helper belongs in
-  `tests/_harness/` instead, alongside `WpfTestContext`, which is already the shared
-  test surface outside both content libraries. Row 006 adds
-  `DependencyPropertyReflection` there for exactly this. (This wave does not unify
-  ex001/ex002's two existing idioms — only documents the convention for what comes
-  next.)
+  `DependencyPropertyKey`) needed a third shape: a private `DependencyPropertyKey`
+  field. `exercises/_support/` is for *content* fixtures both libraries compile, not
+  test code — a test-only reflection helper belongs in `tests/_harness/` instead,
+  alongside `WpfTestContext`, which is already the shared test surface outside both
+  content libraries. Row 006 added `DependencyPropertyReflection` there for exactly
+  this, and later rows needing the same kind of reflection should extend it rather
+  than write a fourth private copy. (ex001/ex002's two existing idioms were not
+  unified — this only records the convention for what comes next.)
 - **The "ready to use" convention, and its anti-bypass rule.** An exercise may ship a
   finished collaborator marked "ready to use" (its doc comment may even read slightly
   differently between the stub and the solution — that is deliberate, not drift).

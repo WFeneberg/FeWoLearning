@@ -85,4 +85,49 @@ public class Ex009_PropertyValuePrecedenceTests : WpfTestContext
         badge.SetValue(ToneProperty, "ViaSetValue");
         Assert.Equal("ViaSetValue", badge.Tone);
     }
+
+    // SourceOf is the drilled API itself (DependencyPropertyHelper.GetValueSource) put in
+    // the learner's hands, rather than only appearing inside the test file. The four tests
+    // above already establish and assert the ladder through the raw helper directly; these
+    // check that Ex009_Badge.SourceOf reports the same thing.
+
+    [WpfFact]
+    public void SourceOf_Reports_Default_With_Nothing_Set()
+    {
+        var badge = new Ex009_Badge();
+
+        Assert.Equal(BaseValueSource.Default, Ex009_Badge.SourceOf(badge));
+    }
+
+    [WpfFact]
+    public void SourceOf_Reports_Style_When_A_Style_Setter_Wins()
+    {
+        var badge = new Ex009_Badge { Style = StyleSettingToneTo("FromStyle") };
+        Layout(badge);
+
+        Assert.Equal(BaseValueSource.Style, Ex009_Badge.SourceOf(badge));
+    }
+
+    [WpfFact]
+    public void SourceOf_Reports_Local_When_A_Local_Value_Wins()
+    {
+        var badge = new Ex009_Badge { Style = StyleSettingToneTo("FromStyle") };
+        Layout(badge);
+        badge.SetValue(ToneProperty, "Local");
+
+        Assert.Equal(BaseValueSource.Local, Ex009_Badge.SourceOf(badge));
+    }
+
+    [WpfFact]
+    public void SourceOf_Reflects_A_Value_Written_Through_The_Clr_Wrapper()
+    {
+        var badge = new Ex009_Badge();
+
+        // Unlike the three SourceOf tests above, this one writes through Tone itself, not
+        // through a raw SetValue - a CLR wrapper backed by a shadow field instead of the
+        // dependency property store would leave SourceOf still reporting Default here.
+        badge.Tone = "ViaClr";
+
+        Assert.Equal(BaseValueSource.Local, Ex009_Badge.SourceOf(badge));
+    }
 }

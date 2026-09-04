@@ -11,7 +11,7 @@ namespace FeWoLearning.Wpf.Exercises.Beginner;
 
 public class Ex010_TemperatureViewModel : INotifyPropertyChanged
 {
-    private double _celsius;
+    private double _celsius = 0.0;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
