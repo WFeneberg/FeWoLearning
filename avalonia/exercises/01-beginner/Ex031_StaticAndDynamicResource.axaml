@@ -1,0 +1,32 @@
+<!-- Exercise 031 - StaticAndDynamicResource (beginner).
+     Goal:   Declare a shared resource and consume it from two TextBlocks -
+             one through StaticResource, one through DynamicResource - so a
+             runtime resource swap reaches only the DynamicResource consumer.
+     Drills: ResourceDictionary, StaticResource vs DynamicResource.
+     Passes: dotnet test, filtered to Ex031_ (see the exact command in
+     Ex031_StaticAndDynamicResource.axaml.cs - an XML comment may not hold
+     two hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex031_StaticAndDynamicResource">
+  <!-- TODO: replace this placeholder with:
+         <UserControl.Resources>
+           <x:Double x:Key="Size">17</x:Double>
+         </UserControl.Resources>
+         <StackPanel Spacing="8">
+           <TextBlock Name="StaticText" Text="Static" FontSize="{StaticResource Size}" />
+           <TextBlock Name="DynamicText" Text="Dynamic" FontSize="{DynamicResource Size}" />
+         </StackPanel>
+       Both start at FontSize 17. StaticResource resolves the value once, at
+       load time; DynamicResource keeps a live subscription on the resource
+       key. The test replaces Resources["Size"] afterwards - StaticText must
+       stay at 17, DynamicText must follow to the new value. Setting
+       FontSize="17" as a plain literal on both reproduces the starting
+       numbers with no resource lookup at all and cannot follow the swap on
+       either element - and swapping which markup extension goes on which
+       named TextBlock also fails, because the test checks each name
+       individually. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

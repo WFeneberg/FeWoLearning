@@ -1,0 +1,31 @@
+<!-- Exercise 033 - StyledPropertyBasics (beginner).
+     Goal:   Show the given Caption StyledProperty (registered in the
+             code-behind below) in a TextBlock, and let a Style reach it
+             through a self-targeting selector.
+     Drills: StyledProperty<T> registration, default value, styling.
+     Passes: dotnet test, filtered to Ex033_ (see the exact command in
+     Ex033_StyledPropertyBasics.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex033_StyledPropertyBasics"
+             x:Name="Root">
+  <!-- TODO: replace this placeholder with:
+         <UserControl.Styles>
+           <Style Selector="local|Ex033_StyledPropertyBasics.styled">
+             <Setter Property="Caption" Value="from-style" />
+           </Style>
+         </UserControl.Styles>
+         <TextBlock Name="CaptionText" Text="{Binding #Root.Caption}" />
+       The selector names THIS control's own type plus a class, so adding
+       the "styled" class to this UserControl at runtime routes Caption
+       through the Style rather than a local value - that is what separates
+       a real StyledProperty from a plain CLR property (see Ex032_Badge for
+       the contrast). #Root.Caption binds CaptionText.Text to whichever
+       source currently wins: the registered default "n/a" at rest, or
+       "from-style" once "styled" is applied. A hard-coded Text="n/a"
+       reproduces the resting state but can never follow the Style being
+       applied, because it is never bound to Caption at all. -->
+  <TextBlock Name="CaptionText" Text="TODO" />
+</UserControl>

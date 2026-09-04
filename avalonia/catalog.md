@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -58,11 +58,11 @@ not a valid C# identifier.
 | 028 | StyleSelectors | `Style` `Selector` by type and by descendant | ✅ |
 | 029 | StyleClasses | `Classes`, toggling a class at runtime | ✅ |
 | 030 | PseudoClasses | `:pointerover`, `:disabled` selectors | ✅ |
-| 031 | StaticAndDynamicResource | `ResourceDictionary`, `StaticResource` vs `DynamicResource` | ⬜ |
-| 032 | UserControlComposition | nesting a `UserControl`, exposing a CLR property | ⬜ |
-| 033 | StyledPropertyBasics | `StyledProperty<T>` registration, default value, styling | ⬜ |
-| 034 | AttachedPropertyUsage | consuming an attached property (`ToolTip.Tip`) | ⬜ |
-| 035 | ScrollViewerAndSizing | `ScrollViewer`, `MinWidth`/`MaxHeight` interaction | ⬜ |
+| 031 | StaticAndDynamicResource | `ResourceDictionary`, `StaticResource` vs `DynamicResource` | ✅ |
+| 032 | UserControlComposition | nesting a `UserControl`, exposing a CLR property | ✅ |
+| 033 | StyledPropertyBasics | `StyledProperty<T>` registration, default value, styling | ✅ |
+| 034 | AttachedPropertyUsage | consuming an attached property (`ToolTip.Tip`) | ✅ |
+| 035 | ScrollViewerAndSizing | `ScrollViewer`, `MinWidth`/`MaxHeight` interaction | ✅ |
 
 ## Intermediate (036–070) — ReactiveUI composition, Avalonia data and templating
 

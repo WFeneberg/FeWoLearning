@@ -1,0 +1,29 @@
+<!-- Exercise 035 - ScrollViewerAndSizing (beginner).
+     Goal:   Put over-tall content inside a fixed-height ScrollViewer so it
+             genuinely overflows, and separately clamp a Border with
+             MinWidth/MaxHeight against a Width/Height that fight them.
+     Drills: ScrollViewer, MinWidth/MaxHeight interaction.
+     Passes: dotnet test, filtered to Ex035_ (see the exact command in
+     Ex035_ScrollViewerAndSizing.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex035_ScrollViewerAndSizing">
+  <StackPanel Spacing="8">
+    <ScrollViewer Name="Scroller" Height="60"
+                  HorizontalScrollBarVisibility="Disabled">
+      <StackPanel>
+        <TextBlock Text="Line 1" Height="40" />
+        <TextBlock Text="Line 2" Height="40" />
+        <TextBlock Text="Line 3" Height="40" />
+        <TextBlock Text="Line 4" Height="40" />
+        <TextBlock Text="Line 5" Height="40" />
+        <TextBlock Text="Line 6" Height="40" />
+        <TextBlock Text="Line 7" Height="40" />
+        <TextBlock Text="Line 8" Height="40" />
+      </StackPanel>
+    </ScrollViewer>
+    <Border Name="Clamped" MinWidth="250" MaxHeight="40"
+            Width="50" Height="200" Background="#EEEEEE" />
+  </StackPanel>
+</UserControl>

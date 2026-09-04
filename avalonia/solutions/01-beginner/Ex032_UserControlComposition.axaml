@@ -1,0 +1,16 @@
+<!-- Exercise 032 - UserControlComposition (beginner).
+     Goal:   Nest two instances of the given Ex032_Badge UserControl and set
+             each one's plain CLR Caption property to a distinct literal.
+     Drills: nesting a UserControl, exposing a CLR property.
+     Passes: dotnet test, filtered to Ex032_ (see the exact command in
+     Ex032_UserControlComposition.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex032_UserControlComposition">
+  <StackPanel Spacing="8">
+    <b:Ex032_Badge Name="FirstBadge" Caption="Alpha" />
+    <b:Ex032_Badge Name="SecondBadge" Caption="Beta" />
+  </StackPanel>
+</UserControl>

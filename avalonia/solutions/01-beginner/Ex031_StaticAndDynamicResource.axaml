@@ -1,0 +1,19 @@
+<!-- Exercise 031 - StaticAndDynamicResource (beginner).
+     Goal:   Declare a shared resource and consume it from two TextBlocks -
+             one through StaticResource, one through DynamicResource - so a
+             runtime resource swap reaches only the DynamicResource consumer.
+     Drills: ResourceDictionary, StaticResource vs DynamicResource.
+     Passes: dotnet test, filtered to Ex031_ (see the exact command in
+     Ex031_StaticAndDynamicResource.axaml.cs - an XML comment may not hold
+     two hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex031_StaticAndDynamicResource">
+  <UserControl.Resources>
+    <x:Double x:Key="Size">17</x:Double>
+  </UserControl.Resources>
+  <StackPanel Spacing="8">
+    <TextBlock Name="StaticText" Text="Static" FontSize="{StaticResource Size}" />
+    <TextBlock Name="DynamicText" Text="Dynamic" FontSize="{DynamicResource Size}" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,19 @@
+<!-- Exercise 034 - AttachedPropertyUsage (beginner).
+     Goal:   Attach a tooltip to one named control using the ToolTip.Tip
+             attached property, and leave a sibling control untouched.
+     Drills: consuming an attached property (ToolTip.Tip).
+     Passes: dotnet test, filtered to Ex034_ (see the exact command in
+     Ex034_AttachedPropertyUsage.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex034_AttachedPropertyUsage">
+  <StackPanel Spacing="8">
+    <Border Name="Hinted" ToolTip.Tip="a hint" Padding="8" Background="#EEEEEE">
+      <TextBlock Text="Hover me" />
+    </Border>
+    <Border Name="Plain" Padding="8" Background="#EEEEEE">
+      <TextBlock Text="No hint" />
+    </Border>
+  </StackPanel>
+</UserControl>

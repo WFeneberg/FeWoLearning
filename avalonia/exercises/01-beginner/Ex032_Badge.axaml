@@ -1,0 +1,12 @@
+<!-- Exercise 032 - UserControlComposition (beginner). Given. Do not change.
+     This is the nested child control the exercise composes: Caption is an
+     ordinary CLR property, not an AvaloniaProperty - it carries no binding
+     or styling participation. Contrast with Ex033_StyledPropertyBasics,
+     which registers a real StyledProperty instead. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex032_Badge">
+  <Border Background="#EEEEEE" CornerRadius="4" Padding="8">
+    <TextBlock Name="CaptionText" Text="" />
+  </Border>
+</UserControl>

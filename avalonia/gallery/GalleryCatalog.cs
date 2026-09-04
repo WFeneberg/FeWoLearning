@@ -38,5 +38,10 @@ public static class GalleryCatalog
         new("028", "StyleSelectors", () => new Ex028()),
         new("029", "StyleClasses", () => new Ex029()),
         new("030", "PseudoClasses", () => new Ex030()),
+        new("031", "StaticAndDynamicResource", () => new Ex031()),
+        new("032", "UserControlComposition", () => new Ex032()),
+        new("033", "StyledPropertyBasics", () => new Ex033()),
+        new("034", "AttachedPropertyUsage", () => new Ex034()),
+        new("035", "ScrollViewerAndSizing", () => new Ex035()),
     ];
 }
