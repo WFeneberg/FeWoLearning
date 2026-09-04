@@ -13,6 +13,16 @@ public class Ex026_CheckboxGroupTests : BunitContext
 
         Assert.Equal(3, cut.FindAll("input[type=checkbox]").Count);
         Assert.Equal("", cut.Find("#selected").TextContent);
+
+        // Each checkbox must be paired with its own <label for="feature-N">, not
+        // just any three labels - the stub's TODO mandates this pairing.
+        var checkboxes = cut.FindAll("input[type=checkbox]");
+        var labels = cut.FindAll("label");
+        Assert.Equal(new[] { "a", "b", "c" }, labels.Select(l => l.TextContent).ToArray());
+        for (var i = 0; i < checkboxes.Count; i++)
+        {
+            Assert.Equal(checkboxes[i].GetAttribute("id"), labels[i].GetAttribute("for"));
+        }
     }
 
     [Fact]
@@ -61,6 +71,9 @@ public class Ex026_CheckboxGroupTests : BunitContext
         cut.Find("#feature-2").Change(true);
         cut.Find("#feature-0").Change(true);
 
-        cut.WaitForAssertion(() => Assert.Equal(new[] { "a", "c" }, reported));
+        // A captured local, not markup - rule 4 reserves WaitForAssertion for
+        // markup assertions where a stale render frame is possible; wrapping a
+        // local here would only delay reporting a genuine failure.
+        Assert.Equal(new[] { "a", "c" }, reported);
     }
 }

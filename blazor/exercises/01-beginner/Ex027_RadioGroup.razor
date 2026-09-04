@@ -10,6 +10,8 @@
 @code {
     [Parameter] public IReadOnlyList<string> Sizes { get; set; } = [];
 
+    private string? _selected;
+
     protected override void OnParametersSet()
         => throw new NotImplementedException("TODO: Ex027 - track the single radio selection");
 }

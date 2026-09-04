@@ -27,5 +27,6 @@ public class Ex029_NamedCascadingValueTests : BunitContext
             .AddChildContent<Ex029_NamedCascadingValue_Label>());
 
         Assert.Equal("EUR", cut.Find("#locale").TextContent);
+        Assert.Equal("de-DE", cut.Find("#currency").TextContent);
     }
 }
