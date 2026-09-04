@@ -1,0 +1,23 @@
+@implements IDisposable
+@* Exercise 046 - State Container Notification (intermediate).
+   Goal:   Subscribe to an injected store exactly once, no matter how many times this component re-renders.
+   Drills: [Inject] on a shared store, subscribe/unsubscribe symmetry, surviving a parameter push without double-subscribing.
+   Passes: dotnet test --filter FullyQualifiedName~Ex046_ *@
+<span id="label">@Label</span>
+<span id="value">@Store.Value</span>
+
+@code {
+    [Inject] public CounterStore Store { get; set; } = default!;
+    [Parameter] public string Label { get; set; } = "Count";
+
+    // TODO: subscribe to Store.Changed exactly once, in the lifecycle method that
+    // runs only once per component instance - not the one that reruns on every
+    // parameter push, or a later cut.Render(...) would double-subscribe. Store the
+    // handler (an Action) in a field so Dispose() below can unsubscribe the exact
+    // same delegate instance - not a fresh lambda that happens to look the same,
+    // which would never actually detach.
+    protected override void OnInitialized() => throw new NotImplementedException("TODO: Ex046 - subscribe once and unsubscribe exactly once");
+
+    // TODO: unsubscribe the same delegate instance that OnInitialized subscribed.
+    public void Dispose() => throw new NotImplementedException("TODO: Ex046 - subscribe once and unsubscribe exactly once");
+}

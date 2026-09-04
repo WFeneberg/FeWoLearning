@@ -1,0 +1,21 @@
+@using Microsoft.Extensions.Options
+@* Exercise 047 - Options Pattern Component (intermediate).
+   Goal:   Build a greeting from configuration supplied through IOptions<T>, not a literal.
+   Drills: [Inject] IOptions<T>, the options pattern, reading .Value fresh rather than caching it.
+   Passes: dotnet test --filter FullyQualifiedName~Ex047_ *@
+<span id="greeting">@Greeting</span>
+
+@code {
+    [Inject] public IOptions<GreetingOptions> Options { get; set; } = default!;
+    [Parameter, EditorRequired] public string Name { get; set; } = "";
+
+    // TODO: combine the injected options' Prefix with Name, e.g. "Hello, Ada!".
+    // Read Options.Value each time rather than caching it in a field, so a
+    // differently-configured IOptions<T> is reflected without extra plumbing.
+    private string Greeting => throw new NotImplementedException("TODO: Ex047 - build the greeting from the injected options");
+
+    public sealed class GreetingOptions
+    {
+        public string Prefix { get; set; } = "Hello";
+    }
+}

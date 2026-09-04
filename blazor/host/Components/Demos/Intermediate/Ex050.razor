@@ -1,0 +1,16 @@
+@page "/intermediate/050"
+@* Prerendering is disabled here: the solution calls JS interop from
+   OnInitializedAsync, which throws during the static-prerender pass because no
+   circuit/JS runtime exists yet - the call is only valid once interactivity starts. *@
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<h1>Exercise 050 - JsInteropReturnValue</h1>
+
+<Ex050_JsInteropReturnValue />
+
+<script>
+    window.app = window.app || {};
+    window.app.load = function () {
+        return "loaded from host";
+    };
+</script>

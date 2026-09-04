@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 45 ✅ / 55 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -71,11 +71,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 043 | ScopedStateContainer | DI scoped service, shared state across components, `StateHasChanged` | ✅ |
 | 044 | SingletonVsScopedState | singleton vs scoped service lifetime in Blazor Server | ✅ |
 | 045 | CascadingServiceInjection | `[Inject]` property injection vs constructor injection | ✅ |
-| 046 | StateContainerNotification | event-based state container, subscribe/unsubscribe on `Dispose` | ⬜ |
-| 047 | OptionsPatternComponent | `IOptions<T>` injected into a component, configuration binding | ⬜ |
-| 048 | FactoryInjectedComponent | `IServiceProvider`/factory-resolved dependency | ⬜ |
-| 049 | JsInteropInvoke | `IJSRuntime.InvokeVoidAsync`, bUnit `JSInterop` mock setup | ⬜ |
-| 050 | JsInteropReturnValue | `IJSRuntime.InvokeAsync<T>`, mocked return value | ⬜ |
+| 046 | StateContainerNotification | event-based state container, subscribe/unsubscribe on `Dispose` | ✅ |
+| 047 | OptionsPatternComponent | `IOptions<T>` injected into a component, configuration binding | ✅ |
+| 048 | FactoryInjectedComponent | `IServiceProvider`/factory-resolved dependency | ✅ |
+| 049 | JsInteropInvoke | `IJSRuntime.InvokeVoidAsync`, bUnit `JSInterop` mock setup | ✅ |
+| 050 | JsInteropReturnValue | `IJSRuntime.InvokeAsync<T>`, mocked return value | ✅ |
 | 051 | JsInteropElementReference | `ElementReference` passed to JS, mocked interop call | ⬜ |
 | 052 | JsInteropModule | `IJSObjectReference`, JS module isolation, `DisposeAsync` | ⬜ |
 | 053 | JsInteropUnmatchedInvocation | `JSInterop.Mode` Strict vs Loose, asserting an unexpected call fails | ⬜ |

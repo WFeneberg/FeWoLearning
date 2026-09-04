@@ -1,0 +1,16 @@
+@* Exercise 050 - JS Interop Return Value (intermediate).
+   Goal:   Await a JS function's return value and render exactly what it gave back.
+   Drills: IJSRuntime.InvokeAsync<T>, awaiting interop before touching state, bUnit's JSInterop SetResult.
+   Passes: dotnet test --filter FullyQualifiedName~Ex050_ *@
+<span id="loaded">@_loaded</span>
+
+@code {
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+
+    private string _loaded = "";
+
+    // TODO: call JS.InvokeAsync<string>("app.load"), await it, and store exactly
+    // what it returns in _loaded - not a hard-coded placeholder that happens to
+    // look plausible.
+    protected override Task OnInitializedAsync() => throw new NotImplementedException("TODO: Ex050 - return what JS gave you");
+}

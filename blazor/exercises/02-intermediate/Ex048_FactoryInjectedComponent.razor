@@ -1,0 +1,15 @@
+@* Exercise 048 - Factory Injected Component (intermediate).
+   Goal:   Resolve a dependency from the container on demand instead of via [Inject].
+   Drills: IServiceProvider as a service locator, resolving per call rather than via property injection.
+   Passes: dotnet test --filter FullyQualifiedName~Ex048_ *@
+<span id="value">@Resolve().Value</span>
+
+@code {
+    [Inject] public IServiceProvider Services { get; set; } = default!;
+
+    // TODO: resolve CounterStore from Services - do not add a [Inject] CounterStore
+    // property instead; the point of this exercise is pulling the dependency from
+    // the container yourself, on demand, rather than letting the framework hand it
+    // to you once up front.
+    private CounterStore Resolve() => throw new NotImplementedException("TODO: Ex048 - resolve the store from the provider");
+}
