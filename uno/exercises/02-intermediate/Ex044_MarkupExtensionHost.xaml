@@ -1,0 +1,19 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Intermediate.Ex044_MarkupExtensionHost"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FeWoLearning.Uno.Exercises.Intermediate">
+
+    <!--
+        TODO: Ex044 - consume the extension from markup.
+
+        A StackPanel named "Root" holding two Borders, each 10 high:
+          * one named "Default", Width="{local:Ex044_MarkupExtension}" - no properties set,
+            so the extension's own defaults apply (8 * 1),
+          * one named "Scaled", Width="{local:Ex044_MarkupExtension Multiplier=3}" - 24.
+
+        The xmlns:local above is already declared: XAML reaches C# types through
+        "using:<namespace>", not through a CLR assembly reference.
+    -->
+
+</UserControl>

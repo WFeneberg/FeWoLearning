@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 40 ✅ / 60 ⬜**
+**Status: 45 ✅ / 55 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -73,11 +73,11 @@ do" in `README.md`.
 | 038 | OrthogonalStateGroups | two state groups active at once, each switching independently | ✅ |
 | 039 | CustomPanelMeasure | `MeasureOverride`, the constraint passed to children, infinite available size | ✅ |
 | 040 | CustomPanelArrange | `ArrangeOverride`, final rects, arranging outside the panel | ✅ |
-| 041 | WrapPanel | a full custom panel: wrapping, line breaking, desired size | ⬜ |
-| 042 | AttachedBehavior | attached property that subscribes and unsubscribes events | ⬜ |
-| 043 | InheritedContext | propagating a value down a subtree without a global | ⬜ |
-| 044 | MarkupExtension | a custom `MarkupExtension` used from XAML | ⬜ |
-| 045 | ItemsRepeaterLayout | `ItemsRepeater` + `ItemsSource` + an explicit `Layout` | ⬜ |
+| 041 | WrapPanel | a full custom panel: wrapping, line breaking, desired size | ✅ |
+| 042 | AttachedBehavior | attached property that subscribes and unsubscribes events | ✅ |
+| 043 | InheritedContext | propagating a value down a subtree without a global | ✅ |
+| 044 | MarkupExtension | a custom `MarkupExtension` used from XAML | ✅ |
+| 045 | ItemsRepeaterLayout | `ItemsRepeater` + `ItemsSource` + an explicit `Layout` | ✅ |
 | 046 | ElementFactoryContract | a custom `ElementFactory`: `GetElement`/`RecycleElement`, reuse over rebuild | ⬜ |
 | 047 | ItemContainerStates | an item container control with Selected/Unselected visual states | ⬜ |
 | 048 | ObservableObjectBase | an INPC base with `[CallerMemberName]` and an equality guard | ⬜ |
