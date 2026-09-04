@@ -1,0 +1,55 @@
+<Project Sdk="Uno.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-desktop</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FeWoLearning.Uno.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <UnoSingleProject>true</UnoSingleProject>
+    <UnoFeatures>Skia</UnoFeatures>
+
+    <!-- IsUnoHead makes Uno.icu-win embed icudt.dat into THIS assembly; the harness
+         hands that assembly to Uno's ICU loader. Without it every text measurement
+         throws ArgumentNullException("handle"). The RID puts icuuc77.dll next to the
+         test binary - under `dotnet test` the runtimes/<rid>/native probing that a
+         normal app host does is not reliable. Both make the track Windows-only. -->
+    <IsUnoHead>true</IsUnoHead>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <!-- Uno.Sdk only wires the Skia *runtime* into a real head project. A test host has to
+       ask for it by hand: the Skia runtime, ICU (text segmentation) and HarfBuzz (shaping)
+       are what turn "Uno.UI types load" into "Uno.UI actually measures text". Versions are
+       pinned to the Uno.Sdk in uno/global.json - bump them together. -->
+  <ItemGroup>
+    <PackageReference Include="Uno.WinUI.Runtime.Skia" Version="6.7.103" />
+    <PackageReference Include="Uno.icu-win" Version="77.3.2" />
+    <PackageReference Include="HarfBuzzSharp" Version="8.3.1.1" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="8.3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Exactly one of the two libraries, never both: that is what keeps the identical
+       namespaces and type names from colliding. `dotnet test` is the red run against
+       the stubs, `dotnet test -p:UseSolutions=true` the green run against the
+       reference implementations. -->
+  <ItemGroup Condition="'$(UseSolutions)' != 'true'">
+    <ProjectReference Include="..\exercises\FeWoLearning.Uno.Exercises.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseSolutions)' == 'true'">
+    <ProjectReference Include="..\solutions\FeWoLearning.Uno.Solutions.csproj" />
+  </ItemGroup>
+
+</Project>

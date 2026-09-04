@@ -1,0 +1,15 @@
+<Project Sdk="Uno.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-desktop</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FeWoLearning.Uno.Exercises</RootNamespace>
+    <AssemblyName>FeWoLearning.Uno.Exercises</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <UnoSingleProject>true</UnoSingleProject>
+    <UnoFeatures>Skia</UnoFeatures>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+<Project>
+
+  <!-- Redirect the solutions build to its own output tree. This is required, not
+       cosmetic: exercises/ and solutions/ compile the same type names into the same
+       namespaces, so sharing an obj/ tree makes the build fail with CS0579
+       duplicate-attribute errors on the generated assembly info. -->
+  <PropertyGroup Condition="'$(UseSolutions)' == 'true'">
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts-solutions</ArtifactsPath>
+  </PropertyGroup>
+
+</Project>
