@@ -8,18 +8,16 @@ public sealed class Ticker
 {
     private Action? _handlers;
 
-    public int SubscriberCount { get; private set; }
+    public int SubscriberCount => _handlers?.GetInvocationList().Length ?? 0;
 
     public void Subscribe(Action handler)
     {
         _handlers += handler;
-        SubscriberCount++;
     }
 
     public void Unsubscribe(Action handler)
     {
         _handlers -= handler;
-        SubscriberCount--;
     }
 
     public void Tick() => _handlers?.Invoke();

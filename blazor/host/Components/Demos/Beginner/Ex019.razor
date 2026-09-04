@@ -3,6 +3,11 @@
 
 <h1>Exercise 019 - OnAfterRenderFirst</h1>
 
+<p><em>The counts below lag one render on purpose: OnAfterRender runs after the
+render it reports on, and must not call StateHasChanged() itself or it would
+recurse. If the numbers look one click behind, that is the exercise working,
+not a bug.</em></p>
+
 <button @onclick="Bump">Bump label</button>
 
 <Ex019_OnAfterRenderFirst Label="@_label" />

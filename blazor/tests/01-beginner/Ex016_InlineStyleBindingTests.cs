@@ -43,9 +43,10 @@ public class Ex016_InlineStyleBindingTests : BunitContext
     public void Under_A_Decimal_Comma_Culture_The_Style_Still_Uses_A_Decimal_Point()
     {
         var original = CultureInfo.CurrentCulture;
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
         try
         {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+
             var cut = Render<Ex016_InlineStyleBinding>(p => p.Add(c => c.Percent, 42.5));
 
             // A style="width: 42,5%" (decimal comma) is invalid CSS - this is
