@@ -62,6 +62,9 @@ What you get is the real thing: XAML compiled into the exercise library,
 `DataTemplate`/`ControlTemplate` instantiation, Fluent default styles, and
 `AutomationPeer`-driven invocation instead of synthetic pointer input.
 
+XAML handed to `XamlReader.Load` at runtime must declare the `x` namespace
+itself - `x:Name` in a template string is an `XmlException` without it.
+
 `UnoTestContext` is the base class every test derives from; its `Layout(...)` helper
 runs a real measure/arrange pass. **Nothing about a `FrameworkElement` is
 trustworthy before that pass**: `DesiredSize` and `ActualWidth` are zero and
@@ -71,7 +74,7 @@ process-global.
 
 ### What the harness cannot do
 
-There is no window, so there is no viewport and nothing is ever *loaded*. Three
+There is no window, so there is no viewport and nothing is ever *loaded*. Four
 consequences, all of them found by probing rather than by reading docs:
 
 - **`ItemsControl` and `ListView` never realise their items.** They get their
@@ -87,6 +90,14 @@ consequences, all of them found by probing rather than by reading docs:
 - **`TransformToVisual` returns the origin.** It needs render state a windowless
   tree does not have. `UnoTestContext.Offset` reads `ActualOffset` instead, which
   is accurate.
+- **Nothing driven by the frame loop or by input happens.** No pointer or
+  keyboard events, `Focus()` returns false, and `Loaded`, `Unloaded`,
+  `SizeChanged` and `LayoutUpdated` never fire. So the track exercises event
+  plumbing through what the property system and the automation peers drive:
+  dependency-property callbacks, `RegisterPropertyChangedCallback`,
+  `INotifyPropertyChanged`, `INotifyCollectionChanged`, and `Click` via
+  `ButtonAutomationPeer.Invoke`. Two catalog rows were re-scoped for this (030
+  and 081); do not add an exercise that needs a real input event.
 
 ### The fragile spot
 

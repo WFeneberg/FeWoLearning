@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -53,11 +53,11 @@ do" in `README.md`.
 | 023 | ThemeResource | `ThemeDictionaries`, `RequestedTheme`, re-evaluation | ✅ |
 | 024 | ImplicitStyle | `Style` with `TargetType` and no `x:Key` | ✅ |
 | 025 | StyleInheritance | `BasedOn`, setter override order | ✅ |
-| 026 | ControlTemplateBasics | `ControlTemplate`, `TemplateBinding` | ⬜ |
-| 027 | TemplatePartLookup | `OnApplyTemplate`, `GetTemplateChild`, the `PART_` contract | ⬜ |
-| 028 | VisualStateGroups | `VisualStateManager.GoToState`, state setters | ⬜ |
-| 029 | EventHandlers | `RoutedEventArgs`, invoking a control without pointer input | ⬜ |
-| 030 | RoutedEventBubbling | bubbling order and `Handled` | ⬜ |
+| 026 | ControlTemplateBasics | `ControlTemplate`, `TemplateBinding` | ✅ |
+| 027 | TemplatePartLookup | `OnApplyTemplate`, `GetTemplateChild`, the `PART_` contract | ✅ |
+| 028 | VisualStateGroups | `VisualStateManager.GoToState`, state setters | ✅ |
+| 029 | EventHandlers | `Click` and `RoutedEventArgs`, invoking a control through its automation peer | ✅ |
+| 030 | PropertyChangeObservers | `RegisterPropertyChangedCallback`, watching a property you do not own | ✅ |
 | 031 | CommandBinding | `ICommand`, `CanExecute`, `CanExecuteChanged` | ⬜ |
 | 032 | ValuePrecedence | local value vs style setter vs default value | ⬜ |
 | 033 | ClearValueAndDefault | `ClearValue` falls back to the style, then to the default | ⬜ |
@@ -118,7 +118,7 @@ do" in `README.md`.
 | 078 | TemplatedControlInheritance | subclassing a templated control and extending its states | ⬜ |
 | 079 | CompositeContentModel | building a control from parts with a content model | ⬜ |
 | 080 | CustomAutomationPeer | `AutomationPeer`, patterns, programmatic invocation | ⬜ |
-| 081 | FocusManagement | `FocusManager`, tab order, focus containment | ⬜ |
+| 081 | TemplateSwapping | replacing a `Template` at runtime: re-lookup, re-applied states, old-part cleanup | ⬜ |
 | 082 | StoryboardLogic | `Storyboard`, `DoubleAnimation`, `SkipToFill`, `Completed` | ⬜ |
 | 083 | EasingFunctions | easing math and where the framework evaluates it | ⬜ |
 | 084 | RenderTransforms | `RotateTransform`/`ScaleTransform`, `TransformToVisual` | ⬜ |
