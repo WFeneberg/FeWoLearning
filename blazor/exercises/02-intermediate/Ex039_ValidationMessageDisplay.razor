@@ -1,0 +1,18 @@
+@* Exercise 039 - Validation Message Display (intermediate).
+   Goal:   Show each field's own validation message next to that field.
+   Drills: ValidationMessage, the For expression, per-field message scoping.
+   Passes: dotnet test --filter FullyQualifiedName~Ex039_ *@
+@* TODO: render an <EditForm Model="Model" OnValidSubmit="..." OnInvalidSubmit="...">
+   (a submit handler on one of these is required so EditContext.Validate() actually
+   runs) containing <DataAnnotationsValidator />, a <div id="name-field"> holding
+   <InputText id="name" @bind-Value="Model.Name" /> followed by <ValidationMessage
+   For="() => Model.Name" />, the same pair for Age inside <div id="age-field">, and
+   a submit button #submit. Each field's message must appear inside its own field
+   div - that is what For buys, and it is what the test scopes on. *@
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex039 - show each field's message next to its field");
+}

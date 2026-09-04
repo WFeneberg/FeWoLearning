@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 40 ✅ / 60 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -61,11 +61,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | EditFormBasics | `EditForm`, `EditContext`, `OnValidSubmit` vs `OnSubmit`, `@onsubmit:preventDefault` (the form not re-posting) | ⬜ |
-| 037 | DataAnnotationsValidation | `DataAnnotationsValidator`, `[Required]`/`[Range]`, `ValidationSummary` | ⬜ |
-| 038 | CustomValidationAttribute | custom `ValidationAttribute`, `IsValid` override | ⬜ |
-| 039 | ValidationMessageDisplay | `ValidationMessage<T>`, per-field error display | ⬜ |
-| 040 | EditContextFieldState | `EditContext.IsModified`, `MarkAsUnmodified`, field CSS class | ⬜ |
+| 036 | EditFormBasics | `EditForm`, `EditContext`, `OnValidSubmit` vs `OnSubmit` | ✅ |
+| 037 | DataAnnotationsValidation | `DataAnnotationsValidator`, `[Required]`/`[Range]`, `ValidationSummary` | ✅ |
+| 038 | CustomValidationAttribute | custom `ValidationAttribute`, `IsValid` override | ✅ |
+| 039 | ValidationMessageDisplay | `ValidationMessage<T>`, per-field error display | ✅ |
+| 040 | EditContextFieldState | `EditContext.IsModified`, `MarkAsUnmodified`, field CSS class | ✅ |
 | 041 | CustomFieldValidation | manual `EditContext` validation via a custom validator component | ⬜ |
 | 042 | NestedModelValidation | nested complex object validation, `EditContext` over sub-models | ⬜ |
 | 043 | ScopedStateContainer | DI scoped service, shared state across components, `StateHasChanged` | ⬜ |

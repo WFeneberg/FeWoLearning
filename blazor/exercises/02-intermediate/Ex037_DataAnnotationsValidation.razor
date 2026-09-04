@@ -1,0 +1,24 @@
+@* Exercise 037 - DataAnnotations Validation (intermediate).
+   Goal:   Validate a model on submit with DataAnnotationsValidator and ValidationSummary.
+   Drills: DataAnnotationsValidator, ValidationSummary, OnValidSubmit/OnInvalidSubmit.
+   Passes: dotnet test --filter FullyQualifiedName~Ex037_ *@
+@* TODO: render an <EditForm Model="Model" OnValidSubmit="..." OnInvalidSubmit="...">
+   containing <DataAnnotationsValidator /> and <ValidationSummary /> (wrap the summary
+   in <div id="errors"> so a test can scope to it without guessing its internal CSS
+   class), an <InputText id="name" @bind-Value="Model.Name" />, an <InputNumber
+   id="age" @bind-Value="Model.Age" />, and a submit button #submit, plus
+   <span id="counts">@ValidCount/@InvalidCount</span>. ContactModel's [Required]/
+   [Range] messages are exactly "Name is required" and "Age must be between 1 and
+   120" - those are the strings that reach the summary. *@
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+    [Parameter] public EventCallback OnValid { get; set; }
+    [Parameter] public EventCallback OnInvalid { get; set; }
+
+    public int ValidCount { get; private set; }
+    public int InvalidCount { get; private set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex037 - validate the model on submit");
+}

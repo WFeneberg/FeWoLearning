@@ -1,0 +1,35 @@
+@* Exercise 037 - DataAnnotations Validation (intermediate).
+   Goal:   Validate a model on submit with DataAnnotationsValidator and ValidationSummary.
+   Drills: DataAnnotationsValidator, ValidationSummary, OnValidSubmit/OnInvalidSubmit.
+   Passes: dotnet test --filter FullyQualifiedName~Ex037_ *@
+<EditForm Model="Model" OnValidSubmit="HandleValid" OnInvalidSubmit="HandleInvalid">
+    <DataAnnotationsValidator />
+    <div id="errors">
+        <ValidationSummary />
+    </div>
+    <InputText id="name" @bind-Value="Model.Name" />
+    <InputNumber id="age" @bind-Value="Model.Age" />
+    <button id="submit" type="submit">Save</button>
+</EditForm>
+<span id="counts">@ValidCount/@InvalidCount</span>
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+    [Parameter] public EventCallback OnValid { get; set; }
+    [Parameter] public EventCallback OnInvalid { get; set; }
+
+    public int ValidCount { get; private set; }
+    public int InvalidCount { get; private set; }
+
+    private Task HandleValid()
+    {
+        ValidCount++;
+        return OnValid.InvokeAsync();
+    }
+
+    private Task HandleInvalid()
+    {
+        InvalidCount++;
+        return OnInvalid.InvokeAsync();
+    }
+}

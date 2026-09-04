@@ -1,0 +1,47 @@
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@* Exercise 038 - Custom Validation Attribute (intermediate).
+   Goal:   Write a ValidationAttribute that enforces a project-code shape.
+   Drills: ValidationAttribute, IsValid override, DataAnnotationsValidator integration.
+   Passes: dotnet test --filter FullyQualifiedName~Ex038_ *@
+<EditForm Model="_model" OnSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <InputText id="code" @bind-Value="_model.Code" />
+    <button id="submit" type="submit">Save</button>
+    <ul id="errors">
+        @if (_context is not null)
+        {
+            @foreach (var message in _context.GetValidationMessages())
+            {
+                <li>@message</li>
+            }
+        }
+    </ul>
+</EditForm>
+
+@code {
+    private readonly ProjectModel _model = new();
+    private EditContext? _context;
+
+    private void HandleSubmit(EditContext context)
+    {
+        _context = context;
+        context.Validate();
+    }
+
+    private sealed class ProjectModel
+    {
+        [ProjectCode]
+        public string? Code { get; set; }
+    }
+
+    private sealed class ProjectCodeAttribute : ValidationAttribute
+    {
+        private static readonly Regex Pattern = new("^[A-Z]{3}-\\d{3}$");
+
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+            => value is string code && Pattern.IsMatch(code)
+                ? ValidationResult.Success
+                : new ValidationResult("Code must look like ABC-123");
+    }
+}

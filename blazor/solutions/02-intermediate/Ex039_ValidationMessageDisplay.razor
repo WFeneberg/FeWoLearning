@@ -1,0 +1,24 @@
+@* Exercise 039 - Validation Message Display (intermediate).
+   Goal:   Show each field's own validation message next to that field.
+   Drills: ValidationMessage, the For expression, per-field message scoping.
+   Passes: dotnet test --filter FullyQualifiedName~Ex039_ *@
+<EditForm Model="Model" OnValidSubmit="HandleSubmit" OnInvalidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <div id="name-field">
+        <InputText id="name" @bind-Value="Model.Name" />
+        <ValidationMessage For="() => Model.Name" />
+    </div>
+    <div id="age-field">
+        <InputNumber id="age" @bind-Value="Model.Age" />
+        <ValidationMessage For="() => Model.Age" />
+    </div>
+    <button id="submit" type="submit">Save</button>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+
+    private void HandleSubmit()
+    {
+    }
+}

@@ -1,0 +1,22 @@
+@* Exercise 040 - EditContext Field State (intermediate).
+   Goal:   Track and reset a model's modified state via EditContext.
+   Drills: EditContext creation, IsModified(), MarkAsUnmodified(), field CSS classes.
+   Passes: dotnet test --filter FullyQualifiedName~Ex040_ *@
+@* TODO: create the EditContext from Model in OnParametersSet (recreating it only if
+   Model itself changes to a different instance), render an <EditForm EditContext="..."
+   (not Model=) containing <InputText id="name" @bind-Value="Model.Name" /> and a
+   <button id="reset" @onclick="Reset" type="button">Reset</button> that calls
+   MarkAsUnmodified() on the EditContext, plus <span id="modified">@ModelIsModified</span>.
+   The rendered input carries the CSS class "modified" once changed automatically -
+   that is EditContext's own field-class machinery, not something to hand-code. *@
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+
+    private EditContext? _context;
+
+    public bool ModelIsModified => _context?.IsModified() ?? false;
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex040 - track and reset the field state");
+}

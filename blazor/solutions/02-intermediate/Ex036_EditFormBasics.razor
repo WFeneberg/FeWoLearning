@@ -1,0 +1,22 @@
+@* Exercise 036 - EditForm Basics (intermediate).
+   Goal:   Render an EditForm and react to a valid submit.
+   Drills: EditForm, OnValidSubmit, EventCallback<T>.
+   Passes: dotnet test --filter FullyQualifiedName~Ex036_ *@
+<EditForm Model="Model" OnValidSubmit="AcceptAsync">
+    <InputText id="name" @bind-Value="Model.Name" />
+    <button id="submit" type="submit">Save</button>
+</EditForm>
+<span id="count">@SubmitCount</span>
+
+@code {
+    [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;
+    [Parameter] public EventCallback<ContactModel> OnAccepted { get; set; }
+
+    public int SubmitCount { get; private set; }
+
+    private Task AcceptAsync()
+    {
+        SubmitCount++;
+        return OnAccepted.InvokeAsync(Model);
+    }
+}
