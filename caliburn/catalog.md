@@ -23,15 +23,15 @@ Exercises ex001–ex011 need no view and derive from `CaliburnCoreContext`. From
 on they derive from `CaliburnViewContext` and must be hosted with `Show(...)` before
 any action can fire — see `README.md`.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 5 ✅ / 95 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 001 | NotifyByHand | `INotifyPropertyChanged` by hand, `[CallerMemberName]`, suppress on unchanged value | ⬜ |
-| 002 | PropertyChangedBaseBasics | `PropertyChangedBase`, `Set`, `Refresh` raises an empty property name | ⬜ |
-| 003 | NotifyOfPropertyChange | announcing without a backing field, why `Set` cannot help | ⬜ |
-| 004 | DependentProperties | one setter announcing a chain of computed properties — and not the wrong ones | ⬜ |
-| 005 | BindableCollectionBasics | `BindableCollection<T>`, `IsNotifying` suspension, `Refresh` as one `Reset` | ⬜ |
+| 001 | NotifyByHand | `INotifyPropertyChanged` by hand, `[CallerMemberName]`, suppress on unchanged value | ✅ |
+| 002 | PropertyChangedBaseBasics | `PropertyChangedBase`, `Set`, `Refresh` raises an empty property name | ✅ |
+| 003 | NotifyOfPropertyChange | announcing without a backing field, why `Set` cannot help | ✅ |
+| 004 | DependentProperties | one setter announcing a chain of computed properties — and not the wrong ones | ✅ |
+| 005 | BindableCollectionBasics | `BindableCollection<T>`, `IsNotifying` suspension, `Refresh` as one `Reset` | ✅ |
 | 006 | BindableCollectionRange | `AddRange`/`RemoveRange` raise a single `Reset`, not one event per item | ⬜ |
 | 007 | ScreenDisplayName | `Screen.DisplayName`, announced like any other property | ⬜ |
 | 008 | ScreenInitialize | `OnInitializeAsync` runs once, `IsInitialized` | ⬜ |
