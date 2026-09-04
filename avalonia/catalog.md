@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 40 ✅ / 60 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -68,11 +68,11 @@ not a valid C# identifier.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | WhenAnyValueMultiArity | `WhenAnyValue` over several source properties | ⬜ |
-| 037 | OutputProperty | `ToProperty`, `ObservableAsPropertyHelper` | ⬜ |
-| 038 | OaphInitialValue | OAPH initial value, deferred subscription | ⬜ |
-| 039 | CommandFromTask | `ReactiveCommand.CreateFromTask`, awaiting a result | ⬜ |
-| 040 | CommandIsExecuting | `IsExecuting` gating concurrent invocation | ⬜ |
+| 036 | WhenAnyValueMultiArity | `WhenAnyValue` over several source properties | ✅ |
+| 037 | OutputProperty | `ToProperty`, `ObservableAsPropertyHelper` | ✅ |
+| 038 | OaphInitialValue | OAPH initial value, deferred subscription | ✅ |
+| 039 | CommandFromTask | `ReactiveCommand.CreateFromTask`, awaiting a result | ✅ |
+| 040 | CommandIsExecuting | `IsExecuting` gating concurrent invocation | ✅ |
 | 041 | CommandThrownExceptions | `ThrownExceptions`, no unobserved crash | ⬜ |
 | 042 | CommandCancellation | `CancellationToken` in `CreateFromTask` | ⬜ |
 | 043 | ThrottledSearch | `Throttle` plus `DistinctUntilChanged` | ⬜ |

@@ -8,12 +8,15 @@ namespace FeWoLearning.Avalonia.Exercises.Intermediate;
 ///         awaited result on the view model.
 /// Drills: ReactiveCommand.CreateFromTask, awaiting a result.
 ///
-/// Measured on this machine against ReactiveUI 24.1.0:
-/// ReactiveCommand.CreateFromTask(fn) - the overload with NO ISequencer argument
-/// - leaves the command's IsExecuting/CanExecute state machinery dead (ex040
-/// proves that decisively). Get in the habit here already: always pass
-/// Sequencer.CurrentThread (from ReactiveUI.Primitives.Concurrency) as the
-/// second argument.
+/// Measured on this machine against ReactiveUI 24.1.0: ReactiveCommand.CreateFromTask(fn)
+/// - the overload with NO ISequencer argument - leaves the command's
+/// IsExecuting/CanExecute state machinery dead (ex040 proves that decisively).
+/// Separately measured for THIS exercise: Sequencer.Default (a thread pool) also
+/// marshals the Result-storing subscription independently of the awaited task's
+/// own completion, so "await command.Execute()" can return before Result has
+/// actually been set - a genuine race, not just a style difference. Use
+/// Sequencer.CurrentThread specifically (from ReactiveUI.Primitives.Concurrency)
+/// as the second argument.
 /// Passes: dotnet test --filter FullyQualifiedName~Ex039_
 public class Ex039_CommandFromTaskViewModel : ReactiveObject
 {
