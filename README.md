@@ -20,7 +20,7 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `java/`     | Java                             | JUnit 5     | 100 / 100 (unverified) | planned |
 | `kotlin/`   | Kotlin                           | JUnit 5     | 100 / 100 (unverified) | planned |
 | `flutter/`  | Flutter / Dart                   | `package:test` / `flutter_test` | 100 / 100 (unverified) | planned |
-| `caliburn/` | Caliburn.Micro 5 MVVM on WPF (C#) | xUnit v3 + StaFact | **5 / 100** | ✅ .NET 10 |
+| `caliburn/` | Caliburn.Micro 5 MVVM on WPF (C#) | xUnit v3 + StaFact | **10 / 100** | ✅ .NET 10 |
 
 Each track's `catalog.md` is the authoritative per-exercise ledger: it lists all
 100 entries with ✅ (written) or ⬜ (planned).

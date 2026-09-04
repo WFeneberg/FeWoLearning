@@ -78,8 +78,8 @@ suite against the reference solutions instead of the stubs.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-04: ex001-ex005 (26 test facts) are red on the
-  untouched tree, and 31 facts — the 26 plus the harness smoke tests — pass
+  verified as of 2026-09-04: ex001-ex010 (53 test facts) are red on the
+  untouched tree, and 58 facts — the 53 plus the harness smoke tests — pass
   under `-p:UseSolutions=true`. **`wpf/`** is verified end-to-end on its first
   five exercises as of 2026-09-04, on **.NET 10.0.400** with **xunit.v3 4.0.0**
   and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11):
@@ -267,6 +267,15 @@ suite against the reference solutions instead of the stubs.
   ex068-073/ex087/ex095/ex096 will touch; the first of those to mutate one must
   extend `CaliburnCoreContext` to snapshot and restore it, or later tests fail
   in ways that look like their own bugs. See `caliburn/README.md`.
+  Caliburn.Micro 5 marks `Screen.OnInitializeAsync` and `Screen.OnActivateAsync`
+  `[Obsolete]`, with the messages "Override OnInitializedAsync" and "Override
+  OnActivatedAsync". Overriding the obsolete pair puts `CS0672` in the build,
+  which breaks the track's zero-warnings rule for `solutions/`. Both members
+  of each pair genuinely exist and both run — measured order on a first
+  activation is `OnInitializeAsync` → `OnInitializedAsync` → `OnActivateAsync`
+  → `OnActivatedAsync` — so they are the same lifecycle point and the
+  non-obsolete name is the one to override. `OnDeactivateAsync` is **not**
+  obsolete and has no `OnDeactivatedAsync` counterpart.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -360,7 +369,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 10 / 100 (verified) | 90 |
 | `blazor/` | 35 / 100 (verified) | 65 |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 5 / 100 (verified) | 95 |
+| `caliburn/`| 10 / 100 (verified) | 90 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `blazor/`,
