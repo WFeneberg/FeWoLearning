@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>FeWoLearning.Wpf.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- No OutputType here: xunit.v3 sets it to Exe through its own build props. -->
+  </PropertyGroup>
+
+  <!-- xunit.v3 4.0.0 pulls in Microsoft.Testing.Platform.MSBuild 2.3.3, which refuses to run
+       under the classic VSTest bridge on the .NET 10 SDK ("Testing with VSTest target is no
+       longer supported... opt-in to the new dotnet test experience", see
+       https://aka.ms/dotnet-test-mtp-error). Not one of the three failures the brief
+       anticipated for Step 6 - the fix lives in wpf/global.json
+       ({"test":{"runner":"Microsoft.Testing.Platform"}}), not here. -->
+
+  <!-- Xunit.StaFact supplies [WpfFact]/[WpfTheory]: an STA thread plus a real
+       DispatcherSynchronizationContext, so `await` resumes on the dispatcher.
+       4.0.23 depends on xunit.v3.extensibility.core 4.0.0, which is why this is an
+       xunit.v3 track. Do not add xunit 2.x - FactAttribute would land in two
+       assemblies and every test file would fail CS0433. -->
+  <ItemGroup>
+    <PackageReference Include="Xunit.StaFact" Version="4.0.23" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Exactly one of the two content libraries, never both: that is what keeps the
+       identical namespaces and type names from colliding. `dotnet test` is the red
+       run against the stubs, `dotnet test -p:UseSolutions=true` the green run
+       against the reference implementations. Same mechanism as blazor/ and uno/. -->
+  <ItemGroup Condition="'$(UseSolutions)' != 'true'">
+    <ProjectReference Include="..\exercises\FeWoLearning.Wpf.Exercises.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseSolutions)' == 'true'">
+    <ProjectReference Include="..\solutions\FeWoLearning.Wpf.Solutions.csproj" />
+  </ItemGroup>
+
+</Project>

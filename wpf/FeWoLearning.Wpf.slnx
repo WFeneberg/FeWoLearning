@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/exercises/">
+    <Project Path="exercises/FeWoLearning.Wpf.Exercises.csproj" />
+  </Folder>
+  <Folder Name="/solutions/">
+    <Project Path="solutions/FeWoLearning.Wpf.Solutions.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FeWoLearning.Wpf.Tests.csproj" />
+  </Folder>
+</Solution>
