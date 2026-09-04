@@ -74,11 +74,15 @@ two seconds on a `ManualResetEventSlim` specifically for a `True` emission, agai
 command gated on a `TaskCompletionSource` that was still mid-flight, and no `True`
 arrived. Passing *any* sequencer explicitly fixes both behaviours.
 
-So the rule for this track: **always pass a sequencer to an async `ReactiveCommand`
-factory**, and prefer `Sequencer.CurrentThread` (`ReactiveUI.Primitives.Concurrency`),
-which delivers on the calling thread and therefore makes tests deterministic. The
-default sequencer is `TaskPoolSequencer` — a thread pool — so the default overload is
-also the racy choice even where it works.
+So the rule for this track: **always pass `Sequencer.CurrentThread`**
+(`ReactiveUI.Primitives.Concurrency`) to an async `ReactiveCommand` factory. Not
+"prefer" — require. `Sequencer.Default` fixes `IsExecuting` and `CanExecute`, but a
+later measurement found it is *still* racy for the awaited **result**: ex039's test
+failed 5 runs out of 5 under `Sequencer.Default`, because the result-storing
+subscription and the awaited task's completion are marshaled independently with no
+ordering guarantee between them. `Sequencer.CurrentThread` delivers on the calling
+thread and orders both. The default overload's sequencer is `TaskPoolSequencer`, a
+thread pool, so it is the worst of the three.
 
 Two related facts measured at the same time:
 
