@@ -338,6 +338,17 @@ trap documented for `python/`.
   wrong, just not the lesson. Where no public API separates the two, prefer a
   documented limitation in the stub's `Goal:` and a note in the test file over an
   assertion that would fail a legitimate solution.
+
+  The root cause is worth knowing before reaching for diagnostics, because it recurs:
+  `GetDiagnostic(SelectingItemsControl.SelectedItemProperty)` reports
+  `Priority=LocalValue` with an empty `Diagnostic` string for **both** a real
+  `TwoWay` binding and a plain direct assignment — measured. `SelectedItem` is a
+  **`DirectProperty`** (CLR-backed) rather than a `StyledProperty`, and direct
+  properties carry no binding-priority metadata. So *no* exercise whose subject is a
+  `DirectProperty` binding can prove that binding structurally. Later tiers hit this
+  again with `SelectionModel`, `DataGrid` selection and `TreeView`: check whether the
+  property is direct or styled **before** designing the discriminator, and fall back
+  to a documented limitation without spending rounds on it.
 - Confirm each red failure comes from the exercise's own
   `NotImplementedException` — not from a compile error, not from a missing XAML
   resource, and above all not from the uninitialized-ReactiveUI exception of
