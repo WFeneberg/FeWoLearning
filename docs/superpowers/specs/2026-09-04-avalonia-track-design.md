@@ -358,6 +358,15 @@ trap documented for `python/`.
   So: **check direct-vs-styled before designing the discriminator.** For a styled
   property there is an honest structural test; for a direct property there is not, and
   a documented limitation is the answer rather than a spent fix round.
+
+  **But priority does not separate every mechanism, only styling.** Measured on the
+  same `FontSize`: a `{StaticResource}` and a `{DynamicResource}` markup extension
+  *both* report `LocalValue`, exactly as a plain literal does. So the priority trick
+  proves "a style set this" and nothing more — it cannot show that a value came from a
+  resource lookup. For resources the honest discriminator is behavioural: swap the
+  resource at runtime (`view.Resources["Key"] = newValue`) and assert that the
+  `DynamicResource` consumer follows while the `StaticResource` consumer does not.
+  Reaching for priority a second time, by analogy, is the mistake to avoid.
 - **Do not pin where the markup lives, or how a selector is spelled.** ex028–ex030
   first shipped a scan of `view.Styles` on the root `UserControl`, which came back
   *empty* — measured — for a solution that scoped its `<Style>` block to an inner
