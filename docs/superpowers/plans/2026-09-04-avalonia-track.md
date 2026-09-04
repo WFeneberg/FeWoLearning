@@ -899,8 +899,13 @@ It must document setup, all six commands, the seven constraints, the `solutions/
 Run: `grep -c '^| [0-9]' avalonia/catalog.md`
 Expected: `100`
 
-Run: `grep -c '⬜' avalonia/catalog.md`
-Expected: `101` — the 100 rows plus the legend line.
+Run: `grep '^| [0-9]' avalonia/catalog.md | grep -c '⬜'`
+Expected: `100`
+
+Scope the glyph count to table rows as shown. A bare `grep -c '⬜'` over the whole
+file also matches the legend line **and the status line**, so it returns 102 — house
+style puts a `⬜` in both. `blazor/catalog.md` has 65 planned rows and a bare count of
+67, which is the check to calibrate against.
 
 - [ ] **Step 8: Commit**
 
@@ -946,7 +951,8 @@ git commit -m "avalonia: 100-row catalog and track README"
 <!-- Exercise 001 - HelloView (beginner).
      Goal:   Render two view-model properties into two named TextBlocks.
      Drills: UserControl, x:DataType, one-way binding into named TextBlocks.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex001_ -->
+     Passes: dotnet test, filtered to Ex001_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
@@ -959,7 +965,18 @@ git commit -m "avalonia: 100-row catalog and track README"
 </UserControl>
 ```
 
-Write the `Passes:` line with a real double dash (`--filter`); it is spelled apart here only to survive this document's own markdown.
+**The `Passes:` line cannot hold the real command in an `.axaml` file.** XML forbids
+two consecutive hyphens anywhere inside a `<!-- -->` comment, so `--filter` is a hard
+XAML compiler error (AVLN1001) — this was measured, not guessed. The convention for
+every view exercise in this track is therefore:
+
+- the `.axaml` header carries `Goal:` / `Drills:` and a `Passes:` line that names the
+  filter in prose and points at the code-behind, saying why;
+- the `.axaml.cs` carries `// Passes: dotnet test --filter FullyQualifiedName~ExNNN_`
+  with the real double dash.
+
+View-model-only exercises (`.cs`, no XAML) put the full header in the one file and use
+the real `--filter` directly.
 
 `avalonia/exercises/01-beginner/Ex001_HelloView.axaml.cs`:
 
@@ -1119,7 +1136,8 @@ public class Ex001_HelloViewModel : ReactiveObject
 <!-- Exercise 002 - LayoutStackPanel (beginner).
      Goal:   Stack three fixed-height bars with uniform gaps.
      Drills: StackPanel orientation and Spacing, stacked Bounds.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex002_ -->
+     Passes: dotnet test, filtered to Ex002_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex002_LayoutStackPanel">
@@ -1236,7 +1254,8 @@ public partial class Ex002_LayoutStackPanel : UserControl
 <!-- Exercise 003 - LayoutGrid (beginner).
      Goal:   Place four cells in a two-by-two Grid mixing Auto and star sizing.
      Drills: RowDefinitions/ColumnDefinitions, Auto vs *, Grid.Row/Grid.Column.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex003_ -->
+     Passes: dotnet test, filtered to Ex003_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex003_LayoutGrid">
@@ -1349,7 +1368,8 @@ public partial class Ex003_LayoutGrid : UserControl
 <!-- Exercise 004 - LayoutGridSpan (beginner).
      Goal:   Span a banner across three proportionally sized columns.
      Drills: Grid.ColumnSpan, proportional star sizing.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex004_ -->
+     Passes: dotnet test, filtered to Ex004_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex004_LayoutGridSpan">
@@ -1468,7 +1488,8 @@ public partial class Ex004_LayoutGridSpan : UserControl
 <!-- Exercise 005 - LayoutDockPanel (beginner).
      Goal:   Build a classic shell: top bar, bottom bar, side bar, filled body.
      Drills: DockPanel.Dock, LastChildFill, dock order.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex005_ -->
+     Passes: dotnet test, filtered to Ex005_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex005_LayoutDockPanel">
@@ -1591,7 +1612,7 @@ Each page is a thin wrapper that supplies a sample `DataContext` where the exerc
 ```xml
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner;assembly=FeWoLearning.Avalonia.Exercises"
+             xmlns:b="using:FeWoLearning.Avalonia.Exercises.Beginner"
              x:Class="FeWoLearning.Avalonia.Gallery.Pages.Beginner.Ex001">
   <StackPanel Spacing="12">
     <TextBlock Text="Exercise 001 — HelloView" FontSize="18" FontWeight="Bold" />
@@ -1600,11 +1621,23 @@ Each page is a thin wrapper that supplies a sample `DataContext` where the exerc
 </UserControl>
 ```
 
-The `assembly=` in that `clr-namespace` is wrong for solutions mode, where the assembly is named `FeWoLearning.Avalonia.Solutions`. **Omit the `assembly=` part entirely** — Avalonia then resolves the namespace across referenced assemblies, and exactly one of the two is ever referenced:
+The `assembly=` in that `clr-namespace` is wrong for solutions mode, where the
+assembly is named `FeWoLearning.Avalonia.Solutions` — a hard-coded name breaks
+`-p:UseSolutions=true`. But simply dropping `assembly=` does **not** work either:
+a bare `clr-namespace:` resolves only types in the *same* assembly, and a gallery page
+reaching into the content project is cross-assembly. Measured.
+
+Use Avalonia's `using:` scheme instead, which searches referenced assemblies and names
+no assembly of its own. Since exactly one content project is ever referenced, it
+resolves unambiguously in both modes:
 
 ```xml
-             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             xmlns:b="using:FeWoLearning.Avalonia.Exercises.Beginner"
 ```
+
+Note the distinction: an **exercise stub's own** `.axaml` keeps `clr-namespace:` for its
+`x:DataType`, because its view model sits in the same assembly. Only the cross-assembly
+gallery pages need `using:`.
 
 `avalonia/gallery/Pages/Beginner/Ex001.axaml.cs`:
 
@@ -1630,7 +1663,7 @@ public partial class Ex001 : UserControl
 ```xml
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             xmlns:b="using:FeWoLearning.Avalonia.Exercises.Beginner"
              x:Class="FeWoLearning.Avalonia.Gallery.Pages.Beginner.Ex005">
   <StackPanel Spacing="12">
     <TextBlock Text="Exercise 005 — LayoutDockPanel" FontSize="18" FontWeight="Bold" />
@@ -1813,7 +1846,8 @@ git commit -m "avalonia: ex001-ex005"
 <!-- Exercise 006 - AlignmentAndMargin (beginner).
      Goal:   Position a small box inside a padded frame using alignment and margin.
      Drills: HorizontalAlignment/VerticalAlignment, Margin vs Padding.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex006_ -->
+     Passes: dotnet test, filtered to Ex006_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex006_AlignmentAndMargin">
@@ -1931,7 +1965,8 @@ public partial class Ex006_AlignmentAndMargin : UserControl
 <!-- Exercise 007 - LayoutWrapPanel (beginner).
      Goal:   Let four fixed-width tiles wrap onto two rows.
      Drills: WrapPanel wrapping at a constrained width.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex007_ -->
+     Passes: dotnet test, filtered to Ex007_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex007_LayoutWrapPanel">
@@ -2335,7 +2370,8 @@ public class Ex009_ReactiveObjectBasics : ReactiveObject
 <!-- Exercise 010 - CompiledBinding (beginner).
      Goal:   Bind a direct and a nested path with explicit compiled bindings.
      Drills: explicit {CompiledBinding}, nested path re-resolution.
-     Passes: dotnet test - -filter FullyQualifiedName~Ex010_ -->
+     Passes: dotnet test, filtered to Ex010_ (exact command in the code-behind:
+     an XML comment may not hold two hyphens in a row). -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
@@ -2532,7 +2568,7 @@ ex006, ex007 and ex010 get pages; ex008 and ex009 have no view and get none. Fol
 ```xml
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             xmlns:b="using:FeWoLearning.Avalonia.Exercises.Beginner"
              x:Class="FeWoLearning.Avalonia.Gallery.Pages.Beginner.Ex010">
   <StackPanel Spacing="12">
     <TextBlock Text="Exercise 010 — CompiledBinding" FontSize="18" FontWeight="Bold" />
@@ -2684,8 +2720,11 @@ Add to the ✅-verified line that Avalonia 12.1.1 with ReactiveUI 24.1.0 on .NET
 
 - [ ] **Step 7: Verify the docs claims match reality**
 
-Every number written in Step 1 and Step 3 must match the catalog. Run: `grep -c '✅' avalonia/catalog.md`
-Expected: `11` — ten rows plus the legend line. If it is not 11, fix the table rows rather than the documentation.
+Every number written in Step 1 and Step 3 must match the catalog. Run:
+`grep '^| [0-9]' avalonia/catalog.md | grep -c '✅'`
+Expected: `10`. Scope the count to table rows — a bare `grep -c '✅'` also matches the
+legend and status lines and returns 12. If the row count is not 10, fix the table rows
+rather than the documentation.
 
 - [ ] **Step 8: Commit**
 
