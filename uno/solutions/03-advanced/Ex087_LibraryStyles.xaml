@@ -1,0 +1,22 @@
+<ResourceDictionary
+    x:Class="FeWoLearning.Uno.Exercises.Advanced.Ex087_LibraryStyles"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FeWoLearning.Uno.Exercises.Advanced">
+
+    <!-- Implicit: TargetType and no x:Key, so a consumer writes the element and nothing
+         else. A keyed style would make every call site name it. -->
+    <Style TargetType="local:Ex087_LibraryControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:Ex087_LibraryControl">
+                    <Border x:Name="PART_Root"
+                            Width="42"
+                            Height="17"
+                            Background="{TemplateBinding Background}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

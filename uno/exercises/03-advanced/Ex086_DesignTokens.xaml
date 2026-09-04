@@ -1,0 +1,27 @@
+<ResourceDictionary
+    x:Class="FeWoLearning.Uno.Exercises.Advanced.Ex086_DesignTokens"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        TODO: Ex086 - build a two-layer token system.
+
+        ResourceDictionary.ThemeDictionaries with "Light" and "Dark", each declaring the
+        *primitive* tokens:
+          * SolidColorBrush "SurfaceBrush" - White in Light, Black in Dark
+          * x:Double "SpacingUnit" - 4 in Light, 8 in Dark (a stand-in for a density
+            change; real systems vary spacing by platform rather than by theme, but the
+            mechanism is the same)
+
+        Then, outside the theme dictionaries, the *semantic* layer: a base Style for Border
+        keyed "CardBaseStyle" setting Background to {ThemeResource SurfaceBrush} and Padding
+        to 4, and a Style keyed "CardCompactStyle" that is BasedOn CardBaseStyle and
+        overrides Padding to 2.
+
+        Two layers is the whole idea: primitives change per theme, semantics stay put, and
+        a consumer names only the semantic style. Note that a Style cannot live inside a
+        theme dictionary and be BasedOn one outside it - which is why the split is this way
+        round.
+    -->
+
+</ResourceDictionary>

@@ -99,7 +99,11 @@ consequences, all of them found by probing rather than by reading docs:
   called for a `NonVirtualizingLayout`, so `LayoutContext.LayoutState` cannot be
   used and ex071 keys its per-host state by context itself;
   `ApplicationDataContainer.CreateContainer` throws;
-  `BindingExpression` has no `UpdateTarget` (WPF has it, WinUI does not); `x:Load` realises its element
+  `BindingExpression` has no `UpdateTarget` (WPF has it, WinUI does not);
+  a library's `Themes/Generic.xaml` is never consulted, because the app head is
+  what registers library dictionaries - ex087 ships a mergeable
+  `ResourceDictionary` instead, which is what Uno.Toolkit and Uno.Material do
+  anyway; `Storyboard.SetTarget` has no getter; `x:Load` realises its element
   immediately instead of deferring; `FlowDirection.RightToLeft` does not mirror
   a layout; and `Binding.ConverterLanguage` is ignored - the converter is handed
   the current thread culture instead. When an exercise hits one, keep the real

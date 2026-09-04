@@ -1,0 +1,29 @@
+<ResourceDictionary
+    x:Class="FeWoLearning.Uno.Exercises.Advanced.Ex086_DesignTokens"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- The primitive layer: per theme, and named by nothing outside this file. -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="SurfaceBrush" Color="White" />
+            <x:Double x:Key="SpacingUnit">4</x:Double>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="SurfaceBrush" Color="Black" />
+            <x:Double x:Key="SpacingUnit">8</x:Double>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <!-- The semantic layer: outside the theme dictionaries, because a Style inside one
+         cannot be BasedOn a style outside it. Consumers name only these. -->
+    <Style x:Key="CardBaseStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBrush}" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
+    <Style x:Key="CardCompactStyle" TargetType="Border" BasedOn="{StaticResource CardBaseStyle}">
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
+</ResourceDictionary>

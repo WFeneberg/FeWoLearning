@@ -31,7 +31,7 @@ rather than as current values. Writing exercises against a mental model that has
 been verified would be worse than leaving the gap, so those rows now cover async
 patterns instead. MVUX is the obvious next addition to this track.
 
-**Status: 85 ✅ / 15 ⬜**
+**Status: 90 ✅ / 10 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -132,11 +132,11 @@ patterns instead. MVUX is the obvious next addition to this track.
 | 083 | EasingFunctions | easing math and where the framework evaluates it | ✅ |
 | 084 | RenderTransforms | `RotateTransform`/`ScaleTransform`, `TransformPoint`, `TransformBounds`, composition order | ✅ |
 | 085 | ClippingGeometry | `Clip`, geometry parsing, bounds arithmetic | ✅ |
-| 086 | DesignTokenSystem | a token resource system with light/dark and `BasedOn` styles | ⬜ |
-| 087 | ControlLibraryStyles | `Themes/Generic.xaml`, default style lookup from a library | ⬜ |
-| 088 | RuntimeXamlLoading | `XamlReader.Load`, error handling, dynamic UI | ⬜ |
-| 089 | WeakEventHandling | the weak event pattern, unsubscribing without leaking | ⬜ |
-| 090 | LeakDiagnostics | proving a visual was released with `WeakReference` + GC | ⬜ |
+| 086 | DesignTokenSystem | a token resource system with light/dark and `BasedOn` styles | ✅ |
+| 087 | ControlLibraryStyles | shipping a mergeable `ResourceDictionary` with a control, and the lookup that finds it | ✅ |
+| 088 | RuntimeXamlLoading | `XamlReader.Load`, error handling, dynamic UI | ✅ |
+| 089 | SubscriptionTokens | `Subscribe` returning `IDisposable`, deterministic unsubscription | ✅ |
+| 090 | LeakDiagnostics | proving a visual was released with `WeakReference` + GC | ✅ |
 
 ## Expert (091–100) — architecture
 

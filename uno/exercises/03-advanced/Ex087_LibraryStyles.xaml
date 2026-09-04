@@ -1,0 +1,19 @@
+<ResourceDictionary
+    x:Class="FeWoLearning.Uno.Exercises.Advanced.Ex087_LibraryStyles"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FeWoLearning.Uno.Exercises.Advanced">
+
+    <!--
+        TODO: Ex087 - ship the look for Ex087_LibraryControl.
+
+        An implicit Style - TargetType and no x:Key - for local:Ex087_LibraryControl,
+        setting Template to a ControlTemplate whose content is a Border named "PART_Root",
+        42 wide and 17 high, with its Background bound to the control's Background by
+        TemplateBinding.
+
+        Implicit, because a consumer should write <local:Ex087_LibraryControl /> and get a
+        look - not have to know a style key.
+    -->
+
+</ResourceDictionary>
