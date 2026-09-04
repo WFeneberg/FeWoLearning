@@ -1,0 +1,16 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Beginner.Ex009_XamlUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Each x:Name below becomes a field on the generated half of the code-behind class,
+        typed as the element it names. That is the whole connection between the two files:
+        x:Class picks the class, x:Name picks the members.
+    -->
+    <StackPanel x:Name="Root">
+        <TextBlock x:Name="Caption" Text="Hello Uno" />
+        <Border x:Name="Box" Width="30" Height="40" />
+    </StackPanel>
+
+</UserControl>
