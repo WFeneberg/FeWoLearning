@@ -42,7 +42,9 @@ caliburn/
   README.md
   catalog.md                          # the 100-row ledger and work queue
   exercises/<tier>/ExNNN_<Slug>.cs     # + .xaml / .xaml.cs where a view is the subject
+  exercises/_support/TrackMarker.cs    # not an exercise, never a catalog row
   solutions/<tier>/ExNNN_<Slug>.cs
+  solutions/_support/TrackMarker.cs    # identical marker, not an exercise
   tests/<tier>/ExNNN_<Slug>Tests.cs
   tests/_harness/                      # not exercises, never a catalog row
 ```
@@ -73,9 +75,14 @@ because `01-beginner` is not a valid C# identifier:
 FeWoLearning.Caliburn.Exercises.Beginner / .Intermediate / .Advanced / .Expert
 ```
 
-`tests/_harness/` and `_support/` are **not exercises**. They hold the base
-test classes described below plus their own smoke tests, and neither gets a
-row in `catalog.md`.
+`tests/_harness/` and `_support/` are **not exercises** and neither ever gets
+a row in `catalog.md`, but they hold different things. `tests/_harness/`
+holds the two base test classes described below plus their own smoke tests.
+`_support/` is not under `tests/` at all — it exists identically in
+`exercises/` and `solutions/`, and each copy holds exactly one file,
+`TrackMarker.cs`: a marker type whose only job is to name that content
+assembly so the test harness can register it with `AssemblySource` for
+Caliburn's `ViewLocator`, without depending on any individual exercise.
 
 ## How the harness works
 
