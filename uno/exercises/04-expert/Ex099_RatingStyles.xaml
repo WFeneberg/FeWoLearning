@@ -1,0 +1,25 @@
+<ResourceDictionary
+    x:Class="FeWoLearning.Uno.Exercises.Expert.Ex099_RatingStyles"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FeWoLearning.Uno.Exercises.Expert">
+
+    <!--
+        TODO: Ex099 - ship the look.
+
+        An implicit Style for local:Ex099_RatingControl whose Template contains:
+          * a StackPanel root, holding
+          * a Button named "PART_Increment" with Content "+", and
+          * a Border named "PART_Fill", 20 wide and 10 high, Opacity 1.
+
+        Two state groups on the root:
+          * "AvailabilityStates" with "Editable" (nothing) and "ReadOnly"
+            (PART_Increment.IsEnabled = False)
+          * "RatingStates" with "Empty" (nothing) and "Rated"
+            (PART_Fill.Width = 60)
+
+        Orthogonal on purpose: a read-only control can be rated, and an editable one can be
+        empty.
+    -->
+
+</ResourceDictionary>

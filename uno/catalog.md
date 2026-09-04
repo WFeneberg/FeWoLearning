@@ -31,7 +31,7 @@ rather than as current values. Writing exercises against a mental model that has
 been verified would be worse than leaving the gap, so those rows now cover async
 patterns instead. MVUX is the obvious next addition to this track.
 
-**Status: 95 ✅ / 5 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -147,8 +147,8 @@ patterns instead. MVUX is the obvious next addition to this track.
 | 093 | AsyncStreamViewModel | `IAsyncEnumerable` driving a view model, cancellation, completion | ✅ |
 | 094 | NavigationService | typed routes over a `Frame`, behind an interface a view model can use | ✅ |
 | 095 | HostConfiguration | `IHostBuilder`, options binding, environment overrides | ✅ |
-| 096 | BehaviorFramework | a small attached-behaviour framework with lifetime management | ⬜ |
-| 097 | FlexLayoutEngine | a flex-style layout engine as a reusable `Layout` | ⬜ |
-| 098 | DiagnosticsTracing | structured tracing of layout and binding work | ⬜ |
-| 099 | CapstoneControl | one control: template, states, peer, tokens, tests | ⬜ |
-| 100 | FeatureModules | composing a screen from independently registered modules | ⬜ |
+| 096 | BehaviorFramework | a small attached-behaviour framework with lifetime management | ✅ |
+| 097 | FlexLayoutEngine | a flex-style panel: two-pass measure, grow factors in an attached property | ✅ |
+| 098 | DiagnosticsTracing | structured tracing of layout and binding work | ✅ |
+| 099 | CapstoneControl | one control: template, states, peer, tokens, tests | ✅ |
+| 100 | FeatureModules | composing a screen from independently registered modules | ✅ |
