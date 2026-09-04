@@ -1,0 +1,18 @@
+<!-- Exercise 020 - CheckBoxBinding (beginner).
+     Goal:   Two-way bind a three-state CheckBox to a nullable bool.
+     Drills: IsChecked as bool?, three-state.
+     Passes: dotnet test, filtered to Ex020_ (see the exact command in
+     Ex020_CheckBoxBinding.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex020_CheckBoxBinding"
+             x:DataType="b:Ex020_CheckBoxBindingViewModel">
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <CheckBox Name="ThreeStateBox" Content="Three-state"
+              IsThreeState="True"
+              IsChecked="{CompiledBinding IsChecked, Mode=TwoWay}"
+              Width="160" Height="32" />
+  </StackPanel>
+</UserControl>

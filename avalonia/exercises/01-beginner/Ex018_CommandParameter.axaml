@@ -1,0 +1,27 @@
+<!-- Exercise 018 - CommandParameter (beginner).
+     Goal:   Route two different literal parameters into the same
+             ReactiveCommand via CommandParameter.
+     Drills: ReactiveCommand<TParam, RxVoid>, CommandParameter.
+     Passes: dotnet test, filtered to Ex018_ (see the exact command in
+     Ex018_CommandParameter.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex018_CommandParameter"
+             x:DataType="b:Ex018_CommandParameterViewModel">
+  <!-- TODO: replace this placeholder with two Buttons, both bound to the SAME
+       SetParameterCommand but each with its OWN literal CommandParameter:
+         <Button Name="AlphaButton" Content="Alpha"
+                 Command="{CompiledBinding SetParameterCommand}"
+                 CommandParameter="alpha" Width="120" Height="40" />
+         <Button Name="BetaButton" Content="Beta"
+                 Command="{CompiledBinding SetParameterCommand}"
+                 CommandParameter="beta" Width="120" Height="40" />
+       CommandParameter is declared here as a plain XAML string, and it
+       arrives at the command as a string - use string as the command's
+       TParam. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <Button Content="TODO" />
+  </StackPanel>
+</UserControl>

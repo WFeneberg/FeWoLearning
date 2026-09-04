@@ -1,0 +1,18 @@
+<!-- Exercise 017 - CommandCanExecute (beginner).
+     Goal:   Gate a ReactiveCommand's ability to run on a view-model property,
+             using WhenAnyValue as the canExecute observable.
+     Drills: WhenAnyValue feeding canExecute, button enablement.
+     Passes: dotnet test, filtered to Ex017_ (see the exact command in
+     Ex017_CommandCanExecute.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex017_CommandCanExecute"
+             x:DataType="b:Ex017_CommandCanExecuteViewModel">
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <Button Name="RunButton" Content="Run"
+            Command="{CompiledBinding RunCommand}"
+            Width="120" Height="40" />
+  </StackPanel>
+</UserControl>

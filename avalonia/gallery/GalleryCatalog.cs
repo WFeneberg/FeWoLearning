@@ -23,5 +23,10 @@ public static class GalleryCatalog
         new("013", "BindingStringFormat", () => new Ex013()),
         new("014", "BindingFallback", () => new Ex014()),
         new("015", "ValueConverter", () => new Ex015()),
+        new("016", "ReactiveCommandBasics", () => new Ex016()),
+        new("017", "CommandCanExecute", () => new Ex017()),
+        new("018", "CommandParameter", () => new Ex018()),
+        new("019", "ButtonClickEvent", () => new Ex019()),
+        new("020", "CheckBoxBinding", () => new Ex020()),
     ];
 }

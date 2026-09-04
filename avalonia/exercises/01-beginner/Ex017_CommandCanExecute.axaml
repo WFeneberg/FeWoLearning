@@ -1,0 +1,27 @@
+<!-- Exercise 017 - CommandCanExecute (beginner).
+     Goal:   Gate a ReactiveCommand's ability to run on a view-model property,
+             using WhenAnyValue as the canExecute observable.
+     Drills: WhenAnyValue feeding canExecute, button enablement.
+     Passes: dotnet test, filtered to Ex017_ (see the exact command in
+     Ex017_CommandCanExecute.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex017_CommandCanExecute"
+             x:DataType="b:Ex017_CommandCanExecuteViewModel">
+  <!-- TODO: replace this placeholder with a single Button named RunButton whose
+       Command is bound to RunCommand:
+         <Button Name="RunButton" Content="Run"
+                 Command="{CompiledBinding RunCommand}"
+                 Width="120" Height="40" />
+       All the canExecute logic belongs in the view model's RunCommand, not
+       here - do not bind Button.IsEnabled directly to anything. Measured fact:
+       once canExecute goes false, Button.IsEnabled itself stays exactly what
+       you set it to (true, if you never touch it) - it is
+       Button.IsEffectivelyEnabled that reflects the command's CanExecute, and
+       a ":disabled" pseudo-class is applied to the button's Classes. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <Button Content="TODO" />
+  </StackPanel>
+</UserControl>

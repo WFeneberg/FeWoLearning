@@ -1,0 +1,26 @@
+<!-- Exercise 016 - ReactiveCommandBasics (beginner).
+     Goal:   Wire a Button's Command to a parameterless ReactiveCommand and
+             show the result it produces.
+     Drills: ReactiveCommand.Create, RxVoid, invocation.
+     Passes: dotnet test, filtered to Ex016_ (see the exact command in
+     Ex016_ReactiveCommandBasics.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex016_ReactiveCommandBasics"
+             x:DataType="b:Ex016_ReactiveCommandBasicsViewModel">
+  <!-- TODO: replace this placeholder with a Button named IncrementButton whose
+       Command is bound to IncrementCommand, plus a TextBlock named CounterText
+       showing Counter:
+         <Button Name="IncrementButton" Content="Increment"
+                 Command="{CompiledBinding IncrementCommand}"
+                 Width="120" Height="40" />
+         <TextBlock Name="CounterText" Text="{CompiledBinding Counter}" />
+       Give the Button that explicit Width/Height - the test drives a real
+       mouse click through the actual headless input pipeline, and the click
+       point is computed from the button's own laid-out Bounds. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <Button Content="TODO" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="using:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Gallery.Pages.Beginner.Ex020">
+  <StackPanel Spacing="12">
+    <TextBlock Text="Exercise 020 — CheckBoxBinding" FontSize="18" FontWeight="Bold" />
+    <b:Ex020_CheckBoxBinding Name="Subject" />
+  </StackPanel>
+</UserControl>

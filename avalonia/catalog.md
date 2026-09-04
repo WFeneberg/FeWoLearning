@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -43,11 +43,11 @@ not a valid C# identifier.
 | 013 | BindingStringFormat | `StringFormat`, invariant culture | ✅ |
 | 014 | BindingFallback | `FallbackValue`, `TargetNullValue` | ✅ |
 | 015 | ValueConverter | `IValueConverter` both directions | ✅ |
-| 016 | ReactiveCommandBasics | `ReactiveCommand.Create`, `RxVoid`, invocation | ⬜ |
-| 017 | CommandCanExecute | `WhenAnyValue` feeding `canExecute`, button enablement | ⬜ |
-| 018 | CommandParameter | `ReactiveCommand<TParam, RxVoid>`, `CommandParameter` | ⬜ |
-| 019 | ButtonClickEvent | `Click` event handler versus a bound command | ⬜ |
-| 020 | CheckBoxBinding | `IsChecked` as `bool?`, three-state | ⬜ |
+| 016 | ReactiveCommandBasics | `ReactiveCommand.Create`, `RxVoid`, invocation | ✅ |
+| 017 | CommandCanExecute | `WhenAnyValue` feeding `canExecute`, button enablement | ✅ |
+| 018 | CommandParameter | `ReactiveCommand<TParam, RxVoid>`, `CommandParameter` | ✅ |
+| 019 | ButtonClickEvent | `Click` event handler versus a bound command | ✅ |
+| 020 | CheckBoxBinding | `IsChecked` as `bool?`, three-state | ✅ |
 | 021 | RadioGroupBinding | `RadioButton` `GroupName`, enum-backed selection | ⬜ |
 | 022 | SliderBinding | `Slider` `Value`/`Minimum`/`Maximum`, clamping | ⬜ |
 | 023 | ComboBoxSelection | `ItemsSource` plus `SelectedItem` | ⬜ |

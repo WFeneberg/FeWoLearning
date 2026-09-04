@@ -1,0 +1,28 @@
+<!-- Exercise 019 - ButtonClickEvent (beginner).
+     Goal:   Contrast a code-behind Click event handler with a bound
+             ReactiveCommand, side by side, each driving its OWN counter.
+     Drills: Click event handler versus a bound command.
+     Passes: dotnet test, filtered to Ex019_ (see the exact command in
+     Ex019_ButtonClickEvent.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex019_ButtonClickEvent"
+             x:DataType="b:Ex019_ButtonClickEventViewModel">
+  <!-- TODO: replace this placeholder with two Buttons:
+         <Button Name="EventButton" Content="Event"
+                 Click="OnEventButtonClick" Width="120" Height="40" />
+         <Button Name="CommandButton" Content="Command"
+                 Command="{CompiledBinding CommandClickCommand}"
+                 Width="120" Height="40" />
+       EventButton must NOT have a Command - it is driven purely by the
+       code-behind Click handler you write below, which should bump
+       EventClickCount on the view model. CommandButton must NOT have a Click
+       handler - it is driven purely by CommandClickCommand, which bumps
+       CommandClickCount. This is the whole point of the exercise: two
+       independent mechanisms, each provably only moving its own counter. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <Button Content="TODO" />
+  </StackPanel>
+</UserControl>

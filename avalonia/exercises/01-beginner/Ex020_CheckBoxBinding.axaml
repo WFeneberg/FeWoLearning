@@ -1,0 +1,27 @@
+<!-- Exercise 020 - CheckBoxBinding (beginner).
+     Goal:   Two-way bind a three-state CheckBox to a nullable bool.
+     Drills: IsChecked as bool?, three-state.
+     Passes: dotnet test, filtered to Ex020_ (see the exact command in
+     Ex020_CheckBoxBinding.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex020_CheckBoxBinding"
+             x:DataType="b:Ex020_CheckBoxBindingViewModel">
+  <!-- TODO: replace this placeholder with a single CheckBox named
+       ThreeStateBox, IsThreeState set so a click cycles through all three
+       states, IsChecked bound two-way to IsChecked:
+         <CheckBox Name="ThreeStateBox" Content="Three-state"
+                   IsThreeState="True"
+                   IsChecked="{CompiledBinding IsChecked, Mode=TwoWay}"
+                   Width="160" Height="32" />
+       Measured click cycle starting from the view model's initial null:
+       null -> False -> True -> null. That is NOT the False-first order you
+       might expect from a plain two-state CheckBox - the null state is what
+       a two-state implementation can never reach, and is the thing this
+       exercise's test actually checks for. -->
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <CheckBox Content="TODO" />
+  </StackPanel>
+</UserControl>
