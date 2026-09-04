@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 2 ✅ / 98 ⬜**
+**Status: 4 ✅ / 96 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -46,8 +46,8 @@ Two deliberate content gaps:
 |-----|------|----------|--------|
 | 001 | ClrToDependencyProperty | `DependencyProperty.Register`, metadata default, `GetValue`/`SetValue`, `ClearValue` | ✅ |
 | 002 | CoerceAndValidate | `ValidateValueCallback`, `CoerceValueCallback`, `PropertyChangedCallback`, `CoerceValue` | ✅ |
-| 003 | ObservableViewModelBase | `INotifyPropertyChanged`, `SetProperty` + `[CallerMemberName]`, no event without a real change | ⬜ |
-| 004 | CodeBehindToBinding | `SetBinding`, `Binding.Path`, `BindingMode.TwoWay`, `UpdateSourceTrigger` | ⬜ |
+| 003 | ObservableViewModelBase | `INotifyPropertyChanged`, `SetProperty` + `[CallerMemberName]`, no event without a real change | ✅ |
+| 004 | CodeBehindToBinding | `SetBinding`, `Binding.Path`, `BindingMode.TwoWay`, `UpdateSourceTrigger` | ✅ |
 | 005 | RelayCommand | `ICommand`, `CanExecute`, `CommandManager.RequerySuggested` | ⬜ |
 | 006 | ReadOnlyDependencyProperty | `RegisterReadOnly`, `DependencyPropertyKey`, write through the key only | ⬜ |
 | 007 | AttachedProperty | `RegisterAttached`, static `GetX`/`SetX`, read from a parent | ⬜ |
