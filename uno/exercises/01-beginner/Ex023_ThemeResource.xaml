@@ -1,0 +1,22 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Beginner.Ex023_ThemeResource"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        TODO: Ex023 - declare theme dictionaries and consume them.
+
+        On this UserControl's Resources, a ResourceDictionary with
+        ResourceDictionary.ThemeDictionaries holding two dictionaries, keyed "Light" and
+        "Dark" - the keys are fixed names, not labels you choose. Each declares a
+        SolidColorBrush keyed "CardBackground": White in Light, Black in Dark.
+
+        The content: a Border named "Card", 40 by 20, whose Background is
+        {ThemeResource CardBackground}.
+
+        Use ThemeResource, not StaticResource. StaticResource would resolve once against
+        whichever theme happened to be active and then never change again - which is the
+        bug this exercise is about.
+    -->
+
+</UserControl>

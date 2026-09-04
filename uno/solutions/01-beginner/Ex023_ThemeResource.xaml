@@ -1,0 +1,23 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Beginner.Ex023_ThemeResource"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <!-- "Light" and "Dark" are the names the framework looks for. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="CardBackground" Color="White" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="CardBackground" Color="Black" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- ThemeResource keeps a live reference; StaticResource would resolve once. -->
+    <Border x:Name="Card" Width="40" Height="20" Background="{ThemeResource CardBackground}" />
+
+</UserControl>

@@ -1,0 +1,22 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Beginner.Ex022_StaticResource"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <x:Double x:Key="CardWidth">120</x:Double>
+    </UserControl.Resources>
+
+    <StackPanel x:Name="Root">
+        <Border x:Name="Outer" Height="10" Width="{StaticResource CardWidth}" />
+
+        <!-- Its own dictionary shadows the key for itself and everything below it. -->
+        <Border x:Name="Shadowing" Height="10" Width="{StaticResource CardWidth}">
+            <Border.Resources>
+                <x:Double x:Key="CardWidth">60</x:Double>
+            </Border.Resources>
+            <Border x:Name="Inner" Height="10" Width="{StaticResource CardWidth}" />
+        </Border>
+    </StackPanel>
+
+</UserControl>

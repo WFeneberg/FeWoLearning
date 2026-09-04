@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 20 ✅ / 80 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -48,11 +48,11 @@ do" in `README.md`.
 | 018 | DataContextInheritance | `DataContext` flows down the tree, local override | ✅ |
 | 019 | DataTemplateBasics | `DataTemplate`, `ContentControl.ContentTemplate` | ✅ |
 | 020 | ItemsRepeaterBinding | `ItemsRepeater`, `ItemsSource` + `ItemTemplate`, one element per item | ✅ |
-| 021 | ObservableCollectionUpdates | `INotifyCollectionChanged` reaching the visual tree | ⬜ |
-| 022 | StaticResource | `ResourceDictionary`, `{StaticResource}` lookup walk | ⬜ |
-| 023 | ThemeResource | `ThemeDictionaries`, `RequestedTheme`, re-evaluation | ⬜ |
-| 024 | ImplicitStyle | `Style` with `TargetType` and no `x:Key` | ⬜ |
-| 025 | StyleInheritance | `BasedOn`, setter override order | ⬜ |
+| 021 | ObservableCollectionUpdates | `INotifyCollectionChanged` reaching the visual tree | ✅ |
+| 022 | StaticResource | `ResourceDictionary`, `{StaticResource}` lookup walk | ✅ |
+| 023 | ThemeResource | `ThemeDictionaries`, `RequestedTheme`, re-evaluation | ✅ |
+| 024 | ImplicitStyle | `Style` with `TargetType` and no `x:Key` | ✅ |
+| 025 | StyleInheritance | `BasedOn`, setter override order | ✅ |
 | 026 | ControlTemplateBasics | `ControlTemplate`, `TemplateBinding` | ⬜ |
 | 027 | TemplatePartLookup | `OnApplyTemplate`, `GetTemplateChild`, the `PART_` contract | ⬜ |
 | 028 | VisualStateGroups | `VisualStateManager.GoToState`, state setters | ⬜ |

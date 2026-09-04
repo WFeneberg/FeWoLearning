@@ -1,0 +1,25 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Beginner.Ex022_StaticResource"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        TODO: Ex022 - build two nested resource scopes and consume them.
+
+        On this UserControl's own Resources:
+          * an x:Double keyed "CardWidth" with the value 120.
+
+        Then the content: a StackPanel named "Root" holding
+          * a Border named "Outer", its Width bound with {StaticResource CardWidth}, and
+          * a Border named "Shadowing" that declares its OWN Resources with an x:Double
+            keyed "CardWidth" of 60, its Width also {StaticResource CardWidth}, and a
+            child Border named "Inner" whose Width is {StaticResource CardWidth} too.
+
+        Give every Border a Height of 10 so the layout has something to arrange.
+
+        Three elements, one resource key, two different answers: the lookup walks up from
+        the element until a dictionary knows the key, so "Inner" and "Shadowing" find 60
+        and "Outer" finds 120.
+    -->
+
+</UserControl>
