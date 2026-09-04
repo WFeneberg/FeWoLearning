@@ -1,0 +1,13 @@
+@* Exercise 030 - Component Composition (beginner).
+   Goal:   Register with the cascaded parent on initialization.
+   Drills: [CascadingParameter] of a component type, OnInitialized side effects.
+   Passes: dotnet test --filter FullyQualifiedName~Ex030_ *@
+@* This component renders nothing itself - it only registers with its parent. *@
+
+@code {
+    [CascadingParameter] public Ex030_ComponentComposition? Parent { get; set; }
+    [Parameter] public string Label { get; set; } = "";
+
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex030 - register this item with its parent");
+}

@@ -1,0 +1,13 @@
+@* Exercise 028 - Cascading Value Basics (beginner).
+   Goal:   Cascade a value to descendants without passing it explicitly.
+   Drills: CascadingValue, ChildContent.
+   Passes: dotnet test --filter FullyQualifiedName~Ex028_ *@
+@* TODO: wrap ChildContent in a <CascadingValue Value="Theme">. *@
+
+@code {
+    [Parameter] public string Theme { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex028 - cascade the theme");
+}

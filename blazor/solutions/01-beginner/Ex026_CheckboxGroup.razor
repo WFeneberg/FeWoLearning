@@ -1,0 +1,32 @@
+@* Exercise 026 - Checkbox Group (beginner).
+   Goal:   Track multi-selection state and report it in stable order.
+   Drills: HashSet-backed selection, projecting through the source list for order.
+   Passes: dotnet test --filter FullyQualifiedName~Ex026_ *@
+@for (var i = 0; i < Features.Count; i++)
+{
+    var feature = Features[i];
+    <input type="checkbox" id="feature-@i" checked="@_selected.Contains(feature)" @onchange="@(e => Toggle(feature, e.Value))" />
+    <label for="feature-@i">@feature</label>
+}
+<span id="selected">@string.Join(", ", Features.Where(_selected.Contains))</span>
+
+@code {
+    [Parameter] public IReadOnlyList<string> Features { get; set; } = [];
+    [Parameter] public EventCallback<IReadOnlyList<string>> SelectionChanged { get; set; }
+
+    private readonly HashSet<string> _selected = [];
+
+    private async Task Toggle(string feature, object? isChecked)
+    {
+        if (isChecked is true)
+        {
+            _selected.Add(feature);
+        }
+        else
+        {
+            _selected.Remove(feature);
+        }
+
+        await SelectionChanged.InvokeAsync(Features.Where(_selected.Contains).ToList());
+    }
+}

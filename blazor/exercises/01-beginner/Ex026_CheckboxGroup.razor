@@ -1,0 +1,18 @@
+@* Exercise 026 - Checkbox Group (beginner).
+   Goal:   Track multi-selection state and report it in stable order.
+   Drills: HashSet-backed selection, projecting through the source list for order.
+   Passes: dotnet test --filter FullyQualifiedName~Ex026_ *@
+@* TODO: render one per feature (N is the zero-based index):
+     <input type="checkbox" id="feature-N" />
+     <label for="feature-N">@feature</label>
+   plus <span id="selected">…</span> listing the selected features joined by ", "
+   in Features order, not click order. Toggling reports the selection through
+   SelectionChanged. *@
+
+@code {
+    [Parameter] public IReadOnlyList<string> Features { get; set; } = [];
+    [Parameter] public EventCallback<IReadOnlyList<string>> SelectionChanged { get; set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex026 - track the checkbox selection");
+}

@@ -1,0 +1,16 @@
+@* Exercise 027 - Radio Group (beginner).
+   Goal:   Track a single-selection state with mutual exclusion.
+   Drills: single-field selection state, radio group semantics.
+   Passes: dotnet test --filter FullyQualifiedName~Ex027_ *@
+@for (var i = 0; i < Sizes.Count; i++)
+{
+    var size = Sizes[i];
+    <input type="radio" name="size" id="size-@i" checked="@(size == _selected)" @onchange="@(() => _selected = size)" />
+}
+<span id="chosen">@_selected</span>
+
+@code {
+    [Parameter] public IReadOnlyList<string> Sizes { get; set; } = [];
+
+    private string? _selected;
+}

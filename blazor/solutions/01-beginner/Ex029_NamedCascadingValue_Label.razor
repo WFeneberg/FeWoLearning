@@ -1,0 +1,10 @@
+@* Exercise 029 - Named Cascading Value (beginner).
+   Goal:   Consume two same-typed cascaded values, matched by Name.
+   Drills: [CascadingParameter(Name = ...)].
+   Passes: dotnet test --filter FullyQualifiedName~Ex029_ *@
+<span id="locale">@Locale</span><span id="currency">@Currency</span>
+
+@code {
+    [CascadingParameter(Name = "Locale")] public string? Locale { get; set; }
+    [CascadingParameter(Name = "Currency")] public string? Currency { get; set; }
+}

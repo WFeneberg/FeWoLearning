@@ -1,0 +1,14 @@
+@* Exercise 029 - Named Cascading Value (beginner).
+   Goal:   Cascade two values of the same type, told apart only by Name.
+   Drills: CascadingValue Name, avoiding ambiguous resolution.
+   Passes: dotnet test --filter FullyQualifiedName~Ex029_ *@
+@* TODO: cascade both as named values, Name="Locale" and Name="Currency". *@
+
+@code {
+    [Parameter] public string Locale { get; set; } = "";
+    [Parameter] public string Currency { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex029 - cascade both values by name");
+}

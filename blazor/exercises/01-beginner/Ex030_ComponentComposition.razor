@@ -1,0 +1,17 @@
+@* Exercise 030 - Component Composition (beginner).
+   Goal:   Let child components register themselves with their parent.
+   Drills: cascading `this`, mid-render state mutation, re-rendering after registration.
+   Passes: dotnet test --filter FullyQualifiedName~Ex030_ *@
+@* TODO: cascade `this` so children can find it, render ChildContent (so children
+   register), then render <nav id="crumbs"> with one <span class="crumb">@label</span>
+   per registered label separated by " / ", where the last one additionally carries
+   the class "current". *@
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    // TODO: expose Register(string label) and an ordered list of registered labels.
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex030 - collect and render the registered crumbs");
+}
