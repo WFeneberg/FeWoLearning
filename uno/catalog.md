@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 45 ✅ / 55 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -78,11 +78,11 @@ do" in `README.md`.
 | 043 | InheritedContext | propagating a value down a subtree without a global | ✅ |
 | 044 | MarkupExtension | a custom `MarkupExtension` used from XAML | ✅ |
 | 045 | ItemsRepeaterLayout | `ItemsRepeater` + `ItemsSource` + an explicit `Layout` | ✅ |
-| 046 | ElementFactoryContract | a custom `ElementFactory`: `GetElement`/`RecycleElement`, reuse over rebuild | ⬜ |
-| 047 | ItemContainerStates | an item container control with Selected/Unselected visual states | ⬜ |
-| 048 | ObservableObjectBase | an INPC base with `[CallerMemberName]` and an equality guard | ⬜ |
-| 049 | AsyncCommand | async `ICommand`, busy flag, exception capture | ⬜ |
-| 050 | InputValidation | `INotifyDataErrorInfo`, per-property errors | ⬜ |
+| 046 | ElementFactoryContract | `IElementFactory`: `GetElement`/`RecycleElement`, reuse over rebuild, reset on return | ✅ |
+| 047 | ItemContainerStates | an item container control with Selected/Unselected visual states | ✅ |
+| 048 | ObservableObjectBase | an INPC base with `[CallerMemberName]` and an equality guard | ✅ |
+| 049 | AsyncCommand | async `ICommand`, busy flag, exception capture | ✅ |
+| 050 | InputValidation | `INotifyDataErrorInfo`, per-property errors | ✅ |
 | 051 | FunctionalConverter | a reusable converter parameterised by a delegate | ⬜ |
 | 052 | BindingFallbacks | `FallbackValue`, `TargetNullValue`, failed paths | ⬜ |
 | 053 | RelativeSourceBinding | `RelativeSource` `Self` and `TemplatedParent` | ⬜ |
