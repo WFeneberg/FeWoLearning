@@ -39,6 +39,6 @@ public class Ex008_TwoWayBindingTests : BunitContext
 
         cut.Find("#name").Change("Grace");
 
-        cut.WaitForAssertion(() => Assert.Equal("Ada", cut.Find("#echo").TextContent));
+        Assert.Equal("Ada", cut.Find("#echo").TextContent);
     }
 }

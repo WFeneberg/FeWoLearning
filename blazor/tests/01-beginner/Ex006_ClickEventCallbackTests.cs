@@ -22,7 +22,7 @@ public class Ex006_ClickEventCallbackTests : BunitContext
 
         cut.Find("#like").Click();
 
-        cut.WaitForAssertion(() => Assert.Equal(new[] { 5 }, received));
+        Assert.Equal(new[] { 5 }, received);
     }
 
     [Fact]
@@ -36,6 +36,6 @@ public class Ex006_ClickEventCallbackTests : BunitContext
         cut.Find("#like").Click();
         cut.Find("#like").Click();
 
-        cut.WaitForAssertion(() => Assert.Equal(new[] { 5, 5 }, received));
+        Assert.Equal(new[] { 5, 5 }, received);
     }
 }

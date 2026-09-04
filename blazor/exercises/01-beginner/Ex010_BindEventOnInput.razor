@@ -12,5 +12,6 @@
     [Parameter] public string Query { get; set; } = "";
     [Parameter] public EventCallback<string> QueryChanged { get; set; }
 
-    protected override void OnParametersSet() => throw new NotImplementedException("TODO: Ex010 - report the query on every keystroke");
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex010 - report the query on every keystroke");
 }

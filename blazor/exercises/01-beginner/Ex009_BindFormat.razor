@@ -12,5 +12,6 @@
     [Parameter] public DateOnly Value { get; set; }
     [Parameter] public EventCallback<DateOnly> ValueChanged { get; set; }
 
-    protected override void OnParametersSet() => throw new NotImplementedException("TODO: Ex009 - format and parse the due date");
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex009 - format and parse the due date");
 }

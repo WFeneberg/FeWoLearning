@@ -44,5 +44,11 @@ public class Ex007_CounterStateTests : BunitContext
         cut.Find("#inc").Click();
 
         cut.WaitForAssertion(() => Assert.Equal("6", cut.Find("#value").TextContent));
+
+        // A later parameter change must not reset the count - the seed from Start
+        // belongs in OnInitialized, which runs once, not in OnParametersSet, which
+        // would re-read Start here and silently discard the three clicks above.
+        cut.Render(p => p.Add(c => c.Start, 99));
+        Assert.Equal("6", cut.Find("#value").TextContent);
     }
 }

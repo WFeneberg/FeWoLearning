@@ -33,8 +33,19 @@ public class Ex010_BindEventOnInputTests : BunitContext
         var cut = Render<Ex010_BindEventOnInput>(p => p.Bind(c => c.Query, current, v => current = v));
 
         // The element has no onchange handler at all when only @oninput is wired, so
-        // bUnit rejects the dispatch outright - that absence is itself the proof.
-        Assert.Throws<MissingEventHandlerException>(() => cut.Find("#q").Change("xyz"));
+        // bUnit currently rejects the dispatch outright - that absence is itself the
+        // proof. Swallow the specific exception rather than asserting on it: this way
+        // the fact still rejects a both-events implementation (no exception, but
+        // current would wrongly change) even if bUnit ever stops throwing for a
+        // missing handler.
+        try
+        {
+            cut.Find("#q").Change("xyz");
+        }
+        catch (MissingEventHandlerException)
+        {
+        }
+
         Assert.Equal("ab", current);
     }
 }
