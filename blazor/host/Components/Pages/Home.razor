@@ -1,0 +1,21 @@
+@page "/"
+
+<PageTitle>FeWoLearning - Blazor</PageTitle>
+
+<h1>FeWoLearning - Blazor</h1>
+
+<p>
+    Demo pages render the components from whichever library is referenced:
+    <code>dotnet run --project host</code> shows your exercise stubs,
+    <code>dotnet run --project host -p:UseSolutions=true</code> shows the reference solutions.
+    An unfinished stub surfaces its <code>NotImplementedException</code> here - that is expected.
+</p>
+
+<h2>Beginner</h2>
+<ul>
+    @for (var n = 1; n <= 35; n++)
+    {
+        var id = n.ToString("D3");
+        <li><a href="@($"/beginner/{id}")">Exercise @id</a></li>
+    }
+</ul>

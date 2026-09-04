@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/exercises/">
+    <Project Path="exercises/FeWoLearning.Blazor.Exercises.csproj" />
+  </Folder>
+  <Folder Name="/solutions/">
+    <Project Path="solutions/FeWoLearning.Blazor.Solutions.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FeWoLearning.Blazor.Tests.csproj" />
+  </Folder>
+  <Folder Name="/host/">
+    <Project Path="host/FeWoLearning.Blazor.Host.csproj" />
+  </Folder>
+</Solution>

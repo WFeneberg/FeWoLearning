@@ -1,0 +1,12 @@
+<Project>
+
+  <!-- Redirect the solutions build to its own output tree. This is required, not
+       cosmetic: setting BaseOutputPath/BaseIntermediateOutputPath inside a .csproj
+       body is evaluated too late, the stale default obj/ is then globbed alongside
+       the new one, and the build fails with CS0579 duplicate-attribute errors. -->
+  <PropertyGroup Condition="'$(UseSolutions)' == 'true'">
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts-solutions</ArtifactsPath>
+  </PropertyGroup>
+
+</Project>
