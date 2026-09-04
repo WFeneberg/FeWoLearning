@@ -199,13 +199,14 @@ The base class every test derives from. Three members:
   drains the dispatcher queue down to `priority`. Bindings update at
   `DispatcherPriority.DataBind`; a test that asserts before pumping reads the
   stale value. This is the single most common way a WPF test lies.
-- **`Host(FrameworkElement element)`** — **opt-in.** Parks the element in an
+- **`Show(FrameworkElement element)`** — **opt-in.** Parks the element in an
   off-screen `Window` (`Left = -10000`, `Top = -10000`,
   `ShowActivated = false`, shown then measured) and returns a disposable that
-  closes it. Only for exercises that genuinely need a `PresentationSource`:
+  closes it, and it returns the `Window` so a test can reach the visual root. Only
+  for exercises that genuinely need a `PresentationSource`:
   `Loaded`, keyboard focus, and the `HwndSource`/`HwndHost` interop rows.
 
-`Host` is what `uno/` could not offer — Uno's harness has no window, so its
+`Show` is what `uno/` could not offer — Uno's harness has no window, so its
 `Loaded`, focus and input rows had to be re-scoped or dropped. Here those
 exercises are real. The cost is a real (invisible, unactivated) window per test
 that opts in, so it stays opt-in and must be disposed.
@@ -222,7 +223,7 @@ the run is noise. Four assertions:
    `Application.Current`.
 3. A `Binding` set up in code pushes its source value to the target after
    `Pump(DispatcherPriority.DataBind)`.
-4. `Host(...)` fires `Loaded` on the hosted element.
+4. `Show(...)` fires `Loaded` on the hosted element.
 
 ### 4.4 Serial execution
 
@@ -374,7 +375,7 @@ prescribes.
 - Root `CLAUDE.md`: a `wpf/` row in the per-track command table; a `wpf/` row in
   the Current-state table (`5 / 100`); a Toolchain-status entry; and a
   Track-specific-gotchas entry covering the three-project `UseSolutions` layout,
-  the STA/`[WpfFact]` requirement, `Pump(DataBind)`, and `Host` being opt-in.
+  the STA/`[WpfFact]` requirement, `Pump(DataBind)`, and `Show` being opt-in.
 - `docs/exercise-format.md`: a `wpf/` row in the naming table, and a mention in
   the Known-gaps section that `wpf/` — like `avalonia/` and `blazor/` — cannot
   drift silently because its `solutions/` is compile-checked.
