@@ -55,6 +55,42 @@ A `ReactiveUI.Avalonia` **14.7.1** also exists on nuget.org; it is deliberately
 not used, because 12.1.1 is the version that matches Avalonia 12.1.x and is the
 one this design's probe actually verified.
 
+### 2.2 An eighth constraint: async commands need an explicit sequencer
+
+Measured on 2026-09-04 against ReactiveUI 24.1.0 / ReactiveUI.Primitives 7.1.0, and
+it governs every async-command exercise from ex039 onward.
+
+`ReactiveCommand.CreateFromTask(fn)` — the overload with **no** `ISequencer` argument —
+produces a command whose state machinery is **dead**:
+
+| overload used | `IsExecuting` emissions | `CanExecute` while in flight |
+|---|---|---|
+| `CreateFromTask(fn)` | `[False]` only — **`True` never fires** | stays `True` — **no gating at all** |
+| `CreateFromTask(fn, Sequencer.CurrentThread)` | `[False, True, False]` | `False` |
+| `CreateFromTask(fn, Sequencer.Default)` | `[False, True, False]` | `False` |
+
+This was established decisively, not inferred from a flake: a subscriber waited a full
+two seconds on a `ManualResetEventSlim` specifically for a `True` emission, against a
+command gated on a `TaskCompletionSource` that was still mid-flight, and no `True`
+arrived. Passing *any* sequencer explicitly fixes both behaviours.
+
+So the rule for this track: **always pass a sequencer to an async `ReactiveCommand`
+factory**, and prefer `Sequencer.CurrentThread` (`ReactiveUI.Primitives.Concurrency`),
+which delivers on the calling thread and therefore makes tests deterministic. The
+default sequencer is `TaskPoolSequencer` — a thread pool — so the default overload is
+also the racy choice even where it works.
+
+Two related facts measured at the same time:
+
+- **`IObservable<T>` has no `GetAwaiter` in ReactiveUI 24**, so `await command.Execute()`
+  does not compile. Use `await command.Execute().FirstAsync()` or
+  `await command.Execute().ToTask()` — both from `ReactiveUI.Primitives.LinqExtensions`.
+  Awaiting is how an async-command test stays deterministic; never sleep on a guess.
+- **There is no virtual-time or `TestScheduler` facility** in ReactiveUI.Primitives, and
+  `RxApp` does not exist as a type. Exercises whose catalog rows imply virtual time
+  (ex044 `SequencerScheduling`) must be re-scoped around gating an async body on a
+  `TaskCompletionSource` instead, which is the deterministic technique that does work.
+
 ### 2.1 Seven constraints discovered by the probe
 
 A throwaway probe in the scratchpad — a ReactiveUI view model plus a real
