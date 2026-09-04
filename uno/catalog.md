@@ -31,7 +31,7 @@ rather than as current values. Writing exercises against a mental model that has
 been verified would be worse than leaving the gap, so those rows now cover async
 patterns instead. MVUX is the obvious next addition to this track.
 
-**Status: 90 ✅ / 10 ⬜**
+**Status: 95 ✅ / 5 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -142,11 +142,11 @@ patterns instead. MVUX is the obvious next addition to this track.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 091 | PlatformSeam | a partial-class seam, per-platform implementation, tested core | ⬜ |
-| 092 | AsyncPipeline | composing async steps with cancellation and error propagation | ⬜ |
-| 093 | AsyncStreamViewModel | `IAsyncEnumerable` driving a view model, cancellation, completion | ⬜ |
-| 094 | NavigationRegions | `Uno.Extensions.Navigation` routes and navigators | ⬜ |
-| 095 | HostConfiguration | `IHostBuilder`, options binding, environment overrides | ⬜ |
+| 091 | CompositionRoot | assembling the whole graph: host, capabilities, platform, view models | ✅ |
+| 092 | AsyncPipeline | composing async steps with cancellation and error propagation | ✅ |
+| 093 | AsyncStreamViewModel | `IAsyncEnumerable` driving a view model, cancellation, completion | ✅ |
+| 094 | NavigationService | typed routes over a `Frame`, behind an interface a view model can use | ✅ |
+| 095 | HostConfiguration | `IHostBuilder`, options binding, environment overrides | ✅ |
 | 096 | BehaviorFramework | a small attached-behaviour framework with lifetime management | ⬜ |
 | 097 | FlexLayoutEngine | a flex-style layout engine as a reusable `Layout` | ⬜ |
 | 098 | DiagnosticsTracing | structured tracing of layout and binding work | ⬜ |
