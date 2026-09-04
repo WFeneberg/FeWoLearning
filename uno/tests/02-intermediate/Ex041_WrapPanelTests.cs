@@ -89,7 +89,7 @@ public class Ex041_WrapPanelTests : UnoTestContext
         // The height the measure pass promised is the height the arrange pass used. When
         // the two disagree the panel claims space it does not fill, and the layout jitters
         // as soon as anything above it re-measures.
-        Assert.Equal(panel.DesiredSize.Height, 60, 1);
+        Assert.Equal(60, panel.DesiredSize.Height, 1);
     }
 
     [Fact]

@@ -22,7 +22,16 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 60 ✅ / 40 ⬜**
+**MVUX is deliberately not covered.** Six rows (064–067, 092–093) were originally
+`Feed<T>`/`State<T>` exercises. `Uno.Extensions.Reactive` turned out to need care this
+track has not paid yet: its source generator errors on any record in the assembly with
+an `Id`-shaped member that is not `partial`, and `await state.Value(ct)` returned the
+*previous* value in a probe, which means feeds want to be taught as message streams
+rather than as current values. Writing exercises against a mental model that has not
+been verified would be worse than leaving the gap, so those rows now cover async
+patterns instead. MVUX is the obvious next addition to this track.
+
+**Status: 65 ✅ / 35 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -93,13 +102,13 @@ do" in `README.md`.
 | 058 | SizeConstraints | `MinWidth`/`MaxWidth` against `Width`, clamping in the measure pass | ✅ |
 | 059 | FrameNavigation | `Frame.Navigate`/`GoBack`, `OnNavigatedTo` | ✅ |
 | 060 | NavigationParameters | typed parameters, back stack, state on return | ✅ |
-| 061 | SettingsStorage | `ApplicationData.LocalSettings` round-trip | ⬜ |
-| 062 | FileStorageAsync | `StorageFolder`/`StorageFile` async round-trip | ⬜ |
-| 063 | DispatcherMarshalling | background work publishing to the UI thread safely | ⬜ |
-| 064 | MvuxFeedBasics | `Uno.Extensions.Reactive` `Feed<T>`, data/error/progress axes | ⬜ |
-| 065 | MvuxStateUpdates | `State<T>`, `Update`/`Set`, immutable records | ⬜ |
-| 066 | MvuxListFeed | `ListFeed<T>`, empty vs loaded, pagination shape | ⬜ |
-| 067 | MvuxCommands | commands from async methods, parameter feeds | ⬜ |
+| 061 | SettingsStorage | `ApplicationData.LocalSettings` round-trip | ✅ |
+| 062 | FileStorageAsync | `StorageFolder`/`StorageFile` async round-trip | ✅ |
+| 063 | DispatcherSeam | wrapping `DispatcherQueue` behind a testable seam, the has-access guard | ✅ |
+| 064 | AsyncLoadOnDemand | loading/loaded/failed state, cancelling a superseded load | ✅ |
+| 065 | ProgressReporting | `IProgress<T>` from background work to a bound property | ✅ |
+| 066 | WeakMessenger | publish/subscribe between view models without keeping them alive | ⬜ |
+| 067 | DebouncedInput | coalescing rapid changes, cancelling the pending one | ⬜ |
 | 068 | HostingDependencyInjection | `IHost`, `IServiceCollection`, resolving a view model | ⬜ |
 | 069 | ConditionalPlatformCode | one seam, per-platform implementations, a testable core | ⬜ |
 | 070 | CapabilityProbe | feature detection instead of platform checks | ⬜ |
@@ -134,8 +143,8 @@ do" in `README.md`.
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
 | 091 | PlatformSeam | a partial-class seam, per-platform implementation, tested core | ⬜ |
-| 092 | MvuxPipeline | feed combinators, error and progress propagation | ⬜ |
-| 093 | MvuxDynamicFeeds | feeds derived from feeds, cancellation, replay | ⬜ |
+| 092 | AsyncPipeline | composing async steps with cancellation and error propagation | ⬜ |
+| 093 | AsyncStreamViewModel | `IAsyncEnumerable` driving a view model, cancellation, completion | ⬜ |
 | 094 | NavigationRegions | `Uno.Extensions.Navigation` routes and navigators | ⬜ |
 | 095 | HostConfiguration | `IHostBuilder`, options binding, environment overrides | ⬜ |
 | 096 | BehaviorFramework | a small attached-behaviour framework with lifetime management | ⬜ |
