@@ -9,7 +9,7 @@ public class Ex010_ScreenGuardCloseTests : CaliburnCoreContext
     {
         var vm = new Ex010_ScreenGuardClose();
 
-        var canClose = await vm.CanCloseAsync(TestContext.Current.CancellationToken);
+        var canClose = await vm.CanCloseAsync();
 
         Assert.True(canClose);
     }
@@ -19,7 +19,7 @@ public class Ex010_ScreenGuardCloseTests : CaliburnCoreContext
     {
         var vm = new Ex010_ScreenGuardClose { HasUnsavedChanges = true };
 
-        var canClose = await vm.CanCloseAsync(TestContext.Current.CancellationToken);
+        var canClose = await vm.CanCloseAsync();
 
         Assert.False(canClose);
     }
@@ -31,7 +31,7 @@ public class Ex010_ScreenGuardCloseTests : CaliburnCoreContext
         var confirmation = new TaskCompletionSource<bool>();
         vm.ConfirmDiscardAsync = () => confirmation.Task;
 
-        var closeTask = vm.CanCloseAsync(TestContext.Current.CancellationToken);
+        var closeTask = vm.CanCloseAsync();
 
         // Not resolved yet - a real implementation must suspend on the confirmation, not
         // just wrap a synchronous decision in an already-completed Task.
@@ -52,7 +52,7 @@ public class Ex010_ScreenGuardCloseTests : CaliburnCoreContext
             ConfirmDiscardAsync = () => Task.FromResult(false),
         };
 
-        var canClose = await vm.CanCloseAsync(TestContext.Current.CancellationToken);
+        var canClose = await vm.CanCloseAsync();
 
         Assert.False(canClose);
     }
@@ -67,7 +67,7 @@ public class Ex010_ScreenGuardCloseTests : CaliburnCoreContext
             ConfirmDiscardAsync = () => { wasAsked = true; return Task.FromResult(true); },
         };
 
-        var canClose = await vm.CanCloseAsync(TestContext.Current.CancellationToken);
+        var canClose = await vm.CanCloseAsync();
 
         Assert.True(canClose);
         // Assert the negative: nothing to discard means nothing to ask about.

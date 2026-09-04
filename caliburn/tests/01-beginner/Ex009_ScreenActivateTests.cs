@@ -62,10 +62,16 @@ public class Ex009_ScreenActivateTests : CaliburnCoreContext
     public async Task DeactivateAsync_On_A_Never_Activated_Screen_Does_Nothing_At_All()
     {
         var vm = new Ex009_ScreenActivate();
+        var changes = new List<string?>();
+        vm.PropertyChanged += (_, e) => changes.Add(e.PropertyName);
+        var deactivations = new List<DeactivationEventArgs>();
+        vm.Deactivated += (_, e) => { deactivations.Add(e); return Task.CompletedTask; };
 
         // Never activated - per Caliburn this call never reaches OnDeactivateAsync at all.
         await Deactivate(vm, close: false);
         Assert.Equal(0, vm.DeactivateCount);
+        Assert.Empty(changes);
+        Assert.Empty(deactivations);
 
         // Drives the exercise's own hook too, so this test still fails red on the untouched
         // stub instead of only ever proving framework behaviour the learner had no part in.

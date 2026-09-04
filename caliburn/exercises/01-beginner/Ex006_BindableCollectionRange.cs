@@ -6,12 +6,13 @@
 // Passes: dotnet test --filter FullyQualifiedName~Ex006_
 //
 // AddRange(n items) and RemoveRange(n items) each raise exactly ONE CollectionChanged, with
-// action Reset - never one event per item, however many items are involved. That single
-// Reset also carries PropertyChanged for Count and Item[]. The sharp bit: AddRange with an
-// EMPTY sequence still raises that Reset, and so does RemoveRange asked to remove items that
-// were never in the collection - a bound ItemsControl re-reads the whole list either way,
-// even though nothing actually changed. A range call that might have nothing to do is the
-// CALLER's job to guard against, not the collection's.
+// action Reset - never one event per item, however many items are involved - and alongside
+// it, PropertyChanged for Count and Item[]. The sharp bit: AddRange with an EMPTY sequence
+// still raises that Reset, and so does RemoveRange asked to remove items that were never in
+// the collection - a bound ItemsControl re-reads the whole list either way, even though
+// nothing actually changed. A range call that might have nothing to do is the CALLER's job
+// to guard against, not the collection's - AddRange itself must stay a plain, unconditional
+// delegation, or it stops being the thing AddRangeIfAny is guarding.
 
 using Caliburn.Micro;
 

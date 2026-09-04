@@ -10,8 +10,10 @@
 // activated is the same kind of no-op. Both hooks run on every REAL transition, and
 // OnDeactivateAsync's close flag says whether the deactivation is a hide (close: false) or
 // a genuine close (close: true) - your own state must remember which one happened.
-// (Caliburn.Micro 5 renamed the initialize hook to OnInitializedAsync and the activate hook
-// to OnActivatedAsync; OnDeactivateAsync kept its original name - it is not obsolete.)
+// (Caliburn.Micro 5 deprecated OnInitializeAsync in favour of OnInitializedAsync, and
+// OnActivateAsync in favour of OnActivatedAsync - the old names still compile and still
+// run, but are marked obsolete; OnDeactivateAsync kept its original name and is not
+// obsolete.)
 // ActivateAsync/DeactivateAsync themselves are reached through the IActivate/IDeactivate
 // interfaces, never directly off a Screen-typed reference.
 
