@@ -58,10 +58,11 @@ tests there — do not add `solutions/` to a project/module.
 | `avalonia/`| — (restore on first `dotnet test`)     | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_HelloView` |
 | `blazor/` | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `uno/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
+| `caliburn/`| — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 
 Run every command **from inside the track folder**, not the repo root.
 
-For `blazor/` and `uno/`, `dotnet test -p:UseSolutions=true` runs the identical
+For `blazor/`, `uno/` and `caliburn/`, `dotnet test -p:UseSolutions=true` runs the identical
 suite against the reference solutions instead of the stubs.
 
 ## Toolchain status (verified 2026-09-04)
@@ -74,7 +75,11 @@ suite against the reference solutions instead of the stubs.
   **Blazor's** beginner tier (35/100) is verified end-to-end as of 2026-09-04 on
   **.NET 10.0.400 with bUnit 2.9.0**: 115 stub facts red, 0 passed on the
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
-  `java/`, `kotlin/`, `flutter/` and `php/`.
+  `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
+  **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
+  verified as of 2026-09-04: ex001-ex005 (26 test facts) are red on the
+  untouched tree, and 31 facts — the 26 plus the harness smoke tests — pass
+  under `-p:UseSolutions=true`.
 - `java/` and `kotlin/` are currently **catalog-only** additions: their ledgers
   and README files exist, but the build scaffolding and seeded exercises do not.
 - `flutter/` is content-complete like `java/` and `kotlin/`: `pubspec.yaml`
@@ -206,6 +211,36 @@ suite against the reference solutions instead of the stubs.
   only rendered text can be satisfied by a hard-coded literal in the XAML, so
   every binding exercise must change the view model afterwards, call
   `Dispatcher.UIThread.RunJobs()`, and assert the text followed.
+- **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
+  (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
+  the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
+  reference solutions are compile-checked — do not "fix" it back to match the
+  rest of the repo. Tier namespaces are pinned
+  (`FeWoLearning.Caliburn.Exercises.Beginner` and friends) because
+  `01-beginner` is not a valid C# identifier. **`Xunit.StaFact` is pinned to
+  3.0.13, and 4.x must not be used**: 4.x needs xunit.v3 4.0.0, which dropped
+  the VSTest bridge, and `dotnet test` then dies on the .NET 10 SDK with
+  "Testing with VSTest target is no longer supported by
+  Microsoft.Testing.Platform". The `TestingPlatformDotnetTestSupport` property
+  alone did not fix it. 3.0.13 sits on xunit.v3 3.2.2, the same generation
+  `avalonia/` runs. **A Caliburn action only fires when the view is hosted in
+  a real `Window`.** `Microsoft.Xaml.Behaviors` triggers will not resolve
+  their source without a `PresentationSource`; `Measure`/`Arrange`,
+  `ApplyTemplate()` and hand-raised `Loaded` all fail to supply one. Hence
+  `CaliburnViewContext.Show(...)`, which opens a real window off-screen at
+  zero opacity — **and hence the track needs an interactive desktop session
+  and will not run in a service or session-0 context.** `IoC` must be
+  initialized even with no UI: `Coroutine.BeginExecute` calls `IoC.BuildUp`.
+  `XamlPlatformProvider` captures `Dispatcher.CurrentDispatcher` in its
+  constructor, so it leaks across tests; `CaliburnCoreContext` resets
+  `PlatformProvider.Current` per test, and tests run serially.
+  `FrameworkElement.LoadedEvent` is a *direct* routed event — raising it on a
+  view never reaches that view's children. An element must not be named
+  after a `FrameworkElement` member: `x:Name="Name"` hides
+  `FrameworkElement.Name` (`CS0108`). Exercises use `UserName`-style names.
+  The `exercises/` build emits expected `CS0067`/`CS0649` warnings from stubs
+  whose members throw; `solutions/` builds with 0 warnings — same stance as
+  `blazor/`.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -299,6 +334,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 10 / 100 (verified) | 90 |
 | `blazor/` | 35 / 100 (verified) | 65 |
 | `uno/`    | 100 / 100 (verified) | —         |
+| `caliburn/`| 5 / 100 (verified) | 95 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/` and `blazor/`,
 both still being built out — see the table above for exact counts. Nothing else is

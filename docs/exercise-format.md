@@ -35,6 +35,7 @@ is prefixed:
 | `kotlin/` | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_val_var_basics/` |
 | `avalonia/`| one folder per tier, `.axaml` + code-behind, test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloView.axaml` |
 | `uno/`    | one folder per tier, `.cs` (plus `.xaml` + code-behind for markup exercises), test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloProperty.cs` |
+| `caliburn/`| one file per exercise, tier-wide namespace, test in a separate `tests/` project | `exercises/01-beginner/Ex001_NotifyByHand.cs` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
