@@ -34,8 +34,9 @@ Two deliberate content gaps:
   libraries for a single row, so row 088 does `HwndSource`/`HwndHost` plus P/Invoke
   instead — the harder and more transferable half.
 - **Wall-clock performance.** No row asserts elapsed time; a timing test is noise on
-  a loaded machine. Rows 076–080 assert *that* recycling, freezing or deferral
-  happened — container identity, `IsFrozen`, the number of refreshes collapsed.
+  a loaded machine. Rows 076–080 assert *that* the mechanism fired instead —
+  container identity across a scroll, `IsFrozen`, the number of measure passes an
+  invalidation caused.
 
 **Status: 0 ✅ / 100 ⬜**
 

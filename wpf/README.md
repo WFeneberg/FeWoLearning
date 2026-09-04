@@ -125,7 +125,8 @@ Three failure modes, each of which has already shipped in some track of this rep
 - **WinForms interop.** `WindowsFormsHost` would pull WinForms into both content
   libraries for one row, so ex088 does `HwndSource`/`HwndHost` plus P/Invoke instead.
 - **Wall-clock performance.** No exercise asserts elapsed time — that is noise on a
-  loaded machine. The performance rows assert *that* recycling, freezing or deferral
-  happened.
+  loaded machine. The performance rows (076–080) assert *that* the mechanism fired
+  instead — container identity across a scroll, `IsFrozen`, the number of measure
+  passes an invalidation caused.
 
 Windows-only, because WPF is.
