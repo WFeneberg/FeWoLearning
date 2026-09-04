@@ -323,6 +323,21 @@ trap documented for `python/`.
   button.Command)` — or `Assert.Null(button.Command)` where the exercise's point is
   that there is no command — is what pins the wiring. ex016 and ex019 carried it and
   were immune; ex018 lacked it and was not.
+- **Beware a control's own built-in behaviour standing in for the mechanism.** ex021
+  drills a converter's `ConvertBack`, but a `RadioButton`'s `GroupName` gives
+  mutual exclusivity for free, entirely inside the control and independent of any
+  binding. A `Mode=OneWay` binding plus `Click` handlers writing the view model
+  directly therefore reproduced every observable effect while `ConvertBack` threw
+  unconditionally. When a control does part of the exercise's job by itself, the UI
+  test cannot reach the part that matters — **test that unit directly** with a plain
+  `[Fact]` against the converter, and assert the exact sentinel (`Assert.Same(
+  BindingOperations.DoNothing, result)`), not merely a falsy value.
+- **Some mechanisms are not mechanically provable, and that is worth saying out
+  loud.** A hand-rolled `SelectionChanged`/`PropertyChanged` sync is behaviourally
+  indistinguishable from a declarative `SelectedItem` binding — the cheat is not even
+  wrong, just not the lesson. Where no public API separates the two, prefer a
+  documented limitation in the stub's `Goal:` and a note in the test file over an
+  assertion that would fail a legitimate solution.
 - Confirm each red failure comes from the exercise's own
   `NotImplementedException` — not from a compile error, not from a missing XAML
   resource, and above all not from the uninitialized-ReactiveUI exception of
