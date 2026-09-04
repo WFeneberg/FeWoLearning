@@ -1,16 +1,21 @@
 # Avalonia Track
 
-100 test-driven Avalonia 12 desktop UI exercises, built on **ReactiveUI** MVVM
-throughout. "Beginner" means Avalonia beginner, not C# beginner: ex001 is a
-`UserControl` with a bound `TextBlock`, not a `FizzBuzz`. Plain C# language
+A 100-exercise catalog of test-driven Avalonia 12 desktop UI exercises, built
+on **ReactiveUI** MVVM throughout. "Beginner" means Avalonia beginner, not C#
+beginner: ex001 is a `UserControl` with a bound `TextBlock`, not a
+`FizzBuzz`. Plain C# language
 drills belong to the `dotnet/` track; Blazor's component model belongs to
 `blazor/`.
 
 Every exercise is a stub that **fails red** before implementation and **passes
 green** once it matches its reference solution — the same invariant as every
-other track in this repo. All 100 exercises are seeded, but only some have
-been confirmed red/green by an actual test run — see `catalog.md`'s status
-line for the current, live count of how many.
+other track in this repo. The exercises written so far were each confirmed
+red as a stub and green against its reference solution by a real
+`dotnet test` / `dotnet test -p:UseSolutions=true` run; the rest of the
+catalog is planned, not yet written — see `catalog.md`'s status line for the
+live count of how many exist. The scaffolding, headless test harness, and
+gallery already cover all four tiers, so adding the remaining exercises needs
+no further plumbing.
 
 The MVVM base is ReactiveUI end to end: the beginner tier (001–035) uses it
 only declaratively (`ReactiveObject`, `RaiseAndSetIfChanged`,
