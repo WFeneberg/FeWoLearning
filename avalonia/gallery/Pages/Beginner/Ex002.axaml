@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="using:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Gallery.Pages.Beginner.Ex002">
+  <StackPanel Spacing="12">
+    <TextBlock Text="Exercise 002 — LayoutStackPanel" FontSize="18" FontWeight="Bold" />
+    <Border Height="200" Width="300" HorizontalAlignment="Left">
+      <b:Ex002_LayoutStackPanel />
+    </Border>
+  </StackPanel>
+</UserControl>

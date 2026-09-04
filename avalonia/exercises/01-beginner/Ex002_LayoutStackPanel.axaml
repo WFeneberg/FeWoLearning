@@ -1,0 +1,14 @@
+<!-- Exercise 002 - LayoutStackPanel (beginner).
+     Goal:   Stack three fixed-height bars with uniform gaps.
+     Drills: StackPanel orientation and Spacing, stacked Bounds.
+     Passes: dotnet test, filtered to Ex002_ (see the exact command in
+     Ex002_LayoutStackPanel.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex002_LayoutStackPanel">
+  <!-- TODO: replace this placeholder with a vertical StackPanel whose Spacing is 8,
+       holding three Borders named "Row1", "Row2" and "Row3", each 20 device pixels
+       tall. Leave their widths to the panel. -->
+  <TextBlock Text="TODO" />
+</UserControl>

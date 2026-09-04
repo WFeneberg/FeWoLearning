@@ -1,3 +1,5 @@
+using FeWoLearning.Avalonia.Gallery.Pages.Beginner;
+
 namespace FeWoLearning.Avalonia.Gallery;
 
 public static class GalleryCatalog
@@ -6,5 +8,12 @@ public static class GalleryCatalog
     /// One entry per exercise whose result is visual. View-model-only exercises
     /// (ex008, ex009) deliberately have no page.
     /// </summary>
-    public static IReadOnlyList<GalleryEntry> Entries { get; } = [];
+    public static IReadOnlyList<GalleryEntry> Entries { get; } =
+    [
+        new("001", "HelloView", () => new Ex001()),
+        new("002", "LayoutStackPanel", () => new Ex002()),
+        new("003", "LayoutGrid", () => new Ex003()),
+        new("004", "LayoutGridSpan", () => new Ex004()),
+        new("005", "LayoutDockPanel", () => new Ex005()),
+    ];
 }

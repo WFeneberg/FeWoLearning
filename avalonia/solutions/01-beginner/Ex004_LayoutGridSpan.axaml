@@ -1,0 +1,22 @@
+<!-- Exercise 004 - LayoutGridSpan (beginner).
+     Goal:   Span a banner across three proportionally sized columns.
+     Drills: Grid.ColumnSpan, proportional star sizing.
+     Passes: dotnet test, filtered to Ex004_ (see the exact command in
+     Ex004_LayoutGridSpan.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex004_LayoutGridSpan">
+  <!-- VerticalAlignment="Top" matters here: with no star ROW, a Grid stretched by
+       its parent to more height than its Auto rows need picks up a small, non-
+       proportional inflation on those rows in this Avalonia build (reproduced with
+       the simplest possible two-Auto-row Grid, no spanning/star columns involved).
+       Pinning the Grid to its own content height avoids it. -->
+  <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="1*,2*,1*" VerticalAlignment="Top">
+    <Border Name="Banner" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+            Height="16" Background="#22000000" />
+    <Border Name="Left"   Grid.Row="1" Grid.Column="0" Height="30" Background="#4C8BF5" />
+    <Border Name="Middle" Grid.Row="1" Grid.Column="1" Height="30" Background="#34A853" />
+    <Border Name="Right"  Grid.Row="1" Grid.Column="2" Height="30" Background="#FBBC05" />
+  </Grid>
+</UserControl>

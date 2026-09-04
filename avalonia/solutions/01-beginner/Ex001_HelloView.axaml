@@ -1,0 +1,16 @@
+<!-- Exercise 001 - HelloView (beginner).
+     Goal:   Render two view-model properties into two named TextBlocks.
+     Drills: UserControl, x:DataType, one-way binding into named TextBlocks.
+     Passes: dotnet test, filtered to Ex001_ (see the exact command in
+     Ex001_HelloView.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex001_HelloView"
+             x:DataType="b:Ex001_HelloViewModel">
+  <StackPanel Orientation="Vertical" Spacing="4">
+    <TextBlock Name="TitleText" Text="{Binding Title}" FontSize="20" />
+    <TextBlock Name="SubtitleText" Text="{Binding Subtitle}" Opacity="0.7" />
+  </StackPanel>
+</UserControl>

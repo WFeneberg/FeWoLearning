@@ -22,17 +22,17 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 5 ✅ / 95 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 001 | HelloView | `UserControl`, `x:DataType`, one-way binding into named `TextBlock`s | ⬜ |
-| 002 | LayoutStackPanel | `StackPanel` orientation and `Spacing`, stacked `Bounds` | ⬜ |
-| 003 | LayoutGrid | `RowDefinitions`/`ColumnDefinitions`, `Auto` vs `*`, `Grid.Row`/`Grid.Column` | ⬜ |
-| 004 | LayoutGridSpan | `Grid.ColumnSpan`, proportional star sizing | ⬜ |
-| 005 | LayoutDockPanel | `DockPanel.Dock`, `LastChildFill`, dock order | ⬜ |
+| 001 | HelloView | `UserControl`, `x:DataType`, one-way binding into named `TextBlock`s | ✅ |
+| 002 | LayoutStackPanel | `StackPanel` orientation and `Spacing`, stacked `Bounds` | ✅ |
+| 003 | LayoutGrid | `RowDefinitions`/`ColumnDefinitions`, `Auto` vs `*`, `Grid.Row`/`Grid.Column` | ✅ |
+| 004 | LayoutGridSpan | `Grid.ColumnSpan`, proportional star sizing | ✅ |
+| 005 | LayoutDockPanel | `DockPanel.Dock`, `LastChildFill`, dock order | ✅ |
 | 006 | AlignmentAndMargin | `HorizontalAlignment`/`VerticalAlignment`, `Margin` vs `Padding` | ⬜ |
 | 007 | LayoutWrapPanel | `WrapPanel` wrapping at a constrained width | ⬜ |
 | 008 | ObservableViewModel | `INotifyPropertyChanged` by hand, change-only notification | ⬜ |

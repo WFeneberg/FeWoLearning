@@ -1,0 +1,18 @@
+<!-- Exercise 003 - LayoutGrid (beginner).
+     Goal:   Place four cells in a two-by-two Grid mixing Auto and star sizing.
+     Drills: RowDefinitions/ColumnDefinitions, Auto vs *, Grid.Row/Grid.Column.
+     Passes: dotnet test, filtered to Ex003_ (see the exact command in
+     Ex003_LayoutGrid.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex003_LayoutGrid">
+  <!-- TODO: replace this placeholder with a Grid whose rows are "Auto,*" and whose
+       columns are "80,*", holding four Borders:
+         HeaderLeft  at row 0 col 0, Height 24
+         HeaderRight at row 0 col 1, Height 24
+         BodyLeft    at row 1 col 0
+         BodyRight   at row 1 col 1
+       The Auto row must take its height from the 24-tall header cells. -->
+  <TextBlock Text="TODO" />
+</UserControl>

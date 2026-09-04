@@ -1,0 +1,16 @@
+<!-- Exercise 005 - LayoutDockPanel (beginner).
+     Goal:   Build a classic shell: top bar, bottom bar, side bar, filled body.
+     Drills: DockPanel.Dock, LastChildFill, dock order.
+     Passes: dotnet test, filtered to Ex005_ (see the exact command in
+     Ex005_LayoutDockPanel.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex005_LayoutDockPanel">
+  <DockPanel LastChildFill="True">
+    <Border Name="TopBar"    DockPanel.Dock="Top"    Height="30" Background="#22000000" />
+    <Border Name="BottomBar" DockPanel.Dock="Bottom" Height="20" Background="#22000000" />
+    <Border Name="SideBar"   DockPanel.Dock="Left"   Width="60"  Background="#11000000" />
+    <Border Name="Body"      Background="#4C8BF5" />
+  </DockPanel>
+</UserControl>
