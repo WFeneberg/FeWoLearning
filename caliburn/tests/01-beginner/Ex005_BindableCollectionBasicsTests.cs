@@ -44,8 +44,8 @@ public class Ex005_BindableCollectionBasicsTests : CaliburnCoreContext
 
         vm.ReplaceAll(new[] { "bread", "butter", "jam" });
 
-        // A naive Clear-then-Add-each would be four events here, and four layout passes
-        // in a bound ItemsControl. Reset means "re-read everything", once.
+        // A naive Clear-then-Add-each would be four events here, and four rounds of
+        // container generation in a bound ItemsControl. Reset means "re-read everything", once.
         Assert.Equal(new[] { NotifyCollectionChangedAction.Reset }, actions);
     }
 

@@ -66,9 +66,9 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
             Left = -32000,
             Top = -32000,
         };
+        _windows.Add(w);
         w.Show();
         Pump(DispatcherPriority.Loaded);
-        _windows.Add(w);
         return w;
     }
 
@@ -76,7 +76,9 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
     protected static void Pump(DispatcherPriority priority = DispatcherPriority.Background) =>
         Dispatcher.CurrentDispatcher.Invoke(() => { }, priority);
 
-    public void Dispose()
+    // Virtual so a derived test class can add its own teardown without hiding this one -
+    // an override MUST call base.Dispose(), or the tracked windows never get closed.
+    public virtual void Dispose()
     {
         foreach (var w in _windows) w.Close();
         GC.SuppressFinalize(this);

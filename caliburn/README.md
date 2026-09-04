@@ -2,7 +2,7 @@
 
 Test-driven **Caliburn.Micro 5** MVVM exercises on **WPF**, targeting .NET 10.
 No Caliburn templates, no Visual Studio extension, no scaffolding tool — the
-NuGet packages are pinned in `Directory.Build.props` and restore on the first
+NuGet packages are pinned in the three `.csproj` files and restore on the first
 `dotnet build`.
 
 **Caliburn.Micro is the subject; WPF is only the carrier.** A `Button` shows up
@@ -129,6 +129,23 @@ The whole test assembly runs serially
 (`[assembly: CollectionBehavior(DisableTestParallelization = true)]`) because
 Caliburn's configuration — `IoC`, `PlatformProvider`, `AssemblySource`, the
 `ViewLocator` — is process-global, not per-test.
+
+**Forward risk: the harness does not reset every process-global static.**
+`CaliburnCoreContext` resets exactly three globals per test — `PlatformProvider.Current`,
+`AssemblySource.Instance`, and the `IoC` delegates. It does **not** reset
+`ViewLocator.LocateTypeForModelType`/`NameTransformer`, `ViewModelBinder.BindProperties`/
+`BindActions`, `ConventionManager.ElementConventions`, `MessageBinder.SpecialValues`/
+`CustomConverters`, `ActionMessage.InvokeAction`/`ApplyAvailabilityEffect`,
+`LogManager.GetLog`, or `BindingScope.GetNamedElements` — all equally static and
+equally process-global. Nothing shipped today touches them, but ex015
+(`NameTransformerRule`), ex020 (`CustomElementConvention`), ex063, ex068–ex073, ex087,
+ex095 and ex096 will. Because the assembly runs serially with no restore between
+tests, the first of those to mutate one of these statics — ex015's
+`NameTransformer.AddRule` — will leak into every later test in the run unless whoever
+writes it first extends `CaliburnCoreContext` (or `CaliburnViewContext`) to snapshot
+the value in its constructor and restore it on teardown. Until then, a later
+exercise failing for no visible reason of its own is this, not a bug in that
+exercise.
 
 `tests/_harness/HarnessSmokeTests.cs` proves the harness itself: `HarnessCoreSmokeTests`
 (1 `[Fact]`) exercises the core context with no view at all, and `HarnessSmokeTests`

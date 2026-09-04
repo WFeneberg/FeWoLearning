@@ -240,7 +240,13 @@ suite against the reference solutions instead of the stubs.
   `FrameworkElement.Name` (`CS0108`). Exercises use `UserName`-style names.
   The `exercises/` build emits expected `CS0067`/`CS0649` warnings from stubs
   whose members throw; `solutions/` builds with 0 warnings — same stance as
-  `blazor/`.
+  `blazor/`. **Forward risk:** the harness resets only three process-global
+  statics per test (`PlatformProvider.Current`, `AssemblySource.Instance`, the
+  `IoC` delegates) — not `ViewLocator`'s `NameTransformer`, `ConventionManager`,
+  `MessageBinder`, or the other Caliburn statics the planned ex015/ex020/ex063/
+  ex068-073/ex087/ex095/ex096 will touch; the first of those to mutate one must
+  extend `CaliburnCoreContext` to snapshot and restore it, or later tests fail
+  in ways that look like their own bugs. See `caliburn/README.md`.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -336,8 +342,9 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 5 / 100 (verified) | 95 |
 
-Every 100-exercise ledger is fully seeded except `avalonia/` and `blazor/`,
-both still being built out — see the table above for exact counts. Nothing else is
+Every 100-exercise ledger is fully seeded except `avalonia/`, `blazor/` and
+`caliburn/`, all three still being built out — see the table above for exact
+counts. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the other six tracks are.

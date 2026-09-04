@@ -19,9 +19,10 @@ reference solutions in `solutions/<tier>/`. Tier namespaces are
 `FeWoLearning.Caliburn.Exercises.Beginner/.Intermediate/.Advanced/.Expert`, because
 `01-beginner` is not a valid C# identifier.
 
-Exercises ex001–ex011 need no view and derive from `CaliburnCoreContext`. From ex012
-on they derive from `CaliburnViewContext` and must be hosted with `Show(...)` before
-any action can fire — see `README.md`.
+Exercises ex001–ex011 need no view and derive from `CaliburnCoreContext`. Viewless
+exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
+exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
+`Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
 **Status: 5 ✅ / 95 ⬜**
 
@@ -115,7 +116,7 @@ any action can fire — see `README.md`.
 | 086 | AsyncInitializationOrdering | `OnInitializeAsync` vs `OnActivateAsync` ordering | ⬜ |
 | 087 | CustomAttachedConventions | conventions driven by an attached property | ⬜ |
 | 088 | NestedViewModelGuards | a guard depending on a nested view model | ⬜ |
-| 089 | CollectionSuspension | `IsNotifying` under load, and `Refresh` | ⬜ |
+| 089 | CollectionReconciliation | diffing an incoming list against the bound collection into minimal `Add`/`Remove` events instead of a `Reset`, to preserve selection and scroll position | ⬜ |
 | 090 | ConventionPerformance | the cost of convention lookup, and caching it | ⬜ |
 | 091 | ModularShellAssemblySource | a modular shell over `AssemblySource` | ⬜ |
 | 092 | DynamicPluginLoading | loading view/view-model assemblies at runtime | ⬜ |
