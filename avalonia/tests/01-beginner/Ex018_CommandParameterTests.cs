@@ -44,15 +44,22 @@ public class Ex018_CommandParameterTests
         Assert.Equal("delta", vm.LastParameter);
     }
 
+    // Structural discriminator: both buttons must route through the SAME
+    // command instance - that is the exercise's whole point, one parameterised
+    // command serving two call sites. Without this, a pair of Click handlers
+    // that set vm.LastParameter directly (never touching SetParameterCommand
+    // at all) would satisfy every other assertion in this file.
     [AvaloniaFact]
-    public void Each_Button_Declares_Its_Own_CommandParameter()
+    public void Each_Button_Declares_Its_Own_CommandParameter_And_Is_Bound_To_The_Shared_Command()
     {
-        var (view, _) = Arrange();
+        var (view, vm) = Arrange();
         var alpha = view.FindControl<Button>("AlphaButton")!;
         var beta = view.FindControl<Button>("BetaButton")!;
 
         Assert.Equal("alpha", alpha.CommandParameter);
         Assert.Equal("beta", beta.CommandParameter);
+        Assert.Same(vm.SetParameterCommand, alpha.Command);
+        Assert.Same(vm.SetParameterCommand, beta.Command);
     }
 
     // Clicking BETA before ALPHA on purpose: a solution that hard-codes "alpha"
