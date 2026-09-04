@@ -9,11 +9,11 @@
     @for (var i = 0; i < _tabs.Count; i++)
     {
         var tab = _tabs[i];
-        <button class="tab@(tab == _active ? " active" : "")" id="tab-@i" @onclick="() => Activate(tab)">@tab.Title</button>
+        <button class="tab@(tab == ActiveTab ? " active" : "")" id="tab-@i" @onclick="() => Activate(tab)">@tab.Title</button>
     }
 </div>
 <div id="tab-panel">
-    @_active?.ChildContent
+    @ActiveTab?.ChildContent
 </div>
 
 @code {
@@ -21,6 +21,7 @@
 
     private readonly List<Ex035_TabsComposition_Tab> _tabs = [];
     private Ex035_TabsComposition_Tab? _active;
+    private bool _refreshQueued;
 
     // Live registry: the parent keeps the child instances themselves, not a
     // snapshot of their Title/ChildContent taken once at registration time. That
@@ -35,17 +36,37 @@
     public void Unregister(Ex035_TabsComposition_Tab tab)
     {
         _tabs.Remove(tab);
-        if (ReferenceEquals(_active, tab))
-        {
-            _active = _tabs.Count > 0 ? _tabs[0] : null;
-        }
-
         StateHasChanged();
     }
 
+    // Resolves fresh on every render rather than being eagerly patched up inside
+    // Unregister: if the tab last activated is no longer registered (it was just
+    // removed), fall back to the first remaining one. That makes the fallback
+    // correct by construction regardless of what order simultaneous removals
+    // dispose in - there is no window where it can transiently point at a tab
+    // that turns out to have been removed too.
+    private Ex035_TabsComposition_Tab? ActiveTab => _active is not null && _tabs.Contains(_active) ? _active : _tabs.FirstOrDefault();
+
     // A registered tab calls this whenever its own parameters change, so a
-    // relabel is reflected even though the tab was already registered.
-    public void Refresh() => StateHasChanged();
+    // relabel is reflected even though the tab was already registered. Bounded
+    // to at most one extra render pass per batch: Refresh() only asks for a
+    // re-render the first time it's called since the last one committed, so no
+    // matter how many tabs call it in the same pass - or how often a tab's own
+    // Title keeps changing across passes - this can never queue more than one
+    // pass at a time. OnAfterRender (called once that pass has committed) is
+    // what allows the next genuine request through.
+    public void Refresh()
+    {
+        if (_refreshQueued)
+        {
+            return;
+        }
+
+        _refreshQueued = true;
+        StateHasChanged();
+    }
+
+    protected override void OnAfterRender(bool firstRender) => _refreshQueued = false;
 
     private void Activate(Ex035_TabsComposition_Tab tab)
     {

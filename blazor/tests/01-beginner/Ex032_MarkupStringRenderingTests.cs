@@ -25,15 +25,13 @@ public class Ex032_MarkupStringRenderingTests : BunitContext
             .Add(c => c.AllowHtml, true));
 
         Assert.Equal("hi", cut.Find("#rich b").TextContent);
-    }
 
-    [Fact]
-    public void Empty_Html_With_AllowHtml_Renders_An_Empty_Rich_Element()
-    {
-        var cut = Render<Ex032_MarkupStringRendering>(p => p
-            .Add(c => c.Html, "")
-            .Add(c => c.AllowHtml, true));
-
+        // Folded here per rule 1 (identical premise: AllowHtml=true): an empty Html
+        // value can't discriminate escaped-vs-markup behaviour on its own - a
+        // MarkupString("") and an escaped "" both render as empty text - so this
+        // isn't a fact worth keeping separate. It only confirms the empty case
+        // still renders the given #rich element without throwing.
+        cut.Render(p => p.Add(c => c.Html, "").Add(c => c.AllowHtml, true));
         var rich = cut.Find("#rich");
         Assert.Equal("DIV", rich.TagName);
         Assert.Equal("", rich.TextContent);

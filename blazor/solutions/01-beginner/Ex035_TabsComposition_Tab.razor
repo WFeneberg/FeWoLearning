@@ -10,27 +10,13 @@
     [Parameter] public string Title { get; set; } = "";
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    private string? _lastNotifiedTitle;
-
     protected override void OnInitialized() => Parent?.Register(this);
 
-    // OnParametersSet fires on every render pass the parent triggers - including
-    // one caused by Parent.Refresh() itself, since re-rendering the parent
-    // re-invokes ChildContent and re-parameterizes every tab again. Without the
-    // guard below, telling the parent to re-render because Title changed would
-    // cause another such pass, which would ask again, forever. Only notify the
-    // parent when Title has actually moved since the last time this fired; that
-    // is what lets a later relabel reach the header without looping.
-    protected override void OnParametersSet()
-    {
-        if (_lastNotifiedTitle == Title)
-        {
-            return;
-        }
-
-        _lastNotifiedTitle = Title;
-        Parent?.Refresh();
-    }
+    // Every parameter update (including the first one) tells the parent it may
+    // need to re-render, since the parent reads Title/ChildContent live off this
+    // instance rather than a snapshot. Refresh() itself is responsible for not
+    // letting that turn into an unbounded render cascade - see its comment.
+    protected override void OnParametersSet() => Parent?.Refresh();
 
     public void Dispose() => Parent?.Unregister(this);
 }

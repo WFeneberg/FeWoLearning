@@ -4,8 +4,10 @@
    Passes: dotnet test --filter FullyQualifiedName~Ex031_ *@
 @* TODO: render <span id="total">@_total</span> and three <AddButton Amount="N" OnAdd="..." />
    children with amounts 1, 5 and 10, whose callback adds the reported amount to _total.
-   Do not call StateHasChanged() here - an EventCallback handler already triggers a
-   re-render of this component, and the test proves it. *@
+   Do not call StateHasChanged() here - an EventCallback handler already triggers this
+   component's re-render, so a manual call would be redundant. Note: the tests cannot
+   tell the difference between relying on that and calling it anyway - trust the
+   framework here rather than looking for a test to prove it wrong. *@
 
 @code {
     private int _total;

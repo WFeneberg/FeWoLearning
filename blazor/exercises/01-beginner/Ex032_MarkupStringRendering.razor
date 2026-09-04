@@ -1,29 +1,17 @@
 @* Exercise 032 - MarkupString Rendering (beginner).
-   Goal:   Render raw HTML only when explicitly allowed; escape it otherwise.
+   Goal:   Render HTML raw only when explicitly allowed; otherwise show it as
+           visible, escaped text.
    Drills: MarkupString, opting out of Blazor's default HTML-encoding.
    Passes: dotnet test --filter FullyQualifiedName~Ex032_ *@
-@* Rendering `@Rendered` directly would call the framework's AddContent(int, object)
-   overload, which always treats a boxed value as escaped text - even a boxed
-   MarkupString. Re-checking the runtime type here is what actually lets the
-   MarkupString branch render as real HTML. *@
-<div id="rich">
-    @if (Rendered is MarkupString markup)
-    {
-        @markup
-    }
-    else
-    {
-        @Rendered
-    }
-</div>
+@* TODO: render <div id="rich"> containing Html. When AllowHtml is true, Html must
+   be interpreted as real HTML (e.g. a "<b>" in it becomes an actual bold element).
+   When AllowHtml is false, Html must appear as plain, visible text - any markup
+   characters in it stay literal, not interpreted. *@
 
 @code {
     [Parameter] public string Html { get; set; } = "";
     [Parameter] public bool AllowHtml { get; set; }
 
-    // TODO: return new MarkupString(Html) when AllowHtml, otherwise the plain Html
-    // string so Blazor escapes it. The return type is object on purpose: the two
-    // branches have different types (MarkupString vs string) with no common type,
-    // so the property cannot be typed as either one alone.
-    private object Rendered => throw new NotImplementedException("TODO: Ex032 - return raw markup only when it is allowed");
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex032 - render raw markup only when it is allowed");
 }

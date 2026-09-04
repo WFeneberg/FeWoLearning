@@ -1,27 +1,20 @@
 @* Exercise 032 - MarkupString Rendering (beginner).
-   Goal:   Render raw HTML only when explicitly allowed; escape it otherwise.
+   Goal:   Render HTML raw only when explicitly allowed; otherwise show it as
+           visible, escaped text.
    Drills: MarkupString, opting out of Blazor's default HTML-encoding.
    Passes: dotnet test --filter FullyQualifiedName~Ex032_ *@
-@* Rendering `@Rendered` directly would call the framework's AddContent(int, object)
-   overload, which always treats a boxed value as escaped text - even a boxed
-   MarkupString. Re-checking the runtime type here is what actually lets the
-   MarkupString branch render as real HTML. *@
 <div id="rich">
-    @if (Rendered is MarkupString markup)
+    @if (AllowHtml)
     {
-        @markup
+        @((MarkupString)Html)
     }
     else
     {
-        @Rendered
+        @Html
     }
 </div>
 
 @code {
     [Parameter] public string Html { get; set; } = "";
     [Parameter] public bool AllowHtml { get; set; }
-
-    // object, not MarkupString or string: the two branches have no common type,
-    // so an explicit cast is required on the MarkupString branch (CS0173 otherwise).
-    private object Rendered => AllowHtml ? (object)new MarkupString(Html) : Html;
 }

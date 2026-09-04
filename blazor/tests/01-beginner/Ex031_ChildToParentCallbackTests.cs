@@ -11,13 +11,12 @@ public class Ex031_ChildToParentCallbackTests : BunitContext
     {
         var cut = Render<Ex031_ChildToParentCallback>();
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Equal("0", cut.Find("#total").TextContent);
-            var buttons = cut.FindAll("button.add");
-            Assert.Equal(3, buttons.Count);
-            Assert.Equal(new[] { "1", "5", "10" }, buttons.Select(b => b.GetAttribute("data-amount")).ToArray());
-        });
+        // Plain initial render, no event dispatch - per rule 4 this needs no
+        // WaitForAssertion.
+        Assert.Equal("0", cut.Find("#total").TextContent);
+        var buttons = cut.FindAll("button.add");
+        Assert.Equal(3, buttons.Count);
+        Assert.Equal(new[] { "1", "5", "10" }, buttons.Select(b => b.GetAttribute("data-amount")).ToArray());
     }
 
     [Fact]
