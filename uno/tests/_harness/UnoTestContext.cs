@@ -26,6 +26,17 @@ public abstract class UnoTestContext
         return element;
     }
 
+    /// <summary>
+    /// Where the layout pass actually put an element, relative to its parent. Only
+    /// meaningful after <see cref="Layout"/>.
+    /// </summary>
+    /// <remarks>
+    /// Read off <c>ActualOffset</c> rather than <c>TransformToVisual</c>: the latter needs
+    /// render state that a windowless tree does not have, and quietly returns the origin.
+    /// </remarks>
+    protected static Point Offset(UIElement element) =>
+        new(element.ActualOffset.X, element.ActualOffset.Y);
+
     /// <summary>Depth-first walk of the visual tree, template children included.</summary>
     protected static IEnumerable<DependencyObject> Descendants(DependencyObject root)
     {

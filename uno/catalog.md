@@ -18,7 +18,7 @@ reference solutions in `solutions/<tier>/`. Tier namespaces are
 Every test runs headless against the real Skia `Uno.UI` — see `README.md` for how
 that works and what it costs.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -34,11 +34,11 @@ that works and what it costs.
 | 008 | ConverterParameter | parameter-driven conversion, invariant parsing | ✅ |
 | 009 | XamlUserControl | `x:Class`, `InitializeComponent`, `x:Name`, code-behind | ✅ |
 | 010 | GridPlacement | `RowDefinitions`/`ColumnDefinitions`, `Grid.Row`/`Grid.Column` | ✅ |
-| 011 | StarSizing | `*` vs `Auto` vs absolute, `ActualWidth` after arrange | ⬜ |
-| 012 | StackPanelSpacing | `Orientation`, `Spacing`, how `DesiredSize` accumulates | ⬜ |
-| 013 | MarginPadding | margin vs padding in the measure pass | ⬜ |
-| 014 | AlignmentStretch | `HorizontalAlignment`/`VerticalAlignment` vs `Stretch` | ⬜ |
-| 015 | CanvasPositioning | `Canvas.Left`/`Top`/`ZIndex`, no layout negotiation | ⬜ |
+| 011 | StarSizing | `*` vs `Auto` vs absolute, `ActualWidth` after arrange | ✅ |
+| 012 | StackPanelSpacing | `Orientation`, `Spacing`, how `DesiredSize` accumulates | ✅ |
+| 013 | MarginPadding | margin vs padding in the measure pass | ✅ |
+| 014 | AlignmentStretch | `HorizontalAlignment`/`VerticalAlignment` vs `Stretch` | ✅ |
+| 015 | CanvasPositioning | `Canvas.Left`/`Top`/`ZIndex`, no layout negotiation | ✅ |
 | 016 | RelativePanelAlign | `RelativePanel.RightOf`/`AlignBottomWith` constraint solving | ⬜ |
 | 017 | VisibilityCollapsed | `Visibility.Collapsed` leaves layout, `Opacity` does not | ⬜ |
 | 018 | DataContextInheritance | `DataContext` flows down the tree, local override | ⬜ |
