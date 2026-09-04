@@ -147,11 +147,14 @@ narrow question — does the WPF mechanism work — and deliberately does not at
   dependency-property reflection helper, and wrote it two different ways — a private
   static property in `Ex001_ClrToDependencyPropertyTests`, a private static method in
   `Ex002_CoerceAndValidateTests` — and row 006 (`RegisterReadOnly`,
-  `DependencyPropertyKey`) will need a third shape again. Going forward, a helper like
-  this belongs in `exercises/_support/`, mirrored byte-for-byte into
-  `solutions/_support/`, the way `avalonia/`, `blazor/`, `caliburn/` and `uno/` all do
-  it. (This wave does not unify ex001/ex002's two existing idioms — only documents
-  the convention for what comes next.)
+  `DependencyPropertyKey`) needs a third shape again: a private
+  `DependencyPropertyKey` field. `exercises/_support/` is for *content* fixtures both
+  libraries compile, not test code — a test-only reflection helper belongs in
+  `tests/_harness/` instead, alongside `WpfTestContext`, which is already the shared
+  test surface outside both content libraries. Row 006 adds
+  `DependencyPropertyReflection` there for exactly this. (This wave does not unify
+  ex001/ex002's two existing idioms — only documents the convention for what comes
+  next.)
 - **The "ready to use" convention, and its anti-bypass rule.** An exercise may ship a
   finished collaborator marked "ready to use" (its doc comment may even read slightly
   differently between the stub and the solution — that is deliberate, not drift).

@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 10 ✅ / 90 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -49,11 +49,11 @@ Two deliberate content gaps:
 | 003 | ObservableViewModelBase | `INotifyPropertyChanged`, `SetProperty` + `[CallerMemberName]`, no event without a real change | ✅ |
 | 004 | CodeBehindToBinding | `SetBinding`, `Binding.Path`, `BindingMode.TwoWay`, `UpdateSourceTrigger` | ✅ |
 | 005 | RelayCommand | `ICommand`, `CanExecute`, `CommandManager.RequerySuggested` | ✅ |
-| 006 | ReadOnlyDependencyProperty | `RegisterReadOnly`, `DependencyPropertyKey`, write through the key only | ⬜ |
-| 007 | AttachedProperty | `RegisterAttached`, static `GetX`/`SetX`, read from a parent | ⬜ |
-| 008 | MetadataInheritance | `FrameworkPropertyMetadata`, `Inherits`, `AffectsMeasure` | ⬜ |
-| 009 | PropertyValuePrecedence | local value vs style setter vs default, `DependencyPropertyHelper.GetValueSource` | ⬜ |
-| 010 | DependentPropertyFanOut | one field change raising several `PropertyChanged` names | ⬜ |
+| 006 | ReadOnlyDependencyProperty | `RegisterReadOnly`, `DependencyPropertyKey`, write through the key only | ✅ |
+| 007 | AttachedProperty | `RegisterAttached`, static `GetX`/`SetX`, read from a parent | ✅ |
+| 008 | MetadataInheritance | `FrameworkPropertyMetadata`, `Inherits`, `AffectsMeasure` | ✅ |
+| 009 | PropertyValuePrecedence | local value vs style setter vs default, `DependencyPropertyHelper.GetValueSource` | ✅ |
+| 010 | DependentPropertyFanOut | one field change raising several `PropertyChanged` names | ✅ |
 | 011 | NotifyAllProperties | `PropertyChangedEventArgs(string.Empty)` semantics | ⬜ |
 | 012 | LegacyEventToInpc | replace a bespoke `XChanged` event with `INotifyPropertyChanged` | ⬜ |
 | 013 | TwoWayUpdateSourceTrigger | `UpdateSourceTrigger.Explicit`, `BindingExpression.UpdateSource` | ⬜ |
