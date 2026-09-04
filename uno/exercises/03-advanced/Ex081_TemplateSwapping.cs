@@ -21,7 +21,7 @@ namespace FeWoLearning.Uno.Exercises.Advanced;
 
 public partial class Ex081_TemplateSwapping : Control
 {
-    private static ControlTemplate Template() => (ControlTemplate)XamlReader.Load(
+    private static ControlTemplate CreateTemplate() => (ControlTemplate)XamlReader.Load(
         """
         <ControlTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -42,10 +42,10 @@ public partial class Ex081_TemplateSwapping : Control
         """);
 
     /// <summary>Test fixture: two equivalent templates, so a swap produces new parts.</summary>
-    public static readonly ControlTemplate FirstTemplate = Template();
+    public static readonly ControlTemplate FirstTemplate = CreateTemplate();
 
     /// <summary>Test fixture: the second one.</summary>
-    public static readonly ControlTemplate SecondTemplate = Template();
+    public static readonly ControlTemplate SecondTemplate = CreateTemplate();
 
     public static readonly DependencyProperty IsHighlightedProperty =
         DependencyProperty.Register(

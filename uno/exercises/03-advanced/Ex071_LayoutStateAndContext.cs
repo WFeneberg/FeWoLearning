@@ -81,7 +81,7 @@ public sealed class Ex071_LayoutStateAndContext : NonVirtualizingLayout
         throw new NotImplementedException("TODO: Ex071 - build the repeater");
 
     /// <summary>Given: the item template.</summary>
-    protected static readonly DataTemplate ItemTemplate = (DataTemplate)XamlReader.Load(
+    private static readonly DataTemplate ItemTemplate = (DataTemplate)XamlReader.Load(
         """
         <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
             <Border Width="{Binding}" Height="10" HorizontalAlignment="Left" VerticalAlignment="Top" />

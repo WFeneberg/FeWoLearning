@@ -60,7 +60,12 @@ public sealed class Ex046_ElementFactoryContract : IElementFactory
 
     // The framework-facing half, given. Both members are pure adapters, which is true of a
     // real factory too: the interface is a calling convention, not the design.
+    // Uno0001 suppressed on purpose: args.Data and args.Element are the unimplemented
+    // members this exercise is *about*. The warning is correct, and leaving it on would
+    // make the whole build noisy about something already documented in the header.
+#pragma warning disable Uno0001
     UIElement IElementFactory.GetElement(ElementFactoryGetArgs args) => GetElement(args.Data);
 
     void IElementFactory.RecycleElement(ElementFactoryRecycleArgs args) => RecycleElement(args.Element);
+#pragma warning restore Uno0001
 }
