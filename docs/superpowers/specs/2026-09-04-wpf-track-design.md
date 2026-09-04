@@ -304,9 +304,10 @@ shell · capstone.
 
 - **Performance rows assert mechanism, never milliseconds.** A test that
   measures elapsed time is noise on any machine under load. So the performance
-  block asserts *that* recycling, freezing or deferral happened — container
-  identity across a scroll, `IsFrozen`, the number of refreshes a `DeferRefresh`
-  collapsed — not how fast it was. This is the same discipline `uno/`'s README
+  block asserts the mechanism instead of the clock: container identity across a
+  scroll (076), `IsFrozen` (077), the fallback order a `PriorityBinding` resolves
+  (078), the render options actually set (079), the number of measure passes an
+  invalidation caused (080). This is the same discipline `uno/`'s README
   documents for virtualization, and it is why those rows are still worth having.
 - **No `UseWindowsForms`.** `WindowsFormsHost` would pull WinForms into both
   content libraries for a single row. The interop rows use `HwndSource` /
