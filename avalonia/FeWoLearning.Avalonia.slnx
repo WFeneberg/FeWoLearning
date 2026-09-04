@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/exercises/">
+    <Project Path="exercises/FeWoLearning.Avalonia.Exercises.csproj" />
+  </Folder>
+  <Folder Name="/solutions/">
+    <Project Path="solutions/FeWoLearning.Avalonia.Solutions.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FeWoLearning.Avalonia.Tests.csproj" />
+  </Folder>
+  <Folder Name="/gallery/">
+    <Project Path="gallery/FeWoLearning.Avalonia.Gallery.csproj" />
+  </Folder>
+</Solution>

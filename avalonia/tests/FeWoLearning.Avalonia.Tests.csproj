@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>FeWoLearning.Avalonia.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- xunit.v3 ONLY. Avalonia.Headless.XUnit depends on xunit.v3.extensibility.core;
+       adding xunit 2.x puts FactAttribute in two assemblies and every test file
+       fails with CS0433. -->
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Exactly one of the two content projects, never both: that is what keeps the
+       identical namespaces and type names from colliding. `dotnet test` is the red
+       run against the stubs, `dotnet test -p:UseSolutions=true` the green run against
+       the reference implementations. Same mechanism as blazor/ and uno/. -->
+  <ItemGroup Condition="'$(UseSolutions)' != 'true'">
+    <ProjectReference Include="..\exercises\FeWoLearning.Avalonia.Exercises.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseSolutions)' == 'true'">
+    <ProjectReference Include="..\solutions\FeWoLearning.Avalonia.Solutions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\gallery\FeWoLearning.Avalonia.Gallery.csproj" />
+  </ItemGroup>
+
+</Project>
