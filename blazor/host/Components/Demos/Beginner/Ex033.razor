@@ -1,0 +1,13 @@
+@page "/beginner/033"
+@rendermode InteractiveServer
+
+<h1>Exercise 033 - EmptyStateFallback</h1>
+
+<Ex033_EmptyStateFallback Query="" Results="_matches" />
+<Ex033_EmptyStateFallback Query="bl" Results="_matches" />
+<Ex033_EmptyStateFallback Query="zzz" Results="_empty" />
+
+@code {
+    private readonly string[] _matches = ["blazor", "blue"];
+    private readonly string[] _empty = [];
+}

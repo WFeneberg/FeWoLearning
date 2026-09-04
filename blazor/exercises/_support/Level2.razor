@@ -1,0 +1,8 @@
+@* _support/Level2.razor - test fixture, not an exercise. *@
+<div class="level-2">
+    <Level3 Message="@Message" />
+</div>
+
+@code {
+    [Parameter] public string Message { get; set; } = "";
+}

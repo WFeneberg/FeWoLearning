@@ -1,0 +1,9 @@
+@* Test fixture, not an exercise. Raises an EventCallback<int> on click. *@
+<button class="add" data-amount="@Amount" @onclick="RaiseAsync">+@Amount</button>
+
+@code {
+    [Parameter] public int Amount { get; set; }
+    [Parameter] public EventCallback<int> OnAdd { get; set; }
+
+    private Task RaiseAsync() => OnAdd.InvokeAsync(Amount);
+}

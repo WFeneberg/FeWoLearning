@@ -1,0 +1,14 @@
+@* Exercise 035 - Tabs Composition (beginner).
+   Goal:   Register with the cascaded parent, and unregister when removed.
+   Drills: [CascadingParameter], IDisposable, live (not snapshotted) parameter reads.
+   Passes: dotnet test --filter FullyQualifiedName~Ex035_ *@
+@* This component renders nothing itself - the parent renders its ChildContent. *@
+
+@code {
+    [CascadingParameter] public Ex035_TabsComposition? Parent { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex035 - register this tab with its parent");
+}

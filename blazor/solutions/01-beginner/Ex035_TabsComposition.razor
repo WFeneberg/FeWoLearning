@@ -1,0 +1,55 @@
+@* Exercise 035 - Tabs Composition (beginner).
+   Goal:   Let tabs register with a cascaded parent that tracks the active one.
+   Drills: capstone - live registration, unregistering, active tab selection.
+   Passes: dotnet test --filter FullyQualifiedName~Ex035_ *@
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+<div id="tabs">
+    @for (var i = 0; i < _tabs.Count; i++)
+    {
+        var tab = _tabs[i];
+        <button class="tab@(tab == _active ? " active" : "")" id="tab-@i" @onclick="() => Activate(tab)">@tab.Title</button>
+    }
+</div>
+<div id="tab-panel">
+    @_active?.ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private readonly List<Ex035_TabsComposition_Tab> _tabs = [];
+    private Ex035_TabsComposition_Tab? _active;
+
+    // Live registry: the parent keeps the child instances themselves, not a
+    // snapshot of their Title/ChildContent taken once at registration time. That
+    // is what lets a relabel or a removal be reflected on the next render.
+    public void Register(Ex035_TabsComposition_Tab tab)
+    {
+        _tabs.Add(tab);
+        _active ??= tab;
+        StateHasChanged();
+    }
+
+    public void Unregister(Ex035_TabsComposition_Tab tab)
+    {
+        _tabs.Remove(tab);
+        if (ReferenceEquals(_active, tab))
+        {
+            _active = _tabs.Count > 0 ? _tabs[0] : null;
+        }
+
+        StateHasChanged();
+    }
+
+    // A registered tab calls this whenever its own parameters change, so a
+    // relabel is reflected even though the tab was already registered.
+    public void Refresh() => StateHasChanged();
+
+    private void Activate(Ex035_TabsComposition_Tab tab)
+    {
+        _active = tab;
+        StateHasChanged();
+    }
+}

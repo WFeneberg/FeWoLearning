@@ -1,0 +1,26 @@
+@* Exercise 033 - Empty State Fallback (beginner).
+   Goal:   Render exactly one of three states: prompt, results, or no-results.
+   Drills: multi-branch @if precedence, blank-string handling, exact user-facing copy.
+   Passes: dotnet test --filter FullyQualifiedName~Ex033_ *@
+@if (string.IsNullOrWhiteSpace(Query))
+{
+    <p id="prompt">Type to search</p>
+}
+else if (Results.Count > 0)
+{
+    <ul id="results">
+        @foreach (var result in Results)
+        {
+            <li class="hit">@result</li>
+        }
+    </ul>
+}
+else
+{
+    <p id="no-results">No results for "@Query"</p>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<string> Results { get; set; } = [];
+    [Parameter] public string Query { get; set; } = "";
+}

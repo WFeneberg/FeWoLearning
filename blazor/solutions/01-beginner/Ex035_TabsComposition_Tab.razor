@@ -1,0 +1,36 @@
+@* Exercise 035 - Tabs Composition (beginner).
+   Goal:   Register with the cascaded parent, and unregister when removed.
+   Drills: [CascadingParameter], IDisposable, live (not snapshotted) parameter reads.
+   Passes: dotnet test --filter FullyQualifiedName~Ex035_ *@
+@* This component renders nothing itself - the parent renders its ChildContent. *@
+@implements IDisposable
+
+@code {
+    [CascadingParameter] public Ex035_TabsComposition? Parent { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string? _lastNotifiedTitle;
+
+    protected override void OnInitialized() => Parent?.Register(this);
+
+    // OnParametersSet fires on every render pass the parent triggers - including
+    // one caused by Parent.Refresh() itself, since re-rendering the parent
+    // re-invokes ChildContent and re-parameterizes every tab again. Without the
+    // guard below, telling the parent to re-render because Title changed would
+    // cause another such pass, which would ask again, forever. Only notify the
+    // parent when Title has actually moved since the last time this fired; that
+    // is what lets a later relabel reach the header without looping.
+    protected override void OnParametersSet()
+    {
+        if (_lastNotifiedTitle == Title)
+        {
+            return;
+        }
+
+        _lastNotifiedTitle = Title;
+        Parent?.Refresh();
+    }
+
+    public void Dispose() => Parent?.Unregister(this);
+}

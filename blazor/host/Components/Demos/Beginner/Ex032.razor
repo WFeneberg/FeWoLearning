@@ -1,0 +1,11 @@
+@page "/beginner/032"
+@rendermode InteractiveServer
+
+<h1>Exercise 032 - MarkupStringRendering</h1>
+
+<Ex032_MarkupStringRendering Html="@_html" AllowHtml="true" />
+<Ex032_MarkupStringRendering Html="@_html" AllowHtml="false" />
+
+@code {
+    private readonly string _html = "<b>bold</b> and <i>italic</i>";
+}

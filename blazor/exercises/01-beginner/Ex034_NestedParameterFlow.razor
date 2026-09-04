@@ -1,0 +1,15 @@
+@* Exercise 034 - Nested Parameter Flow (beginner).
+   Goal:   Pass a parameter explicitly through a three-level component chain.
+   Drills: parameters do not flow implicitly between components, explicit relaying.
+   Passes: dotnet test --filter FullyQualifiedName~Ex034_ *@
+@* TODO: render <div class="level-1"> containing a <Level2 /> so that the leaf #leaf
+   shows Message. Parameters do not flow implicitly through levels: each level must
+   pass the value on explicitly. Level2 already does its half - it passes Message
+   on to Level3. *@
+
+@code {
+    [Parameter] public string Message { get; set; } = "";
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex034 - pass the message down the chain");
+}

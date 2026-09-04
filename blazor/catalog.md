@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -51,11 +51,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 028 | CascadingValueBasics | `CascadingValue`/`[CascadingParameter]` | ✅ |
 | 029 | NamedCascadingValue | `Name`-matched cascading values of the same type | ✅ |
 | 030 | ComponentComposition | child registers itself with its parent | ✅ |
-| 031 | ChildToParentCallback | `EventCallback` re-renders the parent automatically | ⬜ |
-| 032 | MarkupStringRendering | `MarkupString` vs escaped text | ⬜ |
-| 033 | EmptyStateFallback | three-state rendering, exact user-facing copy | ⬜ |
-| 034 | NestedParameterFlow | parameters do not flow implicitly through levels | ⬜ |
-| 035 | TabsComposition | capstone: cascaded parent, registration, active state | ⬜ |
+| 031 | ChildToParentCallback | `EventCallback` re-renders the parent automatically | ✅ |
+| 032 | MarkupStringRendering | `MarkupString` vs escaped text | ✅ |
+| 033 | EmptyStateFallback | three-state rendering, exact user-facing copy | ✅ |
+| 034 | NestedParameterFlow | parameters do not flow implicitly through levels | ✅ |
+| 035 | TabsComposition | capstone: cascaded parent, registration, active state | ✅ |
 
 ## Intermediate (036–070) — EditForm/validation, DI, JS interop, navigation, async lifecycle
 

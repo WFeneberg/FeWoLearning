@@ -1,0 +1,17 @@
+@* Exercise 033 - Empty State Fallback (beginner).
+   Goal:   Render exactly one of three states: prompt, results, or no-results.
+   Drills: multi-branch @if precedence, blank-string handling, exact user-facing copy.
+   Passes: dotnet test --filter FullyQualifiedName~Ex033_ *@
+@* TODO: render exactly one of:
+     <p id="prompt">Type to search</p> when Query is blank
+     <ul id="results"> with one <li class="hit">@result</li> per result, otherwise
+     <p id="no-results">No results for "@Query"</p> when Query is set and Results is empty
+   The double quotes around the query are part of the copy. *@
+
+@code {
+    [Parameter] public IReadOnlyList<string> Results { get; set; } = [];
+    [Parameter] public string Query { get; set; } = "";
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex033 - render the right one of three states");
+}

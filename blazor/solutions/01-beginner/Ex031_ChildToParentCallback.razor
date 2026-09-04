@@ -1,0 +1,14 @@
+@* Exercise 031 - Child To Parent Callback (beginner).
+   Goal:   Let an EventCallback handler re-render the parent with no manual StateHasChanged.
+   Drills: EventCallback<T>, implicit re-render after an event handler runs.
+   Passes: dotnet test --filter FullyQualifiedName~Ex031_ *@
+<span id="total">@_total</span>
+<AddButton Amount="1" OnAdd="Add" />
+<AddButton Amount="5" OnAdd="Add" />
+<AddButton Amount="10" OnAdd="Add" />
+
+@code {
+    private int _total;
+
+    private void Add(int amount) => _total += amount;
+}

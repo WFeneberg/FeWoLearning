@@ -1,0 +1,19 @@
+@* Exercise 035 - Tabs Composition (beginner).
+   Goal:   Let tabs register with a cascaded parent that tracks the active one.
+   Drills: capstone - live registration, unregistering, active tab selection.
+   Passes: dotnet test --filter FullyQualifiedName~Ex035_ *@
+@* TODO: cascade `this` so tabs can find it, render ChildContent (so tabs register),
+   then render <div id="tabs"> with one <button class="tab" id="tab-N">@tab.Title</button>
+   per registered tab (the active one additionally carrying class "active"), and
+   <div id="tab-panel"> holding only the active tab's ChildContent. Clicking a header
+   activates that tab. The first registered tab is active initially. *@
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    // TODO: expose Register(Ex035_TabsComposition_Tab tab) and an ordered list of
+    // registered tabs; track which one is active.
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex035 - render the tab headers and the active panel");
+}
