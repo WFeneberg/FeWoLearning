@@ -2736,7 +2736,7 @@ In the `## Languages & tracks` table, after the `rust/` row:
 In the Naming table:
 
 ```markdown
-| `avalonia/`| one folder per tier, `.axaml` + code-behind + sibling test | `exercises/01-beginner/Ex001_HelloView.axaml` |
+| `avalonia/`| one folder per tier, `.axaml` + code-behind, test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloView.axaml` |
 ```
 
 - [ ] **Step 3: Add `avalonia/` to the `CLAUDE.md` track table**
