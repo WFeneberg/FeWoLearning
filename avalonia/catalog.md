@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -53,11 +53,11 @@ not a valid C# identifier.
 | 023 | ComboBoxSelection | `ItemsSource` plus `SelectedItem` | ✅ |
 | 024 | ListBoxSelection | `SelectedIndex`, `SelectedItems`, selection mode | ✅ |
 | 025 | ItemsControlTemplate | `ItemsControl` with a `DataTemplate` | ✅ |
-| 026 | ObservableCollectionUpdates | add and remove reflected in the visual tree | ⬜ |
-| 027 | EmptyStateFallback | `IsVisible` driven by an empty collection | ⬜ |
-| 028 | StyleSelectors | `Style` `Selector` by type and by descendant | ⬜ |
-| 029 | StyleClasses | `Classes`, toggling a class at runtime | ⬜ |
-| 030 | PseudoClasses | `:pointerover`, `:disabled` selectors | ⬜ |
+| 026 | ObservableCollectionUpdates | add and remove reflected in the visual tree | ✅ |
+| 027 | EmptyStateFallback | `IsVisible` driven by an empty collection | ✅ |
+| 028 | StyleSelectors | `Style` `Selector` by type and by descendant | ✅ |
+| 029 | StyleClasses | `Classes`, toggling a class at runtime | ✅ |
+| 030 | PseudoClasses | `:pointerover`, `:disabled` selectors | ✅ |
 | 031 | StaticAndDynamicResource | `ResourceDictionary`, `StaticResource` vs `DynamicResource` | ⬜ |
 | 032 | UserControlComposition | nesting a `UserControl`, exposing a CLR property | ⬜ |
 | 033 | StyledPropertyBasics | `StyledProperty<T>` registration, default value, styling | ⬜ |

@@ -1,0 +1,33 @@
+<!-- Exercise 029 - StyleClasses (beginner).
+     Goal:   Toggle a Classes membership from a code-behind Click handler and
+             let a class-selector Style react to it live.
+     Drills: Classes, toggling a class at runtime.
+     Passes: dotnet test, filtered to Ex029_ (see the exact command in
+     Ex029_StyleClasses.axaml.cs - an XML comment may not hold two hyphens in
+     a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex029_StyleClasses">
+  <!-- TODO: replace this placeholder with:
+         <UserControl.Styles>
+           <Style Selector="TextBlock">
+             <Setter Property="FontSize" Value="21" />
+           </Style>
+           <Style Selector="TextBlock.tag">
+             <Setter Property="FontSize" Value="33" />
+           </Style>
+         </UserControl.Styles>
+         <StackPanel Spacing="8">
+           <TextBlock Name="Toggle" Text="Toggle me" />
+           <Button Name="ToggleButton" Content="Toggle tag" Click="OnToggleButtonClick" />
+         </StackPanel>
+       Then implement OnToggleButtonClick below: it must add the class "tag"
+       to Toggle when it is not present, and remove it when it is - i.e. a
+       genuine toggle, not a one-way switch. Reproducing the FontSize jump by
+       setting Toggle.FontSize directly from the handler, without ever
+       touching Toggle.Classes, has no Style rule backing it - the test reads
+       UserControl.Styles directly, so it can never pass that way. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

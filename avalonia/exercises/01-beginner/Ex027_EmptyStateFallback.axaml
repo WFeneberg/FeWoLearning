@@ -1,0 +1,38 @@
+<!-- Exercise 027 - EmptyStateFallback (beginner).
+     Goal:   Drive IsVisible on two sibling elements straight from a
+             collection's Count, with no converter and no code-behind.
+     Drills: IsVisible driven by an empty collection, via the ! / !!
+             binding-path negation operators.
+     Passes: dotnet test, filtered to Ex027_ (see the exact command in
+     Ex027_EmptyStateFallback.axaml.cs - an XML comment may not hold two
+     hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex027_EmptyStateFallback"
+             x:DataType="b:Ex027_EmptyStateFallbackViewModel">
+  <!-- TODO: replace this placeholder with:
+         <StackPanel Spacing="8">
+           <TextBlock Name="EmptyMessage" Text="No items yet"
+                      IsVisible="{CompiledBinding !Items.Count}" />
+           <ItemsControl Name="ItemsPanel" ItemsSource="{CompiledBinding Items}"
+                         IsVisible="{CompiledBinding !!Items.Count}">
+             <ItemsControl.ItemTemplate>
+               <DataTemplate x:DataType="x:String">
+                 <TextBlock Text="{CompiledBinding}" />
+               </DataTemplate>
+             </ItemsControl.ItemTemplate>
+           </ItemsControl>
+         </StackPanel>
+       Avalonia's binding path grammar coerces an int Count to bool and negates
+       it: "!Items.Count" is true exactly when the collection is empty, and
+       "!!Items.Count" double-negates back to true exactly when it is not. A
+       ValueConverter would also work, but this negation idiom is the intended
+       answer here - it needs nothing but the two bindings above. Hard-coding
+       IsVisible="True"/"False" on either element matches only one state; the
+       test drives the collection empty -> non-empty -> empty again and checks
+       both elements flip in opposite directions every time. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

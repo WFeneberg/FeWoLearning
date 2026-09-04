@@ -1,0 +1,31 @@
+<!-- Exercise 026 - ObservableCollectionUpdates (beginner).
+     Goal:   Render a bound ObservableCollection through an ItemsControl and
+             prove the view reacts live to Add AND Remove, not just the
+             initial render.
+     Drills: ItemsControl reacting to collection mutation.
+     Passes: dotnet test, filtered to Ex026_ (see the exact command in
+     Ex026_ObservableCollectionUpdates.axaml.cs - an XML comment may not hold
+     two hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex026_ObservableCollectionUpdates"
+             x:DataType="b:Ex026_ObservableCollectionUpdatesViewModel">
+  <!-- TODO: replace this placeholder with a single ItemsControl named
+       ItemList, its ItemsSource bound to Items, and an ItemTemplate that
+       renders each string item through a TextBlock:
+         <ItemsControl Name="ItemList" ItemsSource="{CompiledBinding Items}">
+           <ItemsControl.ItemTemplate>
+             <DataTemplate x:DataType="x:String">
+               <TextBlock Text="{CompiledBinding}" />
+             </DataTemplate>
+           </ItemsControl.ItemTemplate>
+         </ItemsControl>
+       A hard-coded StackPanel of TextBlocks can reproduce the INITIAL render,
+       but the test also calls Items.Add and Items.Remove on the view model
+       afterwards and checks the realized container count changes both times
+       - a static panel can never do that. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

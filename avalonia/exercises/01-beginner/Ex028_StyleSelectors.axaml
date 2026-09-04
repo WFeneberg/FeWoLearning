@@ -1,0 +1,36 @@
+<!-- Exercise 028 - StyleSelectors (beginner).
+     Goal:   Write two Style rules in UserControl.Styles - one matching by
+             type, one matching by a descendant combinator plus a class -
+             and let the more specific rule win.
+     Drills: Style Selector by type and by descendant.
+     Passes: dotnet test, filtered to Ex028_ (see the exact command in
+     Ex028_StyleSelectors.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex028_StyleSelectors">
+  <!-- TODO: replace this placeholder with:
+         <UserControl.Styles>
+           <Style Selector="TextBlock">
+             <Setter Property="FontSize" Value="21" />
+           </Style>
+           <Style Selector="StackPanel > TextBlock.tag">
+             <Setter Property="FontSize" Value="33" />
+           </Style>
+         </UserControl.Styles>
+         <StackPanel Spacing="8">
+           <TextBlock Name="PlainText" Text="Plain" />
+           <TextBlock Name="TaggedText" Text="Tagged" Classes="tag" />
+         </StackPanel>
+       Both TextBlocks are direct children of the same StackPanel. PlainText
+       only matches the type selector (FontSize 21); TaggedText matches BOTH
+       rules, and the descendant+class selector is more specific, so it wins
+       (FontSize 33). Setting FontSize locally on each TextBlock instead of
+       through a Style reproduces the same two numbers with no Style rule at
+       all - the test reaches into UserControl.Styles itself and checks the
+       Style/Selector/Setter objects are actually there, which a local
+       FontSize setter can never satisfy. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

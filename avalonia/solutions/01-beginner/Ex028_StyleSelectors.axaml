@@ -1,0 +1,24 @@
+<!-- Exercise 028 - StyleSelectors (beginner).
+     Goal:   Write two Style rules in UserControl.Styles - one matching by
+             type, one matching by a descendant combinator plus a class -
+             and let the more specific rule win.
+     Drills: Style Selector by type and by descendant.
+     Passes: dotnet test, filtered to Ex028_ (see the exact command in
+     Ex028_StyleSelectors.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex028_StyleSelectors">
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="FontSize" Value="21" />
+    </Style>
+    <Style Selector="StackPanel > TextBlock.tag">
+      <Setter Property="FontSize" Value="33" />
+    </Style>
+  </UserControl.Styles>
+  <StackPanel Spacing="8">
+    <TextBlock Name="PlainText" Text="Plain" />
+    <TextBlock Name="TaggedText" Text="Tagged" Classes="tag" />
+  </StackPanel>
+</UserControl>

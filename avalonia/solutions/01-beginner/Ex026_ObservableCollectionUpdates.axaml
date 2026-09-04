@@ -1,0 +1,21 @@
+<!-- Exercise 026 - ObservableCollectionUpdates (beginner).
+     Goal:   Render a bound ObservableCollection through an ItemsControl and
+             prove the view reacts live to Add AND Remove, not just the
+             initial render.
+     Drills: ItemsControl reacting to collection mutation.
+     Passes: dotnet test, filtered to Ex026_ (see the exact command in
+     Ex026_ObservableCollectionUpdates.axaml.cs - an XML comment may not hold
+     two hyphens in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex026_ObservableCollectionUpdates"
+             x:DataType="b:Ex026_ObservableCollectionUpdatesViewModel">
+  <ItemsControl Name="ItemList" ItemsSource="{CompiledBinding Items}">
+    <ItemsControl.ItemTemplate>
+      <DataTemplate x:DataType="x:String">
+        <TextBlock Text="{CompiledBinding}" />
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

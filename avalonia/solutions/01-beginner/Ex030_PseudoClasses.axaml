@@ -1,0 +1,25 @@
+<!-- Exercise 030 - PseudoClasses (beginner).
+     Goal:   Style a Button off Avalonia's own :pointerover and :disabled
+             pseudo-classes, not off any event you write yourself.
+     Drills: :pointerover, :disabled selectors.
+     Passes: dotnet test, filtered to Ex030_ (see the exact command in
+     Ex030_PseudoClasses.axaml.cs - an XML comment may not hold two hyphens
+     in a row, so it cannot appear here). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
+             x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex030_PseudoClasses"
+             x:DataType="b:Ex030_PseudoClassesViewModel">
+  <UserControl.Styles>
+    <Style Selector="Button:pointerover">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="Button:disabled">
+      <Setter Property="Opacity" Value="0.3" />
+    </Style>
+  </UserControl.Styles>
+  <StackPanel Spacing="8">
+    <Button Name="ActionButton" Content="Run"
+            Command="{CompiledBinding RunCommand}" Width="120" Height="40" />
+  </StackPanel>
+</UserControl>

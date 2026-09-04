@@ -33,5 +33,10 @@ public static class GalleryCatalog
         new("023", "ComboBoxSelection", () => new Ex023()),
         new("024", "ListBoxSelection", () => new Ex024()),
         new("025", "ItemsControlTemplate", () => new Ex025()),
+        new("026", "ObservableCollectionUpdates", () => new Ex026()),
+        new("027", "EmptyStateFallback", () => new Ex027()),
+        new("028", "StyleSelectors", () => new Ex028()),
+        new("029", "StyleClasses", () => new Ex029()),
+        new("030", "PseudoClasses", () => new Ex030()),
     ];
 }
