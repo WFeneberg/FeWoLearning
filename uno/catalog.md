@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 40 ✅ / 60 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -68,11 +68,11 @@ do" in `README.md`.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | CustomTemplatedControl | `Control` subclass, `DefaultStyleKey`, style dictionary | ⬜ |
-| 037 | TemplatePartContract | a part contract that survives a missing part | ⬜ |
-| 038 | ControlVisualStates | property changes driving `GoToState` | ⬜ |
-| 039 | CustomPanelMeasure | `MeasureOverride`, honouring the available size | ⬜ |
-| 040 | CustomPanelArrange | `ArrangeOverride`, final rects, clipping | ⬜ |
+| 036 | CustomTemplatedControl | `Control` subclass, `DefaultStyleKey`, style dictionary | ✅ |
+| 037 | TemplatePartSubscriptions | event handlers on template parts, unsubscribing on re-template | ✅ |
+| 038 | OrthogonalStateGroups | two state groups active at once, each switching independently | ✅ |
+| 039 | CustomPanelMeasure | `MeasureOverride`, the constraint passed to children, infinite available size | ✅ |
+| 040 | CustomPanelArrange | `ArrangeOverride`, final rects, arranging outside the panel | ✅ |
 | 041 | WrapPanel | a full custom panel: wrapping, line breaking, desired size | ⬜ |
 | 042 | AttachedBehavior | attached property that subscribes and unsubscribes events | ⬜ |
 | 043 | InheritedContext | propagating a value down a subtree without a global | ⬜ |
