@@ -18,8 +18,12 @@ public class Ex023_ThemeResourceTests : UnoTestContext
         var control = new Ex023_ThemeResource();
 
         // The keys are part of the contract - a dictionary keyed "dark" is never consulted.
-        Assert.True(control.Resources.ThemeDictionaries.ContainsKey("Light"));
-        Assert.True(control.Resources.ThemeDictionaries.ContainsKey("Dark"));
+        Assert.True(
+            control.Resources.ThemeDictionaries.ContainsKey("Light"),
+            "no theme dictionary keyed \"Light\" - the key is a fixed name, not a label");
+        Assert.True(
+            control.Resources.ThemeDictionaries.ContainsKey("Dark"),
+            "no theme dictionary keyed \"Dark\"");
     }
 
     [Fact]

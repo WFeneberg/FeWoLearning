@@ -18,16 +18,23 @@ public class Ex099_CapstoneControlTests : UnoTestContext
         return control;
     }
 
-    private static void Press(Ex099_RatingControl control) =>
-        new ButtonAutomationPeer((Button)control.IncrementPart!).Invoke();
+    private static void Press(Ex099_RatingControl control)
+    {
+        // Asserted rather than dereferenced: a control whose OnApplyTemplate has not picked
+        // the part up yet should say so, not fail with a NullReferenceException.
+        var part = control.IncrementPart;
+        Assert.True(part is Button, "PART_Increment was never picked up from the template");
+
+        new ButtonAutomationPeer((Button)part!).Invoke();
+    }
 
     [Fact]
     public void The_Shipped_Style_Supplies_The_Template()
     {
         var control = Rating();
 
-        Assert.NotNull(control.Template);
-        Assert.NotNull(control.IncrementPart);
+        Assert.True(control.Template is not null, "no template - is DefaultStyleKey set, and were the styles merged?");
+        Assert.True(control.IncrementPart is not null, "PART_Increment was never picked up from the template");
     }
 
     [Fact]

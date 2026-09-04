@@ -15,12 +15,14 @@ public class Ex003_AttachedPropertyTests : UnoTestContext
                 "SlotProperty",
                 BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
-            Assert.NotNull(registration);
+            Assert.True(
+                registration is not null,
+                "Ex003_AttachedProperty declares no public static field called SlotProperty - the field is the property's identity.");
             Assert.True(registration!.IsInitOnly, "SlotProperty must be readonly - the field is the property's identity.");
             Assert.Equal(typeof(DependencyProperty), registration.FieldType);
 
             var value = registration.GetValue(null) as DependencyProperty;
-            Assert.NotNull(value);
+            Assert.True(value is not null, "SlotProperty is null - was DependencyProperty.Register ever called?");
             return value!;
         }
     }

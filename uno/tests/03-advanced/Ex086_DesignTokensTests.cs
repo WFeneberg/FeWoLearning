@@ -103,8 +103,12 @@ public class Ex086_DesignTokensTests : UnoTestContext
         // MergedDictionaries, so the theme dictionaries stay its own.
         var tokens = new Ex086_DesignTokens();
 
-        Assert.True(tokens.ThemeDictionaries.ContainsKey("Light"));
-        Assert.True(tokens.ThemeDictionaries.ContainsKey("Dark"));
+        Assert.True(
+            tokens.ThemeDictionaries.ContainsKey("Light"),
+            "the dictionary declares no ThemeDictionaries entry keyed \"Light\"");
+        Assert.True(
+            tokens.ThemeDictionaries.ContainsKey("Dark"),
+            "the dictionary declares no ThemeDictionaries entry keyed \"Dark\"");
     }
 
     [Fact]

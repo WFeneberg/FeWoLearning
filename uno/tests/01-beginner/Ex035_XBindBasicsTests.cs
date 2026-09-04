@@ -8,6 +8,18 @@ public class Ex035_XBindBasicsTests : UnoTestContext
     private static string TextOf(Ex035_XBindBasics control, string name) =>
         FindDescendant<TextBlock>(control, name).Text;
 
+    /// <summary>
+    /// The markup's root panel. Named separately so the failure says what is missing rather
+    /// than "value is null".
+    /// </summary>
+    private static StackPanel FindRoot(Ex035_XBindBasics control)
+    {
+        var root = control.FindName("Root");
+        Assert.True(root is not null, "the markup declares no element named Root");
+
+        return Assert.IsType<StackPanel>(root);
+    }
+
     [Fact]
     public void All_Three_Bindings_Resolve_On_First_Build()
     {
@@ -76,7 +88,7 @@ public class Ex035_XBindBasicsTests : UnoTestContext
     {
         var control = Layout(new Ex035_XBindBasics());
 
-        var root = Assert.IsType<StackPanel>(control.FindName("Root"));
+        var root = FindRoot(control);
 
         Assert.Equal(3, root.Children.Count);
     }

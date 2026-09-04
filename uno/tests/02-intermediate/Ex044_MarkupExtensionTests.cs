@@ -17,6 +17,18 @@ public class Ex044_MarkupExtensionTests : UnoTestContext
             .GetMethod("ProvideValue", BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes)!
             .Invoke(extension, null)!;
 
+    /// <summary>
+    /// The markup's root panel. Named separately so the failure says what is missing rather
+    /// than "value is null".
+    /// </summary>
+    private static StackPanel FindRoot(Ex044_MarkupExtensionHost control)
+    {
+        var root = control.FindName("Root");
+        Assert.True(root is not null, "the markup declares no element named Root");
+
+        return Assert.IsType<StackPanel>(root);
+    }
+
     [Fact]
     public void Multiplies_The_Base_By_The_Multiplier()
     {
@@ -58,7 +70,7 @@ public class Ex044_MarkupExtensionTests : UnoTestContext
     {
         var host = Layout(new Ex044_MarkupExtensionHost());
 
-        var root = Assert.IsType<StackPanel>(host.FindName("Root"));
+        var root = FindRoot(host);
 
         Assert.Equal(2, root.Children.Count);
     }

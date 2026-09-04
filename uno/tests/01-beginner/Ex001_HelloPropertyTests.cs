@@ -14,12 +14,14 @@ public class Ex001_HelloPropertyTests : UnoTestContext
                 "LevelProperty",
                 BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
-            Assert.NotNull(registration);
+            Assert.True(
+                registration is not null,
+                "Ex001_HelloProperty declares no public static field called LevelProperty - the field is the property's identity.");
             Assert.True(registration!.IsInitOnly, "LevelProperty must be readonly - the field is the property's identity.");
             Assert.Equal(typeof(DependencyProperty), registration.FieldType);
 
             var value = registration.GetValue(null) as DependencyProperty;
-            Assert.NotNull(value);
+            Assert.True(value is not null, "LevelProperty is null - was DependencyProperty.Register ever called?");
             return value!;
         }
     }

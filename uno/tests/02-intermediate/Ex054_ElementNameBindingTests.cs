@@ -7,6 +7,18 @@ public class Ex054_ElementNameBindingTests : UnoTestContext
 {
     private static Ex054_ElementNameBinding Control() => Layout(new Ex054_ElementNameBinding());
 
+    /// <summary>
+    /// The markup's root panel. Named separately so the failure says what is missing rather
+    /// than "value is null".
+    /// </summary>
+    private static StackPanel FindRoot(Ex054_ElementNameBinding control)
+    {
+        var root = control.FindName("Root");
+        Assert.True(root is not null, "the markup declares no element named Root");
+
+        return Assert.IsType<StackPanel>(root);
+    }
+
     [Fact]
     public void The_Mirror_Shows_The_Source_Text()
     {
@@ -60,7 +72,7 @@ public class Ex054_ElementNameBindingTests : UnoTestContext
     {
         var control = Control();
 
-        var root = Assert.IsType<StackPanel>(control.FindName("Root"));
+        var root = FindRoot(control);
 
         Assert.Equal(4, root.Children.Count);
     }

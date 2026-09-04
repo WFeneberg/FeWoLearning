@@ -22,8 +22,18 @@ public class Ex067_DebouncedInputTests : UnoTestContext
             return gate.Task;
         }
 
-        /// <summary>Releases the most recent delay, as if its window had elapsed.</summary>
-        public void Elapse() => _pending[^1].TrySetResult();
+        /// <summary>
+        /// Releases the most recent delay, as if its window had elapsed. Tolerates there
+        /// being none: against an unimplemented stub no delay was ever started, and an
+        /// index-out-of-range from here would hide the TODO that is the real failure.
+        /// </summary>
+        public void Elapse()
+        {
+            if (_pending.Count > 0)
+            {
+                _pending[^1].TrySetResult();
+            }
+        }
     }
 
     private static (Ex067_DebouncedInput Input, ControlledDelay Delay) Debounced()
@@ -42,7 +52,7 @@ public class Ex067_DebouncedInputTests : UnoTestContext
         var change = input.ChangeAsync("a");
 
         Assert.Equal(0, input.Runs);
-        Assert.False(change.IsCompleted);
+        Assert.False(change.IsCompleted, "the change settled before the delay elapsed");
 
         // Settled before the test ends. xunit waits for the async operations a test
         // started, so an unreleased gate hangs the whole test host - see ex049.
