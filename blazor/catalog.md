@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -36,11 +36,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 013 | TemplatedFragment | `@typeparam`, `RenderFragment<TItem>`, empty template | ✅ |
 | 014 | AttributeSplatting | `CaptureUnmatchedValues`, `@attributes` | ✅ |
 | 015 | DynamicCssClass | computed class strings, enum-driven styling | ✅ |
-| 016 | InlineStyleBinding | computed inline style, clamping, invariant formatting | ⬜ |
-| 017 | OnInitialized | `OnInitialized` runs once, not per parameter change | ⬜ |
-| 018 | OnParametersSet | `OnParametersSet` runs on every parameter change | ⬜ |
-| 019 | OnAfterRenderFirst | `OnAfterRender(bool firstRender)`, render counting | ⬜ |
-| 020 | DisposableComponent | `@implements IDisposable`, subscribe/unsubscribe symmetry | ⬜ |
+| 016 | InlineStyleBinding | computed inline style from a `double` percentage, clamping, invariant formatting | ✅ |
+| 017 | OnInitialized | `OnInitialized` runs once, not per parameter change | ✅ |
+| 018 | OnParametersSet | `OnParametersSet` runs on every parameter change | ✅ |
+| 019 | OnAfterRenderFirst | `OnAfterRender(bool firstRender)`, render counting | ✅ |
+| 020 | DisposableComponent | `@implements IDisposable`, subscribe/unsubscribe symmetry | ✅ |
 | 021 | EventArgsHandling | `KeyboardEventArgs`, filtering modifier keys | ⬜ |
 | 022 | StopPropagation | `@onclick:stopPropagation`, nested handlers | ⬜ |
 | 023 | InputTextBinding | `@bind` to a local field | ⬜ |

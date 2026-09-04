@@ -1,0 +1,16 @@
+@page "/beginner/017"
+@rendermode InteractiveServer
+
+<h1>Exercise 017 - OnInitialized</h1>
+
+<input @bind="_user" @bind:event="oninput" />
+<button @onclick="Apply">Apply</button>
+
+<Ex017_OnInitialized User="@_appliedUser" />
+
+@code {
+    private string _user = "Ada";
+    private string _appliedUser = "Ada";
+
+    private void Apply() => _appliedUser = _user;
+}

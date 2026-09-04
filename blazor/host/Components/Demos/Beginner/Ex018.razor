@@ -1,0 +1,12 @@
+@page "/beginner/018"
+@rendermode InteractiveServer
+
+<h1>Exercise 018 - OnParametersSet</h1>
+
+<input @bind="_title" @bind:event="oninput" />
+
+<Ex018_OnParametersSet Title="@_title" />
+
+@code {
+    private string _title = "Hello Blazor World";
+}

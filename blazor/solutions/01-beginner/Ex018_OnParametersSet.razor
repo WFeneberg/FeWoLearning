@@ -1,0 +1,34 @@
+@* Exercise 018 - OnParametersSet (beginner).
+   Goal:   Recompute a slug from Title on every parameter change.
+   Drills: OnParametersSet runs on every parameter change, unlike
+           OnInitialized (ex017) which runs only once.
+   Passes: dotnet test --filter FullyQualifiedName~Ex018_ *@
+<span id="slug">@_slug</span>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+
+    private string _slug = "";
+
+    protected override void OnParametersSet()
+    {
+        var chars = new List<char>();
+        var lastWasHyphen = false;
+        foreach (var ch in Title)
+        {
+            if (char.IsLetterOrDigit(ch))
+            {
+                chars.Add(char.ToLowerInvariant(ch));
+                lastWasHyphen = false;
+            }
+            else if (!lastWasHyphen && chars.Count > 0)
+            {
+                chars.Add('-');
+                lastWasHyphen = true;
+            }
+        }
+
+        if (lastWasHyphen) chars.RemoveAt(chars.Count - 1);
+        _slug = new string(chars.ToArray());
+    }
+}

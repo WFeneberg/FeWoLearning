@@ -1,0 +1,28 @@
+@implements IDisposable
+@* Exercise 020 - Disposable Component (beginner).
+   Goal:   Subscribe to a Ticker on init and unsubscribe on dispose.
+   Drills: @implements IDisposable, subscribe/unsubscribe symmetry.
+   Passes: dotnet test --filter FullyQualifiedName~Ex020_ *@
+<span id="ticks">@_ticks</span>
+
+@code {
+    [Parameter, EditorRequired] public Ticker Ticker { get; set; } = default!;
+
+    private int _ticks;
+    private Action? _onTick;
+
+    protected override void OnInitialized()
+    {
+        _onTick = () =>
+        {
+            _ticks++;
+            StateHasChanged();
+        };
+        Ticker.Subscribe(_onTick);
+    }
+
+    public void Dispose()
+    {
+        if (_onTick is not null) Ticker.Unsubscribe(_onTick);
+    }
+}

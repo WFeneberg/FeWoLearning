@@ -1,0 +1,14 @@
+@* Exercise 017 - OnInitialized (beginner).
+   Goal:   Capture the greeting exactly once, when the component is created.
+   Drills: OnInitialized runs once per component instance, not per parameter
+           change - that is OnParametersSet's job (ex018).
+   Passes: dotnet test --filter FullyQualifiedName~Ex017_ *@
+<span id="greeting">@_greeting</span>
+
+@code {
+    [Parameter] public string User { get; set; } = "";
+
+    private string _greeting = "";
+
+    protected override void OnInitialized() => _greeting = $"Welcome, {User}";
+}

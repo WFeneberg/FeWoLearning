@@ -1,0 +1,17 @@
+@* Exercise 019 - OnAfterRender First (beginner).
+   Goal:   Count renders, tracking the first render separately.
+   Drills: OnAfterRender(bool firstRender), render counting.
+   Passes: dotnet test --filter FullyQualifiedName~Ex019_ *@
+<span id="counts">@FirstRenderCount/@AfterRenderCount</span><span id="label">@Label</span>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+
+    public int FirstRenderCount { get; private set; }
+    public int AfterRenderCount { get; private set; }
+
+    // TODO: increment AfterRenderCount on every call, and FirstRenderCount
+    // only when firstRender is true. Do not call StateHasChanged() here -
+    // that would recurse back into OnAfterRender.
+    protected override void OnAfterRender(bool firstRender) => throw new NotImplementedException("TODO: Ex019 - count renders, and first renders separately");
+}

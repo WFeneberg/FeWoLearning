@@ -1,0 +1,16 @@
+@* Exercise 016 - Inline Style Binding (beginner).
+   Goal:   Build an inline width style from a double percentage, clamped to
+           0..100 and formatted with CultureInfo.InvariantCulture - a
+           "width: 42,5%" (decimal comma) is invalid CSS, so a missing
+           InvariantCulture silently breaks the layout, not merely the look.
+   Drills: computed inline style, Math.Clamp, culture-invariant formatting.
+   Passes: dotnet test --filter FullyQualifiedName~Ex016_ *@
+<div id="track"><div id="bar" style="@BarStyle"></div></div>
+
+@code {
+    [Parameter] public double Percent { get; set; }
+
+    // TODO: return "width: {N}%" where N is Percent clamped to 0..100,
+    // formatted with CultureInfo.InvariantCulture.
+    private string BarStyle => throw new NotImplementedException("TODO: Ex016 - build the inline width style");
+}

@@ -1,0 +1,17 @@
+@page "/beginner/020"
+@rendermode InteractiveServer
+
+<h1>Exercise 020 - DisposableComponent</h1>
+
+<button @onclick="() => _ticker.Tick()">Tick</button>
+<label><input type="checkbox" @bind="_mounted" /> Mounted</label>
+
+@if (_mounted)
+{
+    <Ex020_DisposableComponent Ticker="_ticker" />
+}
+
+@code {
+    private readonly Ticker _ticker = new();
+    private bool _mounted = true;
+}
