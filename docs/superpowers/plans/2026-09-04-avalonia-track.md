@@ -1259,8 +1259,8 @@ public partial class Ex002_LayoutStackPanel : UserControl
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex003_LayoutGrid">
-  <!-- TODO: replace this placeholder with a Grid whose rows are "Auto,*" and whose
-       columns are "80,*", holding four Borders:
+  <!-- TODO: replace this placeholder with a Grid named "RootGrid" whose rows are
+       "Auto,*" and whose columns are "80,*", holding four Borders:
          HeaderLeft  at row 0 col 0, Height 24
          HeaderRight at row 0 col 1, Height 24
          BodyLeft    at row 1 col 0
@@ -1325,6 +1325,24 @@ public class Ex003_LayoutGridTests
         Assert.Equal(new Rect(0, 24, 80, 176), view.FindControl<Border>("BodyLeft")!.Bounds);
         Assert.Equal(new Rect(80, 24, 120, 176), view.FindControl<Border>("BodyRight")!.Bounds);
     }
+
+    // Geometry alone cannot tell Auto from a literal: at this host size
+    // RowDefinitions="24,*" renders bit-for-bit identically to "Auto,*", so the two
+    // tests above pass against either. Assert the definitions themselves.
+    [AvaloniaFact]
+    public void Rows_Use_Auto_And_Star_Sizing_Not_Hard_Coded_Heights()
+    {
+        var grid = Show().FindControl<Grid>("RootGrid");
+        Assert.NotNull(grid);
+
+        Assert.True(grid!.RowDefinitions[0].Height.IsAuto,
+            "row 0 must be Auto so it takes its height from the header content");
+        Assert.True(grid.RowDefinitions[1].Height.IsStar,
+            "row 1 must be star-sized so it absorbs the remaining height");
+        Assert.True(grid.ColumnDefinitions[0].Width.IsAbsolute);
+        Assert.Equal(80, grid.ColumnDefinitions[0].Width.Value);
+        Assert.True(grid.ColumnDefinitions[1].Width.IsStar);
+    }
 }
 ```
 
@@ -1336,7 +1354,7 @@ public class Ex003_LayoutGridTests
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex003_LayoutGrid">
-  <Grid RowDefinitions="Auto,*" ColumnDefinitions="80,*">
+  <Grid Name="RootGrid" RowDefinitions="Auto,*" ColumnDefinitions="80,*">
     <Border Name="HeaderLeft"  Grid.Row="0" Grid.Column="0" Height="24" Background="#22000000" />
     <Border Name="HeaderRight" Grid.Row="0" Grid.Column="1" Height="24" Background="#11000000" />
     <Border Name="BodyLeft"    Grid.Row="1" Grid.Column="0" Background="#4C8BF5" />
@@ -1562,7 +1580,9 @@ public class Ex005_LayoutDockPanelTests
         Assert.Equal(new Rect(0, 30, 60, 150), view.FindControl<Border>("SideBar")!.Bounds);
     }
 
-    // The discriminator for LastChildFill: without it Body collapses to zero width.
+    // Body relies on LastChildFill, which defaults to true in Avalonia 12.1.1
+    // (measured), so simply omitting the attribute still fills the body. Only an
+    // explicit LastChildFill="False" collapses Body to zero width.
     [AvaloniaFact]
     public void Body_Fills_The_Remaining_Space()
     {

@@ -285,6 +285,17 @@ trap documented for `python/`.
   pass this test?** If yes, the test is defective. For style, template, and
   binding-mode exercises specifically, check that the assertion could not be
   satisfied by a hard-coded literal in the view.
+- **Rendered geometry cannot prove which sizing mode produced it.** ex003 first
+  shipped with a test in which `RowDefinitions="24,*"` rendered bit-for-bit
+  identically to `"Auto,*"` at the host size under test, so the exercise's own
+  subject went unasserted while the test looked thorough. Whenever an exercise's
+  point is a *sizing mode* rather than a *result*, name the panel and assert the
+  definitions — `GridLength`'s `IsAuto` / `IsStar` / `IsAbsolute` / `Value` —
+  alongside the geometry.
+- **A named control the test looks up must be named in the stub's TODO.** If the
+  solution introduces `Name="RootGrid"` and the stub never mentions it, a learner
+  who writes correct XAML fails on a null lookup, for a reason the exercise is not
+  about.
 - Confirm each red failure comes from the exercise's own
   `NotImplementedException` — not from a compile error, not from a missing XAML
   resource, and above all not from the uninitialized-ReactiveUI exception of
