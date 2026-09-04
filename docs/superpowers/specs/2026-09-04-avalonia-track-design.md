@@ -339,16 +339,34 @@ trap documented for `python/`.
   documented limitation in the stub's `Goal:` and a note in the test file over an
   assertion that would fail a legitimate solution.
 
-  The root cause is worth knowing before reaching for diagnostics, because it recurs:
-  `GetDiagnostic(SelectingItemsControl.SelectedItemProperty)` reports
-  `Priority=LocalValue` with an empty `Diagnostic` string for **both** a real
-  `TwoWay` binding and a plain direct assignment — measured. `SelectedItem` is a
-  **`DirectProperty`** (CLR-backed) rather than a `StyledProperty`, and direct
-  properties carry no binding-priority metadata. So *no* exercise whose subject is a
-  `DirectProperty` binding can prove that binding structurally. Later tiers hit this
-  again with `SelectionModel`, `DataGrid` selection and `TreeView`: check whether the
-  property is direct or styled **before** designing the discriminator, and fall back
-  to a documented limitation without spending rounds on it.
+  The root cause is worth knowing before reaching for diagnostics, because it cuts
+  both ways and both halves were measured:
+
+  - **`DirectProperty` — no signal.** `GetDiagnostic(SelectingItemsControl.SelectedItemProperty)`
+    reports `Priority=LocalValue` with an empty `Diagnostic` string for **both** a real
+    `TwoWay` binding and a plain direct assignment. `SelectedItem` is a `DirectProperty`
+    (CLR-backed), and direct properties carry no binding-priority metadata. No exercise
+    whose subject is a `DirectProperty` binding can prove it structurally. Later tiers
+    hit this again with `SelectionModel`, `DataGrid` selection and `TreeView`.
+  - **`StyledProperty` — a clean signal, and the right discriminator.** `FontSize` and
+    `Opacity` are `StyledProperty<double>`, where priority *is* meaningful: a value set
+    by a `<Style>` setter reports `BindingPriority.StyleTrigger`, a locally-set value
+    reports `BindingPriority.LocalValue` — and this holds **regardless of which element
+    in the tree owns the `Styles` collection**. Assert `Priority != LocalValue` on the
+    styled element.
+
+  So: **check direct-vs-styled before designing the discriminator.** For a styled
+  property there is an honest structural test; for a direct property there is not, and
+  a documented limitation is the answer rather than a spent fix round.
+- **Do not pin where the markup lives, or how a selector is spelled.** ex028–ex030
+  first shipped a scan of `view.Styles` on the root `UserControl`, which came back
+  *empty* — measured — for a solution that scoped its `<Style>` block to an inner
+  `StackPanel.Styles`, an idiomatic and behaviourally identical answer. The same batch
+  had the mirror flaw: `Contains("TextBlock.tag")` matched a selector with no
+  descendant combinator at all, so half of ex028's stated concept went unasserted and
+  a naive solution scored full marks. A structural assertion has to name the
+  *mechanism* — the value's priority, the presence of a combinator — never a location
+  or an exact string.
 - Confirm each red failure comes from the exercise's own
   `NotImplementedException` — not from a compile error, not from a missing XAML
   resource, and above all not from the uninitialized-ReactiveUI exception of
