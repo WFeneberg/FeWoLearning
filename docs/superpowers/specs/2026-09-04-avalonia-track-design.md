@@ -312,6 +312,17 @@ trap documented for `python/`.
   class found in this track was found that way and none was found by reading. Before
   accepting an exercise, implement the laziest wrong version you can think of, run
   the real unmodified test against it, and confirm it goes red.
+- **The cheat must live where the learner writes.** ex018 shipped a test that a
+  `Click`-handler bypass defeated 3/3, even though its author had run a cheat overlay
+  first — the overlay mutated the exercise's *given* view model, which the stub marks
+  "do not change", so it tested a layer no learner touches. For a view exercise the
+  cheat belongs in the `.axaml` and its code-behind, and nowhere else.
+- **A view exercise needs one structural assertion, not only behavioural ones.**
+  Every behavioural assertion about a command can be satisfied by a code-behind event
+  handler that mutates the view model directly. `Assert.Same(vm.SomeCommand,
+  button.Command)` — or `Assert.Null(button.Command)` where the exercise's point is
+  that there is no command — is what pins the wiring. ex016 and ex019 carried it and
+  were immune; ex018 lacked it and was not.
 - Confirm each red failure comes from the exercise's own
   `NotImplementedException` — not from a compile error, not from a missing XAML
   resource, and above all not from the uninitialized-ReactiveUI exception of
