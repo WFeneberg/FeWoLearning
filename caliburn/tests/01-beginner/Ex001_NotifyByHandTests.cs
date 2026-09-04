@@ -37,7 +37,7 @@ public class Ex001_NotifyByHandTests : CaliburnCoreContext
 
         vm.FirstName = "Ada";
 
-        Assert.Contains("FirstName", names);
+        Assert.Contains(nameof(Ex001_NotifyByHand.FirstName), names);
     }
 
     [Fact]

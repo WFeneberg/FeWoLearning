@@ -169,6 +169,14 @@ Pinned package versions, for reference: `Caliburn.Micro` 5.0.258,
 `Xunit.StaFact` 3.0.13, `xunit.v3` 3.2.2, `xunit.runner.visualstudio` 3.1.4,
 `Microsoft.NET.Test.Sdk` 17.14.1.
 
+## The stub build is not warning-free — by design
+
+Stubs that throw from a member never raise their event or assign their
+backing field, so `exercises/` emits `CS0067`/`CS0649`. These are expected
+and deliberately left unsuppressed: silencing them would silence the same
+warning class a real unused-field bug produces. `solutions/` builds with
+**0 warnings** — a warning there is a finding.
+
 ## Why `solutions/` is in the build
 
 The repo-wide convention (see the root `CLAUDE.md`) keeps `solutions/` out of

@@ -32,7 +32,7 @@ public class Ex002_PropertyChangedBaseBasicsTests : CaliburnCoreContext
 
         vm.FirstName = "Ada";
 
-        Assert.Contains("FirstName", names);
+        Assert.Contains(nameof(Ex002_PropertyChangedBaseBasics.FirstName), names);
     }
 
     [Fact]
@@ -69,8 +69,8 @@ public class Ex002_PropertyChangedBaseBasicsTests : CaliburnCoreContext
 
         vm.RefreshAll();
 
-        // An empty property name is the INotifyPropertyChanged convention for "all of
-        // them"; Caliburn's Refresh() raises exactly one such event. Note: empty, not null.
+        // null or empty is the INotifyPropertyChanged convention for "all of them";
+        // Caliburn's Refresh() uses empty. It still raises exactly one such event.
         Assert.Single(names);
         Assert.Equal(string.Empty, names[0]);
     }

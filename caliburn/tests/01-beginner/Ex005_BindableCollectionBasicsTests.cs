@@ -76,4 +76,24 @@ public class Ex005_BindableCollectionBasicsTests : CaliburnCoreContext
         Assert.Empty(vm.Items);
         Assert.Equal(new[] { NotifyCollectionChangedAction.Reset }, actions);
     }
+
+    sealed class BoomException : Exception;
+
+    static IEnumerable<string> Throwing()
+    {
+        yield return "bread";
+        throw new BoomException();
+    }
+
+    [Fact]
+    public void ReplaceAll_Restores_Notification_Even_When_The_Source_Throws()
+    {
+        var vm = new Ex005_BindableCollectionBasics();
+
+        Assert.Throws<BoomException>(() => vm.ReplaceAll(Throwing()));
+
+        // A half-suspended collection is silent forever, and the symptom surfaces in
+        // whatever binds to it rather than here. Hence try/finally, not a bare assignment.
+        Assert.True(vm.Items.IsNotifying);
+    }
 }

@@ -5,8 +5,8 @@
 // Passes: dotnet test --filter FullyQualifiedName~Ex005_
 //
 // A bound ItemsControl reacts to every CollectionChanged event. Clearing a list of 500 and
-// re-adding 500 naively is 1001 events and 1001 layout passes. Suspending notification and
-// raising one Reset at the end is one.
+// re-adding 500 naively is 501 CollectionChanged events and 501 rounds of container
+// generation. Suspending notification and raising one Reset at the end is one.
 
 using Caliburn.Micro;
 
@@ -30,6 +30,6 @@ public class Ex005_BindableCollectionBasics : PropertyChangedBase
 
     // TODO for ReplaceAll: switch Items.IsNotifying off, clear, add the new items one at a
     // time, switch it back on, then call Items.Refresh() to raise the single Reset.
-    // Leave IsNotifying true again afterwards even though nothing here throws - the next
-    // caller depends on it.
+    // Restore IsNotifying even on the way out of an exception - items is a lazy sequence and
+    // can throw mid-enumeration, and a half-suspended collection is silent forever.
 }

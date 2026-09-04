@@ -33,6 +33,7 @@ public class Ex004_DependentPropertiesTests : CaliburnCoreContext
         Assert.Contains(nameof(Ex004_DependentProperties.Subtotal), names);
         Assert.Contains(nameof(Ex004_DependentProperties.Discount), names);
         Assert.Contains(nameof(Ex004_DependentProperties.Total), names);
+        Assert.Equal(4, names.Count);
     }
 
     [Fact]
@@ -47,6 +48,7 @@ public class Ex004_DependentPropertiesTests : CaliburnCoreContext
         Assert.Contains(nameof(Ex004_DependentProperties.Subtotal), names);
         Assert.Contains(nameof(Ex004_DependentProperties.Discount), names);
         Assert.Contains(nameof(Ex004_DependentProperties.Total), names);
+        Assert.Equal(4, names.Count);
     }
 
     [Fact]
@@ -64,6 +66,7 @@ public class Ex004_DependentPropertiesTests : CaliburnCoreContext
         // Subtotal is Quantity * UnitPrice. A discount cannot move it, and announcing it
         // anyway would re-evaluate every binding on Subtotal for nothing.
         Assert.DoesNotContain(nameof(Ex004_DependentProperties.Subtotal), names);
+        Assert.Equal(3, names.Count);
     }
 
     [Fact]
