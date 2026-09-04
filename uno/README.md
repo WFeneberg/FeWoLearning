@@ -110,6 +110,20 @@ consequences, all of them found by probing rather than by reading docs:
   `ButtonAutomationPeer.Invoke`. Two catalog rows were re-scoped for this (030
   and 081); do not add an exercise that needs a real input event.
 
+### Two things that bite async exercises
+
+- **`await CancellationTokenSource.CancelAsync()` overflows the stack** and takes
+  the test host down with no failing test to point at. A continuation resuming
+  inside a cancellation callback re-enters the dispatcher, and the recursion has
+  no floor. Use the synchronous `Cancel()`; ex064 and ex067 say so at the call
+  site. The inline dispatcher in the harness also guards against re-entering
+  Uno's own pump, for the same class of reason.
+- **xunit waits for the async work a synchronous test started.** A test that
+  leaves a `TaskCompletionSource` unsettled hangs the whole run, not just itself
+  (ex049, ex067 both learned this). Settle every gate before the test returns.
+  A hung run also leaves a `testhost` process holding the output DLL, so the next
+  build fails with MSB3027 until it is killed.
+
 ### The fragile spot
 
 The two dispatcher hooks are `internal` in `Uno.UI.Dispatching`, so the harness

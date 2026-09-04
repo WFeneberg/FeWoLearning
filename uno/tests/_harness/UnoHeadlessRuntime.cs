@@ -28,7 +28,9 @@ namespace FeWoLearning.Uno.Tests;
 internal static class UnoHeadlessRuntime
 {
     private static readonly Lock Gate = new();
+    private static readonly Queue<Action> _deferred = new();
     private static bool _booted;
+    private static bool _pumping;
 
     [ModuleInitializer]
     internal static void Boot()
@@ -69,7 +71,42 @@ internal static class UnoHeadlessRuntime
                 + "no longer matches this harness. See the remarks in UnoHeadlessRuntime.");
     }
 
-    private static void RunInline<TPriority>(Action work, TPriority priority) => work();
+    /// <summary>
+    /// Stands in for a head's message loop: queued work runs immediately, so a test never
+    /// has to pump or await a frame.
+    /// </summary>
+    /// <remarks>
+    /// The re-entrancy guard is not optional. Uno hands this method its own pump, and work
+    /// running inside the pump can enqueue more - an awaited continuation resuming inside a
+    /// cancellation callback is enough. Calling the pump again from inside itself recurses
+    /// until the stack runs out, and a StackOverflowException takes the whole test host
+    /// down with no failing test to point at. So a nested call defers, and the outer call
+    /// drains what piled up.
+    /// </remarks>
+    private static void RunInline<TPriority>(Action work, TPriority priority)
+    {
+        if (_pumping)
+        {
+            _deferred.Enqueue(work);
+            return;
+        }
+
+        _pumping = true;
+
+        try
+        {
+            work();
+
+            while (_deferred.Count > 0)
+            {
+                _deferred.Dequeue()();
+            }
+        }
+        finally
+        {
+            _pumping = false;
+        }
+    }
 
     /// <summary>
     /// Uno shapes and measures text through ICU. Its loader reads <c>icudt.dat</c> out of

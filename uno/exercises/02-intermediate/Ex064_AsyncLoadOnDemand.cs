@@ -71,7 +71,8 @@ public sealed class Ex064_AsyncLoadOnDemand : INotifyPropertyChanged
     /// that was cancelled changes nothing - its answer belongs to a request nobody wants.
     /// </summary>
     public async Task LoadAsync(string query) =>
-        // TODO: swap the CancellationTokenSource (cancel and dispose the old one), set the
+        // TODO: swap the CancellationTokenSource (cancel and dispose the old one - use
+        // Cancel, not CancelAsync, see uno/README.md), set the
         // state, await the work, and decide what to do with each of the three outcomes:
         // success, cancellation, failure. OperationCanceledException is not a failure.
         throw new NotImplementedException("TODO: Ex064 - load, cancelling what came before");

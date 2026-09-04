@@ -81,7 +81,10 @@ public sealed class Ex064_AsyncLoadOnDemand : INotifyPropertyChanged
         // finishes, and comparing against the field is how the stale answer gets in.
         if (previous is not null)
         {
-            await previous.CancelAsync();
+            // Cancel, not CancelAsync: awaiting the async form here overflows the stack in
+            // the headless harness, because a continuation resuming inside a cancellation
+            // callback re-enters the dispatcher (see uno/README.md).
+            previous.Cancel();
             previous.Dispose();
         }
 

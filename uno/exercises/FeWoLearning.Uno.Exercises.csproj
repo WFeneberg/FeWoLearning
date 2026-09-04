@@ -12,4 +12,9 @@
     <UnoFeatures>Skia</UnoFeatures>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Generic host, DI, configuration and options (ex068, ex095). -->
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+  </ItemGroup>
+
 </Project>
