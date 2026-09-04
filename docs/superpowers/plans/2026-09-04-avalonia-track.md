@@ -40,9 +40,9 @@ Every task's requirements implicitly include this section. All values are copied
 | `avalonia/exercises/FeWoLearning.Avalonia.Exercises.csproj` | Stub content library |
 | `avalonia/solutions/FeWoLearning.Avalonia.Solutions.csproj` | Reference content library, own `AssemblyName` |
 | `avalonia/tests/FeWoLearning.Avalonia.Tests.csproj` | Headless test project, conditional content reference |
-| `avalonia/tests/_support/TestAppHarness.cs` | `TestApp`, `TestAppBuilder`, ReactiveUI module initializer, `[assembly: AvaloniaTestApplication]` |
-| `avalonia/tests/_support/ViewHarness.cs` | The one verified `Show` helper every view test uses |
-| `avalonia/tests/_support/HarnessTests.cs` | Permanent regression test for the two harness prerequisites |
+| `avalonia/tests/_harness/TestAppHarness.cs` | `TestApp`, `TestAppBuilder`, ReactiveUI module initializer, `[assembly: AvaloniaTestApplication]` |
+| `avalonia/tests/_harness/ViewHarness.cs` | The one verified `Show` helper every view test uses |
+| `avalonia/tests/_harness/HarnessSmokeTests.cs` | Permanent regression test for the two harness prerequisites |
 | `avalonia/gallery/FeWoLearning.Avalonia.Gallery.csproj` | Desktop gallery app |
 | `avalonia/gallery/Program.cs` | Entry point + `AppBuilder` incl. ReactiveUI init |
 | `avalonia/gallery/App.axaml` + `.axaml.cs` | FluentTheme, main window |
@@ -76,17 +76,17 @@ Every task's requirements implicitly include this section. All values are copied
 - Create: `avalonia/exercises/FeWoLearning.Avalonia.Exercises.csproj`
 - Create: `avalonia/solutions/FeWoLearning.Avalonia.Solutions.csproj`
 - Create: `avalonia/tests/FeWoLearning.Avalonia.Tests.csproj`
-- Create: `avalonia/tests/_support/TestAppHarness.cs`
-- Create: `avalonia/tests/_support/ViewHarness.cs`
-- Test: `avalonia/tests/_support/HarnessTests.cs`
+- Create: `avalonia/tests/_harness/TestAppHarness.cs`
+- Create: `avalonia/tests/_harness/ViewHarness.cs`
+- Test: `avalonia/tests/_harness/HarnessSmokeTests.cs`
 - Create: `avalonia/gallery/FeWoLearning.Avalonia.Gallery.csproj`
 - Create: `avalonia/gallery/Program.cs`, `App.axaml`, `App.axaml.cs`, `MainWindow.axaml`, `MainWindow.axaml.cs`, `GalleryEntry.cs`, `GalleryCatalog.cs`
 
 **Interfaces:**
 - Consumes: nothing.
 - Produces:
-  - `FeWoLearning.Avalonia.Tests.Support.ViewHarness.Show<TView>(TView view, double width = 400, double height = 300)` returning `TView` — **every** view exercise test calls this and nothing else to trigger layout.
-  - `FeWoLearning.Avalonia.Tests.Support.ViewHarness.SolutionsMode` — `bool`, true when the loaded content assembly is the solutions one.
+  - `FeWoLearning.Avalonia.Tests.ViewHarness.Show<TView>(TView view, double width = 400, double height = 300)` returning `TView` — **every** view exercise test calls this and nothing else to trigger layout.
+  - `FeWoLearning.Avalonia.Tests.ViewHarness.SolutionsMode` — `bool`, true when the loaded content assembly is the solutions one.
   - `FeWoLearning.Avalonia.Gallery.GalleryEntry` — `record GalleryEntry(string Id, string Title, Func<Control> Create)`.
   - `FeWoLearning.Avalonia.Gallery.GalleryCatalog.Entries` — `IReadOnlyList<GalleryEntry>`.
   - Both content projects expose namespace `FeWoLearning.Avalonia.Exercises.Beginner` (and the other three tiers) regardless of which one is referenced.
@@ -97,7 +97,7 @@ Every task's requirements implicitly include this section. All values are copied
 cd avalonia 2>/dev/null || mkdir -p avalonia && cd avalonia
 mkdir -p exercises/01-beginner exercises/02-intermediate exercises/03-advanced exercises/04-expert exercises/_support
 mkdir -p solutions/01-beginner solutions/02-intermediate solutions/03-advanced solutions/04-expert solutions/_support
-mkdir -p tests/01-beginner tests/_support
+mkdir -p tests/01-beginner tests/_harness
 mkdir -p gallery/Pages/Beginner
 ```
 
@@ -208,7 +208,9 @@ They are identical except that solutions overrides `AssemblyName` while keeping 
   </ItemGroup>
 
   <!-- Exactly one of the two content projects, never both: that is what keeps the
-       identical namespaces and type names from colliding. -->
+       identical namespaces and type names from colliding. `dotnet test` is the red
+       run against the stubs, `dotnet test -p:UseSolutions=true` the green run against
+       the reference implementations. Same mechanism as blazor/ and uno/. -->
   <ItemGroup Condition="'$(UseSolutions)' != 'true'">
     <ProjectReference Include="..\exercises\FeWoLearning.Avalonia.Exercises.csproj" />
   </ItemGroup>
@@ -238,7 +240,7 @@ Actually do simplify it. Replace the last two `ItemGroup`s with:
 
 - [ ] **Step 5: Write the test harness**
 
-`avalonia/tests/_support/TestAppHarness.cs`:
+`avalonia/tests/_harness/TestAppHarness.cs`:
 
 ```csharp
 using System.Runtime.CompilerServices;
@@ -248,9 +250,9 @@ using Avalonia.Themes.Fluent;
 using ReactiveUI.Avalonia;
 using ReactiveUI.Builder;
 
-[assembly: AvaloniaTestApplication(typeof(FeWoLearning.Avalonia.Tests.Support.TestAppBuilder))]
+[assembly: AvaloniaTestApplication(typeof(FeWoLearning.Avalonia.Tests.TestAppBuilder))]
 
-namespace FeWoLearning.Avalonia.Tests.Support;
+namespace FeWoLearning.Avalonia.Tests;
 
 /// <summary>
 /// The Application every [AvaloniaFact] runs inside. FluentTheme is added in code
@@ -281,13 +283,13 @@ internal static class ReactiveUiInitializer
 }
 ```
 
-`avalonia/tests/_support/ViewHarness.cs`:
+`avalonia/tests/_harness/ViewHarness.cs`:
 
 ```csharp
 using Avalonia.Controls;
 using FeWoLearning.Avalonia.Exercises.Beginner;
 
-namespace FeWoLearning.Avalonia.Tests.Support;
+namespace FeWoLearning.Avalonia.Tests;
 
 public static class ViewHarness
 {
@@ -346,9 +348,9 @@ This keeps `SolutionsMode` independent of any single exercise, so it never break
 
 - [ ] **Step 6: Write the harness regression test**
 
-This is a permanent test, not a throwaway. It guards the two prerequisites from spec section 2.1 that would otherwise make every exercise fail for the wrong reason.
+This is a permanent test, not a throwaway, and it is named to match `uno/tests/_harness/HarnessSmokeTests.cs` — the sibling .NET UI track uses the same convention for the same reason. It guards the prerequisites from spec section 2.1 that would otherwise make every exercise fail for the wrong reason.
 
-`avalonia/tests/_support/HarnessTests.cs`:
+`avalonia/tests/_harness/HarnessSmokeTests.cs`:
 
 ```csharp
 using Avalonia.Controls;
@@ -357,9 +359,14 @@ using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Primitives;
 
-namespace FeWoLearning.Avalonia.Tests.Support;
+namespace FeWoLearning.Avalonia.Tests;
 
-public class HarnessTests
+/// <summary>
+/// Not an exercise: proves the harness itself still works. ReactiveUI initialization and
+/// the layout pass are prerequisites for every exercise in the track, so when one of
+/// them breaks these fail first and every exercise failure after them is noise.
+/// </summary>
+public class HarnessSmokeTests
 {
     private sealed class Probe : ReactiveObject
     {
@@ -672,7 +679,7 @@ Expected: both succeed with 0 errors.
 git add avalonia/.gitignore avalonia/Directory.Build.props avalonia/FeWoLearning.Avalonia.slnx \
         avalonia/exercises/FeWoLearning.Avalonia.Exercises.csproj avalonia/exercises/_support/TrackMarker.cs \
         avalonia/solutions/FeWoLearning.Avalonia.Solutions.csproj avalonia/solutions/_support/TrackMarker.cs \
-        avalonia/tests/FeWoLearning.Avalonia.Tests.csproj avalonia/tests/_support/ \
+        avalonia/tests/FeWoLearning.Avalonia.Tests.csproj avalonia/tests/_harness/ \
         avalonia/gallery/
 git commit -m "avalonia: scaffold track (Avalonia 12 + ReactiveUI 24 + headless xunit.v3)"
 ```
@@ -913,7 +920,7 @@ git commit -m "avalonia: 100-row catalog and track README"
 - Modify: `avalonia/gallery/GalleryCatalog.cs`
 - Modify: `avalonia/catalog.md` (five rows plus the status line)
 - Test: `avalonia/tests/01-beginner/Ex001_HelloViewTests.cs` … `Ex005_LayoutDockPanelTests.cs`
-- Test: `avalonia/tests/_support/GallerySmokeTests.cs`
+- Test: `avalonia/tests/_harness/GallerySmokeTests.cs`
 
 **Interfaces:**
 - Consumes: `ViewHarness.Show<TView>(TView, double, double)` and `ViewHarness.SolutionsMode` from Task 1; `GalleryEntry(string Id, string Title, Func<Control> Create)` and `GalleryCatalog.Entries` from Task 1.
@@ -996,7 +1003,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -1145,7 +1152,7 @@ public partial class Ex002_LayoutStackPanel : UserControl
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -1267,7 +1274,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -1380,7 +1387,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -1502,7 +1509,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -1673,13 +1680,13 @@ public static class GalleryCatalog
 
 This test also proves the red/green mechanism itself, which nothing else does.
 
-`avalonia/tests/_support/GallerySmokeTests.cs`:
+`avalonia/tests/_harness/GallerySmokeTests.cs`:
 
 ```csharp
 using Avalonia.Headless.XUnit;
 using FeWoLearning.Avalonia.Gallery;
 
-namespace FeWoLearning.Avalonia.Tests.Support;
+namespace FeWoLearning.Avalonia.Tests;
 
 public class GallerySmokeTests
 {
@@ -1747,11 +1754,11 @@ Expected: PASS, 0 failed.
 
 - [ ] **Step 21: Verify the harness and gallery tests in both modes**
 
-Run: `dotnet test --filter "FullyQualifiedName~Support"`
-Expected: PASS — the harness tests plus `GallerySmokeTests`, with the exercises-mode branch asserting the TODOs.
+Run: `dotnet test --filter "FullyQualifiedName~SmokeTests"`
+Expected: PASS — `HarnessSmokeTests` plus `GallerySmokeTests`, with the exercises-mode branch asserting the TODOs. **Check the reported test count is non-zero**: a `--filter` that matches nothing exits successfully and reads like a pass, which is the cheapest way to fake a green run in this whole plan.
 
-Run: `dotnet test -p:UseSolutions=true --filter "FullyQualifiedName~Support"`
-Expected: PASS — same tests, solutions-mode branch.
+Run: `dotnet test -p:UseSolutions=true --filter "FullyQualifiedName~SmokeTests"`
+Expected: PASS — same tests, non-zero count, solutions-mode branch.
 
 - [ ] **Step 22: Flip the five catalog rows**
 
@@ -1761,7 +1768,7 @@ In `avalonia/catalog.md` change rows 001–005 from `⬜` to `✅` and set the s
 
 ```bash
 git add avalonia/exercises/01-beginner avalonia/solutions/01-beginner avalonia/tests/01-beginner \
-        avalonia/tests/_support/GallerySmokeTests.cs avalonia/gallery/Pages avalonia/gallery/GalleryCatalog.cs \
+        avalonia/tests/_harness/GallerySmokeTests.cs avalonia/gallery/Pages avalonia/gallery/GalleryCatalog.cs \
         avalonia/catalog.md
 git commit -m "avalonia: ex001-ex005"
 ```
@@ -1845,7 +1852,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -1960,7 +1967,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -2398,7 +2405,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using FeWoLearning.Avalonia.Exercises.Beginner;
-using FeWoLearning.Avalonia.Tests.Support;
+using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
@@ -2581,7 +2588,7 @@ Expected: PASS, 0 failed.
 This is the once-per-completed-batch full run. Ten exercises plus the harness and gallery tests.
 
 Run: `dotnet test`
-Expected: every exercise test red, the `Support` tests green, 0 build errors.
+Expected: every exercise test red, the two `SmokeTests` classes green, 0 build errors.
 
 Run: `dotnet test -p:UseSolutions=true`
 Expected: **everything** green, 0 failed.
@@ -2627,7 +2634,7 @@ In the `## Languages & tracks` table, after the `rust/` row:
 | `avalonia/`| Avalonia 12 (ReactiveUI MVVM, C#)| xUnit v3 + Avalonia.Headless | **10 / 100** | ✅ .NET 10 |
 ```
 
-`blazor/` and `php/` are also missing from this table. That is pre-existing drift — leave it alone and do not stage those lines.
+`blazor/`, `php/` and `uno/` are also missing from this table. That is pre-existing drift — leave it alone and do not stage those lines. Note `uno/` landed in this repo while this plan was being written, so re-check the table before editing: if someone has since added those rows, just slot `avalonia/` in beside them.
 
 - [ ] **Step 2: Add the naming row to `docs/exercise-format.md`**
 
