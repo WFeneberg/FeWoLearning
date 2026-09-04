@@ -1,0 +1,15 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Intermediate.Ex054_ElementNameBinding"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel x:Name="Root">
+        <TextBlock x:Name="Source" Text="the source" />
+        <TextBlock x:Name="Mirror" Text="{Binding ElementName=Source, Path=Text}" />
+
+        <!-- Names "Dial" before it appears: the name scope is resolved as a whole. -->
+        <Border x:Name="Sized" Height="10" Width="{Binding ElementName=Dial, Path=Value}" />
+        <Slider x:Name="Dial" Minimum="0" Maximum="200" Value="40" />
+    </StackPanel>
+
+</UserControl>

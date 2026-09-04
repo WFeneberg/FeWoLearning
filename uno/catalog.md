@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 50 ✅ / 50 ⬜**
+**Status: 55 ✅ / 45 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -83,11 +83,11 @@ do" in `README.md`.
 | 048 | ObservableObjectBase | an INPC base with `[CallerMemberName]` and an equality guard | ✅ |
 | 049 | AsyncCommand | async `ICommand`, busy flag, exception capture | ✅ |
 | 050 | InputValidation | `INotifyDataErrorInfo`, per-property errors | ✅ |
-| 051 | FunctionalConverter | a reusable converter parameterised by a delegate | ⬜ |
-| 052 | BindingFallbacks | `FallbackValue`, `TargetNullValue`, failed paths | ⬜ |
-| 053 | RelativeSourceBinding | `RelativeSource` `Self` and `TemplatedParent` | ⬜ |
-| 054 | ElementNameBinding | `ElementName` bindings and name scopes | ⬜ |
-| 055 | XLoadDeferral | `x:Load`, realisation, `FindName` before and after | ⬜ |
+| 051 | FunctionalConverter | a reusable converter parameterised by a delegate | ✅ |
+| 052 | BindingFallbacks | `FallbackValue`, `TargetNullValue`, failed paths | ✅ |
+| 053 | RelativeSourceBinding | `RelativeSource` `Self` and `TemplatedParent` | ✅ |
+| 054 | ElementNameBinding | `ElementName` bindings and name scopes | ✅ |
+| 055 | DataTemplateSelector | choosing a template per item, `SelectTemplateCore`, the null answer | ✅ |
 | 056 | ResourceDictionaryMerging | merged dictionaries and lookup precedence | ⬜ |
 | 057 | ThemeSwitching | switching theme at runtime: what re-evaluates, what does not | ⬜ |
 | 058 | CultureAwareFormatting | binding under an explicit culture, `FlowDirection` mirroring | ⬜ |
