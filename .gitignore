@@ -48,3 +48,6 @@ _tmp_*/
 tmp_*/
 *.tmp.*
 *.tmp*.config.*
+
+# ---- Superpowers SDD scratch (ledger, briefs, review packages) ----
+.superpowers/
