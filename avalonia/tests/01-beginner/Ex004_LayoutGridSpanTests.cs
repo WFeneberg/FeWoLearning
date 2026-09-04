@@ -35,4 +35,31 @@ public class Ex004_LayoutGridSpanTests
         Assert.Equal(new Rect(300, 16, 100, 30), right.Bounds);
         Assert.Equal(2 * left.Bounds.Width, middle.Bounds.Width);
     }
+
+    // The discriminator: fixed columns of 100/200/100 render bit-for-bit identical
+    // rectangles to both tests above at this exact 400x200 host size - even the
+    // "twice as wide" assertion holds for hard-coded pixels that happen to be in a
+    // 1:2:1 ratio. This test looks at the Grid's own ColumnDefinitions instead of
+    // the rendered geometry, so hard-coded pixel widths fail here even though the
+    // Bounds-only assertions above cannot tell the difference.
+    [AvaloniaFact]
+    public void Columns_Use_Star_Sizing_In_A_One_Two_One_Ratio_And_Banner_Spans_All_Three()
+    {
+        var view = Show();
+        var grid = view.FindControl<Grid>("RootGrid");
+        Assert.NotNull(grid);
+
+        Assert.True(grid!.ColumnDefinitions[0].Width.IsStar,
+            "column 0 must be star-sized, not a fixed pixel width");
+        Assert.Equal(1, grid.ColumnDefinitions[0].Width.Value);
+        Assert.True(grid.ColumnDefinitions[1].Width.IsStar,
+            "column 1 must be star-sized, not a fixed pixel width");
+        Assert.Equal(2, grid.ColumnDefinitions[1].Width.Value);
+        Assert.True(grid.ColumnDefinitions[2].Width.IsStar,
+            "column 2 must be star-sized, not a fixed pixel width");
+        Assert.Equal(1, grid.ColumnDefinitions[2].Width.Value);
+
+        var banner = view.FindControl<Border>("Banner")!;
+        Assert.Equal(3, Grid.GetColumnSpan(banner));
+    }
 }

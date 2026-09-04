@@ -7,8 +7,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex005_LayoutDockPanel">
-  <!-- TODO: replace this placeholder with a DockPanel that fills with its last
-       child, holding in this order:
+  <!-- TODO: replace this placeholder with a DockPanel named "RootPanel" that fills
+       with its last child, holding in this order:
          TopBar    docked Top,    Height 30
          BottomBar docked Bottom, Height 20
          SideBar   docked Left,   Width 60

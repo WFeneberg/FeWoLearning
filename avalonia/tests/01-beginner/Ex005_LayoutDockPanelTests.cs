@@ -41,4 +41,26 @@ public class Ex005_LayoutDockPanelTests
 
         Assert.Equal(new Rect(60, 30, 240, 150), view.FindControl<Border>("Body")!.Bounds);
     }
+
+    // The discriminator: a Grid with row/column spans producing the same rectangles
+    // passes all three geometry tests above without a DockPanel, without a single
+    // DockPanel.Dock value, and without LastChildFill ever coming into play. This
+    // test looks at the panel type and the Dock attachments themselves instead of
+    // the rendered geometry, so a Grid-based cheat fails here even though the
+    // Bounds-only assertions above cannot tell the difference.
+    [AvaloniaFact]
+    public void Bars_And_Sidebar_Are_Docked_On_A_DockPanel()
+    {
+        var view = Show();
+        var panel = view.FindControl<DockPanel>("RootPanel");
+        Assert.NotNull(panel);
+
+        var topBar = view.FindControl<Border>("TopBar")!;
+        var bottomBar = view.FindControl<Border>("BottomBar")!;
+        var sideBar = view.FindControl<Border>("SideBar")!;
+
+        Assert.Equal(Dock.Top, DockPanel.GetDock(topBar));
+        Assert.Equal(Dock.Bottom, DockPanel.GetDock(bottomBar));
+        Assert.Equal(Dock.Left, DockPanel.GetDock(sideBar));
+    }
 }

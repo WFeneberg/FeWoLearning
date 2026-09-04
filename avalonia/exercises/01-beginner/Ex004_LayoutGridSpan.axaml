@@ -7,8 +7,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex004_LayoutGridSpan">
-  <!-- TODO: replace this placeholder with a Grid whose columns are "1*,2*,1*" and
-       whose rows are "Auto,Auto", holding:
+  <!-- TODO: replace this placeholder with a Grid named "RootGrid" whose columns are
+       "1*,2*,1*" and whose rows are "Auto,Auto" (real star sizing, not literal
+       numbers that happen to match - the test checks the column definitions
+       themselves, not just the rendered rectangles), holding:
          Banner at row 0, spanning all three columns, Height 16
          Left   at row 1 col 0, Height 30
          Middle at row 1 col 1, Height 30

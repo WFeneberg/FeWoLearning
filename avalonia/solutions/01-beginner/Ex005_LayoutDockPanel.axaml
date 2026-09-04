@@ -7,7 +7,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex005_LayoutDockPanel">
-  <DockPanel LastChildFill="True">
+  <DockPanel Name="RootPanel" LastChildFill="True">
     <Border Name="TopBar"    DockPanel.Dock="Top"    Height="30" Background="#22000000" />
     <Border Name="BottomBar" DockPanel.Dock="Bottom" Height="20" Background="#22000000" />
     <Border Name="SideBar"   DockPanel.Dock="Left"   Width="60"  Background="#11000000" />

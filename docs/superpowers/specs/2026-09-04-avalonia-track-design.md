@@ -112,7 +112,7 @@ avalonia/
     01-beginner/ …
   tests/      FeWoLearning.Avalonia.Tests.csproj         # xunit.v3 + Avalonia.Headless.XUnit
     01-beginner/ …
-    _support/                                            # TestAppBuilder, ReactiveUI init
+    _harness/                                            # TestAppBuilder, ReactiveUI init
   gallery/    FeWoLearning.Avalonia.Gallery.csproj       # Avalonia.Desktop app
 ```
 
@@ -269,7 +269,7 @@ trap documented for `python/`.
   which applies templates and drives the full pass. A headless `Window`'s
   client area equals its requested `Width`/`Height` exactly, so geometry
   assertions are deterministic. Every view exercise's test therefore goes
-  through the shared `Show` helper in `tests/_support/`.
+  through the shared `Show` helper in `tests/_harness/`.
 - **Anything scheduled through the main-thread scheduler has not run yet when
   the assertion executes.** Drain the dispatcher queue with
   `Dispatcher.UIThread.RunJobs()` before asserting, or the test proves only the

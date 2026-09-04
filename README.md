@@ -29,6 +29,11 @@ facts red on the stubs, 115 green on the reference solutions; run
 `dotnet test -p:UseSolutions=true` from inside `blazor/` to check the
 solutions instead of the stubs.
 
+`avalonia/`'s first ten exercises are verified end-to-end — each proven red as
+a stub and green against its reference solution by a real `dotnet test`; the
+other ninety are planned, not yet written. See `avalonia/catalog.md` for the
+live count.
+
 `java/`, `kotlin/`, and `flutter/` are content-complete — every stub, test, and
 reference solution exists — but **unverified**: this machine has no JDK/Gradle
 (+ Kotlin), or Flutter/Dart SDK installed, so none of it has ever been

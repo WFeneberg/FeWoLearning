@@ -37,7 +37,7 @@ not a valid C# identifier.
 | 007 | LayoutWrapPanel | `WrapPanel` wrapping at a constrained width | ✅ |
 | 008 | ObservableViewModel | `INotifyPropertyChanged` by hand, change-only notification | ✅ |
 | 009 | ReactiveObjectBasics | `ReactiveObject`, `RaiseAndSetIfChanged`, `PropertyChanging` ordering | ✅ |
-| 010 | CompiledBinding | explicit `{CompiledBinding}`, nested path re-resolution | ✅ |
+| 010 | CompiledBinding | nested-path re-resolution: the bound text follows when the intermediate object is replaced, not merely mutated | ✅ |
 | 011 | BindingModes | `OneWay`, `TwoWay`, `OneWayToSource` | ⬜ |
 | 012 | TextBoxTwoWay | `TextBox.Text` two-way round-trip | ⬜ |
 | 013 | BindingStringFormat | `StringFormat`, invariant culture | ⬜ |

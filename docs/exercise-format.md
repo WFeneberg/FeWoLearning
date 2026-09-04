@@ -33,7 +33,7 @@ is prefixed:
 | `angular/`| folder with stub + colocated `*.spec.ts`        | `exercises/01-beginner/ex001_pricing_service/` |
 | `java/`   | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_primitive_math/` |
 | `kotlin/` | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_val_var_basics/` |
-| `avalonia/`| one folder per tier, `.axaml` + code-behind + sibling test | `exercises/01-beginner/Ex001_HelloView.axaml` |
+| `avalonia/`| one folder per tier, `.axaml` + code-behind, test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloView.axaml` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
@@ -78,9 +78,11 @@ root `CLAUDE.md`.
 
 ## Known gaps
 
-These are deliberate, documented limitations rather than oversights. They exist
-because `solutions/` is intentionally kept out of each build (the files reuse the
-stubs' type and module names, so compiling both at once would collide).
+These are deliberate, documented limitations rather than oversights. For most
+tracks they exist because `solutions/` is intentionally kept out of each build
+(the files reuse the stubs' type and module names, so compiling both at once
+would collide) — `avalonia/` (and `blazor/`) are exceptions that keep
+`solutions/` in the build instead; see their own tracks for why.
 
 ### `solutions/` is only partly verified
 
@@ -94,6 +96,7 @@ stubs' type and module names, so compiling both at once would collide).
 | `rust/`   | **No.** Solutions are not registered in `lib.rs`.                            |
 | `java/`   | **No** — not by a build (`solutions/` isn't referenced by any Gradle source set) **and not by anything else either**: this machine has no JDK/Gradle, so the track has never been compiled at all, stubs included. Higher risk than every other row in this table. |
 | `kotlin/` | **No** — same situation as `java/`: not referenced by any Gradle source set, and not compiled by anything else either, since this machine has no JDK/Gradle/Kotlin at all. Higher risk than every other row in this table. |
+| `avalonia/`| **Yes.** `solutions/` is its own project, built and referenced by `tests/` (and `gallery/`) whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. Lower risk than every other row in this table. |
 
 Consequence: a reference solution can silently drift until it no longer passes
 its own test, and nothing reports it. This is not hypothetical — an audit found

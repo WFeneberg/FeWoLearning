@@ -7,8 +7,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex002_LayoutStackPanel">
-  <!-- TODO: replace this placeholder with a vertical StackPanel whose Spacing is 8,
-       holding three Borders named "Row1", "Row2" and "Row3", each 20 device pixels
-       tall. Leave their widths to the panel. -->
+  <!-- TODO: replace this placeholder with a vertical StackPanel named "RootPanel"
+       whose Spacing is 8, holding three Borders named "Row1", "Row2" and "Row3",
+       each 20 device pixels tall. Leave their widths to the panel. -->
   <TextBlock Text="TODO" />
 </UserControl>

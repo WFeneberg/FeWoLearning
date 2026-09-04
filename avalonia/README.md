@@ -109,6 +109,11 @@ back to match the rest of the repo.
 
 ## Writing tests for this track
 
+- **`GallerySmokeTests` enforces an exact exception-message contract.** Every
+  gallery-registered stub's thrown message must contain `TODO: Ex<NNN>` with
+  that exact capitalisation and a three-digit, zero-padded number (`TODO: Ex011`,
+  not `TODO - Ex011` or `TODO: Ex11`) — the smoke test string-matches this
+  literally, so a stub that drifts from it fails a test far away from the typo.
 - **Always drive layout through `ViewHarness.Show(view, width, height)`** in
   `tests/_harness/`, never bare `Measure`/`Arrange`. Measured fact: a
   `UserControl`'s XAML lives in its `Content`, hosted by a `ContentPresenter`

@@ -4,6 +4,6 @@
              x:Class="FeWoLearning.Avalonia.Gallery.Pages.Beginner.Ex006">
   <StackPanel Spacing="12">
     <TextBlock Text="Exercise 006 — AlignmentAndMargin" FontSize="18" FontWeight="Bold" />
-    <b:Ex006_AlignmentAndMargin Name="Subject" />
+    <b:Ex006_AlignmentAndMargin />
   </StackPanel>
 </UserControl>

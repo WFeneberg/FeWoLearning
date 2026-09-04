@@ -7,7 +7,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex002_LayoutStackPanel">
-  <StackPanel Orientation="Vertical" Spacing="8">
+  <StackPanel Name="RootPanel" Orientation="Vertical" Spacing="8">
     <Border Name="Row1" Height="20" Background="#4C8BF5" />
     <Border Name="Row2" Height="20" Background="#34A853" />
     <Border Name="Row3" Height="20" Background="#FBBC05" />

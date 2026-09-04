@@ -12,7 +12,7 @@
        proportional inflation on those rows in this Avalonia build (reproduced with
        the simplest possible two-Auto-row Grid, no spanning/star columns involved).
        Pinning the Grid to its own content height avoids it. -->
-  <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="1*,2*,1*" VerticalAlignment="Top">
+  <Grid Name="RootGrid" RowDefinitions="Auto,Auto" ColumnDefinitions="1*,2*,1*" VerticalAlignment="Top">
     <Border Name="Banner" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
             Height="16" Background="#22000000" />
     <Border Name="Left"   Grid.Row="1" Grid.Column="0" Height="30" Background="#4C8BF5" />

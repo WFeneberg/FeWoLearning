@@ -63,7 +63,7 @@ Run every command **from inside the track folder**, not the repo root.
 For `blazor/`, `dotnet test -p:UseSolutions=true` runs the identical suite
 against the reference solutions instead of the stubs.
 
-## Toolchain status (verified 2026-08-03)
+## Toolchain status (verified 2026-09-04)
 
 - ✅ Verified end-to-end: **.NET 10**, **Python 3.14**, **Node 26 / npm 11**
   (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**, **Rust 1.97.1**,
