@@ -34,6 +34,7 @@ is prefixed:
 | `java/`   | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_primitive_math/` |
 | `kotlin/` | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_val_var_basics/` |
 | `avalonia/`| one folder per tier, `.axaml` + code-behind, test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloView.axaml` |
+| `uno/`    | one folder per tier, `.cs` (plus `.xaml` + code-behind for markup exercises), test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloProperty.cs` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
@@ -97,6 +98,7 @@ would collide) — `avalonia/` (and `blazor/`) are exceptions that keep
 | `java/`   | **No** — not by a build (`solutions/` isn't referenced by any Gradle source set) **and not by anything else either**: this machine has no JDK/Gradle, so the track has never been compiled at all, stubs included. Higher risk than every other row in this table. |
 | `kotlin/` | **No** — same situation as `java/`: not referenced by any Gradle source set, and not compiled by anything else either, since this machine has no JDK/Gradle/Kotlin at all. Higher risk than every other row in this table. |
 | `avalonia/`| **Yes.** `solutions/` is its own project, built and referenced by `tests/` (and `gallery/`) whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. Lower risk than every other row in this table. |
+| `uno/`    | **Yes.** Same mechanism: `solutions/` is its own project, and `dotnet test -p:UseSolutions=true` runs the identical 823 tests against it. Every solution is confirmed green and every stub confirmed red, and the solutions build is expected to be warning-free - so a warning there is a finding. Lowest risk in this table. |
 
 Consequence: a reference solution can silently drift until it no longer passes
 its own test, and nothing reports it. This is not hypothetical — an audit found
@@ -142,6 +144,15 @@ against a throwing stub.
   which pins `LIB` at a VS 2022 Community install (see that file's comment for
   why). `cargo`/`rustc` are not on `PATH` in a plain shell — prepend
   `%USERPROFILE%\.cargo\bin`.
+- **`uno/`** — the tests run against the real Skia `Uno.UI` with no window, which
+  the harness in `uno/tests/_harness/` makes possible by installing what a platform
+  head would (two `internal` dispatcher hooks by reflection, ICU data, an
+  `Application`). That has consequences an exercise author has to know before
+  writing one: `ItemsControl`/`ListView` never realise items, no input or focus or
+  `Loaded`/`SizeChanged` ever happens, `TransformToVisual` returns the origin, and
+  `await CancellationTokenSource.CancelAsync()` overflows the stack. `uno/README.md`
+  is the full list, and several catalog rows were re-scoped around it. The stub build
+  carries 16 warnings on purpose - fields and events a learner has not used yet.
 - **`vue/`** — the advanced tier hand-rolls minimal Pinia- and Router-shaped
   helpers rather than depending on `pinia` / `vue-router`.
 - **`java/`** — one package per exercise, with the test beside the stub in a
