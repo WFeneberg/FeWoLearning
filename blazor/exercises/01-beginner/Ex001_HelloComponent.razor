@@ -1,0 +1,12 @@
+@* Exercise 001 - Hello Component (beginner).
+   Goal:   Render a greeting for the Name parameter.
+   Drills: [Parameter], one-way binding of a computed member.
+   Passes: dotnet test --filter FullyQualifiedName~Ex001_ *@
+<p id="greeting">@Greeting</p>
+
+@code {
+    [Parameter] public string Name { get; set; } = "world";
+
+    // TODO: return "Hello, {Name}!"
+    private string Greeting => throw new NotImplementedException("TODO: Ex001 - build the greeting");
+}

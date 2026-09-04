@@ -1,0 +1,26 @@
+@* Exercise 003 - Conditional Rendering (beginner).
+   Goal:   Render exactly one of #loading / #error / #content / #empty.
+   Drills: @if / else if / else, precedence, blank-string handling.
+   Passes: dotnet test --filter FullyQualifiedName~Ex003_ *@
+@if (IsLoading)
+{
+    <p id="loading">Loading</p>
+}
+else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <p id="error">@ErrorMessage</p>
+}
+else if (!string.IsNullOrWhiteSpace(Content))
+{
+    <p id="content">@Content</p>
+}
+else
+{
+    <p id="empty">No data</p>
+}
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public string? Content { get; set; }
+}

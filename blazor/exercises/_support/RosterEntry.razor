@@ -1,0 +1,7 @@
+@* Test fixture, not an exercise. Exists so a test can observe component
+   instance identity across a list reorder (see Ex005). *@
+<span class="entry" data-id="@Person.Id">@Person.Name</span>
+
+@code {
+    [Parameter, EditorRequired] public Person Person { get; set; } = default!;
+}

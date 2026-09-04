@@ -1,0 +1,22 @@
+@* host/Components/Demos/Beginner/Ex005.razor *@
+@page "/beginner/005"
+@rendermode InteractiveServer
+
+<h1>Exercise 005 - KeyedListDiffing</h1>
+
+<button id="shuffle" @onclick="Rotate">Rotate</button>
+
+<Ex005_KeyedListDiffing People="_people" />
+
+@code {
+    private List<Person> _people =
+    [
+        new(1, "Ada"), new(2, "Grace"), new(3, "Linus")
+    ];
+
+    private void Rotate()
+    {
+        var first = _people[0];
+        _people = [.. _people.Skip(1), first];
+    }
+}

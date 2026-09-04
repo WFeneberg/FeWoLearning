@@ -1,0 +1,18 @@
+@* Exercise 003 - Conditional Rendering (beginner).
+   Goal:   Render exactly one of #loading / #error / #content / #empty.
+   Drills: @if / else if / else, precedence, blank-string handling.
+   Passes: dotnet test --filter FullyQualifiedName~Ex003_ *@
+@* TODO: render exactly one of:
+     <p id="loading">Loading</p>
+     <p id="error">@ErrorMessage</p>
+     <p id="content">@Content</p>
+     <p id="empty">No data</p> *@
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public string? Content { get; set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex003 - render exactly one panel");
+}

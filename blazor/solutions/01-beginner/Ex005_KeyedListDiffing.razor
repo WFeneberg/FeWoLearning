@@ -1,0 +1,17 @@
+@* Exercise 005 - Keyed List Diffing (beginner).
+   Goal:   Render a roster whose child components stay with their person when
+           the list is reordered.
+   Drills: @key, component instance identity across a reorder.
+   Passes: dotnet test --filter FullyQualifiedName~Ex005_ *@
+<ul id="roster">
+    @foreach (var person in People)
+    {
+        <li class="row" @key="person.Id">
+            <RosterEntry Person="person" />
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter] public IReadOnlyList<Person> People { get; set; } = [];
+}

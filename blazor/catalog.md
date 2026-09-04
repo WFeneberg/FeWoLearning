@@ -15,17 +15,17 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 5 ✅ / 95 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 001 | HelloComponent | `[Parameter]`, one-way binding of a computed member | ⬜ |
-| 002 | ParameterDefaults | parameter defaults, nullable/blank parameter handling | ⬜ |
-| 003 | ConditionalRendering | `@if`/`else if`/`else`, render precedence | ⬜ |
-| 004 | ListRendering | `@foreach`, list projection, empty list | ⬜ |
-| 005 | KeyedListDiffing | `@key`, component instance identity across reorder | ⬜ |
+| 001 | HelloComponent | `[Parameter]`, one-way binding of a computed member | ✅ |
+| 002 | ParameterDefaults | parameter defaults, nullable/blank parameter handling | ✅ |
+| 003 | ConditionalRendering | `@if`/`else if`/`else`, render precedence | ✅ |
+| 004 | ListRendering | `@foreach`, list projection, empty list | ✅ |
+| 005 | KeyedListDiffing | `@key`, component instance identity across reorder | ✅ |
 | 006 | ClickEventCallback | `@onclick`, `EventCallback<T>`, stateless child | ⬜ |
 | 007 | CounterState | component-owned state, implicit re-render | ⬜ |
 | 008 | TwoWayBinding | `Value`/`ValueChanged` contract for `@bind-Value` | ⬜ |

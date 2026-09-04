@@ -1,0 +1,14 @@
+@* Exercise 004 - List Rendering (beginner).
+   Goal:   Render one <li class="tag"> per tag inside <ul id="tags">.
+   Drills: @foreach, list projection, empty list.
+   Passes: dotnet test --filter FullyQualifiedName~Ex004_ *@
+<ul id="tags">
+    @foreach (var tag in Tags)
+    {
+        <li class="tag">@tag</li>
+    }
+</ul>
+
+@code {
+    [Parameter] public IReadOnlyList<string> Tags { get; set; } = [];
+}
