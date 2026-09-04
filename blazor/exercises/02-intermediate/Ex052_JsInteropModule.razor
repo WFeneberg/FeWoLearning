@@ -16,6 +16,14 @@
     // then call StateHasChanged() so #ready picks up the change. OnAfterRenderAsync
     // runs on every render pass, not just the first - importing unconditionally would
     // re-run the module's top-level script on every re-render.
+    //
+    // Hazard: guard both the import AND the StateHasChanged() call with firstRender.
+    // An unguarded import plus an unconditional StateHasChanged() inside
+    // OnAfterRenderAsync recurses forever - each render triggers another
+    // OnAfterRenderAsync call, which calls StateHasChanged() again, which triggers
+    // another render - and HANGS the test run instead of failing red. If ex052's
+    // tests stall rather than fail quickly, this unbounded recursion is almost
+    // certainly why.
     protected override Task OnAfterRenderAsync(bool firstRender) => throw new NotImplementedException("TODO: Ex052 - import the module once, on first render only");
 
     // TODO: dispose _module if it was ever imported.
