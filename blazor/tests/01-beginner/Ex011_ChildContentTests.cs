@@ -24,11 +24,9 @@ public class Ex011_ChildContentTests : BunitContext
 
         Assert.Empty(cut.FindAll(".card-body"));
 
-        // Pre-state sanity, folded in here rather than as a standalone fact: the
-        // title still renders with no child content supplied. On its own this
-        // would pass the moment any card markup exists at all, whether or not the
-        // body is correctly guarded - only the assertion above (that the body div
-        // itself is gone) proves the guard actually runs.
+        // Folded in here rather than as a standalone fact: its premise (Title set,
+        // no ChildContent supplied) is identical to the setup above, so the
+        // assertion is merged into this test instead of duplicating that setup.
         Assert.Equal("Card", cut.Find(".card-title").TextContent);
     }
 }

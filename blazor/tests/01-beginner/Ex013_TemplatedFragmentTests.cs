@@ -1,14 +1,11 @@
 using Bunit;
 using FeWoLearning.Blazor.Exercises.Beginner;
-using Microsoft.AspNetCore.Components;
 using Xunit;
 
 namespace FeWoLearning.Blazor.Tests.Beginner;
 
 public class Ex013_TemplatedFragmentTests : BunitContext
 {
-    private static RenderFragment Markup(string html) => builder => builder.AddMarkupContent(0, html);
-
     [Fact]
     public void Renders_One_Row_Per_Item_Using_The_Row_Template_In_Order()
     {
@@ -20,11 +17,17 @@ public class Ex013_TemplatedFragmentTests : BunitContext
                 builder.AddAttribute(1, "class", "cell");
                 builder.AddContent(2, item);
                 builder.CloseElement();
-            }));
+            })
+            .Add(c => c.Empty, "<p id=\"none\">none</p>"));
 
         Assert.Equal(2, cut.FindAll("#repeater .row").Count);
         var texts = cut.FindAll("#repeater .row .cell").Select(e => e.TextContent).ToArray();
         Assert.Equal(new[] { "a", "b" }, texts);
+
+        // Items is non-empty here, so Empty must not render alongside the rows - this
+        // is the only configuration that distinguishes "Empty instead of rows" from
+        // "Empty as well as rows", which is the exercise's defining behaviour.
+        Assert.Empty(cut.FindAll("#repeater #none"));
     }
 
     [Fact]
@@ -32,9 +35,9 @@ public class Ex013_TemplatedFragmentTests : BunitContext
     {
         var cut = Render<Ex013_TemplatedFragment<string>>(p => p
             .Add(c => c.Items, Array.Empty<string>())
-            .Add(c => c.Empty, Markup("<p id=\"none\">none</p>")));
+            .Add(c => c.Empty, "<p id=\"none\">none</p>"));
 
-        Assert.Equal("none", cut.Find("#none").TextContent);
+        Assert.Equal("none", cut.Find("#repeater #none").TextContent);
         Assert.Empty(cut.FindAll("#repeater .row"));
     }
 

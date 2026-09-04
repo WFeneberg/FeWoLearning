@@ -15,16 +15,13 @@ public class Ex014_AttributeSplattingTests : BunitContext
     }
 
     [Fact]
-    public void Splats_Unmatched_Attributes_Onto_The_Button()
+    public void Splats_Unmatched_Attributes_Onto_The_Button_And_Lets_A_Caller_Supplied_Id_Win()
     {
-        var cut = Render<Ex014_AttributeSplatting>();
+        var cut = Render<Ex014_AttributeSplatting>(p => p.Add(c => c.Label, "Go"));
 
-        // Pre-state sanity, folded in here rather than as a standalone fact: with
-        // no unmatched attributes supplied, #btn must not carry a stray data-test
-        // attribute. On its own this would pass the moment the button itself is
-        // written, whether or not @attributes is ever wired up - only the
-        // assertions below, after actually adding an unmatched attribute, exercise
-        // the splatting TODO.
+        // Folded in here rather than as a standalone fact: its premise (no unmatched
+        // attributes supplied) is identical to this test's own starting state, so
+        // the assertion is merged into this test instead of duplicating that setup.
         Assert.False(cut.Find("#btn").HasAttribute("data-test"));
 
         cut.Render(p => p.AddUnmatched("data-test", "x").AddUnmatched("disabled", true));
@@ -32,5 +29,12 @@ public class Ex014_AttributeSplattingTests : BunitContext
         var button = cut.Find("#btn");
         Assert.Equal("x", button.GetAttribute("data-test"));
         Assert.True(button.HasAttribute("disabled"));
+
+        // A caller-supplied id must override the button's own default id="btn" -
+        // proving @attributes is applied after id, not before (splat-order
+        // precedence, the point the exercise's Drills line advertises).
+        cut.Render(p => p.AddUnmatched("id", "custom"));
+        Assert.Equal("Go", cut.Find("#custom").TextContent);
+        Assert.Empty(cut.FindAll("#btn"));
     }
 }
