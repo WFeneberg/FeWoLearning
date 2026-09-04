@@ -296,6 +296,22 @@ trap documented for `python/`.
   solution introduces `Name="RootGrid"` and the stub never mentions it, a learner
   who writes correct XAML fails on a null lookup, for a reason the exercise is not
   about.
+- **Assigning a control the value it already holds is a no-op, not an act.**
+  Avalonia's property system suppresses the change notification when the new value
+  equals the current one, so the binding never runs and the assertion that follows
+  passes without exercising anything. ex015 shipped exactly this: the arrange
+  rendered the box to `"32"`, the test then set `Text = "32"`, and `ConvertBack` was
+  never invoked — a fake converter passed the suite. Seed the arrange from a value
+  whose rendered form differs from every value the test later writes.
+- **A round trip through the thing under test proves nothing on its own.**
+  `ConvertBack(Convert(c)) == c` holds for any correct implementation *and* for a
+  lookup table seeded with that one pair. Drive both directions from inputs the test
+  did not itself just produce, and use at least two distinct values per direction so
+  no single hard-coded pair satisfies the suite.
+- **Prove a discriminator by writing the cheat and running it.** Every defect of this
+  class found in this track was found that way and none was found by reading. Before
+  accepting an exercise, implement the laziest wrong version you can think of, run
+  the real unmodified test against it, and confirm it goes red.
 - Confirm each red failure comes from the exercise's own
   `NotImplementedException` — not from a compile error, not from a missing XAML
   resource, and above all not from the uninitialized-ReactiveUI exception of
