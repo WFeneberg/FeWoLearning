@@ -36,7 +36,7 @@ is prefixed:
 | `avalonia/`| one folder per tier, `.axaml` + code-behind, test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloView.axaml` |
 | `uno/`    | one folder per tier, `.cs` (plus `.xaml` + code-behind for markup exercises), test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloProperty.cs` |
 | `caliburn/`| one file per exercise, tier-wide namespace, test in a separate `tests/` project | `exercises/01-beginner/Ex001_NotifyByHand.cs` |
-| `wpf/`    | one folder per tier, `.cs` stub, test in a separate `tests/` project | `exercises/01-beginner/Ex001_ClrToDependencyProperty.cs` |
+| `wpf/`    | one folder per tier, `.cs` (plus `.xaml` + code-behind for markup exercises), test in a separate `tests/` project | `exercises/01-beginner/Ex001_ClrToDependencyProperty.cs` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
@@ -102,7 +102,7 @@ that keep `solutions/` in the build instead; see their own tracks for why.
 | `avalonia/`| **Yes.** `solutions/` is its own project, built and referenced by `tests/` (and `gallery/`) whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. Lower risk than every other row in this table. |
 | `uno/`    | **Yes.** Same mechanism: `solutions/` is its own project, and `dotnet test -p:UseSolutions=true` runs the identical 823 tests against it. Every solution is confirmed green and every stub confirmed red, and the solutions build is expected to be warning-free - so a warning there is a finding. Lowest risk in this table. |
 | `caliburn/`| **Yes.** Same mechanism: `solutions/` is its own project, referenced by `tests/` whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. Lower risk than every other row in this table except `avalonia/`/`uno/`. |
-| `wpf/`    | **Yes.** Same mechanism: `solutions/` is its own project, referenced by `tests/` whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. On its first five exercises (39 test facts: 4 harness smoke tests + 35 exercise facts), `dotnet test` shows 4 passed / 35 failed on the untouched tree, and 39 passed / 0 failed under `-p:UseSolutions=true`. |
+| `wpf/`    | **Yes.** Same mechanism: `solutions/` is its own project, referenced by `tests/` whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. On its first five exercises (41 test facts: 4 harness smoke tests + 37 exercise facts), `dotnet test` shows 4 passed / 37 failed on the untouched tree, and 41 passed / 0 failed under `-p:UseSolutions=true`. |
 
 Consequence: a reference solution can silently drift until it no longer passes
 its own test, and nothing reports it. This is not hypothetical — an audit found

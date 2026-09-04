@@ -115,7 +115,7 @@ Two deliberate content gaps:
 | 064 | CustomMarkupExtension | `MarkupExtension.ProvideValue`, `IProvideValueTarget` | ⬜ |
 | 065 | TemplatesAsResources | `DataTemplate` keyed by `DataType`, implicit lookup | ⬜ |
 | 066 | Localization | satellite resources, `ResourceManager`, switching culture at runtime | ⬜ |
-| 067 | GlobalExceptionHooks | `DispatcherUnhandledException`, `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException` | ⬜ |
+| 067 | GlobalExceptionHooks | `Dispatcher.UnhandledException`, `DispatcherUnhandledExceptionFilter` | ⬜ |
 | 068 | SettingsMigration | a versioned settings store upgrading an old shape | ⬜ |
 | 069 | ConverterCulture | `ConverterCulture` vs `Thread.CurrentUICulture` | ⬜ |
 | 070 | BindingDiagnostics | `PresentationTraceSources.TraceLevel`, catching a silent binding failure | ⬜ |

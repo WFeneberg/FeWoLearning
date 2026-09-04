@@ -83,8 +83,8 @@ suite against the reference solutions instead of the stubs.
   under `-p:UseSolutions=true`. **`wpf/`** is verified end-to-end on its first
   five exercises as of 2026-09-04, on **.NET 10.0.400** with **xunit.v3 4.0.0**
   and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11):
-  `dotnet test` shows 4 passed (the harness smoke tests) and 35 exercise facts
-  red on the untouched tree; the same 39 facts pass under `-p:UseSolutions=true`.
+  `dotnet test` shows 4 passed (the harness smoke tests) and 37 exercise facts
+  red on the untouched tree; the same 41 facts pass under `-p:UseSolutions=true`.
   Windows-only, because WPF is. `Xunit.StaFact` 4.x depends on
   `xunit.v3.extensibility.core` 4.0.0, so this track sits on xunit.v3 **4.0.0**
   while `avalonia/` and `caliburn/` sit on 3.2.2 — pinned independently, and
@@ -240,7 +240,10 @@ suite against the reference solutions instead of the stubs.
   "Testing with VSTest target is no longer supported by
   Microsoft.Testing.Platform". The `TestingPlatformDotnetTestSupport` property
   alone did not fix it. 3.0.13 sits on xunit.v3 3.2.2, the same generation
-  `avalonia/` runs. **A Caliburn action only fires when the view is hosted in
+  `avalonia/` runs. (`wpf/` *does* run `Xunit.StaFact` 4.x successfully, by
+  opting into the `Microsoft.Testing.Platform` runner in `wpf/global.json`;
+  `caliburn/` stays on 3.0.13 instead so it keeps the VSTest path.) **A
+  Caliburn action only fires when the view is hosted in
   a real `Window`.** `Microsoft.Xaml.Behaviors` triggers will not resolve
   their source without a `PresentationSource`; `Measure`/`Arrange`,
   `ApplyTemplate()` and hand-raised `Loaded` all fail to supply one. Hence
@@ -452,14 +455,19 @@ record in the assembly with an `Id`-shaped member that is not `partial`.
 ## The `wpf/` track
 
 WPF on .NET 10, verified end-to-end on its first five exercises (`01-beginner`
-ex001–ex005). It shares the `UseSolutions` mechanism with `blazor/`, `uno/`,
-`avalonia/` and `caliburn/`: `exercises/` and `solutions/` compile the same
-type names into the same namespaces (`FeWoLearning.Wpf.Exercises.<Tier>`) and
-`tests/` references exactly one of them via the `UseSolutions` MSBuild
-property, so `dotnet test` is the red run and `dotnet test
--p:UseSolutions=true` the green one. Its project count matches `uno/` and
-`caliburn/` at three, not `blazor/`'s four (the extra one is `host/`) or
-`avalonia/`'s four (`gallery/`): `wpf/` has no fourth runnable project.
+ex001–ex005). The solution is `FeWoLearning.Wpf.slnx`. It shares the
+`UseSolutions` mechanism with `blazor/`, `uno/`, `avalonia/` and `caliburn/`:
+`exercises/` and `solutions/` compile the same type names into the same
+namespaces (`FeWoLearning.Wpf.Exercises.<Tier>`) and `tests/` references
+exactly one of them via the `UseSolutions` MSBuild property, so `dotnet test`
+is the red run and `dotnet test -p:UseSolutions=true` the green one. Its
+project count matches `uno/` and `caliburn/` at three, not `blazor/`'s four
+(the extra one is `host/`) or `avalonia/`'s four (`gallery/`): `wpf/` has no
+fourth runnable project. As with those siblings, `wpf/Directory.Build.props`
+redirecting the solutions build's output via `UseArtifactsOutput`/
+`ArtifactsPath` is **required, not cosmetic** — without it `exercises/` and
+`solutions/` share an `obj/` tree and the build fails `CS0579` on duplicate
+generated assembly-info attributes. Stubs throw `NotImplementedException`.
 
 The harness is smaller than `uno/`'s: WPF resolves default control templates
 through `SystemResources` with **no `Application` instance needed**, where
@@ -467,21 +475,16 @@ through `SystemResources` with **no `Application` instance needed**, where
 from `Xunit.StaFact` 4.0.23 (an STA thread plus a real
 `DispatcherSynchronizationContext`, so `await` resumes on the dispatcher),
 `WpfTestContext`'s `Layout(...)`/`Pump(...)` to drain the queue, and an opt-in
-`Host(...)` that parks an element in an off-screen window for the few rows
-needing a real `PresentationSource` — `Loaded`, keyboard focus,
-`HwndSource`/`HwndHost` — a capability `uno/`'s windowless harness could not
-offer at all. Tests are serialised with `[assembly: Parallelization(Mode =
-ParallelMode.None)]` —
+`Show(...)` that parks an element in an off-screen window and returns the
+`Window` itself, for the few rows needing a real `PresentationSource` —
+`Loaded`, keyboard focus, `HwndSource`/`HwndHost` — a capability `uno/`'s
+windowless harness could not offer at all. Tests are serialised with
+`[assembly: Parallelization(Mode = ParallelMode.None)]` —
 `CollectionBehavior(DisableTestParallelization = true)` is
 `Obsolete(error: true)` in xunit.v3 4.0.0 and does not compile. Because
 `Xunit.StaFact` 4.x depends on `xunit.v3.extensibility.core` 4.0.0, the track
-also needs `wpf/global.json` (`{"test":{"runner":"Microsoft.Testing.Platform"}}`):
-xunit.v3 4.0.0 pulls in `Microsoft.Testing.Platform.MSBuild` 2.3.3, which
-refuses to run under the classic VSTest bridge on the .NET 10 SDK without that
-opt-in, and `dotnet test` otherwise fails outright with "Testing with VSTest
-target is no longer supported". `avalonia/` runs xunit.v3 3.2.2 and needs no
-such file — this is version-specific, and the next track to bump xunit.v3
-will hit it too.
+also needs `wpf/global.json` — see the Toolchain-status entry above for why
+that file's `Microsoft.Testing.Platform` opt-in is mandatory here.
 
 **Read `wpf/README.md` before adding an exercise.** The recurring bug class is
 timing, not capability: bindings update at `DispatcherPriority.DataBind`, and

@@ -1,8 +1,9 @@
 # WPF Track
 
 Test-driven WPF exercises on .NET 10. Needs the .NET 10 SDK and Windows — nothing
-else: no workload, no template, no IDE plugin, and no window ever opens unless an
-exercise asks for one.
+else: no workload, no template, no IDE plugin. A window opens only when an exercise
+(or the harness's own `Hosted_Element_Raises_Loaded` smoke test) asks for one via
+`Show(...)` — see "What the harness cannot do" below.
 
 ## Commands
 
@@ -83,12 +84,12 @@ no `Application` either; WPF resolves default control templates through
   delegate in a local. And `InvalidateRequerySuggested()` posts at
   `DispatcherPriority.Background`, so `Pump()` before asserting.
 
-### `Host(...)` — opt-in, and the only reason a window ever appears
+### `Show(...)` — opt-in, and the only reason a window ever appears
 
 A few things genuinely need a real `PresentationSource`: `Loaded`, keyboard focus,
-and `HwndSource`/`HwndHost` interop. `WpfTestContext.Host(element)` parks the element
-in a window positioned at `(-10000, -10000)` with `ShowActivated = false`, and
-`Dispose` closes it.
+and `HwndSource`/`HwndHost` interop. `WpfTestContext.Show(element)` parks the element
+in a window positioned at `(-10000, -10000)` with `ShowActivated = false`, returns
+that `Window`, and `Dispose` closes it.
 
 Use it only when the exercise is about one of those three things. This is the
 capability `uno/`'s windowless harness could not offer at all — its `Loaded`, focus
@@ -102,8 +103,65 @@ the theme dictionaries and `Application.Current` are process-global.
 
 `HarnessSmokeTests` exists for the same reason `uno/`'s does: it asserts STA, that a
 `Button` resolves its default template and measures non-zero, that a binding pushes
-after a pump, and that `Host(...)` raises `Loaded`. **If those fail, the harness is
+after a pump, and that `Show(...)` raises `Loaded`. **If those fail, the harness is
 broken and every other failure in the run is noise.**
+
+## What the harness cannot do
+
+A green test here is **not proof of desktop behaviour**. The harness answers one
+narrow question — does the WPF mechanism work — and deliberately does not attempt:
+
+- **No `Application`.** Default control templates resolve through `SystemResources`
+  without one, which is why the harness never constructs one — and an `Application`
+  can only be constructed once per process, so a single stray instance would poison
+  every test that ran after it. Anything whose subject is an `Application` member
+  (`Application.Current`, `DispatcherUnhandledException`, resource lookup through
+  `Application.Resources`, …) cannot be an exercise here; see row 067 for the
+  concrete case this ruled out.
+- **No time control and no wall-clock assertions.** There is no virtual clock and no
+  exercise asserts elapsed time — that is noise on a loaded machine. This is also why
+  the performance rows (076–080) assert *that* the mechanism fired (container identity
+  across a scroll, `IsFrozen`, the number of measure passes an invalidation caused)
+  rather than how fast it fired.
+- **`Show(...)` really does open a window.** It is off-screen and unactivated, but it
+  is a real `Window.Show()` — the same constraint `caliburn/README.md` states for
+  itself. Running the full suite needs a real, interactive desktop session; it will
+  not run headless, as a service, or in a session-0/RDP-disconnected context.
+- **No keyboard or pointer input simulation.** `Show(...)` gets an element a real
+  `PresentationSource`, which is what `Loaded`, keyboard focus and HWND interop need
+  — it does not drive an actual mouse or keyboard. No exercise raises synthetic input.
+- **`Layout(...)` arranges into the full available rect and defaults to 800×600.**
+  `Layout(element, available)` measures and arranges against `available ?? new
+  Size(800, 600)` — rows 028–031 (measure/arrange contract, star/auto sizing, margins,
+  shared size groups) and row 080 (layout invalidation cost) depend on both the
+  default and the ability to override it.
+- **`CommandManager` coalescing.** A second `InvalidateRequerySuggested()` call while
+  one is still pending is swallowed — it posts at `DispatcherPriority.Background`, so
+  a test that invalidates twice without a `Pump()` between them observes only one
+  event. Row 020 (`RequerySuggested`) is exactly about this. Also: ex005's
+  `RelayCommand` leaves a handler registered on the process-global `CommandManager`
+  for the rest of the run, so no later exercise may assert an *exact* count of global
+  `RequerySuggested`/`CanExecuteChanged` events — other tests' commands are still
+  subscribed.
+- **The shared-fixture convention.** ex001 and ex002 each need the same kind of
+  dependency-property reflection helper, and wrote it two different ways — a private
+  static property in `Ex001_ClrToDependencyPropertyTests`, a private static method in
+  `Ex002_CoerceAndValidateTests` — and row 006 (`RegisterReadOnly`,
+  `DependencyPropertyKey`) will need a third shape again. Going forward, a helper like
+  this belongs in `exercises/_support/`, mirrored byte-for-byte into
+  `solutions/_support/`, the way `avalonia/`, `blazor/`, `caliburn/` and `uno/` all do
+  it. (This wave does not unify ex001/ex002's two existing idioms — only documents
+  the convention for what comes next.)
+- **The "ready to use" convention, and its anti-bypass rule.** An exercise may ship a
+  finished collaborator marked "ready to use" (its doc comment may even read slightly
+  differently between the stub and the solution — that is deliberate, not drift).
+  But *if that collaborator could be edited to do the exercise's job itself, at least
+  one test must exercise the subject directly* — not only through the collaborator.
+  ex003 originally violated this: `Ex003_MeterViewModel` is "ready to use", and all
+  six of its tests reached `SetProperty` only through it, so a learner could inline
+  the comparison/assignment/event-raise straight into `Reading`'s and `Label`'s
+  setters, leave `SetProperty` itself throwing, and still pass every test. Its tests
+  now also call `SetProperty` through a small test-local subclass, directly.
 
 ## Writing an exercise without writing a test that lies
 
