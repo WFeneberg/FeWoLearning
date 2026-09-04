@@ -36,7 +36,10 @@ Stubs throw `NotImplementedException`, so the library always compiles and an
 unfinished exercise fails at *test* time rather than breaking the build. A stub
 that fails to compile is a bug.
 
-See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work queue.
+See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **100 / 100**:
+every stub was confirmed red and every reference solution confirmed green by actually
+running both commands above. The one deliberate content gap is MVUX, and
+`catalog.md` says why.
 
 ## How the headless runtime works
 
