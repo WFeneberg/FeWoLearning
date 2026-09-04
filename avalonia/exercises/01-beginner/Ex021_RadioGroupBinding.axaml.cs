@@ -35,6 +35,10 @@ public class Ex021_RadioGroupBindingViewModel : ReactiveObject
     }
 }
 
+// This converter is part of the exercise's deliverable and is tested both
+// directly (unit tests against Convert/ConvertBack alone) and through the UI -
+// implementing only enough to satisfy the view does not satisfy the direct
+// tests, and vice versa.
 public class Ex021_EnumMatchConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
@@ -45,5 +49,6 @@ public class Ex021_EnumMatchConverter : IValueConverter
         throw new NotImplementedException(
             "TODO: Ex021 - parameter when value is true, BindingOperations.DoNothing " +
             "when value is false (an unchecking RadioButton must not overwrite the " +
-            "selection another one in the group just made)");
+            "selection another one in the group just made) - return the DoNothing " +
+            "singleton exactly, not null and not a default enum member");
 }

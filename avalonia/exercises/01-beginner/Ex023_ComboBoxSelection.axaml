@@ -1,5 +1,8 @@
 <!-- Exercise 023 - ComboBoxSelection (beginner).
      Goal:   Bind a ComboBox's ItemsSource and two-way bind its SelectedItem.
+             SelectedItem must be bound declaratively in this XAML, via
+             SelectedItem="{CompiledBinding ..., Mode=TwoWay}" - not
+             synchronized by hand from code-behind event handlers.
      Drills: ItemsSource plus SelectedItem.
      Passes: dotnet test, filtered to Ex023_ (see the exact command in
      Ex023_ComboBoxSelection.axaml.cs - an XML comment may not hold two
@@ -11,7 +14,7 @@
              x:DataType="b:Ex023_ComboBoxSelectionViewModel">
   <!-- TODO: replace this placeholder with a single ComboBox named
        OptionsBox, its ItemsSource bound to Options and its SelectedItem
-       bound two-way to Selected:
+       bound two-way to Selected, BOTH as declarative bindings in this XAML:
          <ComboBox Name="OptionsBox" Width="160"
                    ItemsSource="{CompiledBinding Options}"
                    SelectedItem="{CompiledBinding Selected, Mode=TwoWay}" />
@@ -19,6 +22,13 @@
        bound ItemsSource can look identical when rendered, but its
        ItemsSource stays null and it never reflects the view model's actual
        collection - the test checks ItemsSource directly, not just what is
-       on screen. -->
+       on screen. Do not sync SelectedItem by hand instead (setting it once
+       from DataContextChanged, then keeping it in sync yourself with a
+       PropertyChanged subscription one way and a SelectionChanged handler
+       the other) - that produces the same runtime behaviour as a real
+       binding but is not what this exercise is teaching, and it is called
+       out here even though the test suite cannot mechanically tell the two
+       apart (see the comment in Ex023_ComboBoxSelectionTests.cs). -->
+
   <ComboBox Width="160" />
 </UserControl>

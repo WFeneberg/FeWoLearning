@@ -9,11 +9,12 @@
              xmlns:b="clr-namespace:FeWoLearning.Avalonia.Exercises.Beginner"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex021_RadioGroupBinding"
              x:DataType="b:Ex021_RadioGroupBindingViewModel">
-  <!-- TODO: implement Ex021_EnumMatchConverter in the code-behind (Convert:
-       true when the bound enum equals the ConverterParameter; ConvertBack:
-       the parameter when the RadioButton was just checked, otherwise
-       BindingOperations.DoNothing - NOT a default enum value, and NOT null),
-       declare it as a resource, and bind two RadioButtons sharing one
+  <!-- TODO: Ex021_EnumMatchConverter (in the code-behind) is part of this
+       exercise's deliverable, not a helper handed to you - implement it
+       (Convert: true when the bound enum equals the ConverterParameter;
+       ConvertBack: the parameter when the RadioButton was just checked,
+       otherwise BindingOperations.DoNothing - NOT a default enum value, and
+       NOT null), declare it as a resource, and bind two RadioButtons sharing one
        GroupName, each matched to a different Ex021_Choice member via
        {x:Static}:
          <UserControl.Resources>
@@ -31,7 +32,11 @@
        being unchecked also raises ConvertBack with false, and every group
        member but the one just checked fires that false transition. Writing
        anything other than DoNothing for false lets that unchecking write
-       clobber the selection the checking RadioButton just made. -->
+       clobber the selection the checking RadioButton just made. IsChecked
+       must be bound Mode=TwoWay - a OneWay binding driven by a code-behind
+       Click handler never calls ConvertBack at all, and this exercise is
+       tested directly against ConvertBack's return value as well as through
+       the UI, so that shortcut does not pass. -->
   <StackPanel Orientation="Vertical" Spacing="4">
     <RadioButton Content="TODO" />
   </StackPanel>

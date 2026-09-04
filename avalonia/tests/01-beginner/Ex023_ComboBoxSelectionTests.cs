@@ -6,6 +6,24 @@ using FeWoLearning.Avalonia.Tests;
 
 namespace FeWoLearning.Avalonia.Tests.Beginner;
 
+// KNOWN LIMITATION: this suite cannot mechanically prove SelectedItem is bound
+// declaratively (SelectedItem="{CompiledBinding Selected, Mode=TwoWay}") rather
+// than synchronized by hand in code-behind (set once from DataContextChanged,
+// kept in sync vm->view via a PropertyChanged subscription and view->vm via a
+// SelectionChanged handler). Both produce identical, correct runtime behaviour
+// against every assertion below, so behavioural tests cannot tell them apart.
+//
+// Probed Avalonia.Diagnostics' AvaloniaObject.GetDiagnostic(SelectedItemProperty)
+// as a structural alternative: it reports Priority=LocalValue with an empty
+// Diagnostic string for BOTH a real TwoWay binding and a plain direct
+// assignment to SelectedItem. SelectedItem is a DirectProperty (CLR-backed,
+// not a StyledProperty), so a binding's Bind() call is, at the property-system
+// level, indistinguishable from any other setter call - there is no priority
+// or source metadata separating them. GetDiagnostic does not close this gap.
+//
+// This is an accepted, documented limitation rather than a brittle assertion:
+// the stub's Goal/TODO state the requirement in prose (declarative binding
+// only) instead.
 public class Ex023_ComboBoxSelectionTests
 {
     private static (Ex023_ComboBoxSelection View, Ex023_ComboBoxSelectionViewModel Vm) Arrange()

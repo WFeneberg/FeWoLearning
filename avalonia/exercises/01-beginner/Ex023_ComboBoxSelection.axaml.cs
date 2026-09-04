@@ -11,7 +11,7 @@ public partial class Ex023_ComboBoxSelection : UserControl
         InitializeComponent();
         throw new NotImplementedException(
             "TODO: Ex023 - bind OptionsBox.ItemsSource to Options and " +
-            "SelectedItem two-way to Selected");
+            "SelectedItem two-way to Selected, both declaratively in the XAML");
     }
 }
 
