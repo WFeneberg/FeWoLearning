@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 40 ✅ / 60 ⬜**
+**Status: 45 ✅ / 55 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -66,11 +66,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 038 | CustomValidationAttribute | custom `ValidationAttribute`, `IsValid` override | ✅ |
 | 039 | ValidationMessageDisplay | `ValidationMessage<T>`, per-field error display | ✅ |
 | 040 | EditContextFieldState | `EditContext.IsModified`, `MarkAsUnmodified`, field CSS class | ✅ |
-| 041 | CustomFieldValidation | manual `EditContext` validation via a custom validator component | ⬜ |
-| 042 | NestedModelValidation | nested complex object validation, `EditContext` over sub-models | ⬜ |
-| 043 | ScopedStateContainer | DI scoped service, shared state across components, `StateHasChanged` | ⬜ |
-| 044 | SingletonVsScopedState | singleton vs scoped service lifetime in Blazor Server | ⬜ |
-| 045 | CascadingServiceInjection | `[Inject]` property injection vs constructor injection | ⬜ |
+| 041 | CustomFieldValidation | manual `EditContext` validation via a custom validator component | ✅ |
+| 042 | NestedModelValidation | nested complex object validation, `EditContext` over sub-models | ✅ |
+| 043 | ScopedStateContainer | DI scoped service, shared state across components, `StateHasChanged` | ✅ |
+| 044 | SingletonVsScopedState | singleton vs scoped service lifetime in Blazor Server | ✅ |
+| 045 | CascadingServiceInjection | `[Inject]` property injection vs constructor injection | ✅ |
 | 046 | StateContainerNotification | event-based state container, subscribe/unsubscribe on `Dispose` | ⬜ |
 | 047 | OptionsPatternComponent | `IOptions<T>` injected into a component, configuration binding | ⬜ |
 | 048 | FactoryInjectedComponent | `IServiceProvider`/factory-resolved dependency | ⬜ |
