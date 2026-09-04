@@ -255,11 +255,21 @@ Checked for every exercise. The first is this track's equivalent of the missing
 trap documented for `python/`.
 
 - **A headless test that never forces a layout pass asserts on un-arranged
-  controls.** `Bounds` is `0,0,0,0` until measure and arrange have run, so a
-  layout assertion silently passes or silently fails for the wrong reason. Show
-  the control in a `Window` (which drives the pass), or call `Measure` and
-  `Arrange` explicitly. Never read `Bounds` off a control that was merely
-  constructed.
+  controls.** `Bounds` is `0,0,0,0` until layout has run, so the assertion
+  silently fails for the wrong reason — or worse, silently passes.
+
+  Calling `Measure`/`Arrange` on the control is **not sufficient and was
+  measured to be wrong**: a `UserControl`'s XAML lives in its `Content`, hosted
+  by a `ContentPresenter` from its control template, so without an applied
+  template the control itself reports the arranged size while **every child
+  stays `0,0,0,0`**. `ApplyTemplate()` before `Measure`/`Arrange` does not fix
+  it either.
+
+  The one verified recipe is to put the control in a `Window` and `Show()` it,
+  which applies templates and drives the full pass. A headless `Window`'s
+  client area equals its requested `Width`/`Height` exactly, so geometry
+  assertions are deterministic. Every view exercise's test therefore goes
+  through the shared `Show` helper in `tests/_support/`.
 - **Anything scheduled through the main-thread scheduler has not run yet when
   the assertion executes.** Drain the dispatcher queue with
   `Dispatcher.UIThread.RunJobs()` before asserting, or the test proves only the
