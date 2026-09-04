@@ -1,11 +1,15 @@
+using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Diagnostics;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FeWoLearning.Avalonia.Exercises.Beginner;
 using FeWoLearning.Avalonia.Tests;
 
@@ -25,15 +29,24 @@ public class Ex029_StyleClassesTests
         Dispatcher.UIThread.RunJobs();
     }
 
-    // Mechanism check: a code-behind handler that pokes FontSize directly,
-    // without ever touching Classes or declaring a Style, leaves
-    // UserControl.Styles empty - this can never be satisfied that way.
+    // Every Style rule declared anywhere in the tree, not just the root
+    // UserControl's own Styles collection - a rule scoped to an inner
+    // element's Styles is just as valid Avalonia as one declared on the root.
+    private static IEnumerable<Style> AllStyles(Visual root) =>
+        root.GetSelfAndVisualDescendants()
+            .OfType<StyledElement>()
+            .SelectMany(e => e.Styles)
+            .OfType<Style>();
+
+    // Structural check: a code-behind handler that pokes FontSize directly,
+    // without ever touching Classes or declaring a Style, leaves this walk
+    // empty of matches - it can never be satisfied that way.
     [AvaloniaFact]
     public void UserControl_Declares_A_Class_Selector_Rule()
     {
         var view = Show();
 
-        var hasTagRule = view.Styles.OfType<Style>().Any(style =>
+        var hasTagRule = AllStyles(view).Any(style =>
             style.Selector != null &&
             style.Selector.ToString()!.Contains("TextBlock.tag") &&
             style.Setters.OfType<Setter>().Any(setter =>
@@ -41,7 +54,8 @@ public class Ex029_StyleClassesTests
                 setter.Value is double value &&
                 value == 33));
 
-        Assert.True(hasTagRule, "expected a Style selecting TextBlock.tag with FontSize 33");
+        Assert.True(hasTagRule,
+            "expected a Style selecting TextBlock.tag with FontSize 33 (declared anywhere in the tree)");
     }
 
     [AvaloniaFact]
@@ -58,7 +72,10 @@ public class Ex029_StyleClassesTests
     // add the class and reflect the styled size, then remove it and land
     // back on the original, unstyled size. A one-shot switch or a value
     // poked directly onto FontSize (bypassing Classes) fails one of these
-    // two assertion pairs.
+    // two assertion pairs. The BindingPriority check on top additionally
+    // proves the value came from a Style rather than a local value that
+    // merely happens to render the same number - it holds regardless of
+    // which element in the tree owns the Style.
     [AvaloniaFact]
     public void Clicking_Toggles_The_Tag_Class_And_The_Styled_FontSize_Both_Ways()
     {
@@ -69,9 +86,11 @@ public class Ex029_StyleClassesTests
         Click(button);
         Assert.Contains("tag", toggle.Classes);
         Assert.Equal(33, toggle.FontSize);
+        Assert.NotEqual(BindingPriority.LocalValue, toggle.GetDiagnostic(TextBlock.FontSizeProperty).Priority);
 
         Click(button);
         Assert.DoesNotContain("tag", toggle.Classes);
         Assert.Equal(21, toggle.FontSize);
+        Assert.NotEqual(BindingPriority.LocalValue, toggle.GetDiagnostic(TextBlock.FontSizeProperty).Priority);
     }
 }

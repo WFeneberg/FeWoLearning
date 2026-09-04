@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Diagnostics;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FeWoLearning.Avalonia.Exercises.Beginner;
 using FeWoLearning.Avalonia.Tests;
 
@@ -19,8 +23,17 @@ public class Ex030_PseudoClassesTests
         return (view, vm);
     }
 
-    private static bool HasOpacityRule(Ex030_PseudoClasses view, string selectorFragment, double opacity) =>
-        view.Styles.OfType<Style>().Any(style =>
+    // Every Style rule declared anywhere in the tree, not just the root
+    // UserControl's own Styles collection - a rule scoped to an inner
+    // element's Styles is just as valid Avalonia as one declared on the root.
+    private static IEnumerable<Style> AllStyles(Visual root) =>
+        root.GetSelfAndVisualDescendants()
+            .OfType<StyledElement>()
+            .SelectMany(e => e.Styles)
+            .OfType<Style>();
+
+    private static bool HasOpacityRule(Visual root, string selectorFragment, double opacity) =>
+        AllStyles(root).Any(style =>
             style.Selector != null &&
             style.Selector.ToString()!.Contains(selectorFragment) &&
             style.Setters.OfType<Setter>().Any(setter =>
@@ -28,18 +41,18 @@ public class Ex030_PseudoClassesTests
                 setter.Value is double value &&
                 value == opacity));
 
-    // Mechanism check: a PointerEntered/PointerExited (or CanExecute-driven)
+    // Structural check: a PointerEntered/PointerExited (or CanExecute-driven)
     // code-behind handler that pokes Opacity directly, with no Style at all,
-    // leaves UserControl.Styles empty - this can never be satisfied that way.
+    // leaves this walk empty of matches - it can never be satisfied that way.
     [AvaloniaFact]
     public void UserControl_Declares_PointerOver_And_Disabled_Rules()
     {
         var (view, _) = Arrange();
 
         Assert.True(HasOpacityRule(view, ":pointerover", 0.5),
-            "expected a Style selecting Button:pointerover with Opacity 0.5");
+            "expected a Style selecting Button:pointerover with Opacity 0.5 (declared anywhere in the tree)");
         Assert.True(HasOpacityRule(view, ":disabled", 0.3),
-            "expected a Style selecting Button:disabled with Opacity 0.3");
+            "expected a Style selecting Button:disabled with Opacity 0.3 (declared anywhere in the tree)");
     }
 
     [AvaloniaFact]
@@ -56,7 +69,10 @@ public class Ex030_PseudoClassesTests
 
     // The real discriminator against a code-behind PointerEntered/PointerExited
     // handler: it asserts the pseudo-class membership itself, not only its
-    // Opacity consequence, and drives both directions (enter then leave).
+    // Opacity consequence, drives both directions (enter then leave), and the
+    // BindingPriority check proves the Opacity came from a Style rather than
+    // a code-behind value that merely renders the same number - it holds
+    // regardless of which element in the tree owns the Style.
     [AvaloniaFact]
     public void Hovering_Adds_PointerOver_And_Leaving_Removes_It_Both_Ways()
     {
@@ -72,6 +88,7 @@ public class Ex030_PseudoClassesTests
         Assert.True(button.IsPointerOver);
         Assert.Contains(":pointerover", button.Classes);
         Assert.Equal(0.5, button.Opacity);
+        Assert.NotEqual(BindingPriority.LocalValue, button.GetDiagnostic(Visual.OpacityProperty).Priority);
 
         // Move well away from the button, still inside the window.
         top.MouseMove(new Point(290, 190));
@@ -97,6 +114,7 @@ public class Ex030_PseudoClassesTests
         Assert.False(button.IsEffectivelyEnabled);
         Assert.Contains(":disabled", button.Classes);
         Assert.Equal(0.3, button.Opacity);
+        Assert.NotEqual(BindingPriority.LocalValue, button.GetDiagnostic(Visual.OpacityProperty).Priority);
 
         vm.CanRun = true;
         Dispatcher.UIThread.RunJobs();
