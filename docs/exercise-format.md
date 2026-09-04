@@ -33,6 +33,7 @@ is prefixed:
 | `angular/`| folder with stub + colocated `*.spec.ts`        | `exercises/01-beginner/ex001_pricing_service/` |
 | `java/`   | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_primitive_math/` |
 | `kotlin/` | folder with package source + sibling JUnit test | `exercises/01-beginner/ex001_val_var_basics/` |
+| `avalonia/`| one folder per tier, `.axaml` + code-behind + sibling test | `exercises/01-beginner/Ex001_HelloView.axaml` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*

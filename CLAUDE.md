@@ -55,13 +55,17 @@ tests there — do not add `solutions/` to a project/module.
 | `java/`   | planned                                 | planned                  | planned |
 | `kotlin/` | planned                                 | planned                  | planned |
 | `flutter/`| planned                                 | planned                  | planned |
+| `avalonia/`| — (restore on first `dotnet test`)     | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_HelloView` |
 
 Run every command **from inside the track folder**, not the repo root.
 
 ## Toolchain status (verified 2026-08-03)
 
 - ✅ Verified end-to-end: **.NET 10**, **Python 3.14**, **Node 26 / npm 11**
-  (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**, **Rust 1.97.1**.
+  (both `vue/` and `angular/` have `node_modules`), **Go 1.26.5**, **Rust 1.97.1**,
+  **Avalonia 12.1.1 with ReactiveUI 24.1.0 on .NET 10**. The Avalonia set is
+  pinned and coherent at 12.1.1 and must not be bumped piecemeal: `ReactiveUI.Avalonia`'s
+  12.x line stops at 12.1.1, while Avalonia itself has already released 12.1.2.
 - `java/` and `kotlin/` are currently **catalog-only** additions: their ledgers
   and README files exist, but the build scaffolding and seeded exercises do not.
 - `flutter/` is content-complete like `java/` and `kotlin/`: `pubspec.yaml`
@@ -146,6 +150,53 @@ Run every command **from inside the track folder**, not the repo root.
   golden-file baseline generated on a real machine, and ex094/ex095 use
   plausible-but-unexercised platform-channel-mocking and cross-isolate
   closure APIs.
+- **Avalonia** — The solution is `FeWoLearning.Avalonia.slnx`, with **four**
+  projects: `exercises/`, `solutions/`, `tests/`, `gallery/`. Unlike the repo
+  convention above, `solutions/` is deliberately **in** the build here, the
+  same deviation `blazor/` makes: `tests/` and `gallery/` each reference
+  exactly one content project via the MSBuild property `UseSolutions`, never
+  both, so the name collision the repo-wide convention exists to prevent
+  cannot occur. The payoff is that reference solutions are compile-checked on
+  every build. This is deliberate and permanent — do not "fix" it back to
+  match the rest of the repo. Namespaces are pinned per tier
+  (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), and every `.axaml`
+  needs a fully qualified `x:Class` to match, because `01-beginner` is not a
+  valid C# identifier. Stubs throw `NotImplementedException` after
+  `InitializeComponent()`.
+
+  Seven things current ReactiveUI/Avalonia tutorials get wrong for this
+  package set, each verified by running real code on this machine: the
+  package is `ReactiveUI.Avalonia`, not `Avalonia.ReactiveUI` (the old one
+  stops at Avalonia 11.3.9); the test attribute is `[AvaloniaFact]` /
+  `[AvaloniaTheory]`, not `[AvaloniaTest]`; **xunit.v3 is mandatory** — adding
+  `xunit` 2.x puts `FactAttribute` in two assemblies and every test file fails
+  CS0433; `ReactiveUI.Primitives.RxVoid` replaces `System.Reactive.Unit` —
+  ReactiveUI 24 has no `Unit` type at all; Rx operators come from
+  `using ReactiveUI.Primitives;`, not `System.Reactive.Linq` — there is no
+  `System.Reactive` dependency; the scheduler abstraction is `ISequencer`, not
+  `IScheduler`; and `RxAppBuilder.CreateReactiveUIBuilder().WithAvalonia().Build()`
+  is mandatory, or the first `WhenAnyValue` anywhere throws and every exercise
+  goes red for the wrong reason.
+
+  Two more build traps measured during implementation: a file whose own
+  namespace starts `FeWoLearning.Avalonia.…` cannot reference an Avalonia type
+  fully qualified (`Avalonia.Media.TextWrapping` fails CS0234 — the leading
+  segment binds to the enclosing namespace), though `using` directives are
+  exempt; and an `.axaml` `<!-- -->` comment cannot contain two consecutive
+  hyphens, so a literal `--filter` is a XAML compiler error — the real command
+  lives in the `.axaml.cs`.
+
+  A recurring bug class here: a headless test that never shows its control in
+  a `Window` asserts on children that are all still `0,0,0,0` —
+  `Measure`/`Arrange` alone does not apply the control template, and neither
+  does `ApplyTemplate()`. Use `ViewHarness.Show`. The second: rendered
+  geometry cannot prove *which* mechanism produced it — a test asserting only
+  rectangles passed `RowDefinitions="24,*"` as happily as the `"Auto,*"` the
+  exercise was about, so any exercise whose subject is a sizing or layout mode
+  must also assert the definitions themselves. The third: a test that asserts
+  only rendered text can be satisfied by a hard-coded literal in the XAML, so
+  every binding exercise must change the view model afterwards, call
+  `Dispatcher.UIThread.RunJobs()`, and assert the text followed.
 
 ## Adding or completing exercises
 
@@ -207,6 +258,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
+| `avalonia/`| 10 / 100 (verified) | 90 |
 
 All 100-exercise ledgers across all 9 tracks are now written. Nothing is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and

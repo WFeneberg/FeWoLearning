@@ -15,6 +15,7 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `python/`   | Python 3                         | pytest      | **100 / 100** | ✅ Python 3.14 |
 | `angular/`  | Angular (standalone, signals, TS)| Jest        | **100 / 100** | ✅ Node 26 |
 | `rust/`     | Rust                             | `cargo test`| **100 / 100** | ✅ Rust 1.97 |
+| `avalonia/`| Avalonia 12 (ReactiveUI MVVM, C#)| xUnit v3 + Avalonia.Headless | **10 / 100** | ✅ .NET 10 |
 | `java/`     | Java                             | JUnit 5     | 100 / 100 (unverified) | planned |
 | `kotlin/`   | Kotlin                           | JUnit 5     | 100 / 100 (unverified) | planned |
 | `flutter/`  | Flutter / Dart                   | `package:test` / `flutter_test` | 100 / 100 (unverified) | planned |
