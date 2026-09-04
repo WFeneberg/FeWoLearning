@@ -6,7 +6,8 @@
    <InputText id="name" @bind-Value="Model.Name" /> and <button id="submit"
    type="submit">Save</button>, plus <span id="count">@SubmitCount</span>. EditForm
    renders the <form> element itself and handles submission - you do not write
-   @onsubmit or a preventDefault directive on it. *@
+   @onsubmit or a preventDefault directive on it. Note: a fully valid ContactModel
+   also needs a city on its Address, not just a Name and Age. *@
 
 @code {
     [Parameter, EditorRequired] public ContactModel Model { get; set; } = default!;

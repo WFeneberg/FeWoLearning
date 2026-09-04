@@ -38,13 +38,15 @@ public class Ex040_EditContextFieldStateTests : BunitContext
         cut.WaitForAssertion(() => Assert.Equal("False", cut.Find("#modified").TextContent));
     }
 
-    // Non-vacuity note: a hand-tracked bool flipped on the name field's change event
-    // would also pass the first three facts above. It would NOT pass this one - the
-    // "modified" class comes from EditContext's own FieldCssClassProvider machinery
-    // applied to InputText, not from anything this component could set by hand on a
-    // plain HTML element bound with @bind. That is the fact that forces the real
-    // mechanism (a real EditContext driving the InputText) rather than a parallel
-    // bookkeeping flag.
+    // Non-vacuity note: on its own, a hand-tracked bool flipped on the name field's
+    // change event and cleared on reset would also pass this fact - the class check
+    // and the #modified span read are two independent things unless something ties
+    // them to the same mechanism. The tie-breaker is the pair with the next fact:
+    // a hand-tracker can make #modified read False again after Reset, but it cannot
+    // make the "modified" CSS class come OFF the input, because that class is driven
+    // by the real EditContext's own FieldCssClassProvider machinery, not by anything
+    // this component sets by hand. Only calling MarkAsUnmodified() on the actual
+    // EditContext clears both #modified and the CSS class together.
     [Fact]
     public void Changing_The_Name_Adds_The_Modified_Css_Class_Via_EditContext()
     {
@@ -53,5 +55,17 @@ public class Ex040_EditContextFieldStateTests : BunitContext
         cut.Find("#name").Change("Ada");
 
         cut.WaitForAssertion(() => Assert.Contains("modified", cut.Find("#name").ClassList));
+    }
+
+    [Fact]
+    public void Resetting_After_A_Change_Removes_The_Modified_Css_Class_Too()
+    {
+        var cut = Render<Ex040_EditContextFieldState>(p => p.Add(x => x.Model, new ContactModel()));
+        cut.Find("#name").Change("Ada");
+        cut.WaitForAssertion(() => Assert.Contains("modified", cut.Find("#name").ClassList));
+
+        cut.Find("#reset").Click();
+
+        cut.WaitForAssertion(() => Assert.DoesNotContain("modified", cut.Find("#name").ClassList));
     }
 }
