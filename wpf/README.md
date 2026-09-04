@@ -107,7 +107,7 @@ broken and every other failure in the run is noise.**
 
 ## Writing an exercise without writing a test that lies
 
-Three failure modes, each of which has already shipped in some track of this repo:
+Four failure modes, each of which has already shipped in some track of this repo:
 
 - A test asserting only what the **signature** produces — wrong arity, wrong call
   style — passes before the stub's body ever runs. Assert on introspected metadata,
@@ -119,6 +119,11 @@ Three failure modes, each of which has already shipped in some track of this rep
 - A test asserting only **rendered text** can be satisfied by a hard-coded literal.
   Every binding exercise must mutate the source afterwards, `Pump`, and assert the
   target followed.
+- A test that observes a dependency property only through its CLR wrapper cannot
+  prove the logic lives in the property system — a hand-rolled clamp in the setter
+  satisfies it, while a binding, a style setter or an animation would bypass it
+  entirely. Any exercise about metadata, coercion or validation must also write
+  through `SetValue` and read through `GetValue`.
 
 ## Deliberate gaps
 
