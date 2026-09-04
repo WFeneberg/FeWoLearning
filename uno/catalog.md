@@ -31,7 +31,7 @@ rather than as current values. Writing exercises against a mental model that has
 been verified would be worse than leaving the gap, so those rows now cover async
 patterns instead. MVUX is the obvious next addition to this track.
 
-**Status: 70 ✅ / 30 ⬜**
+**Status: 75 ✅ / 25 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -117,11 +117,11 @@ patterns instead. MVUX is the obvious next addition to this track.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 071 | NonVirtualizingLayout | implementing `NonVirtualizingLayout` for `ItemsRepeater` | ⬜ |
-| 072 | VirtualizingLayoutWindow | `VirtualizingLayout`, realisation window, recycling | ⬜ |
-| 073 | InvalidationTracking | `InvalidateMeasure`/`InvalidateArrange`, counting passes | ⬜ |
-| 074 | LayoutCycles | measuring during arrange, and how to avoid the loop | ⬜ |
-| 075 | DependencyPropertyCost | boxing, cached `DependencyProperty` lookups, struct payloads | ⬜ |
+| 071 | LayoutStateAndContext | `InitializeForContextCore`, `LayoutState`, per-context lifecycle | ✅ |
+| 072 | VirtualizingLayoutWindow | `VirtualizingLayout`, realisation window, recycling | ✅ |
+| 073 | InvalidationTracking | `InvalidateMeasure`/`InvalidateArrange`, counting passes | ✅ |
+| 074 | LayoutCycles | measuring during arrange, and how to avoid the loop | ✅ |
+| 075 | ComputedValueCaching | caching a derived value, invalidated by the properties it reads | ✅ |
 | 076 | ContainerPooling | pooling visuals, resetting state on reuse | ⬜ |
 | 077 | BindingDiagnostics | `BindingExpression`, `UpdateSource`/`UpdateTarget`, failure surfaces | ⬜ |
 | 078 | TemplatedControlInheritance | subclassing a templated control and extending its states | ⬜ |
