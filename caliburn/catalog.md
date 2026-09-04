@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 10 ✅ / 90 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -33,11 +33,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 003 | NotifyOfPropertyChange | announcing without a backing field, why `Set` cannot help | ✅ |
 | 004 | DependentProperties | one setter announcing a chain of computed properties — and not the wrong ones | ✅ |
 | 005 | BindableCollectionBasics | `BindableCollection<T>`, `IsNotifying` suspension, `Refresh` as one `Reset` | ✅ |
-| 006 | BindableCollectionRange | `AddRange`/`RemoveRange` raise a single `Reset`, not one event per item | ⬜ |
-| 007 | ScreenDisplayName | `Screen.DisplayName`, announced like any other property | ⬜ |
-| 008 | ScreenInitialize | `OnInitializeAsync` runs once, `IsInitialized` | ⬜ |
-| 009 | ScreenActivate | `OnActivateAsync`/`OnDeactivateAsync`, `IsActive`, the `Activated` async event | ⬜ |
-| 010 | ScreenGuardClose | `CanCloseAsync` refusing a close | ⬜ |
+| 006 | BindableCollectionRange | `AddRange`/`RemoveRange` raise a single `Reset`, not one event per item - even for an empty or no-op batch | ✅ |
+| 007 | ScreenDisplayName | `Screen.DisplayName` defaults to the type's full name and announces on every assignment - no suppression on an unchanged value | ✅ |
+| 008 | ScreenInitialize | `OnInitializedAsync` runs once, `IsInitialized` | ✅ |
+| 009 | ScreenActivate | `OnActivatedAsync`/`OnDeactivateAsync`, `IsActive`, the `Activated` async event | ✅ |
+| 010 | ScreenGuardClose | `CanCloseAsync` refusing a close | ✅ |
 | 011 | ScreenTryClose | `TryCloseAsync`, deactivation with `close: true` | ⬜ |
 | 012 | ViewAwareCallbacks | `IViewAware`, `OnViewAttached`, `OnViewLoaded` | ⬜ |
 | 013 | ViewLocatorConvention | `FooViewModel` → `FooView`, `AssemblySource` | ⬜ |
