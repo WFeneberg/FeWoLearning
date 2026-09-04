@@ -7,8 +7,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FeWoLearning.Avalonia.Exercises.Beginner.Ex003_LayoutGrid">
-  <!-- TODO: replace this placeholder with a Grid whose rows are "Auto,*" and whose
-       columns are "80,*", holding four Borders:
+  <!-- TODO: replace this placeholder with a Grid named "RootGrid" whose rows are
+       "Auto,*" and whose columns are "80,*" (real Auto/star sizing, not literal
+       numbers that happen to match - the test checks the row/column definitions
+       themselves, not just the rendered rectangles), holding four Borders:
          HeaderLeft  at row 0 col 0, Height 24
          HeaderRight at row 0 col 1, Height 24
          BodyLeft    at row 1 col 0

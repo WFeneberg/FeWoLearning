@@ -30,4 +30,28 @@ public class Ex003_LayoutGridTests
         Assert.Equal(new Rect(0, 24, 80, 176), view.FindControl<Border>("BodyLeft")!.Bounds);
         Assert.Equal(new Rect(80, 24, 120, 176), view.FindControl<Border>("BodyRight")!.Bounds);
     }
+
+    // The discriminator: at this exact 200x200 size, a Grid whose rows are literally
+    // "24,*" instead of "Auto,*" renders bit-for-bit identical rectangles to the
+    // above two tests and would pass them both. This test looks at the Grid's own
+    // RowDefinitions/ColumnDefinitions instead of the rendered geometry, so a
+    // hard-coded row height (or a hard-coded star column) fails here even though
+    // the Bounds-only assertions above cannot tell the difference.
+    [AvaloniaFact]
+    public void Rows_Use_Auto_And_Star_Sizing_Not_Hard_Coded_Heights()
+    {
+        var view = Show();
+        var grid = view.FindControl<Grid>("RootGrid");
+        Assert.NotNull(grid);
+
+        Assert.True(grid!.RowDefinitions[0].Height.IsAuto,
+            "row 0 must be Auto so it takes its height from the header content");
+        Assert.True(grid.RowDefinitions[1].Height.IsStar,
+            "row 1 must be star-sized so it absorbs the remaining height");
+        Assert.True(grid.ColumnDefinitions[0].Width.IsAbsolute,
+            "column 0 must be a fixed pixel width, not Auto or star");
+        Assert.Equal(80, grid.ColumnDefinitions[0].Width.Value);
+        Assert.True(grid.ColumnDefinitions[1].Width.IsStar,
+            "column 1 must be star-sized so it absorbs the remaining width");
+    }
 }
