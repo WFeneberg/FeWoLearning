@@ -1,6 +1,6 @@
 @* Exercise 049 - JS Interop Invoke (intermediate).
-   Goal:   Call a JS function through IJSRuntime and record that it completed.
-   Drills: IJSRuntime.InvokeVoidAsync, awaiting interop before touching state, bUnit's JSInterop mock.
+   Goal:   Call JS through IJSRuntime with the right argument and record that it ran.
+   Drills: IJSRuntime.InvokeVoidAsync, passing the exact argument, bUnit's JSInterop mock verification.
    Passes: dotnet test --filter FullyQualifiedName~Ex049_ *@
 <button id="save" @onclick="SaveAsync">Save</button>
 <span id="state">@_state</span>

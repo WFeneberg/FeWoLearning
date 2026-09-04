@@ -6,6 +6,13 @@ namespace FeWoLearning.Blazor.Tests.Intermediate;
 
 public class Ex050_JsInteropReturnValueTests : BunitContext
 {
+    // OnInitializedAsync is an async lifecycle method - per README §11, a bare
+    // assertion right after Render<T>() only proves something about the first
+    // frame, and would reject a correct implementation that genuinely awaits
+    // (verified: inserting a real `await Task.Delay(30)` before an otherwise
+    // correct interop call fails all three facts in this class without
+    // WaitForAssertion). Wrapped so a real await doesn't fail a fact that should
+    // only care about the eventual, settled state.
     [Fact]
     public void Renders_What_Js_Returned()
     {
@@ -13,7 +20,7 @@ public class Ex050_JsInteropReturnValueTests : BunitContext
 
         var cut = Render<Ex050_JsInteropReturnValue>();
 
-        Assert.Equal("payload", cut.Find("#loaded").TextContent);
+        cut.WaitForAssertion(() => Assert.Equal("payload", cut.Find("#loaded").TextContent));
     }
 
     [Fact]
@@ -21,9 +28,9 @@ public class Ex050_JsInteropReturnValueTests : BunitContext
     {
         JSInterop.Setup<string>("app.load").SetResult("payload");
 
-        Render<Ex050_JsInteropReturnValue>();
+        var cut = Render<Ex050_JsInteropReturnValue>();
 
-        JSInterop.VerifyInvoke("app.load");
+        cut.WaitForAssertion(() => JSInterop.VerifyInvoke("app.load"));
     }
 
     // Non-vacuity: a hard-coded return (e.g. always "payload") would pass the fact
@@ -36,6 +43,6 @@ public class Ex050_JsInteropReturnValueTests : BunitContext
 
         var cut = Render<Ex050_JsInteropReturnValue>();
 
-        Assert.Equal("something-else", cut.Find("#loaded").TextContent);
+        cut.WaitForAssertion(() => Assert.Equal("something-else", cut.Find("#loaded").TextContent));
     }
 }

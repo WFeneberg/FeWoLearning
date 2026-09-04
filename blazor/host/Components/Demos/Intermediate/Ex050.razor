@@ -1,12 +1,16 @@
 @page "/intermediate/050"
-@* Prerendering is disabled here: the solution calls JS interop from
-   OnInitializedAsync, which throws during the static-prerender pass because no
-   circuit/JS runtime exists yet - the call is only valid once interactivity starts. *@
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h1>Exercise 050 - JsInteropReturnValue</h1>
 
-<Ex050_JsInteropReturnValue />
+@* Prerendering is disabled on the component itself, not the page: the solution
+   calls JS interop from OnInitializedAsync, which throws during a static-prerender
+   pass because no circuit/JS runtime exists yet. Putting @rendermode on the page
+   instead would statically-render nothing at all - the whole body, heading and
+   inline <script> included, would only exist once the interactive circuit patches
+   it into the DOM, and Blazor does not execute a <script> inserted that way. Kept
+   on the tag so the page (heading, script) stays statically rendered and only this
+   component's own render is deferred to the circuit. *@
+<Ex050_JsInteropReturnValue @rendermode="@(new InteractiveServerRenderMode(prerender: false))" />
 
 <script>
     window.app = window.app || {};

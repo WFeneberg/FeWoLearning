@@ -1,7 +1,7 @@
 @using Microsoft.Extensions.DependencyInjection
 @* Exercise 048 - Factory Injected Component (intermediate).
-   Goal:   Resolve a dependency from the container on demand instead of via [Inject].
-   Drills: IServiceProvider as a service locator, resolving per call rather than via property injection.
+   Goal:   Get the instance from the container instead of constructing one yourself.
+   Drills: IServiceProvider as a service locator, resolving a dependency on demand.
    Passes: dotnet test --filter FullyQualifiedName~Ex048_ *@
 <span id="value">@Resolve().Value</span>
 

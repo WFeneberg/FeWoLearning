@@ -1,15 +1,15 @@
+@using Microsoft.Extensions.DependencyInjection
 @* Exercise 048 - Factory Injected Component (intermediate).
-   Goal:   Resolve a dependency from the container on demand instead of via [Inject].
-   Drills: IServiceProvider as a service locator, resolving per call rather than via property injection.
+   Goal:   Get the instance from the container instead of constructing one yourself.
+   Drills: IServiceProvider as a service locator, resolving a dependency on demand.
    Passes: dotnet test --filter FullyQualifiedName~Ex048_ *@
 <span id="value">@Resolve().Value</span>
 
 @code {
     [Inject] public IServiceProvider Services { get; set; } = default!;
 
-    // TODO: resolve CounterStore from Services - do not add a [Inject] CounterStore
-    // property instead; the point of this exercise is pulling the dependency from
-    // the container yourself, on demand, rather than letting the framework hand it
-    // to you once up front.
+    // TODO: get CounterStore from Services (e.g. Services.GetRequiredService<CounterStore>())
+    // - do not construct one yourself (`new CounterStore()`), which would never be
+    // resolved from, or observed by, the registered container at all.
     private CounterStore Resolve() => throw new NotImplementedException("TODO: Ex048 - resolve the store from the provider");
 }
