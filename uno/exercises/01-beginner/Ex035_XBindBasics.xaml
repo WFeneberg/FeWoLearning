@@ -1,0 +1,21 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Beginner.Ex035_XBindBasics"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        TODO: Ex035 - bind three TextBlocks to this control with x:Bind.
+
+        A StackPanel named "Root" holding:
+          * a TextBlock named "Once" with Text="{x:Bind Caption}" - no Mode, so the
+            compiled default applies,
+          * a TextBlock named "Live" with Text="{x:Bind Caption, Mode=OneWay}",
+          * a TextBlock named "Computed" with Text="{x:Bind Shout()}" - x:Bind can call a
+            method, which a classic {Binding} cannot.
+
+        x:Bind resolves against the code-behind class, not against the DataContext, so no
+        x:DataType is needed here - the page *is* the source. Paths are compiled into
+        generated code, which is why a typo is a build error rather than a blank label.
+    -->
+
+</UserControl>

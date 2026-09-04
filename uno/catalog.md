@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -58,11 +58,11 @@ do" in `README.md`.
 | 028 | VisualStateGroups | `VisualStateManager.GoToState`, state setters | ✅ |
 | 029 | EventHandlers | `Click` and `RoutedEventArgs`, invoking a control through its automation peer | ✅ |
 | 030 | PropertyChangeObservers | `RegisterPropertyChangedCallback`, watching a property you do not own | ✅ |
-| 031 | CommandBinding | `ICommand`, `CanExecute`, `CanExecuteChanged` | ⬜ |
-| 032 | ValuePrecedence | local value vs style setter vs default value | ⬜ |
-| 033 | ClearValueAndDefault | `ClearValue` falls back to the style, then to the default | ⬜ |
-| 034 | SizeReporting | `DesiredSize` vs `ActualWidth`/`ActualHeight` vs `Width` | ⬜ |
-| 035 | DispatcherQueueBasics | `DispatcherQueue.TryEnqueue`, why UI work must be marshalled | ⬜ |
+| 031 | CommandBinding | `ICommand`, `CanExecute`, `CanExecuteChanged` | ✅ |
+| 032 | ValuePrecedence | local value vs style setter vs default value | ✅ |
+| 033 | ClearValueAndDefault | `ClearValue` falls back to the style, then to the default | ✅ |
+| 034 | SizeReporting | `DesiredSize` vs `ActualWidth`/`ActualHeight` vs `Width` | ✅ |
+| 035 | XBindBasics | `x:Bind` with `x:DataType`, compile-time paths, OneTime by default | ✅ |
 
 ## Intermediate (036–070) — controls, custom layout, MVVM/MVUX, app services
 
