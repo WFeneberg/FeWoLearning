@@ -16,6 +16,15 @@ public class Ex025_SelectBindingTests : BunitContext
         Assert.Equal(3, options.Count);
         Assert.Equal(new[] { "Low", "Normal", "High" }, options.Select(o => o.TextContent).ToArray());
         Assert.Equal(new[] { "Low", "Normal", "High" }, options.Select(o => o.GetAttribute("value")).ToArray());
+
+        // A different Options set must produce a different projection - this is
+        // what actually rules out a hard-coded <option> list on its own, rather
+        // than relying solely on the empty-list fact below to catch it.
+        cut.Render(p => p.Add(c => c.Options, new[] { "X", "Y" }));
+
+        var updated = cut.FindAll("#prio option");
+        Assert.Equal(new[] { "X", "Y" }, updated.Select(o => o.TextContent).ToArray());
+        Assert.Equal(new[] { "X", "Y" }, updated.Select(o => o.GetAttribute("value")).ToArray());
     }
 
     [Fact]

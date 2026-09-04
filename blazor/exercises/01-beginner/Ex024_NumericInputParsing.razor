@@ -6,7 +6,8 @@
      <input id="qty" type="number" ... />
      <span id="total">...</span>
    Two-way bind the input to _quantity with @bind. Show _quantity * UnitPrice
-   in #total, formatted with CultureInfo.InvariantCulture. Unparsable input
+   in #total, formatted with ToString("0.##", CultureInfo.InvariantCulture) -
+   so a whole total shows as "0" or "7", not "0.0" or "7.0". Unparsable input
    must leave _quantity unchanged - that is @bind's own rejection behaviour,
    not something to hand-code. *@
 
