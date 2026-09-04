@@ -36,6 +36,7 @@ is prefixed:
 | `avalonia/`| one folder per tier, `.axaml` + code-behind, test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloView.axaml` |
 | `uno/`    | one folder per tier, `.cs` (plus `.xaml` + code-behind for markup exercises), test in a separate `tests/` project | `exercises/01-beginner/Ex001_HelloProperty.cs` |
 | `caliburn/`| one file per exercise, tier-wide namespace, test in a separate `tests/` project | `exercises/01-beginner/Ex001_NotifyByHand.cs` |
+| `wpf/`    | one folder per tier, `.cs` stub, test in a separate `tests/` project | `exercises/01-beginner/Ex001_ClrToDependencyProperty.cs` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
@@ -83,8 +84,8 @@ root `CLAUDE.md`.
 These are deliberate, documented limitations rather than oversights. For most
 tracks they exist because `solutions/` is intentionally kept out of each build
 (the files reuse the stubs' type and module names, so compiling both at once
-would collide) — `avalonia/`, `blazor/` and `caliburn/` are exceptions that
-keep `solutions/` in the build instead; see their own tracks for why.
+would collide) — `avalonia/`, `blazor/`, `caliburn/` and `wpf/` are exceptions
+that keep `solutions/` in the build instead; see their own tracks for why.
 
 ### `solutions/` is only partly verified
 
