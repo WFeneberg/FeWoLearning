@@ -22,14 +22,15 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**MVUX is deliberately not covered.** Six rows (064–067, 092–093) were originally
-`Feed<T>`/`State<T>` exercises. `Uno.Extensions.Reactive` turned out to need care this
-track has not paid yet: its source generator errors on any record in the assembly with
-an `Id`-shaped member that is not `partial`, and `await state.Value(ct)` returned the
-*previous* value in a probe, which means feeds want to be taught as message streams
-rather than as current values. Writing exercises against a mental model that has not
-been verified would be worse than leaving the gap, so those rows now cover async
-patterns instead. MVUX is the obvious next addition to this track.
+**MVUX lives in four rows** — 064, 065, 092 and 093. Getting there took a proper
+investigation of `Uno.Extensions.Reactive`, because two things are not obvious:
+`Command.Async` needs the dispatcher that the `Uno.Extensions.Reactive.WinUI` package
+supplies (without it, it throws with a message naming exactly that), and
+`await state.Value(ct)` returns the *previous* value when read inside a live
+`SourceContext` — propagation to an existing subscription is asynchronous. The
+exercises therefore teach feeds as message streams and read values outside a context,
+which is deterministic. Four rows had to be given up to make room; the commit that did
+it says which, and they are still in git history.
 
 **Status: 100 ✅ / 0 ⬜**
 
@@ -105,8 +106,8 @@ patterns instead. MVUX is the obvious next addition to this track.
 | 061 | SettingsStorage | `ApplicationData.LocalSettings` round-trip | ✅ |
 | 062 | FileStorageAsync | `StorageFolder`/`StorageFile` async round-trip | ✅ |
 | 063 | DispatcherSeam | wrapping `DispatcherQueue` behind a testable seam, the has-access guard | ✅ |
-| 064 | AsyncLoadOnDemand | loading/loaded/failed state, cancelling a superseded load | ✅ |
-| 065 | ProgressReporting | `IProgress<T>` from background work to a bound property | ✅ |
+| 064 | MvuxFeedBasics | `Feed.Async`, the data/error/progress axes, `Option<T>` | ✅ |
+| 065 | MvuxStateUpdates | `State.Value`, `Update`/`Set`, and the read that lags inside a context | ✅ |
 | 066 | WeakMessenger | publish/subscribe between view models without keeping them alive | ✅ |
 | 067 | DebouncedInput | coalescing rapid changes, cancelling the pending one | ✅ |
 | 068 | HostingDependencyInjection | `IHost`, `IServiceCollection`, resolving a view model | ✅ |
@@ -143,8 +144,8 @@ patterns instead. MVUX is the obvious next addition to this track.
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
 | 091 | CompositionRoot | assembling the whole graph: host, capabilities, platform, view models | ✅ |
-| 092 | AsyncPipeline | composing async steps with cancellation and error propagation | ✅ |
-| 093 | AsyncStreamViewModel | `IAsyncEnumerable` driving a view model, cancellation, completion | ✅ |
+| 092 | MvuxListStateAndCommands | `ListState<T>` mutations and `Command.Async` | ✅ |
+| 093 | MvuxFeedComposition | `Select`/`Where`/`Combine`, error propagation, `None` against `Undefined` | ✅ |
 | 094 | NavigationService | typed routes over a `Frame`, behind an interface a view model can use | ✅ |
 | 095 | HostConfiguration | `IHostBuilder`, options binding, environment overrides | ✅ |
 | 096 | BehaviorFramework | a small attached-behaviour framework with lifetime management | ✅ |

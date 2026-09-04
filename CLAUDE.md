@@ -380,8 +380,13 @@ the origin, `await CancellationTokenSource.CancelAsync()` overflows the stack - 
 the WinUI members Uno leaves unimplemented. Several catalog rows were re-scoped
 around those limits, each with the reason recorded in the commit that did it.
 
-MVUX (`Feed<T>`/`State<T>`) is a deliberate gap, not an oversight: see the note in
-`uno/catalog.md`.
+MVUX (`Feed<T>`, `State<T>`, `ListState<T>`, `Command`) sits in rows 064, 065, 092
+and 093. Two findings shaped them: `Command.Async` needs the dispatcher that the
+`Uno.Extensions.Reactive.WinUI` package supplies, and `await state.Value(ct)` returns
+the *previous* value inside a live `SourceContext`. Feeds are therefore taught as
+message streams, values are read outside a context, and that lag is documented rather
+than asserted. The Reactive package also brings a source generator that errors on any
+record in the assembly with an `Id`-shaped member that is not `partial`.
 
 ## Known gaps
 

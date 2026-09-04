@@ -13,6 +13,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- MVUX: feeds, states, list states and commands (ex064, ex065, ex092, ex093).
+         The .WinUI package is what supplies the dispatcher a Command needs - without it
+         Command.Async throws with a message naming exactly this. -->
+    <PackageReference Include="Uno.Extensions.Reactive" Version="7.3.6" />
+    <PackageReference Include="Uno.Extensions.Reactive.WinUI" Version="7.3.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Generic host, DI, configuration and options (ex068, ex095). -->
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
   </ItemGroup>

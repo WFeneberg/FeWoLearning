@@ -38,8 +38,16 @@ that fails to compile is a bug.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger. Currently **100 / 100**:
 every stub was confirmed red and every reference solution confirmed green by actually
-running both commands above. The one deliberate content gap is MVUX, and
-`catalog.md` says why.
+running both commands above.
+
+MVUX (`Feed<T>`, `State<T>`, `ListState<T>`, `Command`) is covered by rows 064, 065,
+092 and 093. Two things about it are worth knowing before touching those:
+`Command.Async` needs the dispatcher the `Uno.Extensions.Reactive.WinUI` package
+supplies, and `await state.Value(ct)` answers with the *previous* value when read
+inside a live `SourceContext` - propagation to an existing subscription is
+asynchronous. The exercises therefore treat feeds as message streams and read values
+outside a context. The lag is documented in ex065 rather than asserted: it depends on
+timing, and a test on it would be a test of the harness.
 
 ## How the headless runtime works
 

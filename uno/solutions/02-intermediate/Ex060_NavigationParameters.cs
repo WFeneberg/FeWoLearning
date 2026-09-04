@@ -16,7 +16,13 @@ using Microsoft.UI.Xaml.Navigation;
 namespace FeWoLearning.Uno.Exercises.Intermediate;
 
 /// <summary>What a caller hands to the detail page.</summary>
-public sealed record Ex060_DetailRequest(int Id, string Title);
+/// <remarks>
+/// `partial` because Uno.Extensions.Reactive - referenced for the MVUX exercises - has a
+/// source generator that offers IKeyEquatable to any record with an Id-shaped member, and
+/// errors out (KE0001) on one that is not partial. Every record in this assembly is
+/// therefore partial, whether or not it takes part in MVUX.
+/// </remarks>
+public sealed partial record Ex060_DetailRequest(int Id, string Title);
 
 /// <summary>
 /// A page that reads a typed request out of its navigation parameter.
