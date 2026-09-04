@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Intermediate.Ex057_ThemeSwitching"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="CardBackground" Color="White" />
+                    <x:Double x:Key="CardWidth">40</x:Double>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="CardBackground" Color="Black" />
+                    <x:Double x:Key="CardWidth">80</x:Double>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel x:Name="Root">
+        <!-- Keeps a live reference and re-resolves on every theme change. -->
+        <Border x:Name="Live" Height="10" Background="{ThemeResource CardBackground}" />
+
+        <!-- Resolved once, against whichever theme was active while this tree was built.
+             The Dark dictionary says 80 and this element will never hear about it. -->
+        <Border x:Name="Frozen" Height="10" Width="{StaticResource CardWidth}" />
+
+        <Border x:Name="Wrapper">
+            <Border x:Name="Nested" Height="10" Background="{ThemeResource CardBackground}" />
+        </Border>
+    </StackPanel>
+
+</UserControl>

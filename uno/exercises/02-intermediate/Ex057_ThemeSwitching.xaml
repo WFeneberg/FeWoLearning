@@ -1,0 +1,25 @@
+<UserControl
+    x:Class="FeWoLearning.Uno.Exercises.Intermediate.Ex057_ThemeSwitching"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        TODO: Ex057 - show what a theme change does and does not touch.
+
+        On this control's Resources, a ResourceDictionary with ThemeDictionaries keyed
+        "Light" and "Dark". Each declares:
+          * a SolidColorBrush keyed "CardBackground" - White in Light, Black in Dark, and
+          * an x:Double keyed "CardWidth" - 40 in Light, 80 in Dark.
+
+        The content: a StackPanel named "Root" holding
+          * a Border named "Live", 10 high, Background="{ThemeResource CardBackground}",
+          * a Border named "Frozen", 10 high, Width="{StaticResource CardWidth}",
+          * a Border named "Nested" inside a Border named "Wrapper", the nested one 10 high
+            with Background="{ThemeResource CardBackground}".
+
+        "Frozen" is the point of the exercise: StaticResource resolves once against
+        whichever theme was active while the tree was built, and a later theme change cannot
+        reach it. "Nested" shows the other half - a theme set on an ancestor reaches down.
+    -->
+
+</UserControl>

@@ -22,7 +22,7 @@ that works and what it costs.
 so collection exercises are built on `ItemsRepeater` — see "What the harness cannot
 do" in `README.md`.
 
-**Status: 55 ✅ / 45 ⬜**
+**Status: 60 ✅ / 40 ⬜**
 
 ## Beginner (001–035) — the object model, XAML, layout, binding
 
@@ -88,11 +88,11 @@ do" in `README.md`.
 | 053 | RelativeSourceBinding | `RelativeSource` `Self` and `TemplatedParent` | ✅ |
 | 054 | ElementNameBinding | `ElementName` bindings and name scopes | ✅ |
 | 055 | DataTemplateSelector | choosing a template per item, `SelectTemplateCore`, the null answer | ✅ |
-| 056 | ResourceDictionaryMerging | merged dictionaries and lookup precedence | ⬜ |
-| 057 | ThemeSwitching | switching theme at runtime: what re-evaluates, what does not | ⬜ |
-| 058 | CultureAwareFormatting | binding under an explicit culture, `FlowDirection` mirroring | ⬜ |
-| 059 | FrameNavigation | `Frame.Navigate`/`GoBack`, `OnNavigatedTo` | ⬜ |
-| 060 | NavigationParameters | typed parameters, back stack, state on return | ⬜ |
+| 056 | ResourceDictionaryMerging | merged dictionaries and lookup precedence | ✅ |
+| 057 | ThemeSwitching | switching theme at runtime: what re-evaluates, what does not | ✅ |
+| 058 | SizeConstraints | `MinWidth`/`MaxWidth` against `Width`, clamping in the measure pass | ✅ |
+| 059 | FrameNavigation | `Frame.Navigate`/`GoBack`, `OnNavigatedTo` | ✅ |
+| 060 | NavigationParameters | typed parameters, back stack, state on return | ✅ |
 | 061 | SettingsStorage | `ApplicationData.LocalSettings` round-trip | ⬜ |
 | 062 | FileStorageAsync | `StorageFolder`/`StorageFile` async round-trip | ⬜ |
 | 063 | DispatcherMarshalling | background work publishing to the UI thread safely | ⬜ |

@@ -90,13 +90,17 @@ consequences, all of them found by probing rather than by reading docs:
 - **`TransformToVisual` returns the origin.** It needs render state a windowless
   tree does not have. `UnoTestContext.Offset` reads `ActualOffset` instead, which
   is accurate.
-- **A few WinUI members are unimplemented stubs in Uno.** They compile and then
-  throw at runtime with a link to Uno's not-implemented page. Found so far:
-  `Microsoft.UI.Xaml.ElementFactoryGetArgs.Data` (the `Microsoft.UI.Xaml.Controls`
-  twin of that type works), and `ItemsRepeater.ItemTemplate` rejects any
-  `IElementFactory` that is not a `DataTemplate` or Uno's internal shim. When an
-  exercise hits one, keep the real interface in the signature and put the logic
-  in methods the tests can call - see ex046.
+- **A few WinUI members behave differently or not at all in Uno.** They compile
+  and then throw, or quietly do nothing. Found so far:
+  `Microsoft.UI.Xaml.ElementFactoryGetArgs.Data` throws (the
+  `Microsoft.UI.Xaml.Controls` twin of that type works);
+  `ItemsRepeater.ItemTemplate` rejects any `IElementFactory` that is not a
+  `DataTemplate` or Uno's internal shim; `x:Load` realises its element
+  immediately instead of deferring; `FlowDirection.RightToLeft` does not mirror
+  a layout; and `Binding.ConverterLanguage` is ignored - the converter is handed
+  the current thread culture instead. When an exercise hits one, keep the real
+  API in the signature and put the logic where the tests can reach it (ex046),
+  or pick a different subject for that row.
 - **Nothing driven by the frame loop or by input happens.** No pointer or
   keyboard events, `Focus()` returns false, and `Loaded`, `Unloaded`,
   `SizeChanged` and `LayoutUpdated` never fire. So the track exercises event
