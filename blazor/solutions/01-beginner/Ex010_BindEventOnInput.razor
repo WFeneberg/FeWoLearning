@@ -1,6 +1,6 @@
 @* Exercise 010 - Bind Event On Input (beginner).
    Goal:   Report the query on every keystroke instead of on blur.
-   Drills: @oninput vs @onchange timing.
+   Drills: hand-wired @oninput vs @onchange timing (no @bind directive).
    Passes: dotnet test --filter FullyQualifiedName~Ex010_ *@
 <input id="q" value="@Query" @oninput="OnInputAsync" />
 <span id="echo">@Query</span>

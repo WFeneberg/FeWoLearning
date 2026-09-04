@@ -209,10 +209,17 @@ and Kotlin traps already documented in the repo root `CLAUDE.md`:
   asserts only on the **first** frame. For `@onclick` and async lifecycle,
   use `cut.WaitForAssertion(...)` / `InvokeAsync` on **markup** assertions,
   where a stale render frame is possible — never a bare assertion on markup
-  immediately after the trigger. An assertion on a **captured local**
-  (a value an `EventCallback` or delegate handed straight to a test variable)
-  does not need the wrapper: there is no render frame to go stale, and
-  wrapping it only delays reporting a genuine failure by the full timeout.
+  immediately after the trigger. Three exemptions: an assertion on a
+  **captured local** (a value an `EventCallback` or delegate handed straight
+  to a test variable) does not need the wrapper, since there is no render
+  frame to go stale; a **negative assertion** ("this markup did not change")
+  must stay bare, since `WaitForAssertion` would pass on its first attempt
+  regardless and, when the value genuinely does change, would delay the
+  failure by the full timeout instead of catching it; and an assertion right
+  after a synchronous `cut.Render(...)` parameter push (as opposed to an
+  event dispatch) needs no wrapper either, since the render completes before
+  `Render` returns. In every exemption case, wrapping only delays reporting a
+  genuine failure by the full timeout.
 - A test that compares `cut.Markup` against a whole string breaks on any
   whitespace change and proves nothing about behavior. Assert through
   `Find`/`FindAll` plus `TextContent` or a specific attribute instead.
@@ -224,7 +231,7 @@ and Kotlin traps already documented in the repo root `CLAUDE.md`:
 
 ### What this track actually learned the hard way
 
-Beyond the rules above, review rounds on this specific tier turned up three
+Beyond the rules above, review rounds on this specific tier turned up four
 concrete failure modes worth carrying into future batches:
 
 - **Never assert on whole-markup strings.** Same reasoning as above, stated

@@ -82,8 +82,11 @@ project references both RCLs, there is no collision.
 
 **Multi-file exercises** follow `ExNNN_<Slug>_<Part>.razor` — e.g. ex035's
 parent component is `Ex035_TabsComposition.razor` and the child it cascades to
-is `Ex035_TabsComposition_Tab.razor` (also used by ex028, ex029, ex030). This
-keeps every file belonging to one exercise sorted and grouped together on
+is `Ex035_TabsComposition_Tab.razor`. This same `_<Part>` naming convention —
+not a shared file — is also used by ex028, ex029 and ex030, each with its own
+part file (`Ex028_CascadingValueBasics_Label.razor`,
+`Ex029_NamedCascadingValue_Label.razor`, `Ex030_ComponentComposition_Item.razor`).
+This keeps every file belonging to one exercise sorted and grouped together on
 disk, and applies identically in `exercises/`, `solutions/`, and `tests/`.
 
 **`_support/` is a fixture folder, not an exercise.** Both `exercises/` and
