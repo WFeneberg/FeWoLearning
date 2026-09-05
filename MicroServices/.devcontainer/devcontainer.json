@@ -1,0 +1,60 @@
+// KNOWN-UNVERIFIED (2026-09-05): this file parses (`devcontainer read-configuration`
+// succeeds) and its base image and postCreateCommand channel were independently
+// confirmed correct, but the container itself has never been built to completion
+// on this machine, so docker-outside-of-docker and the track's tests have never
+// been proven to work inside it. `devcontainer up` was run five separate times
+// (three earlier ones were duplicate/concurrent invocations killed once
+// discovered; the final, clean, solo run was watched across five bounded ~9-minute
+// stretches, ~45 minutes total, per-agreement with the task coordinator). Every
+// attempt hung at the identical point: the `docker-outside-of-docker` feature's
+// `apt-get update` RUN step, after printing "Get:12 ... security.ubuntu.com ...
+// Packages [1786 kB]" at "4.147s" of the step's own internal clock — and then zero
+// further output for the full ~45-minute observation window, with the underlying
+// node process still alive but producing nothing. This is a genuine hang, not
+// slow-but-progressing apt: a control-plane probe (`apt-get update` run directly
+// in a plain `mcr.microsoft.com/devcontainers/dotnet:1-10.0` container) completed,
+// slowly, with visible `Ign:`/`Get:` retries — so the mirrors are reachable in
+// general, but this particular feature-layer build's connection to them stalls
+// without ever timing out. Because BuildKit only caches completed layers, no
+// interrupted attempt banks any progress toward the next. The container was never
+// created (confirmed via `docker ps -a --filter label=devcontainer.local_folder`
+// after every attempt), so steps 4 and 5 of task-4-brief.md (docker-outside-of-
+// docker reaching the host daemon; `dotnet test` inside the container) were never
+// run. Independently verified facts that ARE trustworthy: the base image tag
+// `mcr.microsoft.com/devcontainers/dotnet:1-10.0` exists and is the correct .NET
+// 10 / Ubuntu 24.04 "noble" devcontainer image (`dev.containers.release=v0.4.19`,
+// confirmed via `docker manifest inspect` and a real, successful 2.9GB pull); and
+// `@microsoft/aspire-cli` on npm is the correct install channel for the Aspire CLI
+// (its own `bin` entry is `aspire`, so `npm install -g` puts it on PATH) — neither
+// of those was the problem. See task-4-report.md in
+// .superpowers/sdd/2026-09-05-microservices-track/ for the full account, and
+// MicroServices/README.md (added by Task 5) for where this should be recorded
+// track-wide once that file exists. Whoever revisits this: try building on a
+// machine/network path with a healthier route to archive.ubuntu.com and
+// security.ubuntu.com, or pin the feature to a version that vendors its packages,
+// before assuming the devcontainer.json itself is at fault.
+{
+  "name": "FeWoLearning MicroServices",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-10.0",
+
+  // docker-OUTSIDE-of-docker, not docker-in-docker: Aspire starts sibling
+  // containers on the host daemon. Nesting them breaks Aspire's port handling.
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+
+  // 18888 is the Aspire dashboard.
+  "forwardPorts": [18888],
+  "portsAttributes": {
+    "18888": { "label": "Aspire dashboard", "onAutoForward": "notify" }
+  },
+
+  "postCreateCommand": "npm install -g @microsoft/aspire-cli && dotnet restore",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-dotnettools.csdevkit"]
+    }
+  }
+}
