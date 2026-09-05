@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 20 ✅ / 80 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -64,11 +64,11 @@ Two deliberate content gaps:
 | 018 | ConverterParameterAndCulture | `ConverterParameter`, `ConverterCulture` | ✅ |
 | 019 | MultiBinding | `MultiBinding`, `IMultiValueConverter` | ✅ |
 | 020 | RequerySuggested | `CommandManager.InvalidateRequerySuggested`, weak handler storage | ✅ |
-| 021 | RoutedCommandBinding | `RoutedCommand`, `CommandBinding`, `ApplicationCommands` | ⬜ |
-| 022 | StyleSetters | `Style`, `Setter`, applying a style in code | ⬜ |
-| 023 | ImplicitStyleByType | `TargetType` style keyed by type in a dictionary | ⬜ |
-| 024 | StyleBasedOn | `BasedOn` inheritance and setter override order | ⬜ |
-| 025 | StaticVersusDynamicResource | swap a resource at runtime; only `DynamicResource` follows | ⬜ |
+| 021 | RoutedCommandBinding | `RoutedCommand`, `CommandBinding`, `ApplicationCommands` | ✅ |
+| 022 | StyleSetters | `Style`, `Setter`, applying a style in code | ✅ |
+| 023 | ImplicitStyleByType | `TargetType` style keyed by type in a dictionary | ✅ |
+| 024 | StyleBasedOn | `BasedOn` inheritance and setter override order | ✅ |
+| 025 | StaticVersusDynamicResource | swap a resource at runtime; only `DynamicResource` follows | ✅ |
 | 026 | MergedResourceDictionaries | `MergedDictionaries`, lookup order, last-wins | ⬜ |
 | 027 | DataTrigger | `Style.Triggers`, `DataTrigger`, `MultiDataTrigger` | ⬜ |
 | 028 | MeasureArrangeContract | `MeasureOverride`/`ArrangeOverride`, `DesiredSize` vs `RenderSize` | ⬜ |
