@@ -1,0 +1,321 @@
+# MicroServices — Exercise Track
+
+## 1. What this track is
+
+100 graded exercises on **microservices in .NET with Aspire**, following the repo's
+universal exercise pattern: a stub that fails red before implementation and passes
+green once it matches its reference solution.
+
+**"Beginner" means Aspire and distributed-systems beginner, not C# beginner.** `ex001`
+models a resource graph; it is not a `FizzBuzz`. Plain C# language drills belong to
+`dotnet/`; ASP.NET Core component work belongs to `blazor/`.
+
+Four subjects the track owner asked for are taught together because in practice they
+are one subject: **Aspire orchestration**, **polyglot persistence** (SQL Server,
+PostgreSQL, MongoDB, Redis, Valkey, Garnet, Qdrant, Milvus, Elasticsearch, MySQL,
+Oracle, Cosmos DB and Azure Storage), **Docker**, and **Azure** — all of it runnable on
+one developer machine, optionally inside the DevContainer, and **entirely offline for
+the Azure rows**: emulators plus generated artifacts, no subscription, no `az login`,
+no `azd up`.
+
+`catalog.md` is the source of truth for what is written and what is next. The folder is
+`MicroServices/` — capitalised, unlike every other track folder. That is the owner's
+deliberate choice; do not "fix" it.
+
+## 2. Prerequisites
+
+- **.NET 10 SDK** — 10.0.400 verified.
+- **nuget.org reachable** on first restore.
+- **Docker** — only for the 🐳 rows. The default `dotnet test` needs no daemon at all.
+  Docker 29.7.2 (Linux containers) and Compose v5.5.0 verified on this machine.
+- **Aspire CLI** — only for `aspire run`. 13.4.6 verified; the CLI being one patch
+  behind the 13.5.3 packages does not matter.
+- **Azure CLI is not required and not installed.** Nothing in the track calls a
+  subscription.
+
+## 3. Commands
+
+Run every command **from inside `MicroServices/`**, not the repo root.
+
+| Command | Effect |
+|---|---|
+| `dotnet test` | the **red** run: stubs, L1 + L2 only, L3 skipped |
+| `dotnet test -p:UseSolutions=true` | the **green** run: the same facts against `solutions/` |
+| `dotnet test -p:Containers=true` | adds the L3 rows — real containers, real queries |
+| `dotnet test --filter FullyQualifiedName~Ex001_` | one exercise |
+| `aspire run --project playground -- --exercise ex001` | run that exercise's model in the real Aspire dashboard |
+
+The last two combine with `-p:UseSolutions=true` and `-p:Containers=true` freely.
+
+There is no separate install step — `dotnet test` restores on first run.
+
+**Current measured state** (scaffolding only, no exercises seeded yet):
+
+```
+dotnet test                    →  4 passed, 1 skipped
+dotnet test -p:Containers=true →  5 passed, 0 skipped
+```
+
+The skipped one is the harness's own container-gate fact. It is the canary: if it ever
+*passes* under the default run, the gate has stopped gating.
+
+### `-p:Containers=true`, and the no-rebuild alternative
+
+`-p:Containers=true` reaches the test process through a
+`RuntimeHostConfigurationOption` in `tests/…csproj`, i.e. through
+`runtimeconfig.json`, so it requires a build. Setting `FEWO_MS_CONTAINERS=1` in the
+environment does the same thing without one.
+
+The gate deliberately checks **only the switch**, never whether Docker is reachable.
+With the switch on and no daemon the L3 tests **fail**, loudly. A broken Docker setup
+must not be able to masquerade as a green run by silently skipping.
+
+## 4. The three test levels
+
+| Level | Asserts | Cost | Runs |
+|---|---|---|---|
+| **L1 model** | the resource graph: types, `ConnectionStringExpression`, annotations | ~1.4 s | always |
+| **L2 artifact** | `aspire-manifest.json`, generated in-process | ~3.7 s, no container | always |
+| **L3 container** | a real database starts and a real query, message or expiry happens | minutes | opt-in |
+
+**What L1 can prove.** `DistributedApplication.CreateBuilder(...)` + `Build()` produces
+the complete model in ~1.4 s with **zero containers started**, and that model is rich
+enough to grade against: resource types, per-resource annotations (`WaitAnnotation`,
+`HealthCheckAnnotation`, `ContainerImageAnnotation`, `EndpointAnnotation`,
+`EnvironmentCallbackAnnotation`, `ContainerMountAnnotation`), and
+`ConnectionStringExpression.ValueExpression`, which differs per database flavour. That
+last one is what lets a test prove the learner wired up *PostgreSQL* rather than *some
+container*. `ModelHarness` in `tests/_support/` is the entry point.
+
+**What L1 cannot prove.** That anything resolves, connects, or runs. Every value in the
+graph is still an unresolved expression like `{pg.bindings.tcp.host}`.
+
+**What L2 can prove.** The manifest carries, per resource: `type` (`container.v0`,
+`value.v0`, `parameter.v0`, `dockerfile.v0`, `azure.bicep.v0`), `image` with the pinned
+tag, the full `env` map including `ConnectionStrings__*`, `bindings` with `targetPort`,
+and for generated secrets the `inputs.value.default.generate` policy. It is
+deterministic, so it is a good assertion target for publish-shaped rows.
+`ManifestHarness` is the entry point.
+
+**What L2 cannot prove.** Docker Compose YAML — see §6.
+
+**What L3 is for.** Only the things a real run proves: migrations actually applying, a
+Mongo aggregation actually returning documents, an index actually being *used*, an
+outbox actually delivering, a Redis key actually expiring. **25 of the 100 rows** are
+L3, marked 🐳 in `catalog.md`. Everything else stays in the fast loop.
+
+## 5. How an exercise works
+
+Each exercise is a static class exposing at minimum:
+
+```csharp
+public static class Ex037_EfCoreAgainstPostgres
+{
+    public static void Configure(IDistributedApplicationBuilder builder)
+        => throw new NotImplementedException("TODO: ex037 — …");
+}
+```
+
+Rows whose subject includes application code (an EF Core model, a Mongo aggregation, an
+outbox dispatcher) expose further members alongside `Configure`. **Stubs throw
+`NotImplementedException`; the projects still compile.** A stub that fails to build is a
+bug, not an exercise.
+
+Because `Configure` takes an `IDistributedApplicationBuilder`, the code the tests grade
+is exactly the code the dashboard runs — `playground/` is one AppHost that dispatches to
+an exercise by name via `ExerciseRegistry`, instead of 100 executable AppHost projects.
+**Add the registry line in the same commit as the exercise.**
+
+`services/` holds a small fixed set of real ASP.NET Core projects (Catalog, Orders, and
+their siblings) shared by rows that need a genuine HTTP service to reference. They are
+not exercises, get no catalog rows, and change rarely. `tests/_support/` is the same
+kind of thing on the test side: shared fixtures, never a TODO, never a catalog row.
+
+### `solutions/` is in the build here — deliberately
+
+`exercises/` and `solutions/` compile **the same type names into the same namespaces**,
+and `tests/` references exactly one of them via the `UseSolutions` MSBuild property,
+never both — so the collision the repo-wide "`solutions/` outside the build" convention
+exists to prevent cannot occur. This is the same permanent waiver `blazor/`, `uno/`,
+`wpf/`, `caliburn/` and `avalonia/` take, and the payoff is that reference solutions are
+compile-checked and test-run on every green check and cannot drift silently.
+
+`Directory.Build.props` redirects the solutions build through
+`UseArtifactsOutput`/`ArtifactsPath`. That is **required, not cosmetic**: two projects
+emitting the same generated assembly-info attributes into one `obj/` tree fails the
+build with `CS0579`. It has to live in `Directory.Build.props`, because
+`BaseOutputPath`/`BaseIntermediateOutputPath` set inside a `.csproj` body are read after
+the SDK props import — too late.
+
+Namespaces are pinned per tier
+(`FeWoLearning.MicroServices.Exercises.Beginner/.Intermediate/.Advanced/.Expert`),
+because `01-beginner` is not a valid C# identifier.
+
+## 6. Traps measured while building this track
+
+Each of these cost real time. None is a guess.
+
+- **`aspire publish` never exits in a non-interactive shell.** It writes its artifacts
+  and then drops into "press CTRL+C to stop the AppHost" — still running at 200 s and at
+  600 s. It is unusable inside a test loop. Use the in-process path instead:
+  constructing the builder with `Args = ["--operation", "publish", "--output-path", dir]`
+  and awaiting `RunAsync` returns cleanly in **≈3.7 s** and writes
+  `aspire-manifest.json`. That is what `ManifestHarness` does and what L2 asserts
+  against.
+- **Docker Compose YAML is not obtainable in-process.** Every argument combination tried
+  (`--publisher default`, `--publisher compose`, no publisher, with and without
+  `--operation publish`) produced the manifest and nothing else, because the compose file
+  is emitted by a pipeline the CLI drives. Rows 086–090 therefore assert against a
+  **committed golden `docker-compose.yaml`**, generated once at authoring time with the
+  CLI and checked in. The graded claim is that the learner's model is consistent with
+  that file — not that the test re-runs the CLI.
+- **Two compute environments without assignment is a hard failure.** Declaring both
+  `AddDockerComposeEnvironment` and `AddAzureContainerAppEnvironment` without assigning
+  resources fails the `validate-compute-environments` pipeline step: *"Compute
+  resource(s) … are not assigned to a compute environment, but the model contains
+  multiple compute environments"*. Row 095 is built on exactly this.
+- **`FactAttribute.Skip` is not virtual in xunit.v3 3.2.2.** The usual custom
+  `[ContainerFact] : FactAttribute` that overrides `Skip` does not compile — `CS0506`.
+  The gate is therefore a `ContainerGate.Require()` call as the **first line of the test
+  body**, using `Assert.SkipUnless`. If a future bump makes `Skip` virtual, the attribute
+  form becomes available again; until then, do not try to reintroduce it.
+- **`NU1603` silently upgrades the test runner.** `xunit.runner.visualstudio` has **no
+  3.1.6 and no 3.1.7** — 3.1.5 is the last 3.x and the next version is 4.0.0. Naming a
+  3.x that does not exist does not fail the build: NuGet resolves *forward* to 4.0.0 with
+  only an `NU1603` warning, quietly landing the project on the runner generation this
+  track is avoiding. Treat `NU1603` here as an error, not noise.
+
+## 7. Pinned versions
+
+| Package | Version | Where |
+|---|---|---|
+| `Aspire.Hosting` + all `Aspire.Hosting.*` integrations | 13.5.3 | `exercises/` + `solutions/` |
+| `Aspire.Hosting.Elasticsearch` | **13.3.0** | `exercises/` + `solutions/` |
+| `Aspire.Hosting.Testing` | 13.5.3 | `tests/` |
+| `xunit.v3` | 3.2.2 | `tests/` |
+| `xunit.runner.visualstudio` | 3.1.5 | `tests/` |
+| `Microsoft.NET.Test.Sdk` | 17.14.1 | `tests/` |
+
+### The Elasticsearch version lag is deliberate
+
+`Aspire.Hosting.Elasticsearch`'s latest stable is **13.3.0** while every sibling
+integration is at 13.5.3. It is pinned at 13.3.0 on purpose. It has not been silently
+bumped to a version that does not exist, and the Elasticsearch row (051) has not been
+silently dropped to make the version table tidy. If a 13.5.x ever ships, bumping it is a
+one-line change — until then this asymmetry is expected, and a reviewer seeing it should
+read this paragraph rather than "fix" it.
+
+### Why xunit.v3 4.0.0 plus an MTP `global.json` is forbidden here
+
+`dotnet test` must work, because that is the command every other track documents. Two
+configurations were measured:
+
+| Configuration | Result |
+|---|---|
+| xunit.v3 **4.0.0** + `global.json` `{"test":{"runner":"Microsoft.Testing.Platform"}}` | ❌ exit code 5, zero tests discovered |
+| xunit.v3 **3.2.2** + `xunit.runner.visualstudio` **3.1.5**, **no** `global.json` | ✅ discovered and passed, 415 ms, no warnings |
+
+Under the failing configuration the xunit MTP runner printed its own **usage text**: the
+.NET 10 SDK's `dotnet test` bridge passes it options it does not accept. The test
+*executables* run correctly in both configurations — only the `dotnet test` bridge is
+affected, which is precisely the path that matters.
+
+So this track pins **xunit.v3 3.2.2 on the classic VSTest path and ships no
+`global.json`**, the same generation `avalonia/` and `caliburn/` run. **Do not add a
+`global.json` to `MicroServices/`.**
+
+## 8. DevContainer
+
+`MicroServices/.devcontainer/devcontainer.json`, on
+`mcr.microsoft.com/devcontainers/dotnet:1-10.0`. It works under Rider as well as VS
+Code — JetBrains IDEs read `devcontainer.json`.
+
+**Verified end-to-end** with `@devcontainers/cli` 0.89.0, on a fresh rebuild
+(`devcontainer up --remove-existing-container`), not shipped on faith:
+
+- builds to `{"outcome":"success"}` in **~85 seconds**, almost all of it `dotnet restore`;
+- `docker ps` inside works as the non-root `vscode` user **without `sudo`**, and lists the
+  host's own pre-existing containers — the decisive proof that sibling containers land on
+  the **host** daemon rather than nested;
+- `dotnet test` inside gives **4 passed / 1 skipped**, matching the host exactly.
+
+### It does not use the `docker-outside-of-docker` or `node` features
+
+Both fail on this network during the build with `NO_PUBKEY 62D54FD4003F6525` while apt
+verifies a third-party repository's signature — corporate TLS interception without the
+corporate root CA present inside the build environment. Ubuntu's own repos and plain
+HTTPS are unaffected, and the feature's `"moby": false` option fails identically. With
+no features at all the same image comes up in 12 seconds, so the CLI, the image tag and
+Docker itself are all fine.
+
+The apt-free replacement, in `postCreateCommand`, uses only plain HTTPS downloads —
+no apt repo, no GPG keyserver:
+
+- the **host Docker socket bind-mounted** directly (`/var/run/docker.sock`), plus a
+  version-pinned **static `docker` client** (29.8.0) from `download.docker.com`'s
+  static-binary channel. Client only: no daemon, no docker-in-docker;
+- a version-pinned **static Node** (v24.20.0) tarball from `nodejs.org`, extracted into
+  `/usr/local`, because the base image ships no node/npm at all;
+- `npm install -g @microsoft/aspire-cli` on that npm.
+
+Port **18888** (the Aspire dashboard) is forwarded.
+
+### Caveat: the socket `chmod`
+
+`postStartCommand` runs `sudo chmod 666 /var/run/docker.sock` on **every start**. The
+bind-mounted socket arrives `root:root` mode `660`, so `vscode` — and Aspire, and every
+exercise, all of which call `docker` without `sudo` — gets "permission denied" without
+it. It has to be `postStartCommand` rather than `postCreateCommand` because the file is
+the *host's*, and its mode is not owned by this container.
+
+**This is looser than the usual alternative** of adding the user to a docker group and
+leaving the socket at 660: mode 666 makes the host's Docker socket world-writable for the
+lifetime of the container, and anyone who can write that socket is effectively root on
+the host. It is recorded here rather than buried in a comment because a reviewer raised
+it and anyone adopting this setup should decide about it consciously. On this machine it
+is an accepted trade-off (`vscode` already has passwordless `sudo` from the base image,
+so it introduces no new privilege boundary *for that user*); on a shared or multi-tenant
+host it is not, and the group-based route should be used instead.
+
+## 9. Rules for whoever adds the next exercise
+
+Read `catalog.md` first — it is the work queue, not the disk. Work in **batches of
+five**, per the root `CLAUDE.md`: stub + test + solution, red-check filtered to the five,
+green-check with `-p:UseSolutions=true`, register each in `playground/ExerciseRegistry`,
+flip exactly those five catalog rows and the `**Status:**` line, commit as
+`MicroServices: exNNN–exNNN`. Full-suite runs happen once per completed tier, not per
+batch.
+
+Three rules are specific to this track.
+
+**1. Rendered connection data does not prove the mechanism.** This is the recurring bug
+class here. A test asserting that "a Postgres-ish container is in the model" is satisfied
+just as happily by `AddContainer("pg", "postgres")` as by `AddPostgres("pg")` — so it
+grades nothing. Every persistence row must assert **both** the resource *type*
+(`PostgresDatabaseResource`, `SqlServerDatabaseResource`, `MongoDBDatabaseResource`, …)
+**and** the `ConnectionStringExpression`, which differs per flavour:
+
+```
+pg      :: PostgresServerResource    :: Host={pg.bindings.tcp.host};Port=…;Username=postgres;Password={pg-password.value}
+orders  :: PostgresDatabaseResource  :: {pg.connectionString};Database=orders
+sql     :: SqlServerServerResource   :: Server={sql.bindings.tcp.host},…;User ID=sa;…;TrustServerCertificate=true
+catalog :: SqlServerDatabaseResource :: {sql.connectionString};Initial Catalog=catalog
+mongo   :: MongoDBServerResource     :: mongodb://admin:{mongo-password.value}@…/?authSource=admin&authMechanism=SCRAM-SHA-256
+```
+
+The rule generalises: a `WaitFor` row asserts `WaitAnnotation`s, not that the app
+started; a health-check row asserts `HealthCheckAnnotation`, not a 200 response; a
+Dockerfile row asserts `dockerfile.v0`, not that an image exists.
+
+**2. Always ask what a wrong implementation would do.** Before trusting any test, ask
+whether a naive or incorrect implementation would still pass it. The distributed subject
+matter makes this *more* necessary, not less: an assertion about eventual consistency
+that never advances time, or about a message being consumed that never waits for
+delivery, passes against almost anything. Prefer bounded polling with a deadline over
+`Thread.Sleep`, and assert the *mechanism* (partition ids, `explain()` output, the
+compensating event, the dedupe row) rather than only the answer.
+
+**3. Do not guess API shapes.** Aspire 13's surface has moved considerably and tutorial
+material is frequently wrong about it. The CLI ships `aspire docs search` and
+`aspire docs api search --language csharp` — use them rather than inventing builder
+methods, package names or overloads.
