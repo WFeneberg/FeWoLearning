@@ -29,6 +29,17 @@ public class Ex036_ParentChildRelationshipTests : CaliburnCoreContext
     }
 
     [Fact]
+    public void GetParentConductor_Returns_Null_When_Parent_Is_Set_But_Is_Not_An_IConductor()
+    {
+        var subject = new Ex036_ParentChildRelationship();
+        // A wrong implementation that hard-casts child.Parent to IConductor instead of using
+        // "as" would throw an InvalidCastException here instead of returning null.
+        var child = new Ex036_Child { Parent = new object() };
+
+        Assert.Null(subject.GetParentConductor(child));
+    }
+
+    [Fact]
     public async Task RequestCloseAsync_Closes_The_Child_Through_Its_Parent_Conductor()
     {
         var subject = new Ex036_ParentChildRelationship();

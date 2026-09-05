@@ -11,8 +11,11 @@
 //
 // Measured on this machine (Caliburn.Micro 5.0.258): PublishAsync's marshal is invoked exactly
 // once per PublishAsync call regardless of how many subscribers or IHandle<T> implementations
-// end up delivered to inside it - and it is invoked even when nobody is subscribed at all, since
-// the aggregator has no way of knowing that in advance without running the marshal.
+// end up delivered to inside it - and it is invoked even when nobody is subscribed at all.
+// PublishAsync already snapshots the handler list before ever calling the marshal, so it COULD
+// skip the call when that snapshot is empty; running it unconditionally is a design choice, not
+// a technical necessity - it is what lets a caller's marshal reliably wrap "this publish
+// happened", not merely "this publish reached somebody".
 
 using System.Threading;
 using Caliburn.Micro;

@@ -8,13 +8,17 @@
 //         ex033/ex034 used it directly from the conductor's side.
 // Passes: dotnet test --filter FullyQualifiedName~Ex036_
 //
-// Measured on this machine (Caliburn.Micro 5.0.258): activating an item into an ACTIVE
-// Conductor<T> sets that item's IChild.Parent to the conductor itself - object-typed, because
-// IChild only ever knows its parent AS an object, not as any particular conductor shape. A
-// never-activated item's Parent stays null. IConductor's own surface has no CloseItemAsync at
-// all: the only way to close an item, from either side of the relationship, is
-// DeactivateItemAsync(item, close: true, ...), and it still asks the item's own CanCloseAsync
-// first - a refusing child stays exactly where it was, precisely as ex033/ex034 measured.
+// Measured on this machine (Caliburn.Micro 5.0.258): activating an item into a Conductor<T>
+// sets that item's IChild.Parent to the conductor itself - object-typed, because IChild only
+// ever knows its parent AS an object, not as any particular conductor shape - regardless of
+// whether the conductor itself is active; only the item's own IsActive differs on that account.
+// A never-activated item's Parent stays null. IConductor the INTERFACE declares only
+// ActivateItemAsync and DeactivateItemAsync; CloseItemAsync exists too, but as a
+// ScreenExtensions extension method (same Caliburn.Micro namespace every file here already
+// imports) that forwards to DeactivateItemAsync(item, close: true) - the same interface-vs-
+// extension split ex037 measures for IEventAggregator. Either spelling still asks the item's
+// own CanCloseAsync first - a refusing child stays exactly where it was, precisely as
+// ex033/ex034 measured.
 
 using System.Threading;
 using Caliburn.Micro;

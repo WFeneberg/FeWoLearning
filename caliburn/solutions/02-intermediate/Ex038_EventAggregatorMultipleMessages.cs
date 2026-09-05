@@ -3,7 +3,10 @@
 //         IHandle<T> interface the subscriber implements at once, and each keeps receiving
 //         independently of how many times the others are published.
 // Drills: subscribing an object that implements two different IHandle<T> interfaces through a
-//         single Subscribe call, and confirming both types are covered via HandlerExistsFor.
+//         single Subscribe call; and computing, from a candidate list of message types, exactly
+//         which ones the aggregator currently has a handler for - so the "one call covers many
+//         types" claim is something the learner demonstrates, not just something ex037's
+//         Subscribe wrapper is told to repeat.
 // Passes: dotnet test --filter FullyQualifiedName~Ex038_
 
 using System.Threading;
@@ -16,6 +19,10 @@ public class Ex038_EventAggregatorMultipleMessages
     /// <summary>Subscribes subscriber to the aggregator - one call, covering every IHandle&lt;T&gt; interface it implements.</summary>
     public void SubscribeToAll(IEventAggregator aggregator, object subscriber) =>
         aggregator.Subscribe(subscriber, deliver => deliver());
+
+    /// <summary>Filters candidates down to just the ones aggregator currently has a handler for, preserving candidates' order.</summary>
+    public IReadOnlyList<Type> CoveredMessageTypes(IEventAggregator aggregator, IEnumerable<Type> candidates) =>
+        candidates.Where(aggregator.HandlerExistsFor).ToList();
 }
 
 public class Ex038_Ping;

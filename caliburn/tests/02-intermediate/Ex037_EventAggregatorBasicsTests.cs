@@ -18,6 +18,7 @@ public class Ex037_EventAggregatorBasicsTests : CaliburnCoreContext
 
         Assert.Equal(1, subscriber.ReceivedCount);
         Assert.Same(message, subscriber.LastMessage);
+        Assert.Equal("hello", subscriber.LastMessage?.Text);
     }
 
     [Fact]
@@ -71,5 +72,9 @@ public class Ex037_EventAggregatorBasicsTests : CaliburnCoreContext
         subject.Subscribe(aggregator, subscriber);
 
         Assert.True(aggregator.HandlerExistsFor(typeof(Ex037_PingMessage)));
+
+        // subscriber itself is never read again after Subscribe above - without this, a JIT
+        // that treats its local as dead here could make it collectible before the assert runs.
+        GC.KeepAlive(subscriber);
     }
 }
