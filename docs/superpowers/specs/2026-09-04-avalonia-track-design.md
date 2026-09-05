@@ -110,6 +110,50 @@ Two related facts measured at the same time:
   `RxApp.MainThreadScheduler`, the replacements are `AvaloniaScheduler` / `RxSchedulers`
   from `ReactiveUI.Avalonia`, alongside Avalonia's own `Dispatcher.UIThread`.
 
+### 2.3 The MVVM plumbing, as it actually is in ReactiveUI 24
+
+Measured on 2026-09-05. Everything ex046–ex050 needs exists, but two pieces differ
+from every published example.
+
+Working as documented:
+
+- **`Interaction<TInput, TOutput>`** with `RegisterHandler(ctx => ctx.SetOutput(...))`.
+  Calling `Handle(...)` with **no** handler registered throws
+  `UnhandledInteractionException<,>` — an excellent discriminator, since a solution
+  that never registers a handler fails loudly rather than silently.
+- **`IActivatableViewModel` + `ViewModelActivator` + `WhenActivated`** (from
+  `ReactiveUI.ViewForMixins`). Measured: activation count went 0 → 1 when the view was
+  shown in a headless window. `ReactiveUserControl<TViewModel>` and
+  `ReactiveWindow<TViewModel>` both exist in `ReactiveUI.Avalonia`.
+- **No ReactiveUI validation helpers exist**, so ex047 is plain `INotifyDataErrorInfo`
+  with no extra package — which is what its catalog row already says.
+
+The two that differ:
+
+- **`ViewModelViewHost` resolves nothing by default.** With a view model assigned and
+  no registration, `host.Content` measured `null`. ReactiveUI 24's view registration
+  is **builder-time** (`IReactiveUIBuilder.RegisterView<TView, TViewModel>()`), and
+  there is no `AppLocator` type — that name appears in the assembly but resolves to
+  nothing. Registering globally from the harness is the wrong answer anyway: the test
+  harness must stay ignorant of exercise types.
+
+  The self-contained answer, measured working: set an explicit `IViewLocator` on the
+  host. `ViewModelViewHost` exposes settable `ViewModel` (object), `ViewContract`
+  (string) and `ViewLocator` (`IViewLocator`), and with a hand-written locator the
+  content resolved correctly. That also makes the resolution mechanism explicit rather
+  than magic, which is the better exercise.
+- **`IViewLocator` has four members, not one**, and the generic ones return a generic
+  view and require a reference-type constraint. This compiles; nothing else does:
+
+      IViewFor<TViewModel>? ResolveView<TViewModel>() where TViewModel : class;
+      IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract) where TViewModel : class;
+      IViewFor? ResolveView(object? viewModel);
+      IViewFor? ResolveView(object? viewModel, string? contract);
+
+  Classic ReactiveUI's single `ResolveView<T>(T viewModel, string contract)` does not
+  exist. Omitting `where TViewModel : class` is CS0425/CS0452, and returning a
+  non-generic `IViewFor` from the generic overloads is CS0738.
+
 ### 2.1 Seven constraints discovered by the probe
 
 A throwaway probe in the scratchpad — a ReactiveUI view model plus a real
