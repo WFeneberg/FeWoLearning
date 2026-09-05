@@ -1,0 +1,17 @@
+@page "/expert/100"
+@rendermode InteractiveServer
+
+<h1>Exercise 100 - StreamingSsrCapstone</h1>
+
+<p>The load takes a second, so the placeholder is on screen first and the panel is
+   replaced - not patched - when the data lands.</p>
+
+<Ex100_StreamingSsrCapstone Load="LoadSlowlyAsync" />
+
+@code {
+    private static async Task<IReadOnlyList<string>> LoadSlowlyAsync()
+    {
+        await Task.Delay(1000);
+        return ["alpha", "beta", "gamma"];
+    }
+}

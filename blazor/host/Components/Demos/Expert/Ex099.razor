@@ -1,0 +1,24 @@
+@page "/expert/099"
+@rendermode InteractiveServer
+
+<h1>Exercise 099 - DiffAlgorithmKeyMismatch</h1>
+
+<p>Reorder keeps every row; renaming one key rebuilds that row alone - watch its
+   tick count go back to zero while its neighbours keep theirs.</p>
+
+<button id="reorder" @onclick="Reorder">reorder</button>
+<button id="rename" @onclick="RenameFirstKey">rename the first key</button>
+
+<Ex099_DiffAlgorithmKeyMismatch Rows="_rows" />
+
+@code {
+    private List<Ex099_DiffAlgorithmKeyMismatch.RowSpec> _rows =
+    [
+        new("a", "alpha"), new("b", "beta"), new("c", "gamma"),
+    ];
+
+    private void Reorder() => _rows = [.. _rows.Skip(1), _rows[0]];
+
+    private void RenameFirstKey()
+        => _rows = [_rows[0] with { Key = _rows[0].Key + "!" }, .. _rows.Skip(1)];
+}

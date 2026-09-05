@@ -1,0 +1,24 @@
+@page "/expert/096"
+@page "/expert/096/{*Rest}"
+@rendermode InteractiveServer
+
+<h1>Exercise 096 - CustomRouterFallback</h1>
+
+<p>Try <a href="/expert/096/about">/about</a>, <a href="/expert/096/contact">/contact</a>,
+   or <a href="/expert/096/nowhere">/nowhere</a>. The catch-all only sees what the
+   routes did not claim.</p>
+
+<Ex096_CustomRouterFallback Routes="_routes" CatchAll="_catchAll" NotFound="_notFound" />
+
+@code {
+    [Parameter] public string? Rest { get; set; }
+
+    private readonly Dictionary<string, RenderFragment> _routes = new()
+    {
+        ["expert/096/about"] = @<p class="page">the about page</p>,
+        ["expert/096/contact"] = @<p class="page">the contact page</p>,
+    };
+
+    private readonly RenderFragment _catchAll = @<p class="page">nothing claimed this path</p>;
+    private readonly RenderFragment _notFound = @<p class="page">not found</p>;
+}

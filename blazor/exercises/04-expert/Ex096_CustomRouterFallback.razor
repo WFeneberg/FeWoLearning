@@ -1,0 +1,52 @@
+@implements IDisposable
+@* Exercise 096 - Custom Router Fallback (expert).
+   Goal:   Decide what a hand-rolled router shows when nothing matches - and get the
+           order of that decision right.
+   Drills: a three-step fallback (exact route, then catch-all, then not-found), and
+           re-deciding it on every navigation. ex095 was the matching; this is what
+           happens when matching fails.
+   Passes: dotnet test --filter FullyQualifiedName~Ex096_ *@
+@if (Content is not null)
+{
+    @Content
+}
+
+@code {
+    /// What was chosen for the current path.
+    public enum Choice { Route, CatchAll, NotFound, Nothing }
+
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    /// Exact paths (no parameters here - ex095 is the matcher) to their content.
+    [Parameter] public IReadOnlyDictionary<string, RenderFragment> Routes { get; set; }
+        = new Dictionary<string, RenderFragment>();
+
+    /// Shown for a path no route claims. Optional.
+    [Parameter] public RenderFragment? CatchAll { get; set; }
+
+    /// Shown when there is no route and no catch-all either. Optional.
+    [Parameter] public RenderFragment? NotFound { get; set; }
+
+    public RenderFragment? Content { get; private set; }
+
+    public Choice Chosen { get; private set; } = Choice.Nothing;
+
+    // TODO: pick Content and Chosen for the current path, and pick again whenever it
+    // changes.
+    //   - The path is Navigation.ToBaseRelativePath(Navigation.Uri) with any query
+    //     cut off and the slashes trimmed; compare it against the keys of Routes
+    //     case-insensitively.
+    //   - Order matters and is the point: an exact route wins outright, THEN the
+    //     catch-all, THEN NotFound. A router that reaches for the catch-all before
+    //     checking the routes answers every request with it and still looks fine on
+    //     an unknown path.
+    //   - Nothing at all is a legitimate outcome: no route, no catch-all, no
+    //     not-found - Content stays null and Chosen is Nothing.
+    //   - Subscribe to LocationChanged so a navigation re-decides, and unsubscribe
+    //     in Dispose.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex096 - choose the content for the current path");
+
+    public void Dispose()
+        => throw new NotImplementedException("TODO: Ex096 - stop listening for navigations");
+}

@@ -1,0 +1,96 @@
+@implements IDisposable
+@* Exercise 096 - Custom Router Fallback (expert).
+   Goal:   Decide what a hand-rolled router shows when nothing matches - and get the
+           order of that decision right.
+   Drills: a three-step fallback (exact route, then catch-all, then not-found), and
+           re-deciding it on every navigation. ex095 was the matching; this is what
+           happens when matching fails.
+   Passes: dotnet test --filter FullyQualifiedName~Ex096_ *@
+@if (Content is not null)
+{
+    @Content
+}
+
+@code {
+    /// What was chosen for the current path.
+    public enum Choice { Route, CatchAll, NotFound, Nothing }
+
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    /// Exact paths (no parameters here - ex095 is the matcher) to their content.
+    [Parameter] public IReadOnlyDictionary<string, RenderFragment> Routes { get; set; }
+        = new Dictionary<string, RenderFragment>();
+
+    /// Shown for a path no route claims. Optional.
+    [Parameter] public RenderFragment? CatchAll { get; set; }
+
+    /// Shown when there is no route and no catch-all either. Optional.
+    [Parameter] public RenderFragment? NotFound { get; set; }
+
+    public RenderFragment? Content { get; private set; }
+
+    public Choice Chosen { get; private set; } = Choice.Nothing;
+
+    private EventHandler<LocationChangedEventArgs>? _onLocationChanged;
+
+    protected override void OnInitialized()
+    {
+        _onLocationChanged = (_, _) =>
+        {
+            Decide();
+            StateHasChanged();
+        };
+        Navigation.LocationChanged += _onLocationChanged;
+
+        Decide();
+    }
+
+    protected override void OnParametersSet() => Decide();
+
+    private void Decide()
+    {
+        var path = CurrentPath();
+
+        // The routes get first refusal; the fallbacks only see what is left.
+        var match = Routes.FirstOrDefault(
+            route => string.Equals(route.Key.Trim('/'), path, StringComparison.OrdinalIgnoreCase));
+
+        if (match.Value is not null)
+        {
+            Content = match.Value;
+            Chosen = Choice.Route;
+            return;
+        }
+
+        if (CatchAll is not null)
+        {
+            Content = CatchAll;
+            Chosen = Choice.CatchAll;
+            return;
+        }
+
+        Content = NotFound;
+        Chosen = NotFound is not null ? Choice.NotFound : Choice.Nothing;
+    }
+
+    private string CurrentPath()
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri);
+
+        var query = path.IndexOf('?');
+        if (query >= 0)
+        {
+            path = path[..query];
+        }
+
+        return path.Trim('/');
+    }
+
+    public void Dispose()
+    {
+        if (_onLocationChanged is not null)
+        {
+            Navigation.LocationChanged -= _onLocationChanged;
+        }
+    }
+}

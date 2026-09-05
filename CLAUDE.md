@@ -400,20 +400,20 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 95 / 100 (verified) | 5 |
+| `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 25 / 100 (verified) | 75 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
 
-Every 100-exercise ledger is fully seeded except `avalonia/`, `blazor/`,
-`caliburn/` and `wpf/`, all four still being built out — see the table above
+Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/` and
+`wpf/`, all three still being built out — see the table above
 for exact counts. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
-they can be trusted the way the other six tracks are.
+they can be trusted the way the verified tracks are.
 
-`dotnet/`, `go/`, `vue/`, `python/`, `angular/` and `rust/` are content-complete
-**and verified** (every stub confirmed red, every solution confirmed green,
+`dotnet/`, `go/`, `vue/`, `python/`, `angular/`, `rust/`, `uno/` and `blazor/`
+are content-complete **and verified** (every stub confirmed red, every solution confirmed green,
 by actually running that track's test command). `java/` and `kotlin/` are also
 content-complete — Gradle scaffolds, all 100 stubs' sibling JUnit tests, and
 all 100 reference solutions exist for each — **but nothing in either has ever
@@ -451,11 +451,14 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 95 written exercises — all of `01-beginner`, `02-intermediate` and
-`03-advanced`, plus ex091–ex095 of `04-expert` — carry 366 individual test
-facts; `dotnet test` shows 366 failed/0 passed on the untouched tree and
-`dotnet test -p:UseSolutions=true` shows 366 passed/0 failed (verified
-2026-09-05). Every failure but one traces
+`blazor/` is content-complete: all 100 exercises across all four tiers carry
+393 individual test facts; `dotnet test` shows 393 failed/0 passed on the
+untouched tree and `dotnet test -p:UseSolutions=true` shows 393 passed/0 failed
+(verified 2026-09-05). Two facts go red on an assertion rather than on their
+exercise's `NotImplementedException`, both deliberately and both documented at
+the fact: ex069's generic type constraint and ex100's `[StreamRendering]`
+attribute are properties of the code's *metadata*, which no behaviour can
+prove. Every failure but one traces
 to its own exercise's `NotImplementedException`; the exception is ex069, whose
 subject is a generic *type constraint* that no behaviour can prove (LINQ's
 `Min`/`Max` need none), so it is graded by reading the type parameter's

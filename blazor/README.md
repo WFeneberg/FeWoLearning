@@ -5,8 +5,8 @@
 100 graded exercises on Microsoft's Blazor component model. **"Beginner" means
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
-plain C# language features — those belong to the `dotnet/` track. As of this
-writing, ex001–ex095 are written and verified — the whole of **01-beginner**
+plain C# language features — those belong to the `dotnet/` track. All 100 are
+written and verified — the whole of **01-beginner**
 (ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
 `@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
 the whole of **02-intermediate** (ex036–ex070: `EditForm`/validation, DI and
@@ -16,10 +16,10 @@ of **03-advanced** (ex071–ex090: `ShouldRender`, `@key` diffing, `Virtualize`,
 custom `InputBase<T>` inputs, custom and cross-field validators,
 `DynamicComponent`, authentication state, `IHandleEvent`/`IHandleAfterRender`,
 render modes, render-fragment caching, sections and
-`[SupplyParameterFromQuery]`), plus the first five rows of **04-expert**
-(ex091–ex095: hand-written `RenderTreeBuilder`, `IComponent` without
-`ComponentBase`, a hand-rolled route matcher). ex096–ex100 are catalog rows
-only (⬜) — `catalog.md` is the source of truth.
+`[SupplyParameterFromQuery]`), and **04-expert** (ex091–ex100: hand-written
+`RenderTreeBuilder`, `IComponent` without `ComponentBase`, a hand-rolled router,
+fragment composition in code, the diff and its keys, and a streaming-SSR
+capstone). `catalog.md` is the source of truth.
 
 ## 2. Prerequisites
 
@@ -37,7 +37,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 366 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 393 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -447,7 +447,9 @@ concrete failure modes worth carrying into future batches:
   sequence number per branch, hand-assigning parameters instead of
   `SetParameterProperties`, capturing the previous value after the new one
   landed, and ignoring the `:int` route constraint — each taking down exactly
-  one fact.
+  one fact. And the last five: consulting the catch-all before the routes,
+  `AddMarkupContent` in the text fragment, an `Adapt` that forwards the value
+  unmapped, dropping `SetKey`, and giving both streaming states the same key.
 - **A stub whose TODO is only markup needs a throwing lifecycle method too.**
   ex079's first draft left the `<DynamicComponent>` markup as the TODO and threw
   only from a property one fact touched; the other three failed on a missing
@@ -467,6 +469,20 @@ concrete failure modes worth carrying into future batches:
   that reason — ComponentBase renders once before it ever asks. Its assertions
   now ride along inside the fact that pushes a second time. Any fact about a
   gate must arrange for the gate to be consulted.
+- **`builder.SetKey` overrides the sequence number, in both directions.** ex099
+  and ex100 measure it: a row whose key is unchanged keeps its instance wherever
+  it moves; a row whose key changed is disposed and rebuilt even though nothing
+  else about it did; and in ex100 two states that open the same component at the
+  same sequence number are *still* a replacement because their keys differ. The
+  pairing matters — ex099 also asserts that a plain parameter change under an
+  unchanged key patches rather than rebuilds, or "a changed key rebuilds" would
+  be indistinguishable from "any change rebuilds".
+- **`OpenRegion`/`CloseRegion` is right, and ungradeable here.** Composing
+  fragments without regions was measured against composing them with regions —
+  identical markup and identical component reuse, including when the number of
+  parts changed between renders. ex097 therefore says in its own remarks that
+  real composition code should use regions and that no fact asserts it, rather
+  than requiring something the harness cannot check.
 - **The sequence number is the identity the diff matches on, and that *is*
   observable.** Two branches of a hand-written `BuildRenderTree` that open the
   same component at the same sequence number hand it the same instance across a

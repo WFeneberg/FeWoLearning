@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 95 ✅ / 5 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -131,8 +131,8 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 093 | CustomComponentBaseLifecycle | custom `ComponentBase`-style base class reimplementing `StateHasChanged`/render scheduling | ✅ |
 | 094 | CustomComponentBaseRenderHook | custom base class hooking `SetParametersAsync`/`OnAfterRender` without `ComponentBase` | ✅ |
 | 095 | CustomRouterMatching | custom route-matching logic layered over `Router`, route constraints | ✅ |
-| 096 | CustomRouterFallback | custom not-found/fallback handling in a hand-rolled router component | ⬜ |
-| 097 | RenderFragmentComposedInCode | composing `RenderFragment` values programmatically from delegates | ⬜ |
-| 098 | RenderFragmentComposedTemplates | composing `RenderFragment<T>` templates in code, higher-order fragment functions | ⬜ |
-| 099 | DiffAlgorithmKeyMismatch | reasoning about the render-tree diff algorithm, key mismatches forcing subtree replacement | ⬜ |
-| 100 | StreamingSsrCapstone | streaming SSR semantics, capstone combining `RenderTreeBuilder` and diffing understanding | ⬜ |
+| 096 | CustomRouterFallback | custom not-found/fallback handling in a hand-rolled router component | ✅ |
+| 097 | RenderFragmentComposedInCode | composing `RenderFragment` values programmatically from delegates | ✅ |
+| 098 | RenderFragmentComposedTemplates | composing `RenderFragment<T>` templates in code, higher-order fragment functions | ✅ |
+| 099 | DiffAlgorithmKeyMismatch | reasoning about the render-tree diff algorithm, key mismatches forcing subtree replacement | ✅ |
+| 100 | StreamingSsrCapstone | streaming SSR semantics, capstone combining `RenderTreeBuilder` and diffing understanding | ✅ |

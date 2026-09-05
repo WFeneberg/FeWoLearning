@@ -1,0 +1,15 @@
+@page "/expert/098"
+@rendermode InteractiveServer
+
+<h1>Exercise 098 - RenderFragmentComposedTemplates</h1>
+
+<p>One template, decorated and adapted, applied to every person.</p>
+
+<Ex098_RenderFragmentComposedTemplates People="_people" />
+
+@code {
+    private readonly FeWoLearning.Blazor.Support.Person[] _people =
+    [
+        new(1, "Ada"), new(2, "Grace"), new(3, "Edsger"),
+    ];
+}

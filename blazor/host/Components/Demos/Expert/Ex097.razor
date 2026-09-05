@@ -1,0 +1,15 @@
+@page "/expert/097"
+@rendermode InteractiveServer
+
+<h1>Exercise 097 - RenderFragmentComposedInCode</h1>
+
+<p>No markup builds the box below - it is three composed delegates.</p>
+<button id="add" @onclick="AddItem">add an item</button>
+
+<Ex097_RenderFragmentComposedInCode Items="_items" />
+
+@code {
+    private List<string> _items = ["<b>escaped</b>", "beta"];
+
+    private void AddItem() => _items = [.. _items, "item " + (_items.Count + 1)];
+}
