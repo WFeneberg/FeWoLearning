@@ -245,6 +245,41 @@ These two additions are the only permitted deviation from the version pin. Addin
 other package still requires the same treatment: probe that it compiles *and* renders
 before committing to an exercise built on it.
 
+### 2.6 Animation time is wall-clock, and cannot be driven
+
+Measured on 2026-09-05 for ex063–ex065. This one overturned my own assumption.
+
+`AvaloniaHeadlessPlatform.ForceRenderTimerTick(n)` exists and is documented, and it
+looks like the animation clock. **It is not.** It forces *frames*, not *time*. Measured:
+a 200 ms `DoubleTransition` on `Opacity`, after `ForceRenderTimerTick(5)` then
+`ForceRenderTimerTick(500)`, had moved only from `1.000` to `0.990` — which is exactly
+the ~2 ms of real time those 505 ticks took. A `KeyFrame` `Animation` driven by
+`RunAsync` did not progress at all and its task never completed.
+
+So **animation progress is not assertable in this harness**, and no amount of ticking
+changes that. Do not write a test that waits for an animation to advance; it would be
+timing-dependent, which this track forbids.
+
+What *is* deterministic, all measured:
+
+- **A transition defers the value, and that is a clean binary discriminator.** Setting
+  `Opacity = 0.0` on a plain `Border` reads back `0.000` immediately. On a `Border`
+  carrying a `DoubleTransition`, it reads back `1.000` — the value is held. Give the
+  transition a long duration (5 s was used) so a few milliseconds of real time cannot
+  blur the result.
+- **Transitions are structurally inspectable**: `transitions.OfType<DoubleTransition>()`
+  yields the instance, with `Property.Name` and `Duration` readable. Assert the
+  mechanism alongside the deferral.
+- **`RenderTransform.Value` gives the matrix directly** — a `ScaleTransform(2, 3)`
+  measured `M11 = 2`, `M22 = 3`. Transform *state* is assertable even though transform
+  *animation* is not.
+
+Therefore, for the animation exercises: assert that the animation is correctly
+**defined and attached**, and assert any immediate, deterministic consequence such as
+value deferral. State plainly in the stub that progress is not asserted, and why. This
+is the documented-limitation route this spec already sanctions — the alternative is a
+flaky test, which is worse than an honest gap.
+
 ### 2.1 Seven constraints discovered by the probe
 
 A throwaway probe in the scratchpad — a ReactiveUI view model plus a real
