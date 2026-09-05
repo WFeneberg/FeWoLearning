@@ -67,7 +67,7 @@ Run every command **from inside the track folder**, not the repo root.
 For `blazor/`, `uno/`, `caliburn/` and `wpf/`, `dotnet test -p:UseSolutions=true` runs the identical
 suite against the reference solutions instead of the stubs. `MicroServices/` supports the same
 `-p:UseSolutions=true` flag, plus `-p:Containers=true` to additionally run the container-backed
-rows (skipped by default). `aspire run --project playground -- --exercise exNNN` runs a single
+rows (skipped by default). `dotnet run --project playground -- --exercise exNNN` runs a single
 exercise in the Aspire dashboard.
 
 ## Toolchain status (verified 2026-09-04)
@@ -103,7 +103,10 @@ exercise in the Aspire dashboard.
   that opt-in, and `dotnet test` fails outright with "Testing with VSTest
   target is no longer supported". `avalonia/` runs xunit.v3 3.2.2 and needs
   no such file — this is version-specific, and the next track to bump
-  xunit.v3 will hit it too.
+  xunit.v3 will hit it too. **As of 2026-09-05, that same combination now
+  makes `dotnet test` here exit 5 with zero tests discovered on this
+  machine** — see the `MicroServices/` entry below for the measured detail;
+  out of scope to fix here.
 - `java/` and `kotlin/` are currently **catalog-only** additions: their ledgers
   and README files exist, but the build scaffolding and seeded exercises do not.
 - `flutter/` is content-complete like `java/` and `kotlin/`: `pubspec.yaml`
@@ -528,8 +531,8 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 
-Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/` and
-`wpf/`, all three still being built out — see the table above
+Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
+`wpf/` and `MicroServices/`, all four still being built out — see the table above
 for exact counts. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
@@ -687,7 +690,11 @@ windowless harness could not offer at all. Tests are serialised with
 `Obsolete(error: true)` in xunit.v3 4.0.0 and does not compile. Because
 `Xunit.StaFact` 4.x depends on `xunit.v3.extensibility.core` 4.0.0, the track
 also needs `wpf/global.json` — see the Toolchain-status entry above for why
-that file's `Microsoft.Testing.Platform` opt-in is mandatory here.
+that file's `Microsoft.Testing.Platform` opt-in is mandatory here. **As of
+2026-09-05, that same opt-in makes `dotnet test` exit 5 with zero tests
+discovered on this machine** (the test executable itself still runs
+correctly) — see the `MicroServices/` toolchain entry above; unfixed, out of
+scope for that track.
 
 **Read `wpf/README.md` before adding an exercise.** The recurring bug class is
 timing, not capability: bindings update at `DispatcherPriority.DataBind`, and
