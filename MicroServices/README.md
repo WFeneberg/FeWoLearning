@@ -196,6 +196,23 @@ Each of these cost real time. None is a guess.
   The gate is therefore a `ContainerGate.Require()` call as the **first line of the test
   body**, using `Assert.SkipUnless`. If a future bump makes `Skip` virtual, the attribute
   form becomes available again; until then, do not try to reintroduce it.
+- **`HealthCheckAnnotation.Key` is `{resource}_{endpoint}_{path}_{statusCode}_check`.**
+  Measured on Aspire 13.5.3 by dumping a built model, not read anywhere:
+  `AddContainer("api","nginx").WithHttpEndpoint(targetPort: 8080).WithHttpHealthCheck("/healthz")`
+  yields `api_http_/healthz_200_check`, and calling `WithHttpHealthCheck()` with no path
+  yields `api_http_/_200_check`. The format is undocumented and is not part of any
+  contract Aspire promises, so **a version bump may change it**. Exercise ex004 fact 1
+  pins the two exact keys and is therefore the tripwire: on a bump it fails with a loud
+  string-equality diff naming the old and new key, never a silent pass. ex004 fact 2
+  asserts only that each key *contains* its own path and not the other's, so it survives
+  a reformat and keeps grading the thing that matters. Anyone writing a later
+  health-check row should assert the substring, not the whole key, unless they also want
+  to own the tripwire.
+- **Aspire attaches `HealthCheckAnnotation`s of its own.** `AddPostgres("pg").AddDatabase("orders")`
+  arrives with `pg_check` and `orders_check` already present, nobody having asked. A
+  health-check exercise written against an *integration* resource therefore grades
+  nothing — the annotation is there whether or not the learner did anything. ex004 uses
+  bare `AddContainer`s for exactly this reason; a bare `AddContainer` carries none.
 - **`NU1603` silently upgrades the test runner.** `xunit.runner.visualstudio` has **no
   3.1.6 and no 3.1.7** — 3.1.5 is the last 3.x and the next version is 4.0.0. Naming a
   3.x that does not exist does not fail the build: NuGet resolves *forward* to 4.0.0 with

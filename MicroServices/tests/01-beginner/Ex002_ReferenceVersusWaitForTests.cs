@@ -12,11 +12,23 @@ public class Ex002_ReferenceVersusWaitForTests
 
         // WithReference alone injects configuration but does NOT order startup.
         // Only WaitFor leaves a WaitAnnotation, so this is the fact that separates
-        // the two - a solution using only WithReference must fail here. The
-        // annotation must name "orders": waiting for the SERVER is not the same
-        // promise as waiting for the database on it.
-        var waits = model.Resource("worker").Annotations.OfType<WaitAnnotation>().ToList();
-        Assert.Contains(waits, w => w.Resource.Name == "orders");
+        // the two - a solution using only WithReference must fail here.
+        //
+        // Three things are asserted, and dropping any one of them lets a wrong model
+        // through:
+        //   * the annotation must name "orders" - WaitFor(orders) also emits a
+        //     WaitAnnotation for the parent SERVER, so a name-blind assertion is
+        //     satisfied by WaitFor(pg), which is a weaker promise;
+        //   * the wait type must be WaitUntilHealthy - WaitForCompletion(orders)
+        //     produces a WaitAnnotation naming "orders" too, but means "start after
+        //     Postgres EXITS", i.e. never. It is the sharpest surviving mutant here
+        //     and the exact opposite of what the exercise asks for.
+        // (WaitUntilStarted, the third member of WaitType, is likewise rejected: it
+        // waits for the process, not for the health checks.)
+        var wait = Assert.Single(
+            model.Resource("worker").Annotations.OfType<WaitAnnotation>(),
+            w => w.Resource.Name == "orders");
+        Assert.Equal(WaitType.WaitUntilHealthy, wait.WaitType);
     }
 
     [Fact]

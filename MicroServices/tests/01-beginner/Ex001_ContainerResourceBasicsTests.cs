@@ -18,20 +18,31 @@ public class Ex001_ContainerResourceBasicsTests
     }
 
     [Fact]
-    public void Database_connection_string_composes_onto_the_server()
+    public void Database_hangs_off_that_server_and_composes_its_connection_string()
     {
         var model = ModelHarness.Build(Ex001_ContainerResourceBasics.Configure);
 
-        // The composition is the point: "orders" is not an independent connection
-        // string, it is the server's with a Database= clause appended. A learner who
-        // added two unrelated Postgres SERVERS would get "{orders.connectionString}"
-        // shaped output here and fail.
+        var pg = Assert.IsType<PostgresServerResource>(model.Resource("pg"));
+        var orders = Assert.IsType<PostgresDatabaseResource>(model.Resource("orders"));
+
+        // The server/database SPLIT is the exercise, so the parent link is asserted
+        // against the very server object named "pg" - not merely "some server".
+        // Reference equality is what rejects a learner who added two Postgres servers
+        // and hung the database off the wrong one.
+        Assert.Same(pg, orders.Parent);
+
+        // And the composition that link produces: "orders" is not an independent
+        // connection string, it is the server's with a Database= clause appended.
+        // Both halves of the expression are learner-determined - the resource names
+        // and, via AddDatabase's databaseName, the value after Database=.
         Assert.Equal(
             "{pg.connectionString};Database=orders",
-            ModelHarness.ConnectionString(model.Resource("orders")));
+            ModelHarness.ConnectionString(orders));
 
-        Assert.Contains(
-            "Username=postgres",
-            ModelHarness.ConnectionString(model.Resource("pg")));
+        // Deliberately NOT asserted: anything inside the SERVER's own connection
+        // string (Host, Port, Username=postgres, the generated password). AddPostgres
+        // determines all of it, the learner writes none of it, and fact 1 already
+        // proves the flavour by type. Grading framework-generated text is the habit
+        // catalog.md's preamble warns against - do not copy it into later exercises.
     }
 }
