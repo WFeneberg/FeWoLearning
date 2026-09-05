@@ -19,6 +19,13 @@ public class Ex041_CommandThrownExceptionsTests
         var vm = new Ex041_CommandThrownExceptionsViewModel(
             () => Task.FromException<string>(new InvalidOperationException("boom")));
 
+        // Nothing has executed yet. A solution that self-executes in its own
+        // constructor (FetchCommand.Execute().Subscribe(_ => { }, ex => LastError =
+        // ex.Message) - wiring the failure handler to that ONE eager execution
+        // instead of the command's ThrownExceptions channel) would already have
+        // LastError set here, before this test ever calls Execute() itself.
+        Assert.Null(vm.LastError);
+
         var thrown = await Record.ExceptionAsync(
             () => vm.FetchCommand.Execute().ToTask(TestContext.Current.CancellationToken));
 
@@ -35,6 +42,10 @@ public class Ex041_CommandThrownExceptionsTests
     {
         var vm = new Ex041_CommandThrownExceptionsViewModel(
             () => Task.FromException<string>(new InvalidOperationException("a totally different failure")));
+
+        // See the arrange-phase note in the test above: this must still be unset
+        // before this test's own Execute() runs.
+        Assert.Null(vm.LastError);
 
         var thrown = await Record.ExceptionAsync(
             () => vm.FetchCommand.Execute().ToTask(TestContext.Current.CancellationToken));

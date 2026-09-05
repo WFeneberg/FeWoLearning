@@ -58,6 +58,22 @@ public class Ex043_ThrottledSearchTests
     // Throttle output with no such built-in suppression, so it only stays at 1
     // through the "xyz -> abc" detour if DistinctUntilChanged is genuinely filtering
     // the pipeline upstream of both subscribers.
+    //
+    // KNOWN, DELIBERATE GAP: this assertion is only sound if SearchCount is wired the
+    // way the stub's TODO instructs - as a second Subscribe on the PRE-ToProperty
+    // observable (WhenAnyValue.Throttle.DistinctUntilChanged), not on CommittedQuery
+    // itself. A learner who instead increments SearchCount from
+    // this.WhenAnyValue(x => x.CommittedQuery) on a Throttle-only pipeline (no
+    // DistinctUntilChanged at all) still passes all three tests in this file: the
+    // OAPH backing CommittedQuery de-duplicates the consecutive "abc" for them, for
+    // free, so a counter downstream of CommittedQuery never sees the duplicate
+    // either - the exact hole SearchCount exists to close, one level removed. There
+    // is no clean structural assertion that closes this without also rejecting
+    // legitimate variants (this track has twice shipped an over-constraining
+    // assertion of that kind), and the alternate wiring is unusual enough, and
+    // already called out by name in the stub ("not to CommittedQuery itself"), that
+    // this is enforced by instruction rather than by a test. This is a deliberate
+    // choice, not an oversight.
     [Fact]
     public void Re_Settling_On_The_Same_Value_Does_Not_Search_Again()
     {
