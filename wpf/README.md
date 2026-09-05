@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Seventeen things that bite
+### Twenty-one things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -279,6 +279,41 @@ no `Application` either; WPF resolves default control templates through
   that is what actually proves `ValidateOnStart()` ran, since a test that only resolves
   `.Value` after starting cannot tell "validated at start" apart from "validated lazily,
   same as always".
+- **`Binding.ValidatesOnNotifyDataErrors` and `Binding.ValidatesOnDataErrors` have opposite
+  defaults - measured directly, not assumed from the two interfaces looking alike.** The
+  first defaults `true`; the second defaults `false`. A `TextBox` bound to a source
+  implementing `INotifyDataErrorInfo`, with no flag touched anywhere, already shows
+  `Validation.GetHasError` the moment the source reports an error; the identical setup
+  against `IDataErrorInfo` shows no error at all until `ValidatesOnDataErrors` is set `true`
+  explicitly. Row 043 depends on the first default; row 044 exists specifically to teach the
+  second, which is why its own Concepts cell names the flag - forgetting it is silent, not a
+  compile error or an exception.
+- **A `Binding`'s `INotifyDataErrorInfo` revalidation does not depend on `ErrorsChanged`
+  firing at all.** Measured directly while building row 043's "never raises its change
+  notification" wrong-implementation check: a source whose `HasErrors`/`GetErrors` are wired
+  correctly but whose error-setting method never raises `ErrorsChanged` (nor
+  `PropertyChanged(HasErrors)`) still shows `Validation.GetHasError` flip correctly on the
+  very next target-to-source push through a bound `TextBox` - WPF re-queries the interface as
+  part of that push itself, not only in reaction to the event. `ErrorsChanged` only matters
+  for something re-checking without a new binding push (a details panel counting current
+  errors, say); row 043's tests catch a silent error-setter with two tests that subscribe to
+  the event/property directly, not with the end-to-end binding test, which cannot tell the
+  difference.
+- **A `DataTemplate`'s implicit key is `System.Windows.DataTemplateKey(type)`, not the bare
+  `Type` - unlike row 023's implicit `Style` key, and measured directly rather than assumed
+  from that convention.** `resources[typeof(X)] = template` compiles, adds to the dictionary,
+  and is never found: the `ContentPresenter` silently falls back to calling `ToString()` on
+  the content object, no exception anywhere to notice the miss by. Row 041 depends on the
+  wrapper key; any later row keying a `DataTemplate` implicitly needs the same care.
+- **A primary-constructor parameter a stub's throwing method references only inside its
+  `NotImplementedException` string (never in real code) triggers CS9113 ("parameter is
+  unread") - a classic constructor assigning that same dependency to a private field does
+  not have the analogous problem**, even though the field is likewise only read inside a
+  throw-only method until the learner implements it. Row 042 hit this building
+  `Ex042_ItemViewModel`: switching from a primary constructor to a classic one assigning
+  `_dialogService` in the constructor body cleared the warning with no other change. Any
+  later row whose TODO lives in a method of a constructor-injected class should use a classic
+  constructor, not a primary constructor, for exactly this reason.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 

@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 40 ✅ / 60 ⬜**
+**Status: 45 ✅ / 55 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -89,11 +89,11 @@ Two deliberate content gaps:
 | 038 | OptionsAndConfiguration | `IOptions<T>`, configuration binding, validation on start | ✅ |
 | 039 | LoggingIntegration | `ILogger<T>` in a view model, scopes | ✅ |
 | 040 | ViewModelBaseHardening | `SetProperty` with a comparer, dependent-property fan-out, reentrancy guard | ✅ |
-| 041 | ViewModelFirstNavigation | `CurrentViewModel` + `ContentControl` + `DataType`-keyed `DataTemplate` | ⬜ |
-| 042 | DialogServiceAbstraction | `IDialogService` behind an interface, asserted without a window | ⬜ |
-| 043 | NotifyDataErrorInfo | `INotifyDataErrorInfo`, per-property errors, `HasErrors` | ⬜ |
-| 044 | DataErrorInfoLegacy | `IDataErrorInfo`, `ValidatesOnDataErrors` | ⬜ |
-| 045 | ValidationRules | `ValidationRule`, `Validation.GetErrors`, `Validation.HasError` | ⬜ |
+| 041 | ViewModelFirstNavigation | `CurrentViewModel` + `ContentControl` + `DataType`-keyed `DataTemplate` | ✅ |
+| 042 | DialogServiceAbstraction | `IDialogService` behind an interface, asserted without a window | ✅ |
+| 043 | NotifyDataErrorInfo | `INotifyDataErrorInfo`, per-property errors, `HasErrors` | ✅ |
+| 044 | DataErrorInfoLegacy | `IDataErrorInfo`, `ValidatesOnDataErrors` | ✅ |
+| 045 | ValidationRules | `ValidationRule`, `Validation.GetErrors`, `Validation.HasError` | ✅ |
 | 046 | AsyncVoidToAsyncCommand | an async command with `IsExecuting` gating instead of `async void` | ⬜ |
 | 047 | ProgressReporting | `IProgress<T>`, `Progress<T>` marshalling back to the dispatcher | ⬜ |
 | 048 | DispatcherInvokeAsyncPriorities | `Dispatcher.InvokeAsync`, execution order across priorities | ⬜ |
