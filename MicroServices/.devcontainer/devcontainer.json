@@ -1,48 +1,16 @@
-// KNOWN-UNVERIFIED (2026-09-05): this file parses (`devcontainer read-configuration`
-// succeeds) and its base image and postCreateCommand channel were independently
-// confirmed correct, but the container itself has never been built to completion
-// on this machine, so docker-outside-of-docker and the track's tests have never
-// been proven to work inside it. `devcontainer up` was run five separate times
-// (three earlier ones were duplicate/concurrent invocations killed once
-// discovered; the final, clean, solo run was watched across five bounded ~9-minute
-// stretches, ~45 minutes total, per-agreement with the task coordinator). Every
-// attempt hung at the identical point: the `docker-outside-of-docker` feature's
-// `apt-get update` RUN step, after printing "Get:12 ... security.ubuntu.com ...
-// Packages [1786 kB]" at "4.147s" of the step's own internal clock — and then zero
-// further output for the full ~45-minute observation window, with the underlying
-// node process still alive but producing nothing. This is a genuine hang, not
-// slow-but-progressing apt: a control-plane probe (`apt-get update` run directly
-// in a plain `mcr.microsoft.com/devcontainers/dotnet:1-10.0` container) completed,
-// slowly, with visible `Ign:`/`Get:` retries — so the mirrors are reachable in
-// general, but this particular feature-layer build's connection to them stalls
-// without ever timing out. Because BuildKit only caches completed layers, no
-// interrupted attempt banks any progress toward the next. The container was never
-// created (confirmed via `docker ps -a --filter label=devcontainer.local_folder`
-// after every attempt), so steps 4 and 5 of task-4-brief.md (docker-outside-of-
-// docker reaching the host daemon; `dotnet test` inside the container) were never
-// run. Independently verified facts that ARE trustworthy: the base image tag
-// `mcr.microsoft.com/devcontainers/dotnet:1-10.0` exists and is the correct .NET
-// 10 / Ubuntu 24.04 "noble" devcontainer image (`dev.containers.release=v0.4.19`,
-// confirmed via `docker manifest inspect` and a real, successful 2.9GB pull); and
-// `@microsoft/aspire-cli` on npm is the correct install channel for the Aspire CLI
-// (its own `bin` entry is `aspire`, so `npm install -g` puts it on PATH) — neither
-// of those was the problem. See task-4-report.md in
-// .superpowers/sdd/2026-09-05-microservices-track/ for the full account, and
-// MicroServices/README.md (added by Task 5) for where this should be recorded
-// track-wide once that file exists. Whoever revisits this: try building on a
-// machine/network path with a healthier route to archive.ubuntu.com and
-// security.ubuntu.com, or pin the feature to a version that vendors its packages,
-// before assuming the devcontainer.json itself is at fault.
 {
   "name": "FeWoLearning MicroServices",
   "image": "mcr.microsoft.com/devcontainers/dotnet:1-10.0",
 
-  // docker-OUTSIDE-of-docker, not docker-in-docker: Aspire starts sibling
-  // containers on the host daemon. Nesting them breaks Aspire's port handling.
-  "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/devcontainers/features/node:1": {}
-  },
+  // Not the "docker-outside-of-docker" FEATURE: that feature's apt repo add
+  // fails with NO_PUBKEY 62D54FD4003F6525 on this network (see
+  // task-4-report.md, fix round 1). Same effect — Aspire's sibling containers
+  // land on the HOST daemon, never nested — reached instead by bind-mounting
+  // the host socket directly and installing a static `docker` CLI binary that
+  // needs no apt repo or GPG key at all.
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
 
   // 18888 is the Aspire dashboard.
   "forwardPorts": [18888],
@@ -50,7 +18,27 @@
     "18888": { "label": "Aspire dashboard", "onAutoForward": "notify" }
   },
 
-  "postCreateCommand": "npm install -g @microsoft/aspire-cli && dotnet restore",
+  // The base image ships no node/npm (confirmed as both root and vscode), and
+  // the "node" feature's apt repo hits the same NO_PUBKEY problem as
+  // docker-outside-of-docker. So both docker and node are installed here from
+  // plain HTTPS tarballs (no apt, no GPG keyserver, nothing this network's
+  // signing-key path can break) rather than from features:
+  //  - docker 29.8.0 static client from download.docker.com's static-binary
+  //    channel — only the `docker` binary is needed, to talk to the socket
+  //    mounted above; no daemon, no docker-in-docker.
+  //  - node v24.20.0 (current LTS "Krypton" as of 2026-09-05) from
+  //    nodejs.org's own dist tarballs, extracted straight into /usr/local so
+  //    `node`/`npm` land on PATH with no further config.
+  //  - @microsoft/aspire-cli then installs the normal way, via that npm.
+  "postCreateCommand": "set -e; curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-29.8.0.tgz -o /tmp/docker.tgz && sudo tar -xzf /tmp/docker.tgz -C /usr/local/bin --strip-components=1 docker/docker && sudo chmod +x /usr/local/bin/docker && rm -f /tmp/docker.tgz && curl -fsSL https://nodejs.org/dist/v24.20.0/node-v24.20.0-linux-x64.tar.xz -o /tmp/node.tar.xz && sudo tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 && rm -f /tmp/node.tar.xz && npm install -g @microsoft/aspire-cli && dotnet restore",
+
+  // The bind-mounted host socket is root:root mode 660 (measured), so the
+  // non-root "vscode" user (and Aspire, and every exercise, which all call
+  // `docker` without sudo) gets "permission denied" without this. Widening it
+  // to 666 is scoped to just this socket, not a broader group/sudo grant, and
+  // must be re-applied every start (not just postCreateCommand) because it is
+  // the HOST's shared socket file and its mode is not owned by this container.
+  "postStartCommand": "sudo chmod 666 /var/run/docker.sock",
 
   "customizations": {
     "vscode": {
