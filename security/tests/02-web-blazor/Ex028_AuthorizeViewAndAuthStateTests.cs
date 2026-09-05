@@ -3,7 +3,6 @@ using Bunit;
 using FeWoLearning.Security.Exercises.Support;
 using FeWoLearning.Security.Exercises.WebBlazor;
 using FeWoLearning.Security.Tests.Harness;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using TestContext = Xunit.TestContext;
@@ -12,17 +11,12 @@ namespace FeWoLearning.Security.Tests.WebBlazor;
 
 public class Ex028_AuthorizeViewAndAuthStateTests
 {
+    // BlazorHarness already wires up real Roles/policy evaluation (see its
+    // constructor for why); the only thing left to attach per test is which
+    // ClaimsPrincipal AuthorizeView should see.
     private static BlazorHarness CreateHarness(ClaimsPrincipal principal)
     {
         var harness = new BlazorHarness();
-        harness.Services.AddAuthorizationCore();
-        // BunitContext pre-registers its own placeholder IAuthorizationService
-        // (which throws unless a test opts in) via AddSingleton, so
-        // AddAuthorizationCore's TryAdd above cannot replace it. Register the
-        // real ASP.NET Core implementation explicitly - the last registration
-        // for a service type wins - to get real Roles evaluation instead.
-        harness.Services.AddSingleton<IAuthorizationService, DefaultAuthorizationService>();
-        harness.Services.AddCascadingAuthenticationState();
         harness.Services.AddSingleton<AuthenticationStateProvider>(new Ex028_TestAuthStateProvider(principal));
         return harness;
     }
