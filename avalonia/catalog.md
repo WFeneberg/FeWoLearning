@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 40 ✅ / 60 ⬜**
+**Status: 45 ✅ / 55 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -73,11 +73,11 @@ not a valid C# identifier.
 | 038 | OaphInitialValue | OAPH initial value, deferred subscription | ✅ |
 | 039 | CommandFromTask | `ReactiveCommand.CreateFromTask`, awaiting a result | ✅ |
 | 040 | CommandIsExecuting | `IsExecuting` gating concurrent invocation | ✅ |
-| 041 | CommandThrownExceptions | `ThrownExceptions`, no unobserved crash | ⬜ |
-| 042 | CommandCancellation | `CancellationToken` in `CreateFromTask` | ⬜ |
-| 043 | ThrottledSearch | `Throttle` plus `DistinctUntilChanged` | ⬜ |
-| 044 | SequencerScheduling | `ISequencer`, virtual time in tests | ⬜ |
-| 045 | MainThreadMarshalling | `RxApp.MainThreadScheduler`, `Dispatcher.UIThread` | ⬜ |
+| 041 | CommandThrownExceptions | `ThrownExceptions`, no unobserved crash | ✅ |
+| 042 | CommandCancellation | `CancellationToken` in `CreateFromTask` | ✅ |
+| 043 | ThrottledSearch | `Throttle` plus `DistinctUntilChanged` | ✅ |
+| 044 | SequencerScheduling | `ISequencer`, virtual time in tests | ✅ |
+| 045 | MainThreadMarshalling | `AvaloniaScheduler` / `RxSchedulers`, `Dispatcher.UIThread` | ✅ |
 | 046 | InteractionDialog | `Interaction<TIn, TOut>` for a dialog result | ⬜ |
 | 047 | ValidationNotifyDataErrorInfo | `INotifyDataErrorInfo`, per-property errors | ⬜ |
 | 048 | ViewModelActivation | `IActivatableViewModel`, `WhenActivated` disposal | ⬜ |
