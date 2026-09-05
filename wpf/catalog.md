@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -69,11 +69,11 @@ Two deliberate content gaps:
 | 023 | ImplicitStyleByType | `TargetType` style keyed by type in a dictionary | ✅ |
 | 024 | StyleBasedOn | `BasedOn` inheritance and setter override order | ✅ |
 | 025 | StaticVersusDynamicResource | swap a resource at runtime; only `DynamicResource` follows | ✅ |
-| 026 | MergedResourceDictionaries | `MergedDictionaries`, lookup order, last-wins | ⬜ |
-| 027 | DataTrigger | `Style.Triggers`, `DataTrigger`, `MultiDataTrigger` | ⬜ |
-| 028 | MeasureArrangeContract | `MeasureOverride`/`ArrangeOverride`, `DesiredSize` vs `RenderSize` | ⬜ |
-| 029 | GridStarAndAuto | star vs auto vs pixel; assert the definitions, not just rectangles | ⬜ |
-| 030 | MarginPaddingAlignment | `Margin`, `Padding`, `HorizontalAlignment`/`VerticalAlignment` | ⬜ |
+| 026 | MergedResourceDictionaries | `MergedDictionaries`, lookup order, last-wins | ✅ |
+| 027 | DataTrigger | `Style.Triggers`, `DataTrigger`, `MultiDataTrigger` | ✅ |
+| 028 | MeasureArrangeContract | `MeasureOverride`/`ArrangeOverride`, `DesiredSize` vs `RenderSize` | ✅ |
+| 029 | GridStarAndAuto | star vs auto vs pixel; assert the definitions, not just rectangles | ✅ |
+| 030 | MarginPaddingAlignment | `Margin`, `Padding`, `HorizontalAlignment`/`VerticalAlignment` | ✅ |
 | 031 | SharedSizeGroup | `Grid.IsSharedSizeScope`, `SharedSizeGroup` | ⬜ |
 | 032 | ItemsControlDataTemplate | `ItemsSource`, `DataTemplate`, generated containers | ⬜ |
 | 033 | ObservableCollectionUpdates | `INotifyCollectionChanged` reaching the generated items | ⬜ |

@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Eight things that bite
+### Thirteen things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -132,6 +132,44 @@ no `Application` either; WPF resolves default control templates through
   pre-declaring `private EventHandler? _handler;` with a placeholder `= null;`. The
   fix, matching row 006's convention: leave the field out of the stub and describe it
   in the TODO instead — it does not exist to warn about until the learner adds it.
+- **`ResourceDictionary` lookup order, confirmed by direct measurement, not assumed:** a
+  dictionary's own entries win over anything reachable only through `MergedDictionaries`,
+  and among several merged dictionaries colliding on the same key, the one added LAST to
+  `MergedDictionaries` wins — swapping two dictionaries' add order swaps the winner too.
+  `ResourceDictionary.Keys` enumerates only a dictionary's own entries, never anything from
+  a merged one — row 026 uses that distinction to prove an entry was written directly into
+  the target rather than into a fresh merged dictionary the lookup happens to still find.
+- **A `DataTrigger`/`MultiDataTrigger` condition re-evaluates synchronously**, unlike a
+  plain `Binding`'s target update. Measured directly: setting the bound source property and
+  reading the trigger's `Setter` value straight back — with no `Pump()` at all — already
+  shows the new value. The `DispatcherPriority.DataBind` deferral described above is
+  specific to a target-property `Binding` pushing a *value* onto a property; a trigger's
+  condition check is not that binding mechanism and fires inline, inside the source's
+  `PropertyChanged` handler. Row 027 still calls `Pump()` after each mutation, defensively —
+  a later row that depends on this instead being deferred would need its own check.
+- **`ColumnDefinition.Width`'s own unassigned default is already `GridLength(1,
+  GridUnitType.Star)`** — measured directly, not `Auto` and not zero. A test that only
+  checks a Star column's `GridUnitType` cannot tell "explicitly assigned Star" apart from
+  "never touched, still the default" for that reason; row 029 assigns a Star factor other
+  than 1 (2) so the numeric `Value`, not just the `GridUnitType`, is what proves the
+  assignment actually happened. Any later Grid-building row needs the same care whenever a
+  column's intended sizing happens to be plain Star(1).
+- **`MeasureOverride`'s `constraint` and `ArrangeOverride`'s `finalSize` are both already
+  reduced by `Margin`** before either override ever sees them, and `DesiredSize` adds
+  `Margin` back onto whatever `MeasureOverride` returned — but capped at the *original*,
+  pre-margin size passed to `Measure(...)`; a `MeasureOverride` that returns more than that
+  gets its `DesiredSize` clamped down to what `Measure` was actually given, not merely to
+  `constraint`. `ArrangeOverride`'s return value is NOT clamped the same way — whatever it
+  returns becomes `RenderSize` verbatim, even if that is larger than `finalSize`. Row 028
+  stays inside the non-clamped range on purpose to keep the base contract legible; row 062
+  (`CustomPanel`) and row 080 (layout invalidation cost) are where the clamping edge and the
+  Measure/Arrange asymmetry actually start to matter.
+- **`HorizontalAlignment`/`VerticalAlignment` take effect on a bare top-level element handed
+  straight to `Arrange(...)`, with no parent panel involved.** The alignment logic lives in
+  `FrameworkElement`'s own arrange machinery, not in whichever panel calls `Arrange` on a
+  child, so `WpfTestContext.Layout(element, availableSize)` alone is enough to see
+  `RenderSize` shrink to the element's natural size and its `VisualOffset` move to a corner
+  of `availableSize` — row 030 needs no wrapping panel at all to exercise this.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 
