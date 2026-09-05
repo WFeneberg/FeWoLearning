@@ -4,7 +4,7 @@
            OnValidSubmit exactly once per valid submission. Implement
            GenerateToken so every component instance gets its own value -
            never one shared constant, and never left empty.
-   Drills: EditForm, antiforgery in interactive and static rendering.
+   Drills: EditForm, a fresh antiforgery token per component instance, OnValidSubmit.
    Passes: attack facts - the rendered form's __RequestVerificationToken
                           hidden input always has a non-empty value, and two
                           separately rendered instances of this component

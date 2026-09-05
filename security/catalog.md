@@ -56,7 +56,7 @@ implementations in `solutions/<block>/` at the same relative path.
 | 027 | CspNonceFlow | nonce propagation to components, eliminating inline handlers | ✅ |
 | 028 | AuthorizeViewAndAuthState | AuthenticationStateProvider, AuthorizeView, cascading auth state | ✅ |
 | 029 | ClientAuthIsNotEnforcement | UI trimming is not authorization, server-side enforcement | ✅ |
-| 030 | AntiforgeryInEditForm | EditForm, antiforgery in interactive and static rendering | ✅ |
+| 030 | AntiforgeryInEditForm | EditForm, a fresh antiforgery token per component instance, OnValidSubmit | ✅ |
 | 031 | SecretsNeverReachClient | configuration surface, what a component may receive | ✅ |
 | 032 | JsInteropInjection | passing untrusted data across JS interop, avoiding eval-shaped calls | ✅ |
 | 033 | NavigationManagerOpenRedirect | client-side redirect validation, external URI rejection | ✅ |

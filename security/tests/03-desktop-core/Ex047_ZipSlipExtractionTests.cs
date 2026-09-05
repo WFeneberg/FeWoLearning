@@ -7,12 +7,23 @@ namespace FeWoLearning.Security.Tests.DesktopCore;
 
 public class Ex047_ZipSlipExtractionTests : IDisposable
 {
-    private readonly string _directory =
+    // Two levels, deliberately. The escape checks below work by watching the
+    // extraction root's PARENT for files that appear during extraction, so that
+    // parent must be a directory this test owns outright - never %TEMP% itself,
+    // whose contents belong to every other process on the machine.
+    private readonly string _sandbox =
         Path.Combine(Path.GetTempPath(), "fewo-sec-" + Guid.NewGuid().ToString("N"));
+
+    private readonly string _directory;
+
+    public Ex047_ZipSlipExtractionTests()
+    {
+        _directory = Path.Combine(_sandbox, "root");
+    }
 
     public void Dispose()
     {
-        if (Directory.Exists(_directory)) Directory.Delete(_directory, recursive: true);
+        if (Directory.Exists(_sandbox)) Directory.Delete(_sandbox, recursive: true);
     }
 
     private static MemoryStream BuildArchive(params (string Name, string Content)[] entries)
@@ -33,9 +44,13 @@ public class Ex047_ZipSlipExtractionTests : IDisposable
         return stream;
     }
 
-    // Snapshots the parent directory's top-level files, runs the extraction, and
-    // returns whatever files are new afterwards - catching any escape path the
-    // implementation might resolve to, not only one hand-picked expected path.
+    // Snapshots the extraction root's parent - this test's own private sandbox
+    // directory, never %TEMP% - runs the extraction, and returns whatever files
+    // are new afterwards. Watching the whole parent, rather than one hand-picked
+    // expected path, catches any escape path the implementation resolves to; and
+    // because the parent is private, "a file appeared here" can only mean this
+    // extraction put it there. Nothing is deleted individually: Dispose removes
+    // the sandbox whole, so the test can never touch a file it did not create.
     private List<string> ExtractAndFindNewFilesInParent(MemoryStream archive)
     {
         Directory.CreateDirectory(_directory);
@@ -45,14 +60,7 @@ public class Ex047_ZipSlipExtractionTests : IDisposable
         Ex047_ZipSlipExtraction.ExtractTo(archive, _directory);
 
         var after = Directory.GetFiles(parent, "*", SearchOption.TopDirectoryOnly);
-        var newFiles = after.Where(f => !before.Contains(f)).ToList();
-
-        // Clean up defensively: if the implementation under test really did leak
-        // a file into the shared parent (%TEMP% itself), do not leave it behind
-        // for the next run to trip over.
-        foreach (var leaked in newFiles) File.Delete(leaked);
-
-        return newFiles;
+        return after.Where(f => !before.Contains(f)).ToList();
     }
 
     [Fact]
@@ -69,19 +77,17 @@ public class Ex047_ZipSlipExtractionTests : IDisposable
     public void Attack_An_Absolute_Path_Entry_Is_Not_Written()
     {
         Directory.CreateDirectory(_directory);
-        var absoluteTarget = Path.Combine(Path.GetTempPath(), "fewo-sec-absolute-" + Guid.NewGuid().ToString("N") + ".txt");
+
+        // An absolute path that is outside the destination but still inside this
+        // test's own sandbox: it exercises the rooted-entry escape exactly the
+        // same way an absolute path into %TEMP% would, and if the implementation
+        // under test really does write it, Dispose is what removes it.
+        var absoluteTarget = Path.Combine(_sandbox, "absolute-escape.txt");
         using var archive = BuildArchive((absoluteTarget, "escaped-content"));
 
-        try
-        {
-            Ex047_ZipSlipExtraction.ExtractTo(archive, _directory);
+        Ex047_ZipSlipExtraction.ExtractTo(archive, _directory);
 
-            Assert.False(File.Exists(absoluteTarget), "an absolute-path entry must not be written");
-        }
-        finally
-        {
-            if (File.Exists(absoluteTarget)) File.Delete(absoluteTarget);
-        }
+        Assert.False(File.Exists(absoluteTarget), "an absolute-path entry must not be written");
     }
 
     [Fact]

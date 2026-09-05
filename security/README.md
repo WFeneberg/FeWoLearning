@@ -35,15 +35,15 @@ argument-less invocation. **Give it an explicit target:**
 | One exercise | `dotnet test --project tests/FeWoLearning.Security.Tests.csproj --filter-class "*Ex001*"` |
 
 All three verified directly on this machine. The stub run reports **Total:
-326, Failed: 322, Passed: 3, Skipped: 1**, exit code 2 (nonzero because
+333, Failed: 329, Passed: 3, Skipped: 1**, exit code 2 (nonzero because
 facts genuinely fail — that is the expected red picture, not a discovery
-failure); the solutions run reports **Total: 326, Failed: 0, Passed: 325,
-Skipped: 1**, run twice with identical results and 0 build warnings both
-times (the 3 passing on the stub run are the harness canaries — see
-"Per-row warnings" for the skip). `--filter-class "*Ex001*"` narrows
-correctly to that exercise's 5 facts. Per block: `01-web-aspnet` 127 facts,
-`02-web-blazor` 55, `03-desktop-core` 104, `04-desktop-wpf` 37 (one of which
-is the skip), plus the 3 harness canaries — 127+55+104+37+3 = 326.
+failure); the solutions run reports **Total: 333, Failed: 0, Passed: 332,
+Skipped: 1**, with 0 build warnings on both builds (the 3 passing on the
+stub run are the harness canaries — see "Per-row warnings" for the skip).
+`--filter-class "*Ex001*"` narrows correctly to that exercise's 5 facts.
+Per block: `01-web-aspnet` 131 facts, `02-web-blazor` 58,
+`03-desktop-core` 104, `04-desktop-wpf` 37 (one of which is the skip), plus
+the 3 harness canaries — 131+58+104+37+3 = 333.
 
 A caveat this session tried hard to reproduce and could not: the design spec
 and an earlier draft of this README claimed that a **bare, argument-less**
@@ -158,16 +158,50 @@ The rule this track lives or dies by:
    facts, and only the use facts, failed against them; do the same before
    trusting a new exercise.
 
+   **The next probe past that one is *wrong-but-implemented*** — an earnest
+   implementation that does real work but picks the wrong mechanism. It is
+   not degenerate, so the reject-everything probe never finds it, and it
+   passes for the same reason a hard-coded digest passes: the facts assert an
+   outcome that more than one mechanism produces. This is the failure mode
+   the final whole-work review caught in **four** exercises that every
+   per-batch review had already passed — `Ex007` (swap two of the four sinks'
+   encoders for each other: **6/6 green**, because "something was escaped" is
+   all the attack facts ever asked), `Ex023` (drop the magic-byte check and
+   keep only the extension allowlist: **6/6 green**, because the disguised
+   `report.pdf` was rejected at the extension gate before a byte was read),
+   `Ex025` (a denylist instead of the allowlist `Ex036` teaches: **green on
+   every payload**) and `Ex041` (plain `string.Equals`: **5/5 green**, and
+   that one is not fixable — see trap 3). So after the reject-everything
+   variant, build the **plausible wrong** one and run the facts against it.
+   The repair is almost always the same shape: assert a property only the
+   right mechanism has — a round-trip through the decoder that sink's real
+   consumer would use, a use fact that forces the attacker's own case onto
+   the happy path so the attack fact can no longer be satisfied by rejecting
+   it, or an assertion on the parsed DOM rather than on known-bad substrings.
+
 2. **A hard-coded crypto digest tests transcription, not behaviour**, and
    breaks the moment a legitimate parameter changes (a different salt, a
    different iteration count). Assert properties instead: a different salt
    yields a different hash, `Verify` round-trips its own `Hash`, a single
    flipped ciphertext byte is detected.
 
-3. **A wall-clock timing assertion is flaky by construction.**
-   `Ex041_FixedTimeComparison` is graded on the mechanism and its behaviour —
-   that it genuinely uses a constant-time comparison over the hash rather
-   than `==`/`SequenceEqual` — never on elapsed time.
+3. **A wall-clock timing assertion is flaky by construction**, so
+   `Ex041_FixedTimeComparison` is graded **purely behaviourally** — never on
+   elapsed time. Be honest about what that costs. Its five facts pin the
+   *outcomes* of the comparison (a prefix does not match; a
+   last-character-only difference does not match; identical matches; case
+   matters; empty against empty matches) and nothing more, and
+   `string.Equals(presented, expected, StringComparison.Ordinal)` satisfies
+   all five — **measured**, by building exactly that and running them. The
+   mechanism the exercise is actually about, hashing both sides to a fixed
+   length and comparing with `CryptographicOperations.FixedTimeEquals`, is
+   **not machine-checkable in this harness**: proving *which* comparison ran
+   would need either a timing assertion (the flaky thing this trap exists to
+   forbid) or reflection over IL, which is out of style everywhere in this
+   repo. The requirement therefore lives in **the stub header**, as prose the
+   learner reads, and the tests grade the behaviour that requirement implies.
+   Do not add a timing assertion here to close the gap — it would not close
+   it, and it would trade a documented limitation for a flaky test.
 
 4. **`Assert.Throws` on a stub that already throws is a false green.** Every
    stub throws `NotImplementedException`, so a test asserting only "an
@@ -245,7 +279,17 @@ from documentation.
   process-global and shared with the developer's own session. The test saves
   prior clipboard content in its constructor and restores it in `Dispose`,
   with a bounded 10-attempt retry against `COMException` — but **running the
-  suite will briefly disturb the clipboard** while it runs.
+  suite will briefly disturb the clipboard** while it runs. The graded
+  contract is the triple of registered clipboard formats Microsoft documents
+  for this, in the values the documentation gives them:
+  `CanIncludeInClipboardHistory` = **false**, `CanUploadToCloudClipboard` =
+  **false**, `ExcludeClipboardContentFromMonitorProcessing` = **true**. Read
+  the names literally — the two `Can…` formats grant a permission, so denying
+  it is `false`, while `Exclude…` asserts an exclusion, so requesting it is
+  `true`. An earlier version of this row asserted `false` for the `Exclude…`
+  format and omitted `CanUploadToCloudClipboard` altogether, which both
+  failed the learner who wrote the documented answer and left the stub
+  header's cloud-sync claim graded by nothing at all.
 - **`Ex060_FilePickerResultStillUntrusted` has the track's only skipped
   test.** Its symbolic-link attack fact needs elevation or Windows Developer
   Mode for `File.CreateSymbolicLink`; without either, the fact is dynamically
@@ -254,10 +298,23 @@ from documentation.
   property left ungraded on an unprivileged run is specifically "a path that
   looks like it's inside the root but resolves outside it" — the other four
   facts in the exercise still run and grade normally.
-- **`Ex049`, `Ex050` and `Ex052` create real OS objects** (processes, a named
-  pipe, an ACL'd file) under per-test temp directories, cleaned up
-  afterwards. `Ex050` uses a unique pipe name per test so the serialised
-  suite cannot collide with a leftover.
+- **`Ex050` and `Ex052` create real OS objects** (a named pipe, an ACL'd
+  file) under per-test temp directories, cleaned up afterwards. `Ex050` uses
+  a unique pipe name per test so the serialised suite cannot collide with a
+  leftover. **`Ex049` starts no process and creates no OS object at all**:
+  `BuildStartInfo` only builds a `ProcessStartInfo` and hands it back for
+  inspection, and `Process.Start` appears nowhere in this track.
+- **`Ex047_ZipSlipExtraction`'s tests prove containment by watching a
+  directory** — listing the extraction root's parent before and after each
+  extraction and asserting nothing new appeared, which catches any escape
+  path the implementation resolves to rather than only one hand-picked one.
+  That parent is a per-test sandbox (`%TEMP%/fewo-sec-<guid>/`) with the
+  extraction root one level down (`.../root/`), never `%TEMP%` itself: a
+  watcher pointed at `%TEMP%` attributes any file another process happens to
+  create in that window to the code under test, and an earlier version of
+  this test then deleted it. Cleanup is now by removing the sandbox whole in
+  `Dispose`, so the test can never touch a file it did not create. Keep both
+  properties if you touch this exercise.
 - **`Ex053_PasswordBoxNoPlaintextBinding` is graded by reflection** over the
   view model's public properties and fields, not by observing rendered
   output.

@@ -11,12 +11,16 @@ public static class Ex009_CorsPolicy
     public static void AddServices(IServiceCollection services, string allowedOrigin) =>
         services.AddCors(options =>
             options.AddPolicy(PolicyName, policy => policy
+                // An explicit origin, never AllowAnyOrigin(). AllowCredentials()
+                // is what makes that choice load-bearing rather than merely
+                // tidy: the CORS protocol forbids "*" alongside credentials, and
+                // ASP.NET Core enforces it - CorsPolicyBuilder.Build() throws
+                // InvalidOperationException for AllowAnyOrigin().AllowCredentials(),
+                // so the wildcard shortcut is not available here at all.
                 .WithOrigins(allowedOrigin)
                 .WithMethods("GET", "POST")
-                .AllowAnyHeader()));
-    // No AllowCredentials(): the origin allowlist above is never "*", but the
-    // combination this exercise warns against needs both halves absent by
-    // construction, not merely untested.
+                .AllowAnyHeader()
+                .AllowCredentials()));
 
     public static void Use(IApplicationBuilder app) =>
         app.UseCors(PolicyName);

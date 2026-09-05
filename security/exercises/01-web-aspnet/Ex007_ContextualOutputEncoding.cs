@@ -13,8 +13,16 @@ namespace FeWoLearning.Security.Exercises.WebAspNet;
 //                          contain the literal "</script>"; "a&b=c" through
 //                          ForUrlQuery contains no raw "&";
 //         use facts      - each method leaves a plain alphanumeric string
-//                          unchanged, and ForHtmlBody("café") still round-trips
-//                          to "café" through System.Net.WebUtility.HtmlDecode.
+//                          unchanged, and each sink round-trips through the
+//                          decoder its own consumer would use: ForHtmlBody and
+//                          ForHtmlAttribute through WebUtility.HtmlDecode (the
+//                          attribute one also keeping its spaces literal),
+//                          ForUrlQuery through Uri.UnescapeDataString, and
+//                          ForJavaScriptString by being read back as the body of
+//                          a double-quoted JSON/JavaScript string literal. Those
+//                          round-trips are what pin each sink to its own encoder:
+//                          the attack facts alone are satisfied by any of the
+//                          three, since all three escape all four payloads.
 public static class Ex007_ContextualOutputEncoding
 {
     public static string ForHtmlBody(string untrusted) =>

@@ -16,8 +16,12 @@ namespace FeWoLearning.Security.Exercises.WebAspNet;
 //                          storageName containing ".." or a directory separator;
 //         use facts      - a real PNG named "photo.png" is accepted, its
 //                          storageName keeps the ".png" extension while being
-//                          unpredictable (never the original name), and two
-//                          uploads of the same name produce different
+//                          unpredictable (never the original name); a real PDF
+//                          (bytes beginning "%PDF") named "report.pdf" is
+//                          accepted too - so ".pdf" has to be on the allowlist,
+//                          and the disguised "report.pdf" above can only be
+//                          caught by reading its bytes, never by its extension;
+//                          and two uploads of the same name produce different
 //                          storageNames.
 public static class Ex023_FileUploadValidation
 {

@@ -13,12 +13,18 @@ public static class Ex055_ClipboardHygiene
         var data = new DataObject();
         data.SetData(DataFormats.UnicodeText, secret);
 
-        // Both formats are booleans: Windows' clipboard history (Win+V) and Cloud
-        // Clipboard sync each check for them and skip this content when they are
-        // present and false. Neither format has any effect on Clipboard.GetText(),
-        // so a normal paste is unaffected.
+        // The three registered clipboard formats Windows documents for this, in
+        // the values the documentation gives them. Read the names literally: the
+        // two "Can..." formats grant a permission, so denying it means false;
+        // "ExcludeClipboardContentFromMonitorProcessing" asserts an exclusion, so
+        // requesting it means true. CanIncludeInClipboardHistory keeps the value
+        // out of Win+V, CanUploadToCloudClipboard keeps it off the user's other
+        // devices, and the exclusion format asks clipboard monitors in general not
+        // to process it. None of them affects Clipboard.GetText(), so an ordinary
+        // Ctrl+V paste still works.
         data.SetData("CanIncludeInClipboardHistory", false);
-        data.SetData("ExcludeClipboardContentFromMonitorProcessing", false);
+        data.SetData("CanUploadToCloudClipboard", false);
+        data.SetData("ExcludeClipboardContentFromMonitorProcessing", true);
 
         // The Win32 clipboard is a single, machine-wide resource that any other
         // process (including the OS's own clipboard-history service) can hold open

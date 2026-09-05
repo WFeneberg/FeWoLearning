@@ -48,8 +48,15 @@ public class Ex055_ClipboardHygieneTests : IDisposable
 
         var data = WithRetry(Clipboard.GetDataObject)!;
 
+        // The values are the ones Microsoft's own documentation and samples use,
+        // and the format names say why: the two "Can..." formats grant a
+        // permission, so denying it is false, while "Exclude..." asserts an
+        // exclusion, so requesting it is true. CanUploadToCloudClipboard is the
+        // format that actually governs cloud sync - without it, "excluded from
+        // cloud sync" would be a claim nothing here checks.
         Assert.Equal(false, data.GetData("CanIncludeInClipboardHistory"));
-        Assert.Equal(false, data.GetData("ExcludeClipboardContentFromMonitorProcessing"));
+        Assert.Equal(false, data.GetData("CanUploadToCloudClipboard"));
+        Assert.Equal(true, data.GetData("ExcludeClipboardContentFromMonitorProcessing"));
     }
 
     [WpfFact]

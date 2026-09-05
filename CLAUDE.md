@@ -534,6 +534,26 @@ the same `global.json` opt-in.
   reject-everything variants of its stubs and confirming only the paired use
   facts, and not the attack facts, failed against them.
 
+  **The bug class one level past that, and the thing the final whole-work
+  review actually found, is *wrong-but-implemented*:** an earnest
+  implementation that does real work but picks the wrong mechanism. It is not
+  degenerate, so the reject-everything probe never catches it, and it passes
+  because the facts assert an outcome more than one mechanism produces. Four
+  exercises were under-grading exactly this way after every per-batch review
+  had passed them — `Ex007` (any of the three encoders escapes all four
+  payloads), `Ex023` (an extension-only allowlist rejects the disguised
+  `report.pdf` before sniffing a byte), `Ex025` (a denylist where the track
+  teaches allowlists) and `Ex041` (plain `string.Equals` satisfies every
+  behavioural fact a constant-time compare does). Three were fixed by
+  asserting a property only the right mechanism has — a round-trip through
+  the decoder that sink's real consumer would use, a use fact that forces the
+  attacker's own case onto the happy path, an assertion on the parsed DOM
+  rather than on known-bad substrings. `Ex041` cannot be fixed without a
+  timing assertion or IL reflection and is documented as behaviourally graded
+  instead. **So: after the reject-everything variant, build the plausible
+  wrong one too.** `security/README.md`'s "How a security test lies" is the
+  long form.
+
   Toolchain traps, all measured: **bUnit 2.9 still ships an obsolete
   `Bunit.TestContext`**, which collides with xunit.v3's `Xunit.TestContext`
   (`CS0104`) the moment a test file has `using Bunit;` and also touches
@@ -724,12 +744,12 @@ constant, which is worth knowing before writing a `BuildRenderTree` by hand.
 
 `security/` is content-complete and verified end-to-end: 60/60 exercises
 across four attack-surface blocks (not tiers — see its own entry in
-"Track-specific gotchas" above), 326 test facts total (127 `01-web-aspnet` +
-55 `02-web-blazor` + 104 `03-desktop-core` + 37 `04-desktop-wpf`, plus 3
-harness canaries). The stub run reports Total: 326, Failed: 322, Passed: 3,
+"Track-specific gotchas" above), 333 test facts total (131 `01-web-aspnet` +
+58 `02-web-blazor` + 104 `03-desktop-core` + 37 `04-desktop-wpf`, plus 3
+harness canaries). The stub run reports Total: 333, Failed: 329, Passed: 3,
 Skipped: 1 (the 3 passing are the harness canaries; the 1 skipped is
 Ex060's symbolic-link fact, which needs elevation or Windows Developer Mode);
-the solutions run reports Total: 326, Failed: 0, Passed: 325, Skipped: 1.
+the solutions run reports Total: 333, Failed: 0, Passed: 332, Skipped: 1.
 Both builds emit 0 warnings. Verified via
 `dotnet test --solution FeWoLearning.Security.slnx` (red) and the same
 command with `-p:UseSolutions=true` (green).

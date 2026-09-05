@@ -93,7 +93,7 @@ root `CLAUDE.md`.
 These are deliberate, documented limitations rather than oversights. For most
 tracks they exist because `solutions/` is intentionally kept out of each build
 (the files reuse the stubs' type and module names, so compiling both at once
-would collide) — `avalonia/`, `blazor/`, `caliburn/`, `wpf/` and
+would collide) — `avalonia/`, `blazor/`, `caliburn/`, `wpf/`, `security/` and
 `MicroServices/` are exceptions that keep `solutions/` in the build instead;
 see their own tracks for why.
 
@@ -113,6 +113,7 @@ see their own tracks for why.
 | `uno/`    | **Yes.** Same mechanism: `solutions/` is its own project, and `dotnet test -p:UseSolutions=true` runs the identical 823 tests against it. Every solution is confirmed green and every stub confirmed red, and the solutions build is expected to be warning-free - so a warning there is a finding. Lowest risk in this table. |
 | `caliburn/`| **Yes.** Same mechanism: `solutions/` is its own project, referenced by `tests/` whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. Lower risk than every other row in this table except `avalonia/`/`uno/`. |
 | `wpf/`    | **Yes.** Same mechanism: `solutions/` is its own project, referenced by `tests/` whenever the `UseSolutions` MSBuild property is set — `dotnet test -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. On its complete beginner tier (210 test facts: 5 harness smoke tests + 205 exercise facts), `dotnet test` shows 5 passed / 205 failed on the untouched tree, and 210 passed / 0 failed under `-p:UseSolutions=true`, with zero warnings on both builds. |
+| `security/`| **Yes.** Same mechanism: `solutions/` is its own project, referenced by `tests/` whenever the `UseSolutions` MSBuild property is set — `dotnet test --solution FeWoLearning.Security.slnx -p:UseSolutions=true` compiles and runs every test against the reference solutions instead of the stubs. Across all 60 exercises (333 test facts: 3 harness canaries + 330 exercise facts, 1 of them dynamically skipped), the stub run shows 3 passed / 329 failed / 1 skipped and the solutions run 332 passed / 0 failed / 1 skipped, with zero warnings on both builds. |
 
 Consequence: a reference solution can silently drift until it no longer passes
 its own test, and nothing reports it. This is not hypothetical — an audit found

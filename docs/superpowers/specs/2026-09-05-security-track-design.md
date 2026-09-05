@@ -95,39 +95,42 @@ parameterised query returns 0). 3.53.3 also works and also clears the warning;
 2.1.13 is chosen as the smallest move inside the line `Microsoft.Data.Sqlite`
 10.0.0 was built against.
 
-### 2.4 Bare `dotnet test` mis-resolves; use `--solution` or `--project`
+### 2.4 Give `dotnet test` an explicit `--solution` or `--project`
 
-**Corrected 2026-09-05, after the original measurement here proved misleading.**
+**Corrected twice — 2026-09-05, and again in the final review.** Read this as a
+rule to follow if a symptom appears, not as a defect this environment has.
 
 `security/global.json` opts into the `Microsoft.Testing.Platform` runner, whose
-`dotnet test` front-end takes `--project` / `--solution` rather than a positional
-path. Invoked with **no arguments** in a directory holding a `.slnx`, it
-auto-resolves to the built test **dll** instead of the solution and reports
-`Es wurden keine Tests ausgeführt` with exit code 5. Measured for `security/`
-and, identically, for the pre-existing `wpf/` track — so it is a property of the
-MTP opt-in, not of either track.
-
-Given an argument it works correctly:
+`dotnet test` front-end is built around `--project` / `--solution` rather than a
+bare, argument-less invocation. Use the explicit form:
 
 | Command | Result |
 |---|---|
-| `dotnet test` | exit 5, `gesamt: 0` |
-| `dotnet test --solution FeWoLearning.Security.slnx` | 326 total, 322 failed, 3 passed, 1 skipped, exit 2 |
-| `dotnet test --project tests/FeWoLearning.Security.Tests.csproj` | identical |
+| `dotnet test --solution FeWoLearning.Security.slnx` | 333 total, 329 failed, 3 passed, 1 skipped, exit 2 |
+| `dotnet test --solution FeWoLearning.Security.slnx -p:UseSolutions=true` | 333 total, 0 failed, 332 passed, 1 skipped |
+| `dotnet test --project tests/FeWoLearning.Security.Tests.csproj` | identical to the first row |
 | `… --filter-class "*Ex001*"` | 5 tests — filtering works |
 
-Ruled out as causes: the shell sandbox (it fails with the sandbox disabled too),
-a stale build server (`dotnet build-server shutdown` changed nothing), the SDK
-version, and environment variables.
+**The conditional rule:** *if* a bare, argument-less `dotnet test` in this
+directory ever reports zero tests (`Es wurden keine Tests ausgeführt`, exit code
+5), the fix is the explicit `--solution` / `--project` form above, whatever the
+cause. Do not assume it is necessary before you have seen it.
 
-The original entry here claimed `dotnet test` was simply broken in this
-environment and that building plus running the test executable directly was the
-only option. That conclusion was wrong, and it was wrong in the most expensive
-direction: it would have told a reader the tool does not work when in fact they
-were one flag away. Building and running
-`tests/bin/Debug/net10.0-windows/FeWoLearning.Security.Tests.exe` directly does
-work, is how every batch in this track was verified, and remains a useful
-fallback — but it is not the only way.
+This entry originally recorded that zero-tests result as a measured, reproducible
+property of the MTP opt-in. It is **not** established as one. It was observed
+once; five separate later invocations — two in Bash and one in PowerShell against
+the already-built tree, and one each for `security/` and the pre-existing `wpf/`
+track in a throwaway `git worktree` that had never been built at all — every one
+of them completed correctly with the full totals, and no party since has
+reproduced the failure. Whatever produced the original observation was not a
+property of this track or of the runner opt-in as such.
+
+Building and running
+`tests/bin/Debug/net10.0-windows/FeWoLearning.Security.Tests.exe` directly also
+works, is how every batch in this track was verified, sidesteps the `dotnet test`
+front-end entirely, and remains a useful fallback — but it is not the only way,
+and the earlier claim that it was is exactly the error this entry has now been
+corrected for twice.
 
 ### 2.5 Consequences of the platform choice
 
@@ -175,9 +178,9 @@ SDK props import and therefore too late.
 
 The **test project must use `Microsoft.NET.Sdk`, not `Microsoft.NET.Sdk.Razor`**.
 It has no `.razor` files of its own; the components under test live in the
-content library. (The Razor SDK was tried in the test project during the probe
-and made no difference to the §2.4 discovery failure, but the plain SDK is the
-correct minimal choice and matches `wpf/`.)
+content library. (The Razor SDK was tried in the test project while chasing the
+zero-tests symptom §2.4 describes and made no difference to it, but the plain SDK
+is the correct minimal choice and matches `wpf/`.)
 
 ### 3.1 Namespaces
 

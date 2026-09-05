@@ -6,7 +6,11 @@ public class Ex023_FileUploadValidationTests
 {
     private static readonly byte[] PngMagicBytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 
+    private static readonly byte[] PdfMagicBytes = [0x25, 0x50, 0x44, 0x46]; // "%PDF"
+
     private static byte[] GenuinePng(int extraBytes = 16) => [.. PngMagicBytes, .. new byte[extraBytes]];
+
+    private static byte[] GenuinePdf(int extraBytes = 16) => [.. PdfMagicBytes, .. new byte[extraBytes]];
 
     [Fact]
     public void Attack_An_Exe_Extension_Is_Rejected_Outright()
@@ -67,6 +71,24 @@ public class Ex023_FileUploadValidationTests
         Assert.Null(rejection);
         Assert.EndsWith(".png", storageName);
         Assert.NotEqual("photo.png", storageName);
+    }
+
+    // Without this fact the MZ-disguised "report.pdf" above is unreachable through
+    // the content check: an implementation whose allowlist simply omits ".pdf"
+    // rejects it at the extension gate and never reads a byte, so it passes the
+    // attack fact for free while sniffing nothing at all. Accepting a *genuine*
+    // PDF forces ".pdf" onto the allowlist, which is what makes the disguised one
+    // reach - and have to fail - the magic-byte check.
+    [Fact]
+    public void Use_A_Genuine_Pdf_Named_Report_Pdf_Is_Accepted()
+    {
+        var accepted = Ex023_FileUploadValidation.TryAccept(
+            "report.pdf", GenuinePdf(), maxBytes: 1_000_000, out var storageName, out var rejection);
+
+        Assert.True(accepted);
+        Assert.Null(rejection);
+        Assert.EndsWith(".pdf", storageName);
+        Assert.NotEqual("report.pdf", storageName);
     }
 
     [Fact]

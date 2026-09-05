@@ -34,8 +34,14 @@ public class Ex009_CorsPolicyTests
         Assert.False(response.Headers.Contains("Access-Control-Allow-Origin"));
     }
 
+    // Asserting only "not (wildcard AND credentials)" would be vacuous: a policy
+    // that never allows credentials at all satisfies it without ever facing the
+    // choice. So this fact first pins credentials ON - the response really does
+    // carry Access-Control-Allow-Credentials: true - and only then demands that
+    // the origin be the exact one rather than "*". That is the forbidden
+    // combination, one edit away, with nowhere left to hide.
     [Fact]
-    public async Task Attack_The_Response_Never_Combines_Wildcard_Origin_With_Credentials()
+    public async Task Attack_Credentials_Are_Allowed_Only_Alongside_An_Exact_Origin_Never_A_Wildcard()
     {
         await using var harness = await StartAsync();
 
@@ -43,12 +49,11 @@ public class Ex009_CorsPolicyTests
         request.Headers.Add("Origin", AllowedOrigin);
         var response = await harness.Client.SendAsync(request, TestContext.Current.CancellationToken);
 
-        var isWildcardOrigin = response.Headers.TryGetValues("Access-Control-Allow-Origin", out var origins) &&
-                                origins.Contains("*");
-        var allowsCredentials = response.Headers.TryGetValues("Access-Control-Allow-Credentials", out var creds) &&
-                                 creds.Contains("true");
+        Assert.Equal("true", Assert.Single(response.Headers.GetValues("Access-Control-Allow-Credentials")));
 
-        Assert.False(isWildcardOrigin && allowsCredentials);
+        var origin = Assert.Single(response.Headers.GetValues("Access-Control-Allow-Origin"));
+        Assert.NotEqual("*", origin);
+        Assert.Equal(AllowedOrigin, origin);
     }
 
     [Fact]

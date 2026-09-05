@@ -6,8 +6,15 @@
            without handing an attacker a script injection. Implement Sanitize so
            that Rendered returns markup safe to pass to MarkupString.
    Drills: MarkupString as a sink, sanitisation, when raw HTML is never safe.
-   Passes: attack facts - script elements, event-handler attributes and
-                          javascript: URLs never survive into the rendered output;
+   Passes: attack facts - script elements, iframes, event-handler attributes
+                          (including "onerror =" written with a space before the
+                          "=") and javascript: URLs - plain or entity-encoded -
+                          never survive into the rendered output; and neither
+                          does any other element, nor any attribute on any
+                          element. The rendered DOM is inspected, not merely
+                          searched for known-bad substrings, so a denylist that
+                          strips only the payloads it happens to recognise fails
+                          here where an allowlist passes without knowing them;
            use facts     - <em> and <strong> do survive, and plain text renders
                           unchanged. *@
 
