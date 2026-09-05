@@ -18,9 +18,12 @@
 // MethodName "WithParam" - and that trigger exists as soon as the XAML is parsed, before any
 // window and before this exercise's AttachViewModel has even run. What AttachViewModel supplies
 // is the DataContext the ActionMessage needs to find WithParam on: without it, raising Click
-// (even once the view is shown) invokes nothing, because there is no view model to resolve the
-// method against. Single quotes in the attach string mark a literal - 'abcd' arrives at
-// WithParam as the literal string "abcd", not a binding to some property named abcd.
+// (even once the view is shown) THROWS - measured as
+// System.Exception: "No target found for method WithParam." - because ActionMessage.ThrowsExceptions
+// defaults to true and there is no view model to resolve the method against. This is a real,
+// observable failure, not a silent no-op. Single quotes in the attach string mark a literal -
+// 'abcd' arrives at WithParam as the literal string "abcd", not a binding to some property
+// named abcd.
 
 using System.Windows;
 using Caliburn.Micro;

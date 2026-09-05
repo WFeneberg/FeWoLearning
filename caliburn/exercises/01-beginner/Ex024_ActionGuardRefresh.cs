@@ -15,14 +15,15 @@
 // NotifyOfPropertyChange(nameof(CanGuarded)) afterwards updates IsEnabled to match.
 //
 // Guarding ByMethod() with a bool CanByMethod() METHOD instead: the button starts correctly
-// disabled when CanByMethod() returns false at bind time - the initial evaluation genuinely
-// reads the method. But once bound, mutating the backing field, then calling
-// NotifyOfPropertyChange(nameof(CanByMethod)) (a targeted notification naming the method), then
-// even calling a full Refresh() (which raises PropertyChanged with an empty property name, ex002)
-// - none of it moves IsEnabled off its original, now-stale value. Do not conclude the method
-// form is "unsupported" or "never works" from this - its initial evaluation at bind time is
-// correct. What is measured is narrower: nothing re-evaluates it afterwards, because
-// PropertyChanged notifications are matched against a PROPERTY name, and a method has none.
+// disabled once the view is loaded (ex023's threshold - not merely bound) when CanByMethod()
+// returns false - the initial evaluation genuinely reads the method. But once loaded, mutating
+// the backing field, then calling NotifyOfPropertyChange(nameof(CanByMethod)) (a targeted
+// notification naming the method), then even calling a full Refresh() (which raises
+// PropertyChanged with an empty property name, ex002) - none of it moves IsEnabled off its
+// original, now-stale value. Do not conclude the method form is "unsupported" or "never works"
+// from this - its initial evaluation on load is correct. What is measured is narrower: nothing
+// re-evaluates it afterwards, because PropertyChanged notifications are matched against a
+// PROPERTY name, and a method has none.
 
 using System.Windows;
 using Caliburn.Micro;
@@ -54,10 +55,11 @@ public class Ex024_Vm : PropertyChangedBase
     /// <summary>Mutates the guard's backing field directly - deliberately bypasses the property setter's own notification.</summary>
     public void SetGuardSilently(bool value) => _canGuarded = value;
 
-    /// <summary>Explicitly announces the guard property changed - the fix for staleness.</summary>
-    public void AnnounceGuard() => NotifyOfPropertyChange(nameof(CanGuarded));
+    /// <summary>Explicitly announces the guard property changed - the fix for staleness. THIS is the exercise: write the one call that re-triggers the guard's re-evaluation.</summary>
+    public void AnnounceGuard() =>
+        throw new NotImplementedException("TODO: Ex024 - NotifyOfPropertyChange(nameof(CanGuarded))");
 
-    /// <summary>A guard METHOD, not a property - evaluated once at bind time (measured above).</summary>
+    /// <summary>A guard METHOD, not a property - evaluated once on load (measured above), never revisited.</summary>
     public bool CanByMethod() => _canByMethod;
 
     public void ByMethod() { }
@@ -65,6 +67,7 @@ public class Ex024_Vm : PropertyChangedBase
     /// <summary>Mutates the method guard's backing field directly - there is no property setter to bypass here at all.</summary>
     public void SetByMethodSilently(bool value) => _canByMethod = value;
 
-    /// <summary>A targeted announcement naming the guard method - measured to have no effect (no property to match).</summary>
-    public void AnnounceByMethodGuard() => NotifyOfPropertyChange(nameof(CanByMethod));
+    /// <summary>A targeted announcement naming the guard method - measured to have no effect (no property to match). Same call shape as AnnounceGuard above, aimed at the method guard instead.</summary>
+    public void AnnounceByMethodGuard() =>
+        throw new NotImplementedException("TODO: Ex024 - NotifyOfPropertyChange(nameof(CanByMethod))");
 }

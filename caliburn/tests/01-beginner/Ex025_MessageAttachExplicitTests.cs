@@ -94,4 +94,24 @@ public class Ex025_MessageAttachExplicitTests : CaliburnViewContext
 
         Assert.Equal(0, vm.Count);
     }
+
+    [WpfFact]
+    public void Without_A_DataContext_Clicking_The_Hosted_Button_Throws_No_Target_Found()
+    {
+        // Drives the throwing member on a THROWAWAY element first, so an unimplemented stub
+        // still fails here for the right reason - but this decoy's DataContext has nothing to
+        // do with the button under test below, which never gets attached to any view model.
+        var subject = new Ex025_MessageAttachExplicit();
+        subject.AttachViewModel(new Grid(), new Ex025_Vm());
+
+        var view = (FrameworkElement)XamlReader.Parse(Xaml);
+        var button = (Button)view.FindName("NotAMethodName")!;
+        Show(view);
+
+        // Measured: this is a real, observable throw - not a silent no-op - because
+        // ActionMessage.ThrowsExceptions defaults to true and there is no DataContext to
+        // resolve WithParam against.
+        var ex = Assert.Throws<Exception>(() => button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)));
+        Assert.Contains("WithParam", ex.Message);
+    }
 }

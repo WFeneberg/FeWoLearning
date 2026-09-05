@@ -16,7 +16,11 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
 
     protected CaliburnViewContext() => PlatformProvider.Current = new XamlPlatformProvider();
 
-    /// <summary>Measure/arrange only. Enough for geometry and for guard evaluation.</summary>
+    /// <summary>
+    /// Measure/arrange only. Enough for geometry - NOT enough for guard evaluation (measured:
+    /// a CanXxx guard is still unevaluated after Layout alone, see ex023/ex024) or for action
+    /// invocation (see <see cref="Show"/>). Guard evaluation needs <see cref="Load"/>.
+    /// </summary>
     protected static void Layout(FrameworkElement e)
     {
         e.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -27,7 +31,10 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
     /// <summary>
     /// Raises Loaded across the tree. FrameworkElement.LoadedEvent is a *direct* routed
     /// event, so raising it on the root alone never reaches the root's children.
-    /// Use this only when a Loaded callback is the subject; actions need <see cref="Show"/>.
+    /// Additionally (measured, ex023/ex024): this is enough for ActionMessage to evaluate a
+    /// CanXxx guard and apply IsEnabled - no real window required for that. Actually INVOKING
+    /// the action still needs <see cref="Show"/>: guard evaluation and action invocation are
+    /// two different thresholds.
     /// </summary>
     protected static void Load(FrameworkElement root)
     {
@@ -49,7 +56,9 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
     /// dispose. THIS IS THE ONLY WAY TO EXERCISE AN ACTION: Caliburn's actions ride on
     /// Microsoft.Xaml.Behaviors triggers, which refuse to resolve their source until the
     /// element has a PresentationSource. Measure/Arrange does not supply one, ApplyTemplate
-    /// does not, and neither does raising Loaded by hand -- only a real window does.
+    /// does not, and neither does raising Loaded by hand -- only a real window does. Guard
+    /// evaluation does NOT need this (<see cref="Load"/> alone is enough) - this additionally
+    /// unlocks INVOKING the action, which Load alone does not.
     /// </summary>
     protected Window Show(FrameworkElement view)
     {

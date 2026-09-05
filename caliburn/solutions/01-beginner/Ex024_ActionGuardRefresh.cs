@@ -37,10 +37,10 @@ public class Ex024_Vm : PropertyChangedBase
     /// <summary>Mutates the guard's backing field directly - deliberately bypasses the property setter's own notification.</summary>
     public void SetGuardSilently(bool value) => _canGuarded = value;
 
-    /// <summary>Explicitly announces the guard property changed - the fix for staleness.</summary>
+    /// <summary>Explicitly announces the guard property changed - the fix for staleness. THIS is the exercise: write the one call that re-triggers the guard's re-evaluation.</summary>
     public void AnnounceGuard() => NotifyOfPropertyChange(nameof(CanGuarded));
 
-    /// <summary>A guard METHOD, not a property - evaluated once at bind time (measured above).</summary>
+    /// <summary>A guard METHOD, not a property - evaluated once on load (measured above), never revisited.</summary>
     public bool CanByMethod() => _canByMethod;
 
     public void ByMethod() { }
@@ -48,6 +48,6 @@ public class Ex024_Vm : PropertyChangedBase
     /// <summary>Mutates the method guard's backing field directly - there is no property setter to bypass here at all.</summary>
     public void SetByMethodSilently(bool value) => _canByMethod = value;
 
-    /// <summary>A targeted announcement naming the guard method - measured to have no effect (no property to match).</summary>
+    /// <summary>A targeted announcement naming the guard method - measured to have no effect (no property to match). Same call shape as AnnounceGuard above, aimed at the method guard instead.</summary>
     public void AnnounceByMethodGuard() => NotifyOfPropertyChange(nameof(CanByMethod));
 }

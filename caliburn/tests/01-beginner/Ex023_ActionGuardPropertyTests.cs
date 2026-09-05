@@ -1,6 +1,5 @@
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Markup;
 using FeWoLearning.Caliburn.Exercises.Beginner;
 
@@ -18,28 +17,53 @@ public class Ex023_ActionGuardPropertyTests : CaliburnViewContext
         </UserControl>
         """;
 
-    (Ex023_Vm Vm, Button Guarded, Button Unguarded) Bound(Ex023_Vm vm)
+    (Ex023_ActionGuardProperty Subject, Ex023_Vm Vm, FrameworkElement View, Button Guarded, Button Unguarded) BoundNotLoaded(Ex023_Vm vm)
     {
         var subject = new Ex023_ActionGuardProperty();
         var view = (FrameworkElement)XamlReader.Parse(Xaml);
         subject.Bind(vm, view);
+        return (subject, vm, view, (Button)view.FindName("Guarded")!, (Button)view.FindName("Unguarded")!);
+    }
+
+    (Ex023_ActionGuardProperty Subject, Ex023_Vm Vm, Button Guarded, Button Unguarded) Bound(Ex023_Vm vm)
+    {
+        var (subject, _, view, guarded, unguarded) = BoundNotLoaded(vm);
         Show(view);
-        return (vm, (Button)view.FindName("Guarded")!, (Button)view.FindName("Unguarded")!);
+        return (subject, vm, guarded, unguarded);
     }
 
     [WpfFact]
-    public void CanGuarded_False_At_Bind_Time_Disables_The_Button_Immediately()
+    public void Binding_Alone_Does_Not_Yet_Gate_The_Button_Loading_Does()
     {
-        var (_, guarded, _) = Bound(new Ex023_Vm(canGuarded: false));
+        var (_, _, view, guarded, _) = BoundNotLoaded(new Ex023_Vm(canGuarded: false));
 
-        // No click, no explicit refresh - the guard is honoured purely from binding the view.
+        // Right after Bind() - no Layout, no Load, no Show - the guard has not been evaluated
+        // yet: ActionMessage defers reading it and subscribing to PropertyChanged through
+        // View.ExecuteOnLoad, so the button measures ENABLED even though CanGuarded is false.
+        // A wrong implementation that (incorrectly) expects the guard to apply the instant
+        // Bind returns would pass every other test in this class and fail only here.
+        Assert.True(guarded.IsEnabled);
+
+        // Loading the view is what makes the guard apply - and a real window is NOT required
+        // for THIS (unlike invoking the action itself, which needs Show - see ex022).
+        Load(view);
+
         Assert.False(guarded.IsEnabled);
     }
 
     [WpfFact]
-    public void CanGuarded_True_At_Bind_Time_Leaves_The_Button_Enabled_Immediately()
+    public void CanGuarded_False_Disables_The_Button_Once_Loaded()
     {
-        var (_, guarded, _) = Bound(new Ex023_Vm(canGuarded: true));
+        var (_, _, guarded, _) = Bound(new Ex023_Vm(canGuarded: false));
+
+        // No click, no explicit refresh - the guard is honoured purely from the view loading.
+        Assert.False(guarded.IsEnabled);
+    }
+
+    [WpfFact]
+    public void CanGuarded_True_Leaves_The_Button_Enabled_Once_Loaded()
+    {
+        var (_, _, guarded, _) = Bound(new Ex023_Vm(canGuarded: true));
 
         Assert.True(guarded.IsEnabled);
     }
@@ -47,7 +71,7 @@ public class Ex023_ActionGuardPropertyTests : CaliburnViewContext
     [WpfFact]
     public void Changing_CanGuarded_Through_Its_Public_Setter_Enables_The_Button_After_Pump()
     {
-        var (vm, guarded, _) = Bound(new Ex023_Vm(canGuarded: false));
+        var (_, vm, guarded, _) = Bound(new Ex023_Vm(canGuarded: false));
         Assert.False(guarded.IsEnabled);
 
         // Moving the guard: a real property setter backed by Set() announces the change on
@@ -61,20 +85,20 @@ public class Ex023_ActionGuardPropertyTests : CaliburnViewContext
     [WpfFact]
     public void The_Guarded_IsEnabled_Is_Not_Wired_Through_A_Real_Binding_Even_Though_The_Guard_Works()
     {
-        var (_, guarded, _) = Bound(new Ex023_Vm(canGuarded: false));
+        var (subject, _, guarded, _) = Bound(new Ex023_Vm(canGuarded: false));
 
-        // The gating demonstrably works (see the tests above) - but, unlike every other
-        // convention this track has measured, it is not implemented as a WPF Binding. A test
-        // that instead asserted a Binding existed here would be asserting something false.
-        Assert.Null(BindingOperations.GetBinding(guarded, UIElement.IsEnabledProperty));
+        // Anchor the "no Binding" claim to a DEMONSTRABLY WORKING guard - without this first
+        // assertion, the second would pass for any implementation, working or not.
+        Assert.False(guarded.IsEnabled);
+        Assert.False(subject.HasBinding(guarded, UIElement.IsEnabledProperty));
     }
 
     [WpfFact]
     public void A_Button_With_No_Matching_CanXxx_Property_Stays_Enabled_And_Ungated()
     {
-        var (_, _, unguarded) = Bound(new Ex023_Vm(canGuarded: false));
+        var (subject, _, _, unguarded) = Bound(new Ex023_Vm(canGuarded: false));
 
         Assert.True(unguarded.IsEnabled);
-        Assert.Null(BindingOperations.GetBinding(unguarded, UIElement.IsEnabledProperty));
+        Assert.False(subject.HasBinding(unguarded, UIElement.IsEnabledProperty));
     }
 }

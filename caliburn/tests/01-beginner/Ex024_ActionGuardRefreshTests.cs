@@ -49,7 +49,7 @@ public class Ex024_ActionGuardRefreshTests : CaliburnViewContext
     }
 
     [WpfFact]
-    public void A_Method_Guard_Evaluates_Correctly_At_Bind_Time_When_It_Returns_False()
+    public void A_Method_Guard_Evaluates_Correctly_Once_Loaded_When_It_Returns_False()
     {
         var (_, _, byMethod) = Bound(new Ex024_Vm(canByMethod: false));
 
@@ -57,12 +57,12 @@ public class Ex024_ActionGuardRefreshTests : CaliburnViewContext
     }
 
     [WpfFact]
-    public void A_Method_Guard_Evaluates_Correctly_At_Bind_Time_When_It_Returns_True()
+    public void A_Method_Guard_Evaluates_Correctly_Once_Loaded_When_It_Returns_True()
     {
         var (_, _, byMethod) = Bound(new Ex024_Vm(canByMethod: true));
 
         // Proves the initial read genuinely calls CanByMethod() - a wrong implementation that
-        // just always started every guarded button disabled would pass the False-at-bind-time
+        // just always started every guarded button disabled would pass the False-once-loaded
         // test above and fail only here.
         Assert.True(byMethod.IsEnabled);
     }
