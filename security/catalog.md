@@ -73,10 +73,10 @@ implementations in `solutions/<block>/` at the same relative path.
 | 039 | AesGcmAuthenticatedEncryption | AES-GCM, nonce uniqueness, tag verification, tamper detection | ✅ |
 | 040 | KeyDerivationAndRotation | key derivation, versioned key material, decrypting older versions | ✅ |
 | 041 | FixedTimeComparison | CryptographicOperations.FixedTimeEquals, why length-first exits leak | ✅ |
-| 042 | CryptographicRandomness | RandomNumberGenerator over System.Random, token generation | ✅ |
-| 043 | SignatureVerification | detached signatures, public-key verification, rejecting tampered data | ✅ |
-| 044 | UpdateIntegrityAndRollback | hash manifests, signed manifests, monotonic version enforcement | ✅ |
-| 045 | UnsafeDeserialization | polymorphic type handling, type allowlists, rejecting arbitrary types | ✅ |
+| 042 | CryptographicRandomness | RandomNumberGenerator over System.Random, token generation, URL-safe encoding | ✅ |
+| 043 | SignatureVerification | ECDSA sign/verify, detached signatures, tamper detection, and recognising when a platform primitive already provides a safety property so the caller does not need to reinvent it | ✅ |
+| 044 | UpdateIntegrityAndRollback | hash manifests, signed manifests, monotonic version enforcement (rollback protection), semantic version comparison | ✅ |
+| 045 | UnsafeDeserialization | polymorphic type handling, type allowlists, rejecting arbitrary types, not leaking attacker input back into error messages | ✅ |
 | 046 | XmlExternalEntity | XmlReaderSettings, DtdProcessing, XmlResolver, entity expansion | ✅ |
 | 047 | ZipSlipExtraction | archive entry path containment, absolute and relative escapes | ✅ |
 | 048 | PathCanonicalization | full-path containment, UNC and device-name traps, alternate streams | ✅ |
@@ -91,7 +91,7 @@ implementations in `solutions/<block>/` at the same relative path.
 |-----|------|----------|--------|
 | 053 | PasswordBoxNoPlaintextBinding | PasswordBox, why Password is not a DependencyProperty | ✅ |
 | 054 | SensitiveBufferLifetime | clearing sensitive buffers, bounded lifetime of plaintext | ✅ |
-| 055 | ClipboardHygiene | clipboard as shared state, excluding data from history | ✅ |
+| 055 | ClipboardHygiene | clipboard as shared state, excluding data from history and cloud sync | ✅ |
 | 056 | DragDropUntrustedPayload | validating dropped formats and paths before acting | ✅ |
 | 057 | EmbeddedBrowserNavigationPolicy | navigation allowlists, scheme restrictions, host object exposure | ✅ |
 | 058 | XamlReaderUntrustedMarkup | XamlReader.Parse as code execution, restricting parsed markup | ✅ |

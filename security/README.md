@@ -1,0 +1,269 @@
+# Security Track
+
+60 graded C# exercises in application security, across the two surfaces the
+track owner actually ships: **web** (ASP.NET Core + Blazor) and **Windows
+desktop** (.NET class libraries + WPF). All 60 are written and verified — see
+`catalog.md` for the row-by-row ledger.
+
+This track deliberately departs from the repo's usual 100-row / four-
+difficulty-tier scheme (see "Catalog structure" below), and it deviates from
+the repo-wide "`solutions/` stays out of the build" convention the same way
+`avalonia/`, `blazor/`, `uno/`, `caliburn/` and `wpf/` do: `exercises/` and
+`solutions/` compile the same type names into the same namespaces, and
+`tests/` references **exactly one** of them via the `UseSolutions` MSBuild
+property, so reference solutions are compile-checked on every green run and
+cannot drift silently.
+
+## Setup and commands
+
+**Windows-only.** Block `04-desktop-wpf` additionally needs an **interactive
+desktop session** — it opens real WPF elements — because WPF is; it will not
+run headless, as a service, or in a session-0/RDP-disconnected context.
+
+Run every command **from inside `security/`**, not the repo root.
+
+**`dotnet test` does not work in this environment.** Measured on this
+machine: it reports "no tests were run", exit code 5 — in both Bash and
+PowerShell — and it does so for the pre-existing, already-verified `wpf/`
+track too, not only for this one. This is a property of the environment, not
+a defect of either track. The working recipe is `dotnet build`, then run the
+built test executable directly:
+
+| Step | Command |
+|---|---|
+| Build stubs (red) | `dotnet build` |
+| Run stub tests | `tests\bin\Debug\net10.0-windows\FeWoLearning.Security.Tests.exe` |
+| Build solutions (green) | `dotnet build -p:UseSolutions=true` |
+| Run solution tests | `artifacts-solutions\bin\FeWoLearning.Security.Tests\debug\FeWoLearning.Security.Tests.exe` |
+
+Verified end-to-end, two independent runs: the stub build is **Total: 326,
+Failed: 322, Skipped: 1** (the 3 passing are the harness canaries — see
+"Per-row warnings" for the skip); the solutions build is **Total: 326,
+Failed: 0, Skipped: 1**, run twice with identical results. Both builds emit
+**0 warnings**. Per block: `01-web-aspnet` 127 facts, `02-web-blazor` 55,
+`03-desktop-core` 104, `04-desktop-wpf` 37 (one of which is the skip), plus
+the 3 harness canaries — 127+55+104+37+3 = 326.
+
+**Build output is German-locale on this machine** ("0 Warnung(en)", not
+"0 Warning(s)"). A scripted check that greps for the English string silently
+passes regardless of the real warning count — read the numeric totals, not
+the words around them.
+
+### Filter syntax
+
+The test executable's `-filter` takes the form `/Assembly/Namespace/Class/Method`,
+with wildcards allowed only at the start and/or end of a segment — not in the
+middle, and a `|`-joined single filter is rejected outright by xunit.v3
+("wildcards may only be at the beginning and/or end"). **A union of several
+things needs repeated `-filter` flags**, not one combined pattern.
+
+One exercise:
+
+```
+tests\bin\Debug\net10.0-windows\FeWoLearning.Security.Tests.exe -filter "/*/*/Ex001*"
+```
+
+A whole block:
+
+```
+tests\bin\Debug\net10.0-windows\FeWoLearning.Security.Tests.exe -filter "/*/FeWoLearning.Security.Tests.WebAspNet/*"
+```
+
+A batch of five (repeated flags, one per exercise):
+
+```
+tests\bin\Debug\net10.0-windows\FeWoLearning.Security.Tests.exe -filter "/*/*/Ex001*" -filter "/*/*/Ex002*" -filter "/*/*/Ex003*" -filter "/*/*/Ex004*" -filter "/*/*/Ex005*"
+```
+
+Same flags against the solutions executable path above for the green run.
+
+## Layout
+
+```
+security/
+  FeWoLearning.Security.slnx
+  Directory.Build.props          # ArtifactsPath redirect under UseSolutions — required, not cosmetic
+  global.json                    # {"test":{"runner":"Microsoft.Testing.Platform"}}
+  catalog.md                     # 60-row ledger, four attack-surface blocks
+  exercises/                     # Microsoft.NET.Sdk.Razor; _support/ + four block folders
+  solutions/                     # identical csproj, identical namespaces, identical _support/
+  tests/                         # Microsoft.NET.Sdk (NOT Razor); _harness/ + four block folders
+```
+
+Namespaces are pinned per block, not per folder, because a folder name like
+`01-web-aspnet` is not a valid C# identifier:
+
+| Folder | Namespace |
+|---|---|
+| `01-web-aspnet/` | `FeWoLearning.Security.Exercises.WebAspNet` |
+| `02-web-blazor/` | `FeWoLearning.Security.Exercises.WebBlazor` |
+| `03-desktop-core/` | `FeWoLearning.Security.Exercises.DesktopCore` |
+| `04-desktop-wpf/` | `FeWoLearning.Security.Exercises.DesktopWpf` |
+
+Test namespaces mirror as `FeWoLearning.Security.Tests.<Block>`. `_support/`
+(identical in `exercises/` and `solutions/`) holds shared fixtures — SQLite
+seed, RSA/ECDSA key generation, a recording logger, the shared attack-payload
+corpus — several exercises' tests depend on; it never carries a TODO and
+never gets a `catalog.md` row. `tests/_harness/` holds the three harness entry
+points (`WebHarness` over `TestServer`, `BlazorHarness` over `BunitContext`,
+and `[WpfFact]` from `Xunit.StaFact` directly) plus `HarnessSmokeTests` — three
+facts, one per harness, the only tests green on the untouched stub tree.
+
+## How a security test lies
+
+The rule this track lives or dies by:
+
+> **An attack fact alone is worthless. Every attack fact must be paired with
+> a use fact.**
+
+1. **An attack fact with no use fact grades nothing.** A reject-everything
+   implementation passes it for free. `Ex004_PathTraversalGuard`'s validator
+   returning a constant `false` passes every traversal payload ever written —
+   only a paired use fact ("the legitimate file is still served") catches
+   that degenerate. Every batch in this track was checked by actually
+   building reject-everything variants of its stubs and confirming the use
+   facts, and only the use facts, failed against them; do the same before
+   trusting a new exercise.
+
+2. **A hard-coded crypto digest tests transcription, not behaviour**, and
+   breaks the moment a legitimate parameter changes (a different salt, a
+   different iteration count). Assert properties instead: a different salt
+   yields a different hash, `Verify` round-trips its own `Hash`, a single
+   flipped ciphertext byte is detected.
+
+3. **A wall-clock timing assertion is flaky by construction.**
+   `Ex041_FixedTimeComparison` is graded on the mechanism and its behaviour —
+   that it genuinely uses a constant-time comparison over the hash rather
+   than `==`/`SequenceEqual` — never on elapsed time.
+
+4. **`Assert.Throws` on a stub that already throws is a false green.** Every
+   stub throws `NotImplementedException`, so a test asserting only "an
+   exception was thrown" passes before the implementation exists. Assert the
+   rejection *outcome* (a returned `false`, an unchanged state, a specific
+   status code), or a locally defined exception type the stub's
+   `NotImplementedException` cannot satisfy. This bites harder here than
+   elsewhere in the repo, because so many security behaviours are naturally
+   phrased as "this must be rejected". The sharper version this track found:
+   xunit's `Assert.Throws<T>` requires an **exact** type match, not a base
+   type — `AesGcm.Decrypt` throws `AuthenticationTagMismatchException`, a
+   `CryptographicException` *subtype*, so a test asserting the base
+   `CryptographicException` fails against real, correct .NET code for the
+   wrong reason. Assert the subtype the platform actually throws.
+
+## Toolchain traps
+
+Every one of these was measured by building and running real code, not read
+from documentation.
+
+- **bUnit 2.9 still ships an obsolete `Bunit.TestContext`**, which collides
+  with xunit.v3's `Xunit.TestContext` (`CS0104`) the moment a test file has
+  `using Bunit;` and also touches `TestContext.Current.CancellationToken`.
+  Fix: `using TestContext = Xunit.TestContext;`. `blazor/` never hits this
+  because it runs xunit 2.x, which has no `TestContext` at all.
+- **`Microsoft.Data.Sqlite` 10.0.0 drags in `SQLitePCLRaw.lib.e_sqlite3`
+  2.1.11**, which carries **GHSA-2m69-gcr7-jv3q (high severity)** and emits
+  `NU1903` on every build. `SQLitePCLRaw.bundle_e_sqlite3` cannot fix it —
+  bundle and lib versions are decoupled. Pinned instead to
+  **`SQLitePCLRaw.lib.e_sqlite3` 2.1.13**, the smallest move that clears the
+  advisory inside the line `Microsoft.Data.Sqlite` 10.0.0 was built against.
+- **Do not reference `Microsoft.Extensions.Hosting` or
+  `System.Security.Cryptography.ProtectedData`.** Both are already in the
+  shared framework for `net10.0-windows` here; referencing either emits
+  `NU1510` on every build. (`wpf/` *does* reference `Microsoft.Extensions.Hosting`
+  explicitly, because it targets the same TFM but does not carry
+  `Microsoft.AspNetCore.App` — do not copy that line into this track.)
+- **`Directory.Build.props` redirecting the solutions build's output via
+  `UseArtifactsOutput`/`ArtifactsPath` is required, not cosmetic.** Without it
+  the two content projects share an `obj/` tree and the build fails
+  `CS0579` on duplicate generated assembly-info attributes.
+- **The test project uses `Microsoft.NET.Sdk`, not the Razor SDK.** It has no
+  `.razor` files of its own — the components under test live in the content
+  library.
+- **`ImplicitUsings` here is the minimal set**: `System`,
+  `System.Collections.Generic`, `System.Linq`, `System.Threading`,
+  `System.Threading.Tasks`, `Xunit`, and nothing else — no `System.IO`, no
+  `System.Net`, no `System.Net.Http`. A `CS0246` in a test file is a missing
+  `using`, not a missing package.
+- **`[assembly: Parallelization(Mode = ParallelMode.None)]` needs
+  `using Xunit.Sdk; using Xunit.v3;`** — those types are not in the bare
+  `Xunit` namespace.
+- **bUnit's `BunitContext` pre-registers a `PlaceholderAuthorizationService`
+  that throws**, and `AddAuthorizationCore()` cannot displace it because the
+  registration is `TryAdd`-based. `BlazorHarness` registers
+  `AddSingleton<IAuthorizationService, DefaultAuthorizationService>()`
+  explicitly for exactly this reason; any row using `AuthorizeView` or
+  `[Authorize]` needs it.
+- **`ECDsa.VerifyData` never throws for malformed signature bytes**, in
+  either `IeeeP1363` or `Rfc3279DerSequence` format — 36 distinct malformed
+  inputs were tried across both formats and none threw. `Ex043` is scoped
+  around recognising this: the exercise teaches noticing when a platform
+  primitive already provides a safety property, rather than adding a guard
+  that would be dead code.
+- **The harness's own WPF canary was once tautological.** `ActualWidth > 0`
+  after `Arrange` holds regardless of whether a control template resolved,
+  because `FrameworkElement` defaults to `HorizontalAlignment.Stretch` and
+  fills whatever rect it is given. It now asserts `Template != null` plus
+  `DesiredSize > 0` measured **before** `Arrange`. Do not reintroduce the old
+  form.
+
+## Per-row warnings
+
+- **`Ex055_ClipboardHygiene` touches the real system clipboard**, which is
+  process-global and shared with the developer's own session. The test saves
+  prior clipboard content in its constructor and restores it in `Dispose`,
+  with a bounded 10-attempt retry against `COMException` — but **running the
+  suite will briefly disturb the clipboard** while it runs.
+- **`Ex060_FilePickerResultStillUntrusted` has the track's only skipped
+  test.** Its symbolic-link attack fact needs elevation or Windows Developer
+  Mode for `File.CreateSymbolicLink`; without either, the fact is dynamically
+  skipped via `Assert.Skip` with a reason, and shows as `Skipped: 1` in every
+  run on this machine. This fails safe rather than false-passing: the
+  property left ungraded on an unprivileged run is specifically "a path that
+  looks like it's inside the root but resolves outside it" — the other four
+  facts in the exercise still run and grade normally.
+- **`Ex049`, `Ex050` and `Ex052` create real OS objects** (processes, a named
+  pipe, an ACL'd file) under per-test temp directories, cleaned up
+  afterwards. `Ex050` uses a unique pipe name per test so the serialised
+  suite cannot collide with a leftover.
+- **`Ex053_PasswordBoxNoPlaintextBinding` is graded by reflection** over the
+  view model's public properties and fields, not by observing rendered
+  output.
+- **`Ex057_EmbeddedBrowserNavigationPolicy` deliberately does not reference
+  WebView2.** The runtime cannot be meaningfully exercised headless, and an
+  exercise that only pretended to test it would be worse than none; it tests
+  the navigation-policy decision surface as a standalone class instead.
+- **`Ex006_SqlInjectionParameterization` is the only row needing a
+  database.** It runs real in-memory SQLite rather than inspecting command
+  text, because a test that merely checks for a parameter placeholder in the
+  command string is satisfied by a solution that builds a right-looking
+  string and concatenates the attacker input in some other query entirely.
+
+## Catalog structure
+
+Every other track in this repo has 100 rows across four **difficulty tiers**.
+This track has **60 rows across four attack-surface blocks** instead, because
+"beginner" is not a meaningful axis for security: a path-traversal guard is
+not conceptually harder than a CSP header, they are different attack
+surfaces entirely. Difficulty rises **within** each block, not across the
+track.
+
+| Block folder | Rows | Harness |
+|---|---|---|
+| `01-web-aspnet` | 001–024 | `TestServer` |
+| `02-web-blazor` | 025–036 | bUnit |
+| `03-desktop-core` | 037–052 | plain xunit |
+| `04-desktop-wpf` | 053–060 | `[WpfFact]` |
+
+`catalog.md` keeps the repo's usual column shape (`# | Slug | Concepts |
+Status`) and its `**Status: N ✅ / M ⬜**` line, so the existing "read the
+catalog, take the next five ⬜ rows" workflow from the repo's `CLAUDE.md`
+still applies — only the row count and the axis the rows are organised by
+differ.
+
+## Deliberate exclusions
+
+Recorded so they read as decisions, not oversights: supply-chain / NuGet
+package-signature verification, threat-modelling artefacts, the full OAuth
+2.0 / OIDC authorization-code-with-PKCE flow (rows 017–018 cover token
+*validation* and rotation, not the flow itself), Windows service and
+privilege separation, and Kerberos/NTLM. None of the 60 rows attempt these.
