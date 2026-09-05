@@ -36,15 +36,27 @@ public class HarnessSmokeTests
     }
 
     [WpfFact]
-    public void Wpf_Harness_Applies_A_Control_Template()
+    public void Wpf_Harness_Runs_Sta_And_Resolves_A_Default_Control_Template()
     {
-        var box = SmokeProbe.MakeTextBox();
+        // The apartment state is what [WpfFact] itself buys; assert it, so a
+        // StaFact regression is named rather than showing up as a cast exception
+        // somewhere in block 04.
+        Assert.Equal(ApartmentState.STA, Thread.CurrentThread.GetApartmentState());
 
-        box.Measure(new System.Windows.Size(200, 50));
-        box.Arrange(new System.Windows.Rect(0, 0, 200, 50));
+        var button = SmokeProbe.MakeButton();
+
+        button.Measure(new System.Windows.Size(200, 50));
         WpfPump.Pump();
 
-        Assert.True(box.ActualWidth > 0);
-        Assert.Equal("smoke", box.Text);
+        // Template plus DesiredSize, measured BEFORE any Arrange. Do not assert
+        // ActualWidth after Arrange: a FrameworkElement defaults to
+        // HorizontalAlignment.Stretch and fills whatever rect it is given, so
+        // ActualWidth > 0 holds even with an empty template - the assertion cannot
+        // fail, which makes it worthless as a canary. DesiredSize comes from Measure
+        // and is 0x0 when template resolution breaks. This is the idiom
+        // wpf/tests/_harness/HarnessSmokeTests.cs already uses and has verified.
+        Assert.NotNull(button.Template);
+        Assert.True(button.DesiredSize.Width > 0, "A templated Button must measure wider than 0.");
+        Assert.True(button.DesiredSize.Height > 0, "A templated Button must measure taller than 0.");
     }
 }

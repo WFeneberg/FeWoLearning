@@ -14,5 +14,8 @@ public static class SmokeProbe
             await ctx.Response.WriteAsync("pong");
         });
 
-    public static System.Windows.Controls.TextBox MakeTextBox() => new() { Text = "smoke" };
+    // A Button, not a TextBox: Button's default template resolves through
+    // SystemResources without an Application, and its DesiredSize is 0x0 when that
+    // resolution fails - which is what makes the smoke fact able to fail at all.
+    public static System.Windows.Controls.Button MakeButton() => new() { Content = "smoke" };
 }
