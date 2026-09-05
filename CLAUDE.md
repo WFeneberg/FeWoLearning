@@ -78,10 +78,10 @@ suite against the reference solutions instead of the stubs.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-05: ex001-ex025 (138 exercise test facts) are red on
-  the untouched tree — `dotnet test` shows 138 failed, 7 passed (the 7 harness
+  verified as of 2026-09-05: ex001-ex030 (171 exercise test facts) are red on
+  the untouched tree — `dotnet test` shows 171 failed, 7 passed (the 7 harness
   smoke tests, which pass in both modes) — and `dotnet test
-  -p:UseSolutions=true` shows 145 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
+  -p:UseSolutions=true` shows 178 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
   five exercises as of 2026-09-04, on **.NET 10.0.400** with **xunit.v3 4.0.0**
   and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11):
   `dotnet test` shows 4 passed (the harness smoke tests) and 37 exercise facts
@@ -309,6 +309,22 @@ suite against the reference solutions instead of the stubs.
   and that read happens *after* the same instance constructor's `Clear()`
   call, so the snapshot comes back empty and permanently zeroes the
   collection for the whole run. Measured on this machine.
+  The same namespace-shadowing trap the file already records for `avalonia/`
+  applies here: a file whose own namespace starts `FeWoLearning.Caliburn.…`
+  cannot reference a Caliburn type fully qualified —
+  `Caliburn.Micro.Action.SetTarget(...)` fails `CS0234`, because the leading
+  `Caliburn` segment binds to the enclosing `FeWoLearning.Caliburn`. `using
+  Caliburn.Micro;` directives are exempt; the workarounds are a `using
+  CaliburnAction = Caliburn.Micro.Action;` alias or `global::Caliburn.Micro.…`.
+  This bites stub TODO strings especially, since a learner types those
+  verbatim. **A measured fact that reframes several exercises:**
+  `ViewModelBinder.Bind(viewModel, view, null)` calls `Action.SetTarget` on the
+  root under the hood. Measured on a freshly parsed view with no
+  `DataContext` assignment at all, `Bind` alone leaves `DataContext` set to
+  the view model, `Action.HasTargetSet` true, `GetTarget` set and
+  `GetTargetWithoutContext` null. That is why the `$view` special value
+  resolves to the bound view rather than collapsing onto `$source` — the
+  collapse only happens where nothing up the tree ever had a target set.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -402,7 +418,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 10 / 100 (verified) | 90 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 25 / 100 (verified) | 75 |
+| `caliburn/`| 30 / 100 (verified) | 70 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/` and
