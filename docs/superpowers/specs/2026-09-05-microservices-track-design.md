@@ -292,7 +292,7 @@ rarely.
 name:
 
 ```
-aspire run --project MicroServices/playground -- --exercise ex037
+aspire run --apphost MicroServices/playground -- --exercise ex037
 ```
 
 This is what buys back the "every exercise is really runnable, in the real

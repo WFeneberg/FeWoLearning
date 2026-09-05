@@ -43,7 +43,8 @@ Run every command **from inside `MicroServices/`**, not the repo root.
 | `dotnet test -p:UseSolutions=true` | the **green** run: the same facts against `solutions/` |
 | `dotnet test -p:Containers=true` | adds the L3 rows — real containers, real queries |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | one exercise |
-| `aspire run --project playground -- --exercise ex001` | run that exercise's model in the real Aspire dashboard |
+| `aspire run --apphost playground -- --exercise ex001` | run that exercise's model in the real Aspire dashboard |
+| `dotnet run --project playground -- --exercise ex001` | same, without the Aspire CLI |
 
 The last two combine with `-p:UseSolutions=true` and `-p:Containers=true` freely.
 

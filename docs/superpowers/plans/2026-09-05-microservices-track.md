@@ -620,13 +620,13 @@ public static class ExerciseRegistry
 ```csharp
 var builder = DistributedApplication.CreateBuilder(args);
 
-// `aspire run --project MicroServices/playground -- --exercise ex001`
+// `aspire run --apphost MicroServices/playground -- --exercise ex001`
 var id = builder.Configuration["exercise"];
 
 if (string.IsNullOrWhiteSpace(id))
 {
     Console.Error.WriteLine(
-        "Pass an exercise, e.g.: aspire run --project MicroServices/playground -- --exercise ex001");
+        "Pass an exercise, e.g.: aspire run --apphost MicroServices/playground -- --exercise ex001");
     Console.Error.WriteLine("Known: " + string.Join(", ", ExerciseRegistry.Known));
     return;
 }
@@ -846,7 +846,7 @@ Expected: `100`.
 
 `MicroServices/README.md` must cover, at minimum:
 
-- setup and the four commands: `dotnet test`, `dotnet test -p:UseSolutions=true`, `dotnet test -p:Containers=true`, `aspire run --project playground -- --exercise exNNN`
+- setup and the four commands: `dotnet test`, `dotnet test -p:UseSolutions=true`, `dotnet test -p:Containers=true`, `aspire run --apphost playground -- --exercise exNNN`
 - the three test levels and what each can and cannot prove
 - the pinned versions, and **why** xunit.v3 4.0.0 / MTP `global.json` is forbidden
 - the `Aspire.Hosting.Elasticsearch` 13.3.0 version lag

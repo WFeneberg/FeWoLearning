@@ -1,12 +1,12 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// `aspire run --project MicroServices/playground -- --exercise ex001`
+// `aspire run --apphost MicroServices/playground -- --exercise ex001`
 var id = builder.Configuration["exercise"];
 
 if (string.IsNullOrWhiteSpace(id))
 {
     Console.Error.WriteLine(
-        "Pass an exercise, e.g.: aspire run --project MicroServices/playground -- --exercise ex001");
+        "Pass an exercise, e.g.: aspire run --apphost MicroServices/playground -- --exercise ex001");
     Console.Error.WriteLine("Known: " + string.Join(", ", ExerciseRegistry.Known));
     return;
 }
