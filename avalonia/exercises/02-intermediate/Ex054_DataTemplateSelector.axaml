@@ -1,0 +1,37 @@
+<!-- Exercise 054 - DataTemplateSelector (intermediate).
+     Goal:   Render a mixed-type collection through Avalonia's implicit, type-keyed
+     DataTemplates - there is no WPF-style DataTemplateSelector, and none is
+     needed: an ItemsControl picks a template out of its DataTemplates collection
+     by matching each item's runtime type against every template's DataType.
+     Drills: ItemsControl.DataTemplates, DataTemplate DataType, implicit dispatch.
+     Passes: dotnet test, filtered to Ex054_ (see
+     Ex054_DataTemplateSelector.axaml.cs for the exact command - an XML comment
+     cannot hold two hyphens in a row). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex054_DataTemplateSelector"
+             x:DataType="i:Ex054_DataTemplateSelectorViewModel">
+  <!-- TODO: replace the placeholder with a single ItemsControl named "Pets", its
+       ItemsSource bound to Pets, and a DataTemplates collection holding one
+       DataTemplate per pet type, each rendering {CompiledBinding Label}:
+         <ItemsControl Name="Pets" ItemsSource="{CompiledBinding Pets}">
+           <ItemsControl.DataTemplates>
+             <DataTemplate DataType="i:Ex054_Dog">
+               <TextBlock Text="{CompiledBinding Label}" />
+             </DataTemplate>
+             <DataTemplate DataType="i:Ex054_Cat">
+               <TextBlock Text="{CompiledBinding Label}" />
+             </DataTemplate>
+           </ItemsControl.DataTemplates>
+         </ItemsControl>
+       A fixed set of hard-coded TextBlocks reproduces the same three strings with
+       no ItemsControl and no template at all - the test looks up a control
+       specifically typed ItemsControl by name, and separately appends a FOURTH
+       pet (another dog, breaking the dog/cat/dog alternation) after the initial
+       render and checks a new TextBlock appears with the right text - something
+       a hard-coded panel can never do. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

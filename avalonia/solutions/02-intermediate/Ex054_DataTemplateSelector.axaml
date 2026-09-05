@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex054_DataTemplateSelector"
+             x:DataType="i:Ex054_DataTemplateSelectorViewModel">
+  <ItemsControl Name="Pets" ItemsSource="{CompiledBinding Pets}">
+    <ItemsControl.DataTemplates>
+      <DataTemplate DataType="i:Ex054_Dog">
+        <TextBlock Text="{CompiledBinding Label}" />
+      </DataTemplate>
+      <DataTemplate DataType="i:Ex054_Cat">
+        <TextBlock Text="{CompiledBinding Label}" />
+      </DataTemplate>
+    </ItemsControl.DataTemplates>
+  </ItemsControl>
+</UserControl>

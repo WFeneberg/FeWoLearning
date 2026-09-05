@@ -1,0 +1,31 @@
+<!-- Exercise 055 - HierarchicalTemplate (intermediate).
+     Goal:   Render a tree of nested view models through a TreeView and a
+     TreeDataTemplate, whose ItemsSource points at each node's own children so
+     TreeView can recurse through the hierarchy on its own.
+     Drills: TreeView, TreeDataTemplate, ItemsSource recursion, IsExpanded.
+     Passes: dotnet test, filtered to Ex055_ (see
+     Ex055_HierarchicalTemplate.axaml.cs for the exact command - an XML comment
+     cannot hold two hyphens in a row). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex055_HierarchicalTemplate"
+             x:DataType="i:Ex055_HierarchicalTemplateViewModel">
+  <!-- TODO: replace the placeholder with a single TreeView named "Tree", its
+       ItemsSource bound to RootItems, and a TreeDataTemplate whose ItemsSource is
+       bound to Children (so TreeView can recurse) and whose content renders
+       {CompiledBinding Name}:
+         <TreeView Name="Tree" ItemsSource="{CompiledBinding RootItems}">
+           <TreeView.ItemTemplate>
+             <TreeDataTemplate x:DataType="i:Ex055_Node" ItemsSource="{CompiledBinding Children}">
+               <TextBlock Text="{CompiledBinding Name}" />
+             </TreeDataTemplate>
+           </TreeView.ItemTemplate>
+         </TreeView>
+       A flat list of hard-coded TextBlocks can reproduce the COLLAPSED state (just
+       the root visible) - the test expands the realized root container and checks
+       BOTH children appear too, which a flat list can never do. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

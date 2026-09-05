@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex055_HierarchicalTemplate"
+             x:DataType="i:Ex055_HierarchicalTemplateViewModel">
+  <TreeView Name="Tree" ItemsSource="{CompiledBinding RootItems}">
+    <TreeView.ItemTemplate>
+      <TreeDataTemplate x:DataType="i:Ex055_Node" ItemsSource="{CompiledBinding Children}">
+        <TextBlock Text="{CompiledBinding Name}" />
+      </TreeDataTemplate>
+    </TreeView.ItemTemplate>
+  </TreeView>
+</UserControl>
