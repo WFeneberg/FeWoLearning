@@ -1,6 +1,9 @@
 // Exercise 012 - View Aware Callbacks (beginner).
 // Goal:   Learn the two callbacks a Screen gets about its own view, and that they fire at two
 //         genuinely different moments.
+// Drills: OnViewAttached firing immediately and synchronously from AttachView, versus
+//         OnViewLoaded firing only once the view has really been loaded - plus views being
+//         stored keyed by context.
 // Passes: dotnet test --filter FullyQualifiedName~Ex012_
 
 using Caliburn.Micro;

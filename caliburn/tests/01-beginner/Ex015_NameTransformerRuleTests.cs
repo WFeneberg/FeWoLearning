@@ -41,6 +41,20 @@ public class Ex015_NameTransformerRuleTests : CaliburnViewContext
     }
 
     [WpfFact]
+    public void One_RegisterPresenterRule_Call_Resolves_Every_Presenter_Suffixed_Model_Not_Just_One()
+    {
+        var subject = new Ex015_NameTransformerRule();
+
+        subject.RegisterPresenterRule();
+
+        // A rule hard-coded to Ex015_ReportPresenter's exact name (or to Ex015_ReportView's)
+        // would satisfy the first assertion below and stop there - this second, unrelated
+        // Presenter-suffixed model is what forces a genuine, general rule instead.
+        Assert.IsType<Ex015_ReportView>(subject.Locate(new Ex015_ReportPresenter()));
+        Assert.IsType<Ex015_SummaryView>(subject.Locate(new Ex015_SummaryPresenter()));
+    }
+
+    [WpfFact]
     public void The_New_Rule_Does_Not_Make_An_Unrelated_Missing_Model_Findable_Too()
     {
         var subject = new Ex015_NameTransformerRule();

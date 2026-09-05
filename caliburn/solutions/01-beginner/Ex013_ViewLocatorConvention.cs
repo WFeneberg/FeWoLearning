@@ -1,6 +1,8 @@
 // Exercise 013 - View Locator Convention (beginner).
 // Goal:   Learn the default convention ViewLocator uses to find a view for a model, and that
 //         a missing view is not an error.
+// Drills: ViewLocator.LocateForModel's FooViewModel -> FooView convention, AssemblySource's
+//         part in it, and the placeholder TextBlock returned for a view it cannot find.
 // Passes: dotnet test --filter FullyQualifiedName~Ex013_
 
 using System.Windows.Controls;

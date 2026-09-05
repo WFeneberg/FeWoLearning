@@ -26,6 +26,14 @@ public abstract class CaliburnCoreContext
     // ever taken. An explicit static constructor removes beforefieldinit, which forces the CLR to
     // run this before ANY instance of the class can be constructed -- guaranteeing the snapshot
     // is taken while ViewLocator.NameTransformer still holds its pristine 4 rules.
+    //
+    // Two more forward risks this reset does NOT cover. First, the snapshot is SHALLOW: restoring
+    // means re-adding the same four Rule instances, not four fresh copies, and Rule.ReplacePattern/
+    // ReplacementValues are public, mutable fields - a test that mutates a built-in rule in place,
+    // rather than adding a new one, is not undone by Clear()+re-add. Second, "pristine" only holds
+    // because nothing touches ViewLocator.NameTransformer before this static constructor runs; a
+    // future test class that reads or mutates it from its OWN static field initializer, before any
+    // CaliburnCoreContext is ever constructed, would silently poison this snapshot for the whole run.
     static readonly List<NameTransformer.Rule> PristineNameTransformerRules;
 
     static CaliburnCoreContext() => PristineNameTransformerRules = ViewLocator.NameTransformer.ToList();

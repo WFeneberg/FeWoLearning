@@ -147,12 +147,20 @@ Caliburn's configuration — `IoC`, `PlatformProvider`, `AssemblySource`, the
 `CaliburnCoreContext` resets exactly four globals per test now —
 `PlatformProvider.Current`, `AssemblySource.Instance`, the `IoC` delegates, and (since
 ex011–ex015) `ViewLocator.NameTransformer`, the first of these globals an exercise
-actually mutated. It still does **not** reset `ViewModelBinder.BindProperties`/
-`BindActions`, `ConventionManager.ElementConventions`, `MessageBinder.SpecialValues`/
-`CustomConverters`, `ActionMessage.InvokeAction`/`ApplyAvailabilityEffect`,
-`LogManager.GetLog`, or `BindingScope.GetNamedElements` — all equally static and
-equally process-global. Nothing shipped today touches those, but ex020
-(`CustomElementConvention`), ex063, ex068–ex073, ex087, ex095 and ex096 will. Because the
+actually mutated. It still does **not** reset `ViewLocator.LocateTypeForModelType` (a
+second writable static delegate field on the very type ex013–ex015 already touch, sitting
+right next to the one that now is reset), `ViewModelBinder.BindProperties`/`BindActions`,
+`ConventionManager.ElementConventions`, `MessageBinder.SpecialValues`/`CustomConverters`,
+`ActionMessage.InvokeAction`/`ApplyAvailabilityEffect`, `LogManager.GetLog`, or
+`BindingScope.GetNamedElements` — all equally static and equally process-global. Nor does
+it reset `Caliburn.Micro.ViewModelLocator` — a **separate type** from `ViewLocator`, with
+its **own** `NameTransformer` static field plus `LocateTypeForViewType`/`LocateForViewType`/
+`LocateForView`, used for view-first resolution. **ex016 (`ViewModelLocator`) is the very
+next catalog row and is exactly the exercise likely to need this**, the same way ex015
+needed the extension this batch made to `ViewLocator.NameTransformer` — do not assume
+ex015's reset covers it; `ViewModelLocator.NameTransformer` is a distinct object. Beyond
+that, nothing shipped today touches ex020 (`CustomElementConvention`), ex063, ex068–ex073,
+ex087, ex095 or ex096's statics either, but those will. Because the
 assembly runs serially with no restore between tests, the first of those to mutate one
 of these statics will leak into every later test in the run unless whoever writes it
 first extends `CaliburnCoreContext` (or `CaliburnViewContext`) the same way ex015's
