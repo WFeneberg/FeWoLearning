@@ -1,0 +1,14 @@
+@page "/advanced/075"
+@rendermode InteractiveServer
+
+<h1>Exercise 075 - CustomInputBaseText</h1>
+
+<p>Comma-separated tags. "two words" is rejected; the model keeps its last good value.</p>
+
+<Ex075_CustomInputBaseText_Form Model="_model" />
+
+<p>Model: [@string.Join(" | ", _model.Tags ?? [])]</p>
+
+@code {
+    private readonly Ex075_CustomInputBaseText_Form.TagModel _model = new() { Tags = ["alpha", "beta"] };
+}

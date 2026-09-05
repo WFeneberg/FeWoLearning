@@ -381,7 +381,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 70 / 100 (verified) | 30 |
+| `blazor/` | 75 / 100 (verified) | 25 |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 15 / 100 (verified) | 85 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
@@ -432,10 +432,11 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 70 written exercises — the whole of `01-beginner` and the whole of
-`02-intermediate` — carry 246 individual test facts; `dotnet test` shows 246
-failed/0 passed on the untouched tree and `dotnet test -p:UseSolutions=true`
-shows 246 passed/0 failed (verified 2026-09-05). Every failure but one traces
+`blazor/`'s 75 written exercises — all of `01-beginner`, all of
+`02-intermediate`, and ex071–ex075 of `03-advanced` — carry 269 individual test
+facts; `dotnet test` shows 269 failed/0 passed on the untouched tree and
+`dotnet test -p:UseSolutions=true` shows 269 passed/0 failed (verified
+2026-09-05). Every failure but one traces
 to its own exercise's `NotImplementedException`; the exception is ex069, whose
 subject is a generic *type constraint* that no behaviour can prove (LINQ's
 `Min`/`Max` need none), so it is graded by reading the type parameter's
@@ -458,6 +459,13 @@ resolution. A third, from ex063/ex065: a negative assertion about async work
 ("the cancelled load did not write its result") is vacuous until the renderer's
 queue has drained, and `await Renderer.Dispatcher.InvokeAsync(() => { })` is
 the drain — no sleep needed, because the continuation was queued there first.
+A fourth, from ex073/ex074: `<Virtualize>` does render under bUnit, but with no
+viewport to measure it falls back to a fixed window, so `ItemSize` does **not**
+change how many rows are realised and a pending items provider renders nothing
+at all. What is observable is the `ItemsProviderRequest`, `OverscanCount`
+widening the window, `Placeholder` filling slots an *under-delivering* provider
+left empty, and `ItemSize` scaling the trailing spacer div — see
+`blazor/README.md` §7.
 
 ## The `uno/` track
 

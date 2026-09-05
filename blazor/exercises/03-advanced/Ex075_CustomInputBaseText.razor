@@ -1,0 +1,38 @@
+@inherits InputBase<string[]>
+@using System.Diagnostics.CodeAnalysis
+@* Exercise 075 - Custom Input Base Text (advanced).
+   Goal:   A form input for a value the browser can only hand you as text, that
+           reports bad text as a validation error rather than throwing or silently
+           keeping the old value.
+   Drills: deriving from InputBase<T>, FormatValueAsString (T -> what the input
+           shows) and TryParseValueFromString (what the user typed -> T, or an
+           error message), and CurrentValueAsString as the seam between them.
+   Passes: dotnet test --filter FullyQualifiedName~Ex075_ *@
+<input class="@CssClass" value="@CurrentValueAsString"
+       @onchange="@(e => CurrentValueAsString = e.Value?.ToString())"
+       @attributes="AdditionalAttributes" />
+
+@code {
+    public const string ParseError = "Tags must be non-empty and contain no spaces.";
+
+    // TODO: the value as the input should display it - the tags joined by ", ".
+    // Null is a legal value here and must come out as the empty string.
+    protected override string FormatValueAsString(string[]? value)
+        => throw new NotImplementedException("TODO: Ex075 - format the tags for display");
+
+    // TODO: the other direction. Split what was typed on commas and trim each part.
+    //   - all parts non-empty and free of whitespace -> that array, no error, true.
+    //   - anything else -> false, with validationErrorMessage set to ParseError.
+    //     Returning false is what keeps the model on its last good value and puts
+    //     the message on screen; do not throw. Assign result anyway - the compiler
+    //     requires it - but know that InputBase ignores it on the false path, so []
+    //     is the honest thing to put there.
+    //   - text that is empty or whitespace parses to an empty array, not an error.
+    // The attributes are part of the base signature: without them the override does
+    // not match its nullability contract (CS8765).
+    protected override bool TryParseValueFromString(
+        string? value,
+        [MaybeNullWhen(false)] out string[] result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
+        => throw new NotImplementedException("TODO: Ex075 - parse the typed tags");
+}

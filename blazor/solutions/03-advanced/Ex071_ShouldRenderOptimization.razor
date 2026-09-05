@@ -1,0 +1,45 @@
+@* Exercise 071 - Should Render Optimization (advanced).
+   Goal:   Stop re-rendering for parameter pushes that change nothing, without
+           breaking the re-renders this component asks for itself.
+   Drills: ShouldRender, remembering what was last rendered, and the trap that
+           ShouldRender gates every render - including the one after a click.
+   Passes: dotnet test --filter FullyQualifiedName~Ex071_ *@
+<span id="value">@Value</span>
+<span id="clicks">@Clicks</span>
+<button id="bump" @onclick="Bump">bump</button>
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+
+    /// How many times this component has actually rendered. Not rendered itself -
+    /// a counter that is part of the output would change the output it counts.
+    public int RenderCount { get; private set; }
+
+    public int Clicks { get; private set; }
+
+    private string? _lastRendered;
+    private bool _dirty = true;
+
+    protected override void OnParametersSet()
+    {
+        if (Value != _lastRendered)
+        {
+            _dirty = true;
+        }
+    }
+
+    private void Bump()
+    {
+        Clicks++;
+        _dirty = true;
+    }
+
+    protected override bool ShouldRender() => _dirty;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        RenderCount++;
+        _lastRendered = Value;
+        _dirty = false;
+    }
+}

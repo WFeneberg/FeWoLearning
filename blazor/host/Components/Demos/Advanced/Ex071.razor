@@ -1,0 +1,20 @@
+@page "/advanced/071"
+@rendermode InteractiveServer
+
+<h1>Exercise 071 - ShouldRenderOptimization</h1>
+
+<p>"push same" re-supplies the identical value: the child does not re-render.
+   Renders so far: <span id="count">@(_child?.RenderCount)</span></p>
+<button id="same" @onclick="Refresh">push same</button>
+<button id="different" @onclick="Change">push different</button>
+
+<Ex071_ShouldRenderOptimization @ref="_child" Value="@_value" />
+
+@code {
+    private Ex071_ShouldRenderOptimization? _child;
+    private string _value = "a";
+
+    private void Refresh() { }
+
+    private void Change() => _value = _value == "a" ? "b" : "a";
+}

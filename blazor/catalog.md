@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 70 ✅ / 30 ⬜**
+**Status: 75 ✅ / 25 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -101,11 +101,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 071 | ShouldRenderOptimization | `ShouldRender` override, skipping redundant re-renders | ⬜ |
-| 072 | KeyDiffingDeepDive | `@key` under reorder/insert/delete, instance reuse vs recreation | ⬜ |
-| 073 | VirtualizeItemsProvider | `Virtualize`, `ItemsProviderResult<T>`, paged loading | ⬜ |
-| 074 | VirtualizeFixedItemSize | `Virtualize` with `ItemSize`, placeholder rendering, overscan | ⬜ |
-| 075 | CustomInputBaseText | `InputBase<T>` derivative, `TryParseValueFromString` override | ⬜ |
+| 071 | ShouldRenderOptimization | `ShouldRender` override, skipping redundant re-renders | ✅ |
+| 072 | KeyDiffingDeepDive | `@key` under reorder/insert/delete, instance reuse vs recreation | ✅ |
+| 073 | VirtualizeItemsProvider | `Virtualize`, `ItemsProviderResult<T>`, paged loading | ✅ |
+| 074 | VirtualizeFixedItemSize | `Virtualize` with `ItemSize`, placeholder rendering, overscan | ✅ |
+| 075 | CustomInputBaseText | `InputBase<T>` derivative, `TryParseValueFromString` override | ✅ |
 | 076 | CustomInputBaseNumeric | `InputBase<T>` for a value type, `FormatValueAsString`, `CurrentValueAsString` | ⬜ |
 | 077 | CustomValidatorComponent | custom validator component wired into `EditContext` | ⬜ |
 | 078 | CrossFieldValidator | cross-field validation via `EditContext.OnValidationRequested` | ⬜ |

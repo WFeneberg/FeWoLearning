@@ -1,0 +1,17 @@
+@* Exercise 075 - Custom Input Base Text (advanced) - the form around it.
+   No TODO here: an InputBase<T> derivative only comes to life inside an EditForm,
+   which is what supplies the cascading EditContext it validates against. The
+   exercise is Ex075_CustomInputBaseText.razor. *@
+<EditForm Model="Model">
+    <Ex075_CustomInputBaseText id="tags" @bind-Value="Model.Tags" />
+    <ValidationMessage For="() => Model.Tags" />
+</EditForm>
+
+@code {
+    public sealed class TagModel
+    {
+        public string[] Tags { get; set; } = [];
+    }
+
+    [Parameter] public TagModel Model { get; set; } = new();
+}

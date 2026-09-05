@@ -1,0 +1,24 @@
+@* Exercise 073 - Virtualize Items Provider (advanced).
+   Goal:   Feed a list that is far too long to render from a paged source, one
+           window at a time.
+   Drills: <Virtualize> with an ItemsProvider, the StartIndex/Count of an
+           ItemsProviderRequest, and ItemsProviderResult<T> carrying the total the
+           component sizes itself by.
+   Passes: dotnet test --filter FullyQualifiedName~Ex073_ *@
+<Virtualize Context="item" ItemsProvider="LoadAsync" ItemSize="ItemSize">
+    <ItemContent>
+        <div class="row">@item</div>
+    </ItemContent>
+</Virtualize>
+
+@code {
+    /// The paged source. StartIndex/Count of the request say which window is wanted;
+    /// the result carries the items plus how many there are in total.
+    [Parameter] public Func<ItemsProviderRequest, ValueTask<ItemsProviderResult<string>>> Provider { get; set; }
+        = _ => ValueTask.FromResult(new ItemsProviderResult<string>([], 0));
+
+    [Parameter] public float ItemSize { get; set; } = 20f;
+
+    private ValueTask<ItemsProviderResult<string>> LoadAsync(ItemsProviderRequest request)
+        => Provider(request);
+}

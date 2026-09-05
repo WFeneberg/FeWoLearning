@@ -6,13 +6,15 @@
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
 plain C# language features — those belong to the `dotnet/` track. As of this
-writing, ex001–ex070 are written and verified — the whole of **01-beginner**
+writing, ex001–ex075 are written and verified — the whole of **01-beginner**
 (ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
 `@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
 the whole of **02-intermediate** (ex036–ex070: `EditForm`/validation, DI and
 state containers, JS interop, navigation, persistent component state, `@ref`,
-the async lifecycle, error boundaries and generic components). **03-advanced**
-and **04-expert** (ex071–ex100) are catalog rows only (⬜) — `catalog.md` is the source of truth.
+the async lifecycle, error boundaries and generic components), plus the first
+five rows of **03-advanced** (ex071–ex075: `ShouldRender`, `@key` diffing,
+`Virtualize`, a custom `InputBase<T>`). ex076–ex100 are catalog rows only
+(⬜) — `catalog.md` is the source of truth.
 
 ## 2. Prerequisites
 
@@ -30,7 +32,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 246 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 269 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -151,6 +153,19 @@ Where an exercise needs a JS call, its test asserts against **bUnit's
 against actual browser behavior. **A green test in this track is not evidence
 of browser behavior**; it is evidence the component called the right method
 with the right arguments against a stand-in.
+
+`<Virtualize>` is a partial exception worth spelling out, because ex073/ex074
+depend on knowing where the line is. It renders in bUnit, but there is no
+viewport for it to measure, so it falls back to a fixed window: **`ItemSize`
+does not change how many rows are realised** (20f and 80f both produced 100),
+and a *pending* items provider renders neither rows nor placeholders. What is
+observable, and what those two exercises are therefore graded on: the
+`ItemsProviderRequest` the component issues, the rows it realises versus the
+declared total, `OverscanCount` widening that window (100 → 120 for an
+overscan of 10), the `Placeholder` fragment filling the slots a provider
+*under-delivered* on, and `ItemSize` scaling the trailing spacer `<div>` that
+reserves room for the rows that are not in the DOM. Anything phrased in terms
+of scrolling belongs in a browser, not here.
 
 `preventDefault` is a non-goal of this tier specifically:
 `@onclick:preventDefault` has no observable effect on bUnit's DOM (there is no
@@ -369,6 +384,24 @@ concrete failure modes worth carrying into future batches:
   dropping `ErrorContent`, returning early instead of calling
   `base.OnErrorAsync`, ignoring the `RenderFragment<T>`, swapping the
   constrained comparison for LINQ, and rendering the `<ul>` unconditionally.
+  ex071–ex075 as well: forgetting to re-open the `ShouldRender` gate after a
+  click (both click facts), dropping the `@key` (four of five), materialising
+  the whole list instead of paging it, not forwarding `ItemSize`/
+  `OverscanCount` to `<Virtualize>`, and accepting invalid input in
+  `TryParseValueFromString` instead of reporting it.
+- **Mutate the solution before writing what a fact proves, not after.** ex075's
+  test carried a comment claiming that assigning a half-parsed array before
+  returning `false` from `TryParseValueFromString` would fail it. The mutation
+  said otherwise: `InputBase` ignores the `out` value entirely on the false
+  path, so that implementation passes every fact. The comment was wrong, not
+  the test — the graded contract is the `false` plus the message, and the fact
+  does catch an implementation that returns `true` for bad input. A confident
+  sentence in a test comment is a claim like any other; run it.
+- **A first render never consults `ShouldRender`.** ex071 originally had a
+  "the first render happens" fact, which passed against the untouched stub for
+  that reason — ComponentBase renders once before it ever asks. Its assertions
+  now ride along inside the fact that pushes a second time. Any fact about a
+  gate must arrange for the gate to be consulted.
 - **`T?` on an unconstrained type parameter is an annotation, not
   `Nullable<T>`.** ex068 renders a badge for `T="Guid"` with no value, and the
   fallback is `Guid.Empty`, not nothing — a value-type `T` has no null to fall

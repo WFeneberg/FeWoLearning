@@ -1,0 +1,18 @@
+@page "/advanced/072"
+@rendermode InteractiveServer
+
+<h1>Exercise 072 - KeyDiffingDeepDive</h1>
+
+<p>Tick a row, then reorder: with @@key the count travels with its label.</p>
+<button id="rotate" @onclick="Rotate">rotate</button>
+<button id="drop" @onclick="Drop">drop first</button>
+
+<Ex072_KeyDiffingDeepDive Labels="_labels" />
+
+@code {
+    private List<string> _labels = ["alpha", "beta", "gamma"];
+
+    private void Rotate() => _labels = [.. _labels.Skip(1), _labels[0]];
+
+    private void Drop() => _labels = [.. _labels.Skip(1)];
+}

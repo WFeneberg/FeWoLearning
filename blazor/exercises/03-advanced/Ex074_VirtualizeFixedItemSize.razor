@@ -1,0 +1,27 @@
+@* Exercise 074 - Virtualize Fixed Item Size (advanced).
+   Goal:   Control how big the realised window is, and show something in the gap
+           while a slow page is still loading.
+   Drills: <Virtualize>'s ItemSize and OverscanCount, and its Placeholder fragment,
+           which is what fills the window until the provider answers.
+   Passes: dotnet test --filter FullyQualifiedName~Ex074_ *@
+
+@* TODO: render a <Virtualize> over Provider with BOTH fragments, passing ItemSize
+   and OverscanCount straight through:
+     ItemContent   <div class="row">…</div> with the item's text.
+     Placeholder   <div class="placeholder">…</div> - what a slot shows when its
+                   item is not there yet, which happens whenever the provider
+                   answers with fewer items than the request asked for.
+   The two knobs do different jobs, and the tests pin down both: OverscanCount
+   widens the realised window, while ItemSize never changes how many rows exist -
+   it sizes the spacer <div> that stands in for all the rows that do not. *@
+
+@code {
+    [Parameter] public Func<ItemsProviderRequest, ValueTask<ItemsProviderResult<string>>> Provider { get; set; }
+        = _ => ValueTask.FromResult(new ItemsProviderResult<string>([], 0));
+
+    [Parameter] public float ItemSize { get; set; } = 20f;
+    [Parameter] public int OverscanCount { get; set; } = 3;
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex074 - render the sized list with a placeholder");
+}

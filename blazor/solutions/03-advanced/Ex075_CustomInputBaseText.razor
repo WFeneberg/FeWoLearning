@@ -1,0 +1,50 @@
+@inherits InputBase<string[]>
+@using System.Diagnostics.CodeAnalysis
+@* Exercise 075 - Custom Input Base Text (advanced).
+   Goal:   A form input for a value the browser can only hand you as text, that
+           reports bad text as a validation error rather than throwing or silently
+           keeping the old value.
+   Drills: deriving from InputBase<T>, FormatValueAsString (T -> what the input
+           shows) and TryParseValueFromString (what the user typed -> T, or an
+           error message), and CurrentValueAsString as the seam between them.
+   Passes: dotnet test --filter FullyQualifiedName~Ex075_ *@
+<input class="@CssClass" value="@CurrentValueAsString"
+       @onchange="@(e => CurrentValueAsString = e.Value?.ToString())"
+       @attributes="AdditionalAttributes" />
+
+@code {
+    public const string ParseError = "Tags must be non-empty and contain no spaces.";
+
+    protected override string FormatValueAsString(string[]? value)
+        => value is null ? "" : string.Join(", ", value);
+
+    // The attributes are part of the base signature: without them the override does
+    // not match its nullability contract (CS8765).
+    protected override bool TryParseValueFromString(
+        string? value,
+        [MaybeNullWhen(false)] out string[] result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            result = [];
+            validationErrorMessage = null;
+            return true;
+        }
+
+        var parts = value.Split(',').Select(part => part.Trim()).ToArray();
+
+        if (parts.Any(part => part.Length == 0 || part.Any(char.IsWhiteSpace)))
+        {
+            // Ignored by InputBase on the false path; the false is what keeps the
+            // model on its last good value.
+            result = [];
+            validationErrorMessage = ParseError;
+            return false;
+        }
+
+        result = parts;
+        validationErrorMessage = null;
+        return true;
+    }
+}

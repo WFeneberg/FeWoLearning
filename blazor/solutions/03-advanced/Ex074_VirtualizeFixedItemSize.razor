@@ -1,0 +1,25 @@
+@* Exercise 074 - Virtualize Fixed Item Size (advanced).
+   Goal:   Control how big the realised window is, and show something in the gap
+           while a slow page is still loading.
+   Drills: <Virtualize>'s ItemSize and OverscanCount, and its Placeholder fragment,
+           which is what fills the window until the provider answers.
+   Passes: dotnet test --filter FullyQualifiedName~Ex074_ *@
+<Virtualize Context="item" ItemsProvider="LoadAsync" ItemSize="ItemSize" OverscanCount="OverscanCount">
+    <ItemContent>
+        <div class="row">@item</div>
+    </ItemContent>
+    <Placeholder>
+        <div class="placeholder">loading…</div>
+    </Placeholder>
+</Virtualize>
+
+@code {
+    [Parameter] public Func<ItemsProviderRequest, ValueTask<ItemsProviderResult<string>>> Provider { get; set; }
+        = _ => ValueTask.FromResult(new ItemsProviderResult<string>([], 0));
+
+    [Parameter] public float ItemSize { get; set; } = 20f;
+    [Parameter] public int OverscanCount { get; set; } = 3;
+
+    private ValueTask<ItemsProviderResult<string>> LoadAsync(ItemsProviderRequest request)
+        => Provider(request);
+}

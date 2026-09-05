@@ -1,0 +1,22 @@
+@page "/advanced/073"
+@rendermode InteractiveServer
+
+<h1>Exercise 073 - VirtualizeItemsProvider</h1>
+
+<p>50000 items, a few dozen in the DOM. Scroll the box.</p>
+
+<div style="height: 300px; overflow-y: auto; border: 1px solid #ccc;">
+    <Ex073_VirtualizeItemsProvider Provider="LoadAsync" ItemSize="24" />
+</div>
+
+@code {
+    private const int Total = 50_000;
+
+    private ValueTask<ItemsProviderResult<string>> LoadAsync(ItemsProviderRequest request)
+    {
+        var count = Math.Min(request.Count, Total - request.StartIndex);
+        return ValueTask.FromResult(new ItemsProviderResult<string>(
+            Enumerable.Range(request.StartIndex, count).Select(i => $"item-{i}"),
+            Total));
+    }
+}

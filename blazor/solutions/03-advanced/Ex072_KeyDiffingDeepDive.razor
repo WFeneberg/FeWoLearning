@@ -1,0 +1,14 @@
+@* Exercise 072 - Key Diffing Deep Dive (advanced).
+   Goal:   Keep each row's own state attached to its item when the list is
+           reordered or an item is removed, instead of to its position.
+   Drills: @key on a loop, and what the diff does without one - it matches children
+           by position, so row 0 keeps its state and is simply handed a new item.
+   Passes: dotnet test --filter FullyQualifiedName~Ex072_ *@
+@foreach (var label in Labels)
+{
+    <Ex072_KeyDiffingDeepDive_Row @key="label" Label="@label" />
+}
+
+@code {
+    [Parameter] public IReadOnlyList<string> Labels { get; set; } = [];
+}

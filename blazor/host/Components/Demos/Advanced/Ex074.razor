@@ -1,0 +1,23 @@
+@page "/advanced/074"
+@rendermode InteractiveServer
+
+<h1>Exercise 074 - VirtualizeFixedItemSize</h1>
+
+<p>The provider is slow, so the placeholders are visible while a window loads.</p>
+
+<div style="height: 300px; overflow-y: auto; border: 1px solid #ccc;">
+    <Ex074_VirtualizeFixedItemSize Provider="LoadAsync" ItemSize="24" OverscanCount="5" />
+</div>
+
+@code {
+    private const int Total = 50_000;
+
+    private async ValueTask<ItemsProviderResult<string>> LoadAsync(ItemsProviderRequest request)
+    {
+        await Task.Delay(500, request.CancellationToken);
+        var count = Math.Min(request.Count, Total - request.StartIndex);
+        return new ItemsProviderResult<string>(
+            Enumerable.Range(request.StartIndex, count).Select(i => $"item-{i}"),
+            Total);
+    }
+}

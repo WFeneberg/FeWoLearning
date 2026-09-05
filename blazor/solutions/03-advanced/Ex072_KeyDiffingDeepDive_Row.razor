@@ -1,0 +1,14 @@
+@* Exercise 072 - Key Diffing Deep Dive (advanced) - the row.
+   No TODO here: this is the thing whose survival the exercise is about. It holds
+   state of its own (Ticks) that no parameter can restore, so a row the diff threw
+   away and rebuilt is visibly a different row. *@
+<div class="row" data-label="@Label">
+    <button class="tick" @onclick="() => Ticks++">tick</button>
+    <span class="ticks">@Ticks</span>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+
+    public int Ticks { get; private set; }
+}
