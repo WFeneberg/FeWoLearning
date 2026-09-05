@@ -24,21 +24,19 @@ public enum Ex045_Outcome
 /// ResultCompletionEventArgs - Cancel via WasCancelled, Fail via Error, Succeed via neither.</summary>
 public class Ex045_OutcomeStep : IResult
 {
-    private List<string> Log { get; }
-
-    public string Name { get; }
-
-    private Ex045_Outcome Outcome { get; }
-
-    private Exception? Failure { get; }
+    private readonly List<string> _log;
+    private readonly Ex045_Outcome _outcome;
+    private readonly Exception? _failure;
 
     public Ex045_OutcomeStep(List<string> log, string name, Ex045_Outcome outcome, Exception? failure = null)
     {
-        Log = log;
+        _log = log;
         Name = name;
-        Outcome = outcome;
-        Failure = failure;
+        _outcome = outcome;
+        _failure = failure;
     }
+
+    public string Name { get; }
 
     public event EventHandler<ResultCompletionEventArgs>? Completed;
 
@@ -46,12 +44,12 @@ public class Ex045_OutcomeStep : IResult
 
     public void Execute(CoroutineExecutionContext context)
     {
-        Log.Add(Name);
+        _log.Add(Name);
 
-        var args = Outcome switch
+        var args = _outcome switch
         {
             Ex045_Outcome.Cancel => new ResultCompletionEventArgs { WasCancelled = true },
-            Ex045_Outcome.Fail => new ResultCompletionEventArgs { Error = Failure },
+            Ex045_Outcome.Fail => new ResultCompletionEventArgs { Error = _failure },
             _ => new ResultCompletionEventArgs(),
         };
 

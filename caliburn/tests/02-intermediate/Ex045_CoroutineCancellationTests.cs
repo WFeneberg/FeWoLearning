@@ -5,17 +5,8 @@ namespace FeWoLearning.Caliburn.Tests.Intermediate;
 
 public class Ex045_CoroutineCancellationTests : CaliburnCoreContext
 {
-    // A step that never raises Completed makes the awaited Task wait forever, not fail - see
-    // caliburn/README.md's Traps table. Bounding every coroutine await here means a forgotten
-    // Completed (or a wrong outcome branch) shows up as a clear, fast failure instead of
-    // stalling the whole suite.
-    private static async Task<Exception?> BoundedExceptionAsync(Task task, string because)
-    {
-        var winner = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(5)));
-        Assert.True(winner == task,
-            $"Timed out waiting for {because} - a step that never raises Completed stalls the coroutine forever instead of failing.");
-        return await Record.ExceptionAsync(() => task);
-    }
+    // BoundedExceptionAsync (used below) lives on CaliburnCoreContext - see its comment for why
+    // a coroutine await needs bounding at all.
 
     [Fact]
     public async Task All_Three_Steps_Succeeding_Runs_Every_Step_In_Order_With_No_Exception()

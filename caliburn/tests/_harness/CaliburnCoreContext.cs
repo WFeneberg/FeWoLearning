@@ -117,4 +117,43 @@ public abstract class CaliburnCoreContext
         foreach (var rule in PristineNameTransformerRules)
             ViewLocator.NameTransformer.Add(rule);
     }
+
+    // Added for ex041-ex045 (coroutines): a step whose IResult/IResult<T>.Execute never raises
+    // Completed makes Coroutine.ExecuteAsync's returned Task wait FOREVER, not fail - the same
+    // sharp edge documented above for ex010's CanCloseAsync. Awaiting a coroutine's task
+    // unconditionally therefore risks a hung test host rather than a red one; these three
+    // helpers bound that await instead, so a forgotten Completed fails fast with a clear message.
+    // Shared here (rather than duplicated per test file) because every coroutine exercise from
+    // here on needs the same bound.
+
+    /// <summary>Awaits task, but only up to 5 seconds - fails with a clear message instead of
+    /// hanging if a coroutine step never raises Completed.</summary>
+    protected static async Task BoundedAsync(Task task, string because)
+    {
+        var winner = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(5)));
+        Assert.True(winner == task,
+            $"Timed out waiting for {because} - a forgotten Completed stalls the coroutine forever instead of failing.");
+        await task;
+    }
+
+    /// <summary>Same bound as BoundedAsync, for a value-returning coroutine task.</summary>
+    protected static async Task<T> BoundedAsync<T>(Task<T> task, string because)
+    {
+        var winner = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(5)));
+        Assert.True(winner == task,
+            $"Timed out waiting for {because} - a forgotten Completed stalls the coroutine forever instead of failing.");
+        return await task;
+    }
+
+    /// <summary>Same bound as BoundedAsync, but returns the task's own exception (or null)
+    /// instead of rethrowing it - for tests that need to inspect WHICH exception a coroutine
+    /// faulted with. The timeout assertion above still runs (and can still fail) before this
+    /// ever touches task's exception, so a hang is never silently swallowed as "no exception".</summary>
+    protected static async Task<Exception?> BoundedExceptionAsync(Task task, string because)
+    {
+        var winner = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(5)));
+        Assert.True(winner == task,
+            $"Timed out waiting for {because} - a forgotten Completed stalls the coroutine forever instead of failing.");
+        return await Record.ExceptionAsync(() => task);
+    }
 }

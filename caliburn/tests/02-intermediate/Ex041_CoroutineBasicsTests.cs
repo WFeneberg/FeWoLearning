@@ -5,16 +5,8 @@ namespace FeWoLearning.Caliburn.Tests.Intermediate;
 
 public class Ex041_CoroutineBasicsTests : CaliburnCoreContext
 {
-    // A step that never raises Completed makes the awaited Task wait forever, not fail - see
-    // caliburn/README.md's Traps table. Bounding every coroutine await here means a forgotten
-    // Completed shows up as a clear, fast failure instead of stalling the whole suite.
-    private static async Task BoundedAsync(Task task, string because)
-    {
-        var winner = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(5)));
-        Assert.True(winner == task,
-            $"Timed out waiting for {because} - a forgotten Completed stalls the coroutine forever instead of failing.");
-        await task;
-    }
+    // BoundedAsync (used below) lives on CaliburnCoreContext - see its comment for why a
+    // coroutine await needs bounding at all.
 
     [Fact]
     public void Execute_Appends_Name_To_The_Shared_Log()

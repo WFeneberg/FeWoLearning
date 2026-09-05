@@ -5,17 +5,6 @@ namespace FeWoLearning.Caliburn.Tests.Intermediate;
 
 public class Ex043_CoroutineResultValueTests : CaliburnCoreContext
 {
-    // A step that never raises Completed makes the awaited Task wait forever, not fail - see
-    // caliburn/README.md's Traps table. Bounding every coroutine await here means a forgotten
-    // Completed shows up as a clear, fast failure instead of stalling the whole suite.
-    private static async Task BoundedAsync(Task task, string because)
-    {
-        var winner = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(5)));
-        Assert.True(winner == task,
-            $"Timed out waiting for {because} - a forgotten Completed stalls the coroutine forever instead of failing.");
-        await task;
-    }
-
     [Fact]
     public void Execute_Stores_The_Factorys_Value_Into_Result()
     {
@@ -27,15 +16,23 @@ public class Ex043_CoroutineResultValueTests : CaliburnCoreContext
     }
 
     [Fact]
-    public void Execute_Calls_The_Factory_Rather_Than_Leaving_Result_At_A_Default()
+    public void Execute_Calls_The_Factory_Exactly_Once_Not_Once_Per_Read()
     {
-        // A stub that never calls _factory and leaves Result at default(int) would pass a test
-        // asserting 0 - using a non-zero value here is what makes that failure mode visible.
-        var step = new Ex043_ValueResult<int>(() => 7);
+        // Catches two distinct bugs at once: a stub that never calls Factory at all (callCount
+        // stays 0), and a Result getter that re-evaluates Factory on every read instead of
+        // returning what Execute already stored (callCount would climb past 1 below).
+        var callCount = 0;
+        var step = new Ex043_ValueResult<int>(() =>
+        {
+            callCount++;
+            return 7;
+        });
 
         step.Execute(new CoroutineExecutionContext());
+        _ = step.Result;
+        _ = step.Result;
 
-        Assert.Equal(7, step.Result);
+        Assert.Equal(1, callCount);
     }
 
     [Fact]
@@ -75,6 +72,20 @@ public class Ex043_CoroutineResultValueTests : CaliburnCoreContext
         {
             yield return single;
         }
+    }
+
+    [Fact]
+    public async Task TaskExtensions_ExecuteAsync_Of_T_Hands_The_Value_Back_Directly()
+    {
+        // TaskExtensions.ExecuteAsync<TResult>(this IResult<TResult>, ...) is the single-step
+        // convenience that DOES return Task<TResult> - unlike Coroutine.ExecuteAsync above, no
+        // bounded helper is needed: the extension owns its own task, and this is red on the stub
+        // (Execute throws before any task is even created).
+        var step = new Ex043_ValueResult<int>(() => 55);
+
+        var value = await step.ExecuteAsync();
+
+        Assert.Equal(55, value);
     }
 
     [Fact]

@@ -30,31 +30,29 @@ public enum Ex045_Outcome
 /// ResultCompletionEventArgs - Cancel via WasCancelled, Fail via Error, Succeed via neither.</summary>
 public class Ex045_OutcomeStep : IResult
 {
-    private List<string> Log { get; }
-
-    public string Name { get; }
-
-    private Ex045_Outcome Outcome { get; }
-
-    private Exception? Failure { get; }
+    private readonly List<string> _log;
+    private readonly Ex045_Outcome _outcome;
+    private readonly Exception? _failure;
 
     public Ex045_OutcomeStep(List<string> log, string name, Ex045_Outcome outcome, Exception? failure = null)
     {
-        Log = log;
+        _log = log;
         Name = name;
-        Outcome = outcome;
-        Failure = failure;
+        _outcome = outcome;
+        _failure = failure;
     }
+
+    public string Name { get; }
 
     public event EventHandler<ResultCompletionEventArgs>? Completed;
 
     /// <summary>Raises Completed with the given args - already wired for you; build the right
-    /// ResultCompletionEventArgs for Outcome and pass it here.</summary>
+    /// ResultCompletionEventArgs for _outcome and pass it here.</summary>
     private void RaiseCompleted(ResultCompletionEventArgs args) => Completed?.Invoke(this, args);
 
-    /// <summary>The TODO: log Name, then call RaiseCompleted with args matching Outcome.</summary>
+    /// <summary>The TODO: log Name, then call RaiseCompleted with args matching _outcome.</summary>
     public void Execute(CoroutineExecutionContext context) =>
-        throw new NotImplementedException("TODO: Ex045 - log Name, then RaiseCompleted according to Outcome");
+        throw new NotImplementedException("TODO: Ex045 - log Name, then RaiseCompleted according to _outcome");
 }
 
 public class Ex045_CoroutineCancellation

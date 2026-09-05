@@ -70,7 +70,7 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 040 | EventAggregatorMarshalling | `PublishAsync`'s marshal delegate wraps the entire delivery and runs exactly once per publish, regardless of subscriber count - the caller controls it, not the aggregator | ✅ |
 | 041 | CoroutineBasics | `IResult`'s two members - `Execute` and the `Completed` event; forgetting to raise `Completed` stalls the coroutine forever instead of failing | ✅ |
 | 042 | CoroutineSequence | a `yield return` chain drives one `IResult` at a time via `Coroutine.ExecuteAsync(IEnumerator<IResult>, ...)` - each step starts only after the previous one's `Completed` has fired | ✅ |
-| 043 | CoroutineResultValue | `IResult<T>.Result` (read-only on the interface) - not `Result.Value` - the value only ever lives on the instance itself, since `Coroutine.ExecuteAsync` still returns a plain `Task` | ✅ |
+| 043 | CoroutineResultValue | `IResult<T>.Result` (read-only on the interface, not `Result.Value`) - reaches you only through the instance inside a `Coroutine.ExecuteAsync` sequence (still a plain `Task`), but `TaskExtensions.ExecuteAsync<TResult>(this IResult<TResult>, ...)` returns `Task<TResult>` directly for a single step | ✅ |
 | 044 | CoroutineFromTask | `TaskExtensions.AsResult()`/`AsResult<T>()` adapting a `Task`/`Task<T>` into the coroutine pipeline - the coroutine genuinely waits for it, and a faulted task surfaces as `AggregateException`, not the original exception | ✅ |
 | 045 | CoroutineCancellation | a sequence stops early two ways - `WasCancelled` throws `TaskCanceledException`, `Error` throws that same original exception - and no later step ever runs either way | ✅ |
 | 046 | CoroutineExecutionContext | `Target` and `View` on the context | ⬜ |

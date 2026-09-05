@@ -5,6 +5,8 @@
 //         because the Task Coroutine hands back only completes once Completed fires.
 // Drills: hand-writing IResult.Execute for the first time - doing the work AND raising
 //         Completed(this, new ResultCompletionEventArgs()) yourself; nothing does it for you.
+//         Contrast with ex043: there, raising Completed is already wired, because Result is the
+//         subject - here, raising it yourself IS the subject.
 // Passes: dotnet test --filter FullyQualifiedName~Ex041_
 
 using Caliburn.Micro;
@@ -15,23 +17,21 @@ namespace FeWoLearning.Caliburn.Exercises.Intermediate;
 /// raise Completed so whatever is running it knows to move on.</summary>
 public class Ex041_LoggingResult : IResult
 {
-    private List<string> Log { get; }
-
-    public string Name { get; }
+    private readonly List<string> _log;
 
     public Ex041_LoggingResult(List<string> log, string name)
     {
-        Log = log;
+        _log = log;
         Name = name;
     }
 
-    public event EventHandler<ResultCompletionEventArgs>? Completed;
+    public string Name { get; }
 
-    private void OnCompleted() => Completed?.Invoke(this, new ResultCompletionEventArgs());
+    public event EventHandler<ResultCompletionEventArgs>? Completed;
 
     public void Execute(CoroutineExecutionContext context)
     {
-        Log.Add(Name);
-        OnCompleted();
+        _log.Add(Name);
+        Completed?.Invoke(this, new ResultCompletionEventArgs());
     }
 }

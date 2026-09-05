@@ -13,7 +13,7 @@
 // work genuinely finishes before "after" is logged. Task<T>.AsResult() returns a TaskResult<T>,
 // which IS an IResult<T> - after execution its Result is the task's value. A faulted task's
 // exception arrives as AggregateException("One or more errors occurred. (...)"), not the bare
-// original exception - Caliburn.Micro.TaskExtensions is where AsResult lives, an extension
+// original exception - TaskExtensions (in Caliburn.Micro) is where AsResult lives, an extension
 // method, not a member of Task itself.
 
 using Caliburn.Micro;
