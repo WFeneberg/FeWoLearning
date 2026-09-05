@@ -17,11 +17,16 @@ on **2026-08-03**.
 | Rust   | `1.97.1` (cargo `1.97.1`) | `rust/`   |
 | JDK    | not installed / unverified | `java/`, `kotlin/` |
 | Kotlin | not installed / unverified | `kotlin/` |
+| Docker | `29.7.2`         | `MicroServices/`   |
+| Aspire CLI | `13.4.6`     | `MicroServices/`   |
+| devcontainer CLI | `0.89.0` | `MicroServices/` |
 
 Go and Rust are installed but **not on `PATH`** for a plain shell. They live at:
 
 - `C:\Program Files\Go\bin\go.exe`
 - `%USERPROFILE%\.cargo\bin\` (`cargo`, `rustc`, `rustup`, `clippy`, `rustfmt`)
+
+The devcontainer CLI was installed for `MicroServices/` via `npm i -g @devcontainers/cli`.
 
 ## Rust linking (fixed — keep in mind if VS is upgraded)
 

@@ -60,11 +60,15 @@ tests there — do not add `solutions/` to a project/module.
 | `uno/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `caliburn/`| — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `wpf/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
+| `MicroServices/`| — (restore on first `dotnet test`)| `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001` |
 
 Run every command **from inside the track folder**, not the repo root.
 
 For `blazor/`, `uno/`, `caliburn/` and `wpf/`, `dotnet test -p:UseSolutions=true` runs the identical
-suite against the reference solutions instead of the stubs.
+suite against the reference solutions instead of the stubs. `MicroServices/` supports the same
+`-p:UseSolutions=true` flag, plus `-p:Containers=true` to additionally run the container-backed
+rows (skipped by default). `aspire run --project playground -- --exercise exNNN` runs a single
+exercise in the Aspire dashboard.
 
 ## Toolchain status (verified 2026-09-04)
 
@@ -116,6 +120,21 @@ suite against the reference solutions instead of the stubs.
   `%USERPROFILE%\.cargo\bin` before invoking them from a plain shell.
 - `go test` needs `GOTMPDIR` outside `%TEMP%`, or on-access scanning deletes test
   binaries before exec (`fork/exec …: file not found`).
+- **`MicroServices/`** is verified as of 2026-09-05 on **Aspire 13.5.3 with
+  .NET 10.0.400**, **Docker 29.7.2**, **devcontainer CLI 0.89.0**, and
+  **xunit.v3 3.2.2** (`xunit.runner.visualstudio` 3.1.5,
+  `Microsoft.NET.Test.Sdk` 17.14.1) pinned on the classic VSTest path:
+  `dotnet test` gives 12 exercise facts red, 4 harness facts passed, 1 skipped
+  (17 total); `dotnet test -p:UseSolutions=true` gives 16 passed, 1 skipped,
+  0 failed. `Aspire.Hosting.Elasticsearch` is deliberately pinned at 13.3.0 —
+  its own latest stable — while every other Aspire package on the track is
+  13.5.3. This also surfaced a problem elsewhere in the repo: `wpf/` sits on
+  xunit.v3 4.0.0 plus a `Microsoft.Testing.Platform` `global.json`, and on
+  this machine that combination now makes `dotnet test` exit 5 with zero
+  tests discovered, even though its test executable still runs its suite
+  correctly when invoked directly — so the `wpf/` entries above claiming
+  `dotnet test` as verified are no longer accurate here. Recorded as a known
+  issue; fixing `wpf/` is out of scope for this track.
 
 ## Track-specific gotchas
 
@@ -390,6 +409,55 @@ suite against the reference solutions instead of the stubs.
   every `.razor` file fails `CS0234`. `_support/` (identical in both RCLs)
   holds shared fixtures several exercises' tests depend on — it is never a
   TODO and never gets a `catalog.md` row.
+- **MicroServices** — The folder is capitalised, `MicroServices/`, unlike every
+  other track's lowercase name. Deliberate, do not "fix" it. `solutions/` is
+  deliberately **in** the build, the same waiver `blazor/`, `uno/`, `wpf/`,
+  `caliburn/` and `avalonia/` take, so reference solutions are compile-checked
+  and cannot drift silently.
+
+  **xunit.v3 4.0.0 plus a `Microsoft.Testing.Platform` `global.json` makes
+  `dotnet test` exit 5 with zero tests discovered on this machine.** This
+  track therefore pins xunit.v3 3.2.2 on the classic VSTest path and ships no
+  `global.json` — see the toolchain-status entry above for how that same
+  combination now breaks `wpf/`'s `dotnet test`, unfixed and out of scope
+  here. A related trap: `xunit.runner.visualstudio` has no 3.1.6 or 3.1.7;
+  3.1.5 is the last 3.x release and the next is 4.0.0. Naming a nonexistent
+  3.x patch version does not fail the build — NuGet silently resolves forward
+  to 4.0.0 with only an `NU1603` warning, landing back on the broken
+  generation without an error to catch it.
+
+  `FactAttribute.Skip` is not virtual in xunit.v3 3.2.2, so the idiomatic
+  custom `[ContainerFact]` overriding `Skip` fails with `CS0506`. The
+  container gate uses `Assert.SkipUnless` in the test body instead, gated by
+  `-p:Containers=true` — an MSBuild property that is otherwise invisible at
+  runtime, so it reaches the test process through a
+  `RuntimeHostConfigurationOption` read back via `AppContext.GetData`.
+
+  `aspire publish` writes its artifacts and then never exits in a
+  non-interactive shell — it must stay out of any test loop. In-process
+  publish returns in about 3.7 seconds and emits `aspire-manifest.json` plus
+  the Bicep module files; Docker Compose YAML is the one artifact NOT
+  obtainable in-process, since every publisher argument combination yields
+  the manifest instead. Declaring two compute environments without assigning
+  resources to either fails the `validate-compute-environments` pipeline
+  step.
+
+  The recurring bug class: rendered connection data does not prove the
+  mechanism (spec §8.2). A test asserting only that "a Postgres-ish container
+  exists" is satisfied by a bare `AddContainer`, so every persistence exercise
+  asserts both the resource type and the connection-string expression. A real
+  example from this track's own first batch: asserting a `WaitAnnotation`
+  merely names the right resource is satisfied equally by `WaitForCompletion`,
+  which models the opposite promise — the wait *type* must be asserted too.
+
+  The devcontainer does **not** use the `docker-outside-of-docker` or `node`
+  devcontainer features — they fail on this network with `NO_PUBKEY
+  62D54FD4003F6525` during apt signature verification (corporate TLS
+  interception without the root CA inside the build). It bind-mounts the
+  host Docker socket and installs version-pinned static `docker` and `node`
+  binaries over plain HTTPS instead. Verified: builds in ~85 s, `docker ps`
+  works inside as the non-root `vscode` user, and `dotnet test` inside
+  matches the host.
 
 ## Adding or completing exercises
 
@@ -458,6 +526,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 30 / 100 (verified) | 70 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
+| `MicroServices/`| 5 / 100 (verified) | 95 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/` and
 `wpf/`, all three still being built out — see the table above
