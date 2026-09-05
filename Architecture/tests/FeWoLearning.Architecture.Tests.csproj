@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>FeWoLearning.Architecture.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- xUnit1051 (pass TestContext.Current.CancellationToken) only - the same single
+         suppression caliburn/ and security/ carry. Any OTHER warning in this project
+         is a finding, not noise. -->
+    <NoWarn>$(NoWarn);xUnit1051</NoWarn>
+  </PropertyGroup>
+
+  <!-- xunit.v3 3.2.2 on the classic VSTest path, and NO global.json.
+       xunit.v3 4.0.0 + a Microsoft.Testing.Platform global.json makes
+       `dotnet test` exit 5 with zero tests discovered on the .NET 10.0.400 SDK.
+       runner.visualstudio has no 3.1.6/3.1.7 - 3.1.5 is the last 3.x, and naming
+       a nonexistent one resolves FORWARD to 4.0.0 with only an NU1603 warning. -->
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+  <!-- MQTTnet 5 split the broker out of the main package. It belongs here and not
+       in the content libraries: exercises are MQTT *clients*, and only the harness
+       ever starts a broker. -->
+  <ItemGroup>
+    <PackageReference Include="MQTTnet.Server" Version="5.2.0.1603" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Exactly one content library, never both: that is what keeps the identical
+       namespaces and type names from colliding. `dotnet test` is the red run,
+       `dotnet test -p:UseSolutions=true` the green one. -->
+  <ItemGroup Condition="'$(UseSolutions)' != 'true'">
+    <ProjectReference Include="..\exercises\FeWoLearning.Architecture.Exercises.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseSolutions)' == 'true'">
+    <ProjectReference Include="..\solutions\FeWoLearning.Architecture.Solutions.csproj" />
+  </ItemGroup>
+
+  <!-- `-p:Containers=true` reaches the test process through runtimeconfig.json;
+       an MSBuild property is otherwise invisible at runtime. -->
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="FeWoLearning.Architecture.Containers"
+                                    Value="$(Containers)"
+                                    Condition="'$(Containers)' != ''" />
+  </ItemGroup>
+
+</Project>

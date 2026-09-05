@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/exercises/">
+    <Project Path="exercises/FeWoLearning.Architecture.Exercises.csproj" />
+  </Folder>
+  <Folder Name="/solutions/">
+    <Project Path="solutions/FeWoLearning.Architecture.Solutions.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FeWoLearning.Architecture.Tests.csproj" />
+  </Folder>
+</Solution>

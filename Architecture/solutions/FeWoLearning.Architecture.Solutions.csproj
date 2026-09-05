@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- RootNamespace is deliberately identical to the exercises project: both
+         libraries compile the same type names into the same namespaces, and only
+         one of them is ever referenced by tests/. Only AssemblyName differs. -->
+    <RootNamespace>FeWoLearning.Architecture.Exercises</RootNamespace>
+    <AssemblyName>FeWoLearning.Architecture.Solutions</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageReference Include="MQTTnet" Version="5.2.0.1603" />
+    <PackageReference Include="Polly.Core" Version="8.7.0" />
+  </ItemGroup>
+
+</Project>
