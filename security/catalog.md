@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 20 ✅ / 40 ⬜**
+**Status: 24 ✅ / 36 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -42,10 +42,10 @@ implementations in `solutions/<block>/` at the same relative path.
 | 018 | RefreshTokenRotation | single-use refresh tokens, reuse detection, family revocation | ✅ |
 | 019 | RateLimiting | rate limiter partitions, 429 responses, per-principal keys | ✅ |
 | 020 | JsonDepthAndUnknownMembers | MaxDepth, unmapped member handling, deserialisation resource limits | ✅ |
-| 021 | SsrfOutboundGuard | outbound URL validation, scheme allowlists, private address ranges | ⬜ |
-| 022 | OpenRedirectGuard | local-redirect checks, absolute URL rejection, return-URL allowlists | ⬜ |
-| 023 | FileUploadValidation | content sniffing, extension allowlists, size limits, safe storage names | ⬜ |
-| 024 | ErrorHandlingWithoutLeakage | ProblemDetails, exception middleware, suppressing internals | ⬜ |
+| 021 | SsrfOutboundGuard | outbound URL validation, scheme allowlists, private address ranges | ✅ |
+| 022 | OpenRedirectGuard | local-redirect checks, absolute URL rejection, return-URL allowlists | ✅ |
+| 023 | FileUploadValidation | content sniffing, extension allowlists, size limits, safe storage names | ✅ |
+| 024 | ErrorHandlingWithoutLeakage | ProblemDetails, exception middleware, suppressing internals | ✅ |
 
 ## web-blazor (025–036) — the component attack surface
 
