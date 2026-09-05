@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 36 ✅ / 24 ⬜**
+**Status: 41 ✅ / 19 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -68,11 +68,11 @@ implementations in `solutions/<block>/` at the same relative path.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 037 | DpapiProtectedData | ProtectedData, DataProtectionScope, optional entropy | ⬜ |
-| 038 | CredentialStorage | never plaintext at rest, round-tripping, scope of protection | ⬜ |
-| 039 | AesGcmAuthenticatedEncryption | AES-GCM, nonce uniqueness, tag verification, tamper detection | ⬜ |
-| 040 | KeyDerivationAndRotation | key derivation, versioned key material, decrypting older versions | ⬜ |
-| 041 | FixedTimeComparison | CryptographicOperations.FixedTimeEquals, why length-first exits leak | ⬜ |
+| 037 | DpapiProtectedData | ProtectedData, DataProtectionScope, optional entropy | ✅ |
+| 038 | CredentialStorage | never plaintext at rest, round-tripping, scope of protection | ✅ |
+| 039 | AesGcmAuthenticatedEncryption | AES-GCM, nonce uniqueness, tag verification, tamper detection | ✅ |
+| 040 | KeyDerivationAndRotation | key derivation, versioned key material, decrypting older versions | ✅ |
+| 041 | FixedTimeComparison | CryptographicOperations.FixedTimeEquals, why length-first exits leak | ✅ |
 | 042 | CryptographicRandomness | RandomNumberGenerator over System.Random, token generation | ⬜ |
 | 043 | SignatureVerification | detached signatures, public-key verification, rejecting tampered data | ⬜ |
 | 044 | UpdateIntegrityAndRollback | hash manifests, signed manifests, monotonic version enforcement | ⬜ |
