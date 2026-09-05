@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 10 ✅ / 50 ⬜**
+**Status: 15 ✅ / 45 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -32,11 +32,11 @@ implementations in `solutions/<block>/` at the same relative path.
 | 008 | AntiforgeryCsrf | antiforgery tokens, cross-origin POST, safe vs unsafe methods | ✅ |
 | 009 | CorsPolicy | origin allowlists, credentials, why wildcard plus credentials fails | ✅ |
 | 010 | CookieSecurityFlags | HttpOnly, Secure, SameSite, cookie scope | ✅ |
-| 011 | SessionFixation | identifier regeneration on privilege change | ⬜ |
-| 012 | PasswordHashingPbkdf2 | Rfc2898DeriveBytes, per-user salt, iteration count, fixed-time verify | ⬜ |
-| 013 | AuthenticationHandler | AuthenticationHandler, ClaimsPrincipal construction, scheme selection | ⬜ |
-| 014 | AuthorizationPolicies | policy-based authorization, requirements, handler registration | ⬜ |
-| 015 | ResourceBasedAuthorization | IAuthorizationService on a resource instance, ownership checks | ⬜ |
+| 011 | SessionFixation | identifier regeneration on privilege change | ✅ |
+| 012 | PasswordHashingPbkdf2 | Rfc2898DeriveBytes, per-user salt, iteration count, fixed-time verify | ✅ |
+| 013 | AuthenticationHandler | AuthenticationHandler, ClaimsPrincipal construction, scheme selection | ✅ |
+| 014 | AuthorizationPolicies | policy-based authorization, requirements, handler registration | ✅ |
+| 015 | ResourceBasedAuthorization | IAuthorizationService on a resource instance, ownership checks | ✅ |
 | 016 | InsecureDirectObjectReference | ownership enforcement, opaque identifiers, enumeration | ⬜ |
 | 017 | JwtValidation | issuer, audience, lifetime and signature validation, alg confusion | ⬜ |
 | 018 | RefreshTokenRotation | single-use refresh tokens, reuse detection, family revocation | ⬜ |
