@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 using FeWoLearning.Wpf.Exercises.Beginner;
 
@@ -5,6 +7,29 @@ namespace FeWoLearning.Wpf.Tests.Beginner;
 
 public class Ex020_RequerySuggestedTests : WpfTestContext
 {
+    [WpfFact]
+    public void The_Handler_Is_Kept_In_A_Field_Not_Only_Subscribed_Inline()
+    {
+        var command = new Ex005_RelayCommand(_ => { });
+        using var observer = new Ex020_RequeryObserver(command);
+
+        // Matches on field TYPE, not name, so naming the field differently is not
+        // punished. Without this, an implementation that subscribes a method-group
+        // delegate (`_command.CanExecuteChanged += OnRequery;`) and stores nothing
+        // anywhere passes every other test here - Dispose can still remove it, because
+        // CommandManager compares delegates structurally, not by identity - but the
+        // delegate handed to += would be reachable only from CommandManager's own weak
+        // list, exactly the leak this row exists to teach against.
+        var delegateFields = typeof(Ex020_RequeryObserver)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            .Where(f => typeof(Delegate).IsAssignableFrom(f.FieldType))
+            .ToList();
+
+        var field = Assert.Single(delegateFields);
+        var stored = Assert.IsAssignableFrom<Delegate>(field.GetValue(observer));
+        Assert.Same(observer, stored.Target);
+    }
+
     [WpfFact]
     public void Invalidating_The_Command_Manager_Notifies_The_Observer()
     {
@@ -81,13 +106,14 @@ public class Ex020_RequerySuggestedTests : WpfTestContext
 
     // No forced-GC test here. An earlier draft tried to prove "weak handler storage"
     // by forcing a collection and asserting the observer kept receiving notifications
-    // afterward - that direction is safe in theory (a still-rooted observer's own
-    // fields can never be collected out from under it), but it was measured against a
-    // deliberately broken implementation (an inline lambda subscribed with no field
-    // anywhere) and the forced collection did not actually reclaim the orphaned
-    // delegate in that run: the assertion passed on both the correct and the broken
-    // code, so it was not load-bearing and was removed. Disposing_Stops_Further_
-    // Notifications above is what actually forces the point: without somewhere to
-    // store the handler, there is nothing to unsubscribe in Dispose, and that failure
-    // is deterministic rather than dependent on GC timing.
+    // afterward, reasoning that a still-rooted observer's own fields can never be
+    // collected out from under it. Measured against a deliberately broken
+    // implementation (an inline lambda subscribed with no field anywhere), the forced
+    // collection did not reclaim the orphaned delegate in that run, so the assertion
+    // passed on both the correct and the broken code and was not load-bearing.
+    // Disposing_Stops_Further_Notifications alone is not enough either: CommandManager
+    // compares delegates structurally on removal, so a fresh method-group delegate
+    // handed to -= still matches the one added in the constructor even with nothing
+    // stored anywhere - that is what The_Handler_Is_Kept_In_A_Field_Not_Only_
+    // Subscribed_Inline above actually checks, directly, by reflection.
 }

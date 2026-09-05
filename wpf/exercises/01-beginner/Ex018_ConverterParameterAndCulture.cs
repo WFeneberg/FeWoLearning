@@ -26,9 +26,10 @@ public sealed class Ex018_TotalPriceConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        // TODO: value is a decimal unit price. parameter is the quantity - it will not
-        // already be an int (Bind passes it as ConverterParameter, which a Binding
-        // never coerces), so convert it with System.Convert.ToInt32(parameter). Return
+        // TODO: value is a decimal unit price. parameter is the quantity, boxed as the
+        // int Bind put there - convert it with System.Convert.ToInt32(parameter)
+        // anyway: that is the habit worth having, because in XAML ConverterParameter
+        // always arrives as a string, and ToInt32 handles both. Return
         // (unitPrice * quantity).ToString("C", culture) - the "C" formats as currency,
         // and it is `culture` - the argument this method receives - that must do the
         // formatting, not CultureInfo.CurrentCulture or CultureInfo.InvariantCulture.

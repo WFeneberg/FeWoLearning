@@ -8,8 +8,10 @@ namespace FeWoLearning.Wpf.Tests.Beginner;
 public class Ex016_DataContextInheritanceTests : WpfTestContext
 {
     // Two hops between root and target on purpose: a single-level tree could not tell
-    // "inherited from the ancestor" apart from "inherited from the immediate parent",
-    // and inner (never touched by any test) proves nothing about it stops passthrough.
+    // "inherited from the ancestor" apart from "inherited from the immediate parent".
+    // inner is never asserted on directly - it exists so the inherited value has to
+    // pass all the way through an intermediate element rather than reaching target
+    // straight from its immediate parent.
     private static (Grid Root, Border Middle, Border Inner, TextBlock Target) BuildTree()
     {
         var root = new Grid();
@@ -83,15 +85,24 @@ public class Ex016_DataContextInheritanceTests : WpfTestContext
     {
         var (root, middle, _, target) = BuildTree();
         root.DataContext = new Ex016_PersonSource { Name = "Ada" };
-        Ex016_DataContextInheritance.OverrideDataContext(middle, new Ex016_PersonSource { Name = "Grace" });
 
+        // Bind and observe the un-overridden value FIRST: a bypass that reads whatever
+        // DataContext is ambient at Bind-time (instead of leaving target's DataContext
+        // alone and relying on live inheritance) would still resolve correctly if the
+        // override happened before this point - so the override below must come after
+        // the binding is already in place, not before it.
         Ex016_DataContextInheritance.BindName(target);
+        Layout(root);
+        Pump();
+        Assert.Equal("Ada", target.Text);
+
+        Ex016_DataContextInheritance.OverrideDataContext(middle, new Ex016_PersonSource { Name = "Grace" });
         Layout(root);
         Pump();
 
         // target is two levels under middle and never sets its own DataContext, yet
-        // sees middle's value, not root's - inheritance restarts at middle rather than
-        // being blocked by it.
+        // now sees middle's value, not root's - inheritance restarts at middle rather
+        // than being blocked by it.
         Assert.Equal("Grace", target.Text);
     }
 

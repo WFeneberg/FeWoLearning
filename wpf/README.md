@@ -110,28 +110,28 @@ no `Application` either; WPF resolves default control templates through
   `Explicit` alike, only `PropertyChanged` reads `False` — and `UpdateSource()`
   succeeds under every trigger, so there is no exception-shape check. Row 013 asserts
   both the focus-based behavior and the binding's declared `UpdateSourceTrigger`.
-- **A `GC.Collect()`-then-assert-it-still-works test is not reliably load-bearing on
-  this host, even in the safe direction.** Row 020 tried to prove "a handler stored in
-  a field survives a forced collection" as a deterministic stand-in for "weak handler
-  storage" — sound in theory (a rooted object's fields can never be collected out from
-  under it), but run against a deliberately broken implementation (an inline lambda
-  subscribed to `CommandManager.RequerySuggested` with no field anywhere), the forced
-  `GC.Collect()` did not reclaim the orphaned delegate in this Debug-build test host,
-  and the assertion passed on the broken code too. It was removed; the row proves the
-  same point through `Dispose()` instead — with nothing stored, there is nothing to
-  unsubscribe, and that failure does not depend on GC timing. Rows 071-075 (leaks,
-  `WeakEventManager`, leak diagnosis) need a real collection to have happened to prove
-  anything — expect the same unreliability there and look for a deterministic
-  consequence instead of forcing a GC and hoping.
+- **A `GC.Collect()`-then-assert test can fail in two opposite ways, and the remedies
+  differ.** Row 020's first attempt asserted the *safe* direction — a handler stored
+  in a field survives a forced collection, because a rooted object's fields can never
+  be collected out from under it — but measured against a deliberately broken
+  implementation (an inline lambda with nothing stored anywhere), the forced
+  collection simply did not reclaim the orphaned delegate: a **false green**, not a
+  flake. Rows 071–075 (leaks, `WeakEventManager`) instead need the *unsafe* direction —
+  a `WeakReference` genuinely dead after dropping the last root — where the failure
+  mode flips to a **flaky red** on correct code if collection just hasn't happened yet.
+  Row 020 replaced its GC probe with a reflection check that the handler lives in a
+  delegate-typed field at all: `Dispose()` alone does not prove storage, because
+  `CommandManager` compares delegates structurally, so a freshly created method-group
+  delegate still unsubscribes correctly even with nothing stored anywhere.
 - **A field a stub pre-declares for the learner to assign later can warn even though
-  it compiles.** `CS0414` ("assigned but never used") fires specifically when a
-  nullable field is written a literal `null` and never read anywhere else in the stub
-  — even though the exact same field written a real (non-default) value, or a
-  non-nullable field written anything, does not warn. Row 020 hit this pre-declaring
-  `private EventHandler? _handler;` with a placeholder `= null;` for the learner to
-  replace. The fix, matching row 006's convention: leave the field itself out of the
-  stub and describe it in the TODO instead — it does not exist to warn about until the
-  learner adds it.
+  it compiles — and nullability is not the reason.** `CS0414` ("assigned but never
+  used") fires when a field's only assignment is a compile-time constant it never
+  reads elsewhere (a literal `null`, `null!`, or `7`); a non-constant initializer (a
+  parameter, `string.Empty`, a lambda) suppresses it regardless of nullability, and
+  omitting the initializer entirely gives `CS0169` instead. Row 020 hit this
+  pre-declaring `private EventHandler? _handler;` with a placeholder `= null;`. The
+  fix, matching row 006's convention: leave the field out of the stub and describe it
+  in the TODO instead — it does not exist to warn about until the learner adds it.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 

@@ -67,6 +67,22 @@ public class Ex017_ValueConverterTests : WpfTestContext
         Assert.Same(DependencyProperty.UnsetValue, result);
     }
 
+    [WpfTheory]
+    [InlineData("low")]
+    [InlineData("HIGH")]
+    public void ConvertBack_Is_Case_Sensitive_And_Returns_UnsetValue_For_A_Differently_Cased_Label(string label)
+    {
+        var converter = new Ex017_PriorityConverter();
+
+        // "the ordinal, exact case" instruction has no bite unless something checks a
+        // near-miss: an OrdinalIgnoreCase (or culture-aware) comparison would pass
+        // "Low"/"Medium"/"High" just as well as this, and this is the only case that
+        // tells the two apart.
+        var result = converter.ConvertBack(label, typeof(int), null!, CultureInfo.InvariantCulture);
+
+        Assert.Same(DependencyProperty.UnsetValue, result);
+    }
+
     // Now through a live, two-way binding, proving Bind() actually wires the converter
     // up rather than only the converter class working in isolation.
 
@@ -144,5 +160,6 @@ public class Ex017_ValueConverterTests : WpfTestContext
         Assert.Equal(nameof(Ex017_PrioritySource.PriorityCode), binding!.Path.Path);
         Assert.Equal(BindingMode.TwoWay, binding.Mode);
         Assert.IsType<Ex017_PriorityConverter>(binding.Converter);
+        Assert.Equal(UpdateSourceTrigger.PropertyChanged, binding.UpdateSourceTrigger);
     }
 }
