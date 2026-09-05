@@ -10,7 +10,11 @@ public static class ExerciseRegistry
 {
     private static readonly Dictionary<string, Action<IDistributedApplicationBuilder>> Map = new(StringComparer.OrdinalIgnoreCase)
     {
-        // Registered as exercises land. Task 6 adds ex001-ex005.
+        ["ex001"] = Ex001_ContainerResourceBasics.Configure,
+        ["ex002"] = Ex002_ReferenceVersusWaitFor.Configure,
+        ["ex003"] = Ex003_EndpointsAndBindings.Configure,
+        ["ex004"] = Ex004_HealthChecksInTheModel.Configure,
+        ["ex005"] = Ex005_ParametersAndSecrets.Configure,
     };
 
     public static Action<IDistributedApplicationBuilder>? Lookup(string id)

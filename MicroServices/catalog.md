@@ -57,17 +57,17 @@ as oversights:
   and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
   093/094/099/100 assert on the generated Bicep for real.
 
-**Status: 0 ✅ / 100 ⬜**
+**Status: 5 ✅ / 95 ⬜**
 
 ## Beginner (001–035) — Aspire model and first persistence
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 001 | ContainerResourceBasics | `AddPostgres` yields a `PostgresServerResource`, `AddDatabase` a child `PostgresDatabaseResource`; assert both **types**, since a bare `AddContainer` also gives you two resources | ⬜ |
-| 002 | ReferenceVersusWaitFor | `WithReference` adds an `EnvironmentCallbackAnnotation`, `WaitFor` a `WaitAnnotation`; neither implies the other, and a consumer with both carries both | ⬜ |
-| 003 | EndpointsAndBindings | `WithHttpEndpoint`/`WithEndpoint`, `EndpointAnnotation.TargetPort` vs `Port` vs `IsExternal`; two endpoints on one resource must stay two annotations | ⬜ |
-| 004 | HealthChecksInTheModel | `WithHttpHealthCheck` writes a `HealthCheckAnnotation` whose key varies with the path; grade the annotation, never a 200 response | ⬜ |
-| 005 | ParametersAndSecrets | `AddParameter`, `ParameterResource.Secret`, and the `inputs.value.default.generate` policy a generated secret emits into the manifest | ⬜ |
+| 001 | ContainerResourceBasics | `AddPostgres` yields a `PostgresServerResource`, `AddDatabase` a child `PostgresDatabaseResource`; assert both **types**, since a bare `AddContainer` also gives you two resources | ✅ |
+| 002 | ReferenceVersusWaitFor | `WithReference` adds an `EnvironmentCallbackAnnotation`, `WaitFor` a `WaitAnnotation`; neither implies the other, and a consumer with both carries both | ✅ |
+| 003 | EndpointsAndBindings | `WithHttpEndpoint`/`WithEndpoint`, `EndpointAnnotation.TargetPort` vs `Port` vs `IsExternal`; two endpoints on one resource must stay two annotations | ✅ |
+| 004 | HealthChecksInTheModel | `WithHttpHealthCheck` writes a `HealthCheckAnnotation` whose key varies with the path; grade the annotation, never a 200 response | ✅ |
+| 005 | ParametersAndSecrets | `AddParameter`, `ParameterResource.Secret`, and the `inputs.value.default.generate` policy a generated secret emits into the manifest | ✅ |
 | 006 | ImageRegistryTagAndDigest | `WithImage`/`WithImageTag`/`WithImageRegistry`; assert `ContainerImageAnnotation.Image`, `.Tag` and `.Registry` **separately** — a full reference baked into one string is the wrong answer | ⬜ |
 | 007 | EnvironmentLiteralsAndCallbacks | `WithEnvironment(name, value)` vs the callback overload: a literal is fixed at model time, a callback runs per `EnvironmentCallbackContext` and can read another resource's endpoint | ⬜ |
 | 008 | ContainerArgsAndEntrypoint | `WithArgs`, `WithEntrypoint`, `CommandLineArgsCallbackAnnotation`; argument **order** is part of the assertion, because a set-equality test grades nothing | ⬜ |
