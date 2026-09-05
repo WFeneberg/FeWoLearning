@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 10 ✅ / 50 ⬜**
+**Status: 16 ✅ / 44 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -33,12 +33,12 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 008 | PipelineBehaviors | decorator chain around a handler, ordering, composition | ✅ |
 | 009 | ValidationBehavior | validation as a pipeline stage that runs before the handler | ✅ |
 | 010 | ResultErrorModel | Result vs exceptions, error-to-status mapping, no control flow by throw | ✅ |
-| 011 | DtoBoundaryMapping | domain-to-DTO projection, preventing domain leakage across the boundary | ⬜ |
-| 012 | ApiVersioning | versioned contracts, v1/v2 coexistence, additive vs breaking change | ⬜ |
-| 013 | PaginationContract | cursor vs offset, stable ordering, page metadata | ⬜ |
-| 014 | BackendForFrontend | aggregation, parallel fan-out, partial-failure semantics | ⬜ |
-| 015 | RateLimitingPolicy | token bucket vs fixed window, per-client partitioning, virtual clock | ⬜ |
-| 016 | HealthReadinessLiveness | health-check composition, readiness gating vs liveness | ⬜ |
+| 011 | DtoBoundaryMapping | domain-to-DTO projection, preventing domain leakage across the boundary | ✅ |
+| 012 | ApiVersioning | versioned contracts, v1/v2 coexistence, additive vs breaking change | ✅ |
+| 013 | PaginationContract | cursor vs offset, stable ordering, page metadata | ✅ |
+| 014 | BackendForFrontend | aggregation, parallel fan-out, partial-failure semantics | ✅ |
+| 015 | RateLimitingPolicy | token bucket vs fixed window, per-client partitioning, virtual clock | ✅ |
+| 016 | HealthReadinessLiveness | health-check composition, readiness gating vs liveness | ✅ |
 
 ## desktop (017–028) — desktop composition, UI-framework-free
 
