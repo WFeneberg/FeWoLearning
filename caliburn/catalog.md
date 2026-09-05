@@ -45,7 +45,7 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 015 | NameTransformerRule | custom `NameTransformer` mapping rule | ✅ |
 | 016 | ViewModelLocator | view-first resolution via `ViewModelLocator.LocateTypeForViewType`/`LocateForView`, constructed through `IoC`; its own `NameTransformer`, a different object from `ViewLocator`'s | ✅ |
 | 017 | ViewModelBinderNames | `ViewModelBinder.Bind` matches an element's `x:Name` to a same-named view-model property; an unmatched name gets no `Binding` at all, not even a fallback one | ✅ |
-| 018 | BindingConventionTwoWay | convention picks `TwoWay` only when the property is settable AND the element's bindable property is two-way capable, else `OneWay`; `UpdateSourceTrigger.PropertyChanged` always - not WPF's own `LostFocus` default for `TextBox.Text` | ✅ |
+| 018 | BindingConventionTwoWay | `Mode` is `TwoWay` when the view-model property has a public setter and `OneWay` otherwise - the element has no say (`ConventionManager.ApplyBindingMode` never sees it); `UpdateSourceTrigger.PropertyChanged` always - not WPF's own `LostFocus` default for `TextBox.Text` | ✅ |
 | 019 | ElementConventionLookup | `ConventionManager.GetElementConvention` walks the type hierarchy (`CheckBox`→`ToggleButton`, `ComboBox`/`ListBox`→`Selector`) and never returns null for a `FrameworkElement` - an unregistered type falls back to the `Visibility` convention | ✅ |
 | 020 | CustomElementConvention | `ConventionManager.AddElementConvention<T>` registers a convention scoped to one owned type, turning a nonsense `Visibility` binding into the intended one | ✅ |
 | 021 | ConventionValueConverter | automatic converter application | ⬜ |

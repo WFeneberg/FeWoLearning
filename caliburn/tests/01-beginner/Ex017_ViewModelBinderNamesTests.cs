@@ -79,13 +79,46 @@ public class Ex017_ViewModelBinderNamesTests : CaliburnViewContext
         var view = NewView();
         new Ex017_ViewModelBinderNames().Bind(new Ex017_Vm(), view);
 
+        // Not bound on its natural property - TextBox's own convention is Text, so this
+        // alone only proves TextBox.Text stayed unbound, nothing more.
         var bogus = (TextBox)view.FindName("Bogus")!;
-
-        // Not bound on its "natural" property, and not silently redirected to some other
-        // dependency property either - ex019/ex020 show ConventionManager would fall back
-        // to Visibility if ASKED; ViewModelBinder never asks for a name it cannot match.
         Assert.Null(BindingOperations.GetBinding(bogus, TextBox.TextProperty));
-        Assert.Null(BindingOperations.GetBinding(bogus, FrameworkElement.VisibilityProperty));
+    }
+
+    [WpfFact]
+    public void An_Unmatched_Name_Gets_No_Binding_Even_On_An_Element_Whose_Own_Convention_Is_The_Visibility_Fallback()
+    {
+        // Border has no convention of its own - ex019/ex020 measure that ConventionManager
+        // falls back to a Visibility binding for it. Asserting "no Visibility binding" on a
+        // TextBox (whose own convention is Text, never Visibility) would be true whether or
+        // not ViewModelBinder ever consulted that fallback - it proves nothing. Border makes
+        // the assertion real, because a wrong ViewModelBinder that silently redirected an
+        // unmatched name to the fallback convention WOULD produce a Visibility binding here.
+        const string xaml = """
+            <UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+              <StackPanel>
+                <Border x:Name="UserName" />
+                <Border x:Name="Bogus2" />
+              </StackPanel>
+            </UserControl>
+            """;
+        var view = (FrameworkElement)XamlReader.Parse(xaml);
+
+        new Ex017_ViewModelBinderNames().Bind(new Ex017_Vm(), view);
+
+        // The half that makes the assertion below falsifiable: the fallback pathway is
+        // genuinely reachable - a Border named after a property the view model DOES have
+        // gets a real Visibility binding, a preview of ex020's lesson.
+        var matched = (Border)view.FindName("UserName")!;
+        var matchedBinding = BindingOperations.GetBinding(matched, FrameworkElement.VisibilityProperty);
+        Assert.NotNull(matchedBinding);
+        Assert.Equal("UserName", matchedBinding!.Path.Path);
+
+        // The unmatched Border gets nothing - ViewModelBinder never asks ConventionManager
+        // for a name it cannot match to a property in the first place.
+        var unmatched = (Border)view.FindName("Bogus2")!;
+        Assert.Null(BindingOperations.GetBinding(unmatched, FrameworkElement.VisibilityProperty));
     }
 
     [WpfFact]

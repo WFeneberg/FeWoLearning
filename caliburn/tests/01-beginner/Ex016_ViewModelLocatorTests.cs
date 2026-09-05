@@ -64,6 +64,25 @@ public class Ex016_ViewModelLocatorTests : CaliburnViewContext
     }
 
     [WpfFact]
+    public void LocateViewModel_Returns_An_Already_Set_DataContext_Verbatim_Without_Constructing_Anything()
+    {
+        var subject = new Ex016_ViewModelLocator();
+        var view = new Ex016_ProbeView();
+        var sentinel = new object();
+        view.DataContext = sentinel;
+
+        var located = subject.LocateViewModel(view);
+
+        // Measured: LocateForView short-circuits on a non-null DataContext and hands it
+        // back as-is - it only falls through to type-based resolution through IoC when
+        // DataContext is null. Without this fact, a wrapper that always calls
+        // LocateForViewType(view.GetType()) - ignoring DataContext entirely - passes every
+        // other test in this class, because every OTHER view here is freshly constructed
+        // with a null DataContext.
+        Assert.Same(sentinel, located);
+    }
+
+    [WpfFact]
     public void ViewModelLocator_Keeps_Its_Own_NameTransformer_A_Different_Object_From_ViewLocators()
     {
         // A structural assertion about static state alone would pass even against an

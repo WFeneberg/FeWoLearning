@@ -18,6 +18,11 @@ public class Ex020_CustomElementConvention
 {
     /// <summary>Registers the convention that lets ViewModelBinder bind Ex020_RatingControl's
     /// Value property by name, instead of falling back to Visibility.</summary>
+    // eventName is null here because nothing in this exercise attaches an action convention
+    // (a Message.Attach-style command trigger) to Ex020_RatingControl - that argument only
+    // feeds ElementConvention.CreateTrigger, which becomes
+    // () => new EventTrigger { EventName = null }. A control meant for real action wiring
+    // needs a real routed event name there, or actions silently never fire.
     public void RegisterRatingControlConvention() =>
         ConventionManager.AddElementConvention<Ex020_RatingControl>(Ex020_RatingControl.ValueProperty, "Value", null!);
 
@@ -30,6 +35,11 @@ public class Ex020_CustomElementConvention
 /// one for it.</summary>
 public class Ex020_RatingControl : Control
 {
+    // BindsTwoWayByDefault is right for a real, hand-authored-XAML DP - kept for that reason -
+    // but it is NOT why this exercise's tests observe TwoWay: ex018 measures that
+    // ConventionManager.ApplyBindingMode looks only at whether the VIEW-MODEL property
+    // (Rating) has a public setter, never at this flag or the element at all. Set this to
+    // false and the binding this exercise's tests assert is still TwoWay.
     public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
         nameof(Value), typeof(int), typeof(Ex020_RatingControl),
         new FrameworkPropertyMetadata(0) { BindsTwoWayByDefault = true });

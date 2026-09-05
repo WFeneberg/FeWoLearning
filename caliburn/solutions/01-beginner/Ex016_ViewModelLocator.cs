@@ -3,10 +3,10 @@
 //         starting from a VIEW, the mirror image of ex013's ViewLocator (model -> view).
 // Drills: ViewModelLocator.LocateTypeForViewType(viewType, searchForInterface) resolving
 //         FooView -> the FooViewModel TYPE; LocateForView(view) resolving a view INSTANCE to
-//         a view model INSTANCE constructed through IoC (not a fresh throwaway object); and
-//         that ViewModelLocator keeps its OWN NameTransformer, a different object from
-//         ViewLocator.NameTransformer (ex013/ex015) - registering a rule on one never
-//         touches the other.
+//         a view model INSTANCE constructed through IoC (not a fresh throwaway object) - but
+//         only when the view's own DataContext is still null; and that ViewModelLocator keeps
+//         its OWN NameTransformer, a different object from ViewLocator.NameTransformer
+//         (ex013/ex015) - registering a rule on one never touches the other.
 // Passes: dotnet test --filter FullyQualifiedName~Ex016_
 
 using System.Windows.Controls;

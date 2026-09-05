@@ -167,15 +167,16 @@ distinct object.
 There is no public `ConventionManager.ElementConventions`. The real surface is
 `ConventionManager.GetElementConvention(Type)` (read) and
 `ConventionManager.AddElementConvention(...)` (write), backed by a **private** static
-dictionary with **no public removal method at all** — unlike every static named above, this one cannot be
-snapshotted and restored by `CaliburnCoreContext`, because there is nothing to call to undo
-an `AddElementConvention`. ex020 (`CustomElementConvention`) is the first exercise to write
-to it, and deliberately does **not** attempt a harness reset: it registers a convention for
-`Ex020_RatingControl`, a type declared inside that exercise itself and never referenced by
-any other exercise's test, so the permanent, unresettable dictionary entry it leaves behind
-can never be observed by anything else. This is the pattern any future exercise touching
-`ConventionManager`'s convention dictionary should follow — register only for a type you own,
-rather than trying to reset a static that has no public way to be reset.
+dictionary with **no public removal method at all** — unlike every static named above,
+this one cannot be snapshotted and restored by `CaliburnCoreContext`, because there is
+nothing to call to undo an `AddElementConvention`. ex020 (`CustomElementConvention`) is
+the first exercise to write to it, and deliberately does **not** attempt a harness reset:
+it registers a convention for `Ex020_RatingControl`, a type declared inside that exercise
+itself and never referenced by any other exercise's test, so the permanent, unresettable
+dictionary entry it leaves behind can never be observed by anything else. This is the
+pattern any future exercise touching `ConventionManager`'s convention dictionary should
+follow — register only for a type you own, rather than trying to reset a static that has
+no public way to be reset.
 
 Beyond that, nothing shipped so far touches ex063, ex068–ex073, ex087, ex095 or ex096's
 statics, but those will. Because the assembly runs serially with no restore between tests,

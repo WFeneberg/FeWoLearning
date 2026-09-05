@@ -1,8 +1,8 @@
 // Exercise 018 - Binding Convention Two Way (beginner).
 // Goal:   Learn that the convention engine doesn't just decide WHETHER to bind (ex017) - it
-//         also picks the binding's Mode and UpdateSourceTrigger, and those choices come from
-//         BOTH sides: whether the view-model property is settable, and whether the element's
-//         bindable property is two-way capable.
+//         also picks the binding's Mode and UpdateSourceTrigger, and that these two choices
+//         are NOT made the same way: Mode depends solely on whether the view-model property
+//         has a public setter; the element has no say in it at all.
 // Drills: reading a real System.Windows.Data.Binding's Mode and UpdateSourceTrigger back via
 //         BindingOperations.GetBinding; that Caliburn's chosen trigger is PropertyChanged,
 //         which is NOT WPF's own default for TextBox.Text (that default is LostFocus).

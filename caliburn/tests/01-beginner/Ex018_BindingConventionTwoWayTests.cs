@@ -66,7 +66,7 @@ public class Ex018_BindingConventionTwoWayTests : CaliburnViewContext
     }
 
     [WpfFact]
-    public void A_Collection_Property_Binds_ItemsSource_OneWay()
+    public void A_GetOnly_Collection_Property_Binds_ItemsSource_OneWay()
     {
         var (subject, view) = Bound();
         var items = (ItemsControl)view.FindName("Items")!;
