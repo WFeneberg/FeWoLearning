@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Twelve things that bite
+### Fifteen things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -165,6 +165,62 @@ no `Application` either; WPF resolves default control templates through
   stays inside the non-clamped range on purpose to keep the base contract legible; row 062
   (`CustomPanel`) and row 080 (layout invalidation cost) are where the clamping edge and the
   Measure/Arrange asymmetry actually start to matter.
+- **A `FrameworkElement` built by plain code never completes `ISupportInitialize`, and
+  default Style/Template resolution is gated on exactly that.** This is the single most
+  consequential harness fact found while building rows 031-034 — it was expected to be a
+  virtualization problem (the way `uno/`'s `ItemsControl`/`ListView` never realise their
+  items at all, see that track's README) and turned out to be something else entirely, one
+  level earlier: measured directly, a bare `new Button()` or `new ItemsControl()` built and
+  configured through ordinary property assignment (no XAML, no explicit `BeginInit()`/
+  `EndInit()`) has `IsInitialized == false` **forever** — neither `Layout(...)` nor `Pump()`
+  ever flips it — and `IsInitialized` is what gates a `Control`'s *unset* default Style/
+  Template ever resolving. With no default Template, `ItemsControl.ItemContainerGenerator`
+  never leaves `GeneratorStatus.NotStarted`, so `ContainerFromItem` returns `null` for every
+  item forever, and no exception is thrown anywhere — the tree just silently behaves as
+  still mid-construction. `Grid`'s `SharedSizeGroup` scope registration is gated on the same
+  flag, even though `Grid` is a `Panel`, not a themed `Control` — row 031 hit this too.
+  `HarnessSmokeTests`' own `Button` dodges this by setting `Content`, which - measured
+  directly - flips `IsInitialized` as a side effect (`Tag` and `Width` do not; this is
+  `ContentControl.Content` specific, not "any property set"). Rows 001-030 never hit this
+  because each one either uses a `Panel` (no Style/Template involved at all, e.g. `Grid` in
+  row 029) or assigns `Style` explicitly (row 027 sets `button.Style = ...` directly,
+  bypassing default-style resolution entirely) - rows 031-034 are the first rows in this
+  track to depend on an *unset* default Style/Template actually resolving. The fix,
+  factored into `WpfTestContext.CompleteInitialization(element)`: one `BeginInit()`/
+  `EndInit()` call on the root of an already-built tree is enough - measured directly,
+  `EndInit()` reaches every descendant already attached under it at the time it is called,
+  not just the element it is called on, and it does not matter whether `BeginInit()`
+  precedes construction or is called together with `EndInit()` only at the very end, after
+  every property is already set. `Show(...)` also works (a real `PresentationSource` always
+  initializes), but opens a window, so `CompleteInitialization` is what rows 032-034 use.
+  This is a live trap for the `02-intermediate` tier's five `CollectionViewSourceBasics`/
+  `SortAndGroup`/`FilterPredicate`/`DeferRefresh`/`EditableObjectTransactions` rows
+  (053-057) and any later row driving a `ListBox`/`ComboBox`/other `ItemsControl`-derived
+  control's default appearance - anything built by plain code needs
+  `CompleteInitialization(...)` before its default Style/Template can be trusted.
+- **`SharedSizeGroup` on a `Star`-sized definition is not merely inert - it is actively
+  broken.** Measured directly (in the course of building row 031): the claim "SharedSizeGroup
+  has no effect on Star" undersells it - assigning a `SharedSizeGroup` name to a `Star`-sized
+  `RowDefinition`/`ColumnDefinition` collapses its `ActualHeight`/`ActualWidth` to zero
+  outright, even with real content and a real available size, rather than leaving it to size
+  normally as an un-grouped `Star` definition would. Row 031 is built entirely on `Auto`
+  definitions for this reason - it does not merely avoid relying on `Star`'s own unassigned
+  default (already documented above for row 029), it avoids `Star` for the shared rows
+  altogether, because the combination has no sane behavior to assert on. Confirmed
+  separately: the sharing itself (two `Auto` rows in two different `Grid`s, tied together by
+  a `SharedSizeGroup` name under a common `Grid.IsSharedSizeScope` ancestor) resolves within
+  a single `Layout(...)` call once the tree is properly initialized - no `Pump()` needed, and
+  the two rows' `ActualHeight` already agree before the first `Pump()` even runs.
+- **A collection change reaches a generated container's CLR object synchronously, but its
+  templated child content does not.** Measured directly while building row 033: right after
+  `ObservableCollection<T>.Add(...)`, before any `Layout(...)` or `Pump()`,
+  `ItemContainerGenerator.ContainerFromItem(newItem)` already returns a non-null
+  `ContentPresenter` - the container itself needs no extra pump. But that `ContentPresenter`
+  has no templated child yet at that point (`VisualTreeHelper.GetChildrenCount` is 0), so its
+  bound text is not observable. Only after a second `Layout(...)` call (a plain `Pump()`
+  alone also works - either one drains whatever the template instantiation is queued on)
+  does the templated child exist and show the correct bound value. Row 033's tests call
+  `Layout(...)` again after every collection mutation for exactly this reason.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 

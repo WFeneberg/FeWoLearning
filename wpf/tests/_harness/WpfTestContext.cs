@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -39,6 +40,39 @@ public abstract class WpfTestContext : IDisposable
 
         Dispatcher.CurrentDispatcher.BeginInvoke(priority, new Action(() => frame.Continue = false));
         Dispatcher.PushFrame(frame);
+    }
+
+    /// <summary>
+    /// Explicitly completes WPF's <see cref="ISupportInitialize"/> protocol - what the XAML
+    /// parser does automatically around every element it builds. A tree built by plain code
+    /// (<c>new ItemsControl()</c>, <c>new Grid()</c>, ...) with ordinary property assignment
+    /// never receives this: <c>IsInitialized</c> stays false forever - neither
+    /// <see cref="Layout"/> nor <see cref="Pump"/> flips it - and default Style/Template
+    /// resolution (a plain <c>new Button()</c> never resolves its default template through
+    /// <c>Layout(...)</c> alone) and <c>Grid</c>'s <c>SharedSizeGroup</c> scope registration
+    /// are both gated on exactly that flag, with no exception anywhere: the tree just
+    /// silently behaves as still mid-construction, so
+    /// <c>ItemContainerGenerator.Status</c> stays <c>NotStarted</c> forever and shared column/
+    /// row sizes never equalize. Measured directly - <c>HarnessSmokeTests</c>' own Button
+    /// dodges this by setting <c>Content</c>, which flips <c>IsInitialized</c> as a side
+    /// effect (a bare <c>Tag</c> or <c>Width</c> assignment does not); rows 001-030 never hit
+    /// this because they either use a Panel (no Style/Template involved at all) or assign
+    /// <c>Style</c> explicitly (bypassing default-style resolution entirely) - rows 031-034
+    /// are the first to depend on an unset default Style/Template actually resolving.
+    /// One call on the ROOT of an already-built tree is enough: measured directly,
+    /// <c>EndInit()</c> reaches every descendant already attached under it at the time it is
+    /// called, not just the element it is called on, and it does not matter whether
+    /// <c>BeginInit()</c> precedes the tree's construction or is called together with
+    /// <c>EndInit()</c> only at the very end. <see cref="Show"/> is the other way to get
+    /// this (a real <c>PresentationSource</c> always initializes), but it opens a window -
+    /// prefer this for anything that is not otherwise about <c>Loaded</c>, focus or HWND
+    /// interop.
+    /// </summary>
+    protected static void CompleteInitialization(FrameworkElement element)
+    {
+        var init = (ISupportInitialize)element;
+        init.BeginInit();
+        init.EndInit();
     }
 
     /// <summary>

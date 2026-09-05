@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -74,11 +74,11 @@ Two deliberate content gaps:
 | 028 | MeasureArrangeContract | `MeasureOverride`/`ArrangeOverride`, `DesiredSize` vs `RenderSize` | ✅ |
 | 029 | GridStarAndAuto | star vs auto vs pixel; assert the definitions, not just rectangles | ✅ |
 | 030 | MarginPaddingAlignment | `Margin`, `Padding`, `HorizontalAlignment`/`VerticalAlignment` | ✅ |
-| 031 | SharedSizeGroup | `Grid.IsSharedSizeScope`, `SharedSizeGroup` | ⬜ |
-| 032 | ItemsControlDataTemplate | `ItemsSource`, `DataTemplate`, generated containers | ⬜ |
-| 033 | ObservableCollectionUpdates | `INotifyCollectionChanged` reaching the generated items | ⬜ |
-| 034 | DataTemplateSelector | `DataTemplateSelector.SelectTemplate` | ⬜ |
-| 035 | RoutedEventRouting | bubbling vs tunnelling (`Preview*`), `Handled` | ⬜ |
+| 031 | SharedSizeGroup | `Grid.IsSharedSizeScope`, `SharedSizeGroup` | ✅ |
+| 032 | ItemsControlDataTemplate | `ItemsSource`, `DataTemplate`, generated containers | ✅ |
+| 033 | ObservableCollectionUpdates | `INotifyCollectionChanged` reaching the generated items | ✅ |
+| 034 | DataTemplateSelector | `DataTemplateSelector.SelectTemplate` | ✅ |
+| 035 | RoutedEventRouting | bubbling vs tunnelling (`Preview*`), `Handled` | ✅ |
 
 ## 02-intermediate (036–070)
 
