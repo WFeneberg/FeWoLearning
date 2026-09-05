@@ -1,0 +1,37 @@
+@implements IDisposable
+@* Exercise 060 - Persist Component State Roundtrip (intermediate).
+   Goal:   Hand a whole typed object across the handover, and stop persisting once the
+           component is gone.
+   Drills: PersistAsJson/TryTakeFromJson with a record (not just a scalar), and
+           disposing the PersistingComponentStateSubscription that RegisterOnPersisting
+           returns.
+   Passes: dotnet test --filter FullyQualifiedName~Ex060_ *@
+<span id="title">@Draft.Title</span>
+<span id="tags">@string.Join(",", Draft.Tags)</span>
+<button id="rename" @onclick="Rename">rename</button>
+
+@code {
+    public const string StateKey = "ex060-draft";
+
+    [Inject] public PersistentComponentState State { get; set; } = default!;
+
+    public DraftState Draft { get; private set; } = new("untitled", []);
+
+    private void Rename() => Draft = Draft with { Title = "spec review", Tags = [.. Draft.Tags, "edited"] };
+
+    // TODO: restore Draft from State under StateKey as a whole DraftState (it
+    // serializes as JSON - one key, one object, not a key per property), leaving the
+    // "untitled" default alone when nothing is stored. Then register a callback that
+    // persists the current Draft back under StateKey, and keep the
+    // PersistingComponentStateSubscription it hands back in a field.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex060 - restore the draft and register the persisting callback");
+
+    // TODO: dispose that subscription. RegisterOnPersisting hangs the callback off a
+    // state object that outlives this component, so a component that never gives the
+    // registration back keeps persisting after it is gone.
+    public void Dispose()
+        => throw new NotImplementedException("TODO: Ex060 - drop the persisting registration");
+
+    public sealed record DraftState(string Title, IReadOnlyList<string> Tags);
+}

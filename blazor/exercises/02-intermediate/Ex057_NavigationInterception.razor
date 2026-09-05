@@ -1,0 +1,33 @@
+@implements IDisposable
+@* Exercise 057 - Navigation Interception (intermediate).
+   Goal:   Keep a half-finished edit on screen by cancelling navigation away from it.
+   Drills: NavigationManager.RegisterLocationChangingHandler, LocationChangingContext
+           .PreventNavigation, disposing the registration.
+   Passes: dotnet test --filter FullyQualifiedName~Ex057_ *@
+<button id="edit" @onclick="Edit">edit</button>
+<span id="state">@(IsDirty ? "dirty" : "clean")</span>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    public bool IsDirty { get; private set; }
+    public int PreventedCount { get; private set; }
+
+    private void Edit() => IsDirty = true;
+
+    // TODO: register a location-changing handler with Navigation and keep the
+    // IDisposable it returns in a field, so Dispose() below can take it back.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex057 - register the location-changing handler");
+
+    // TODO: the handler itself. When IsDirty, cancel the navigation via the context
+    // and count the block in PreventedCount; when clean, let it through untouched.
+    // It stays registered afterwards - one block must not disarm the next.
+    // Note: this runs outside the render loop, so do not call StateHasChanged here.
+    private ValueTask OnLocationChanging(LocationChangingContext context)
+        => throw new NotImplementedException("TODO: Ex057 - prevent navigation while dirty");
+
+    // TODO: dispose the registration, so a disposed component stops intercepting.
+    public void Dispose()
+        => throw new NotImplementedException("TODO: Ex057 - unregister the handler");
+}

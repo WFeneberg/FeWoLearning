@@ -1,0 +1,33 @@
+@using Microsoft.AspNetCore.WebUtilities
+@* Exercise 056 - Query String Parsing (intermediate).
+   Goal:   Read paging and filter values out of the current URL's query string.
+   Drills: NavigationManager.Uri, QueryHelpers.ParseQuery, a key that carries several
+           values, percent-decoding, and falling back when a value is missing or
+           unparsable.
+   Passes: dotnet test --filter FullyQualifiedName~Ex056_ *@
+<span id="page">@Page</span>
+<span id="term">@Term</span>
+<span id="tags">@string.Join(",", Tags)</span>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    public int Page { get; private set; }
+    public string Term { get; private set; } = "";
+    public IReadOnlyList<string> Tags { get; private set; } = [];
+
+    protected override void OnInitialized()
+    {
+        var query = QueryHelpers.ParseQuery(Navigation.ToAbsoluteUri(Navigation.Uri).Query);
+
+        Page = query.TryGetValue("page", out var page) && int.TryParse(page, out var parsed)
+            ? parsed
+            : 1;
+
+        Term = query.TryGetValue("q", out var term) ? term.ToString() : "";
+
+        Tags = query.TryGetValue("tag", out var tags)
+            ? [.. tags.Select(tag => tag ?? "")]
+            : [];
+    }
+}

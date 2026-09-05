@@ -1,0 +1,30 @@
+@* Exercise 059 - Persist Component State Basics (intermediate).
+   Goal:   Carry a value across the prerender -> interactive handover instead of
+           recomputing it, the way a prerendered page hands its data to the circuit.
+   Drills: PersistentComponentState, TryTakeFromJson, RegisterOnPersisting.
+   Passes: dotnet test --filter FullyQualifiedName~Ex059_ *@
+<span id="count">@Count</span>
+<button id="inc" @onclick="() => Count++">+</button>
+
+@code {
+    public const string StateKey = "ex059-count";
+
+    [Inject] public PersistentComponentState State { get; set; } = default!;
+
+    public int Count { get; private set; }
+
+    protected override void OnInitialized()
+    {
+        if (State.TryTakeFromJson<int>(StateKey, out var restored))
+        {
+            Count = restored;
+        }
+
+        // Reads Count when the framework runs it, not when it is registered.
+        State.RegisterOnPersisting(() =>
+        {
+            State.PersistAsJson(StateKey, Count);
+            return Task.CompletedTask;
+        });
+    }
+}

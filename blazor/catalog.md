@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 55 ✅ / 45 ⬜**
+**Status: 60 ✅ / 40 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -81,11 +81,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 053 | JsInteropUnmatchedInvocation | `JSInterop.Mode` Strict vs Loose, asserting an unexpected call fails | ✅ |
 | 054 | NavigationManagerBasics | `NavigationManager.NavigateTo`, bUnit `FakeNavigationManager` | ✅ |
 | 055 | NavigationLocationChanged | `NavigationManager.LocationChanged` subscribe/unsubscribe | ✅ |
-| 056 | QueryStringParsing | `NavigationManager.Uri`, `QueryHelpers.ParseQuery` | ⬜ |
-| 057 | NavigationInterception | `RegisterLocationChangingHandler`, cancelling a navigation | ⬜ |
-| 058 | BindDirectiveModifiers | `@bind:event` (custom update-trigger event), `@bind:format`, `@bind:after` (post-update hook) | ⬜ |
-| 059 | PersistComponentStateBasics | `PersistentComponentState`, `RegisterOnPersisting`, restore on init | ⬜ |
-| 060 | PersistComponentStateRoundtrip | persisting typed state as JSON, subscription disposal | ⬜ |
+| 056 | QueryStringParsing | `NavigationManager.Uri`, `QueryHelpers.ParseQuery` | ✅ |
+| 057 | NavigationInterception | `RegisterLocationChangingHandler`, cancelling a navigation | ✅ |
+| 058 | BindDirectiveModifiers | `@bind:event` (custom update-trigger event), `@bind:format`, `@bind:after` (post-update hook) | ✅ |
+| 059 | PersistComponentStateBasics | `PersistentComponentState`, `RegisterOnPersisting`, restore on init | ✅ |
+| 060 | PersistComponentStateRoundtrip | persisting typed state as JSON, subscription disposal | ✅ |
 | 061 | RefCaptureBasics | `@ref` capturing an element reference and a component reference, calling a method on a child instance | ⬜ |
 | 062 | AsyncOnInitialized | `async OnInitializedAsync`, loading-state rendering | ⬜ |
 | 063 | CancellationOnDispose | `CancellationTokenSource` created in `OnInitialized`, cancelled in `Dispose` | ⬜ |

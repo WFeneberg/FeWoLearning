@@ -1,0 +1,41 @@
+@implements IDisposable
+@* Exercise 060 - Persist Component State Roundtrip (intermediate).
+   Goal:   Hand a whole typed object across the handover, and stop persisting once the
+           component is gone.
+   Drills: PersistAsJson/TryTakeFromJson with a record (not just a scalar), and
+           disposing the PersistingComponentStateSubscription that RegisterOnPersisting
+           returns.
+   Passes: dotnet test --filter FullyQualifiedName~Ex060_ *@
+<span id="title">@Draft.Title</span>
+<span id="tags">@string.Join(",", Draft.Tags)</span>
+<button id="rename" @onclick="Rename">rename</button>
+
+@code {
+    public const string StateKey = "ex060-draft";
+
+    [Inject] public PersistentComponentState State { get; set; } = default!;
+
+    public DraftState Draft { get; private set; } = new("untitled", []);
+
+    private PersistingComponentStateSubscription _subscription;
+
+    private void Rename() => Draft = Draft with { Title = "spec review", Tags = [.. Draft.Tags, "edited"] };
+
+    protected override void OnInitialized()
+    {
+        if (State.TryTakeFromJson<DraftState>(StateKey, out var restored) && restored is not null)
+        {
+            Draft = restored;
+        }
+
+        _subscription = State.RegisterOnPersisting(() =>
+        {
+            State.PersistAsJson(StateKey, Draft);
+            return Task.CompletedTask;
+        });
+    }
+
+    public void Dispose() => _subscription.Dispose();
+
+    public sealed record DraftState(string Title, IReadOnlyList<string> Tags);
+}

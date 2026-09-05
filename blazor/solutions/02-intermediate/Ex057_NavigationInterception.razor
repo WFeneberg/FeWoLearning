@@ -1,0 +1,35 @@
+@implements IDisposable
+@* Exercise 057 - Navigation Interception (intermediate).
+   Goal:   Keep a half-finished edit on screen by cancelling navigation away from it.
+   Drills: NavigationManager.RegisterLocationChangingHandler, LocationChangingContext
+           .PreventNavigation, disposing the registration.
+   Passes: dotnet test --filter FullyQualifiedName~Ex057_ *@
+<button id="edit" @onclick="Edit">edit</button>
+<span id="state">@(IsDirty ? "dirty" : "clean")</span>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    public bool IsDirty { get; private set; }
+    public int PreventedCount { get; private set; }
+
+    private IDisposable? _registration;
+
+    private void Edit() => IsDirty = true;
+
+    protected override void OnInitialized()
+        => _registration = Navigation.RegisterLocationChangingHandler(OnLocationChanging);
+
+    private ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        if (IsDirty)
+        {
+            context.PreventNavigation();
+            PreventedCount++;
+        }
+
+        return ValueTask.CompletedTask;
+    }
+
+    public void Dispose() => _registration?.Dispose();
+}

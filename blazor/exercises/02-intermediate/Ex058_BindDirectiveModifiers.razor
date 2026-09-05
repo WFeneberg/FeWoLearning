@@ -1,0 +1,28 @@
+@* Exercise 058 - Bind Directive Modifiers (intermediate).
+   Goal:   Change when a binding writes, how it renders, and what runs right after it.
+   Drills: @bind:event (a custom update trigger), @bind:format (display and parse
+           format), @bind:after (post-update hook).
+   Passes: dotnet test --filter FullyQualifiedName~Ex058_ *@
+<span id="echo">@_note</span>
+<span id="edits">@Edits</span>
+<span id="due-echo">@_due.ToString("yyyy-MM-dd")</span>
+
+@* TODO: render, above the spans:
+     <input id="note" ... />  two-way bound to _note, writing on every keystroke -
+                              the oninput event, not @bind's default onchange - and
+                              running a hook right after each write that increments
+                              Edits.
+     <input id="due" ... />   two-way bound to _due, both rendered into the input's
+                              value and parsed back with the format yyyy-MM-dd
+                              (without it a DateTime round-trips as 2026-01-15T00:00:00).
+   All three are @bind modifiers; none of them needs a hand-written event handler. *@
+
+@code {
+    private string _note = "";
+    private DateTime _due = new(2026, 1, 15);
+
+    public int Edits { get; private set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex058 - add the modified bindings");
+}

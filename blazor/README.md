@@ -6,10 +6,12 @@
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
 plain C# language features — those belong to the `dotnet/` track. As of this
-writing, only the **01-beginner** tier (ex001–ex035, component fundamentals:
-`[Parameter]`, rendering directives, `@bind`, `EventCallback`,
-`RenderFragment`, lifecycle, `CascadingValue`) is written and verified;
-02-intermediate through 04-expert are catalog rows only (⬜).
+writing, ex001–ex060 are written and verified: the whole **01-beginner** tier
+(ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
+`@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
+the first 25 rows of **02-intermediate** (ex036–ex060: `EditForm`/validation,
+DI and state containers, JS interop, navigation, persistent component state).
+ex061–ex100 are catalog rows only (⬜) — `catalog.md` is the source of truth.
 
 ## 2. Prerequisites
 
@@ -27,7 +29,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 115 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 206 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -63,7 +65,10 @@ naturally falls:
   `_selected` twice, `_total`), because their finished markup needs something
   to bind to that the stub cannot supply itself. Until the learner writes
   that markup, the field is genuinely unused, which is why the stub build
-  carries six warnings (see §9).
+  carries warnings (see §9). Later shape-B stubs avoid adding to that list by
+  rendering the echo markup that reads the field and leaving only the
+  *modified* markup as the TODO (ex058), or by leaving the field itself to the
+  learner (ex060's `PersistingComponentStateSubscription`).
 
 A reference solution replaces the throwing member/method with the real
 implementation and deletes anything that was there only to throw.
@@ -92,6 +97,11 @@ host/Components/Demos/Beginner/Ex001.razor         -> @page "/beginner/001"
   and small components that several exercises' tests depend on. It never
   contains a TODO, is never itself a graded exercise, and never gets a
   `catalog.md` row.
+- **`tests/_support/` is the same idea on the test side** — fixtures that are
+  test infrastructure rather than anything a component under test can see, so
+  they must *not* go into the two RCLs' `_support/`. It currently holds
+  `PersistentStateHarness.cs` (ex059/ex060), and like `_support/` it never
+  gets a `catalog.md` row.
 
 ## 6. Why `solutions/` is a real project here
 
@@ -156,10 +166,36 @@ material found online. This track uses the current names throughout:
   prove component *identity* (e.g. "the same child instance survived a
   reorder"), go through `cut.FindComponents<T>()[i].Instance`, not through an
   element handle.
+- **`BunitNavigationManager.History` is stack-ordered and typed
+  `IReadOnlyCollection<NavigationHistory>`.** The *first* element is the most
+  recent navigation, not the oldest, and the initial URI is not in it at all.
+  It has no indexer, so it is `History.First()`, not `History[0]`. Each entry
+  carries a `NavigationState` — `Succeeded` / `Prevented` / `Faulted` — which
+  is how ex057 proves a location-changing handler actually cancelled a
+  navigation rather than merely running.
+- **`RegisterLocationChangingHandler` works against the fake navigation
+  manager** — `PreventNavigation()` really does leave `Uri` where it was and
+  mark the history entry `Prevented`, and disposing the registration really
+  does re-arm navigation. That handler runs *outside* the render loop, though,
+  so it must not call `StateHasChanged`; ex057 counts blocks into a property
+  the test reads off `cut.Instance` instead of rendering them.
+- **`PersistentComponentState` is not in bUnit's default services** — it is
+  registered by `AddRazorComponents()` in a real host, which bUnit does not
+  call. `tests/_support/PersistentStateHarness.cs` supplies it: construct a
+  `ComponentStatePersistenceManager` (its `ILogger`-only constructor is
+  public), register `manager.State` as a singleton, `RestoreStateAsync` a
+  fake `IPersistentComponentStateStore` into it before rendering, and
+  `PersistStateAsync(store, Renderer)` afterwards to run the component's
+  persisting callbacks. Two traps: **registration must precede the first
+  service resolution**, and touching `BunitContext.Renderer` *is* a
+  resolution — so a test opens the pass (registers `manager.State`) before it
+  seeds the store, not after; and seed the store by persisting through a
+  second, throwaway manager rather than hand-writing JSON bytes, so the test
+  asserts a real round-trip instead of a guessed serialization shape.
 
 ## 9. The stub build is not warning-free — by design
 
-`dotnet build` on `exercises/` emits **exactly six warnings**, all
+`dotnet build` on `exercises/` emits **exactly ten warnings**, all
 `CS0169`/`CS0414`/`CS0649` (unused/never-assigned field), for fields that
 shape-B stubs (§4) declare for the learner to wire up:
 
@@ -169,6 +205,10 @@ shape-B stubs (§4) declare for the learner to wire up:
 - `Ex025_SelectBinding._selected`
 - `Ex027_RadioGroup._selected`
 - `Ex031_ChildToParentCallback._total`
+- `Ex040_EditContextFieldState._context`
+- `Ex041_CustomFieldValidation._context`
+- `Ex045_CascadingServiceInjection._fromProperty`
+- `Ex052_JsInteropModule._module`
 
 These are **expected and must not be suppressed**. Each field is genuinely
 unused until the learner's implementation reads or assigns it; suppressing
@@ -177,7 +217,7 @@ category of warning a real unused-field bug would also produce, defeating the
 purpose of leaving the build unsuppressed. The **solutions** project builds
 with **0 warnings** — building `solutions/FeWoLearning.Blazor.Solutions.csproj`
 directly confirms this; a whole-`.slnx` build in solutions mode still shows
-the same six exercises warnings because `exercises/` remains part of the
+the same ten exercises warnings because `exercises/` remains part of the
 `.slnx` regardless of `UseSolutions`.
 
 ## 10. Sharpest edge in this tier: ex035 can hang the test host, not fail it
@@ -252,3 +292,11 @@ concrete failure modes worth carrying into future batches:
 - **Always ask what a naive, wrong implementation would do before trusting a
   green test** — restated here because it is this tier's single most
   effective check, and the one most easily skipped under time pressure.
+- **For a "stops doing X once disposed" fact, mutate the solution and watch
+  the fact go red.** Asking the question is cheap but easy to answer wrongly;
+  ex056–ex060 were each checked by actually breaking the solution (an empty
+  `Dispose()`, a callback capturing its value at registration time, a
+  hand-rolled query-string split, a plain `@bind` with the modifiers stripped)
+  and confirming that exactly the intended facts failed and no others. Two of
+  those mutations are the bugs a learner is most likely to write, and both
+  produce a component that looks entirely correct while it is on screen.

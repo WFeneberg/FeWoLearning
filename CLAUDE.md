@@ -367,7 +367,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 35 / 100 (verified) | 65 |
+| `blazor/` | 60 / 100 (verified) | 40 |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 10 / 100 (verified) | 90 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
@@ -418,15 +418,23 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 35 written (beginner-tier) exercises carry 115 individual test
-facts; `dotnet test` shows 115 failed/0 passed on the untouched tree, each
-failure traced to its own exercise's `NotImplementedException`, and
-`dotnet test -p:UseSolutions=true` shows 115 passed/0 failed. The `exercises/`
-build itself carries 6 expected `CS0169`/`CS0414`/`CS0649` warnings for
-fields that shape-B stubs declare for the learner to wire up — these are
-intentionally left unsuppressed; `solutions/` builds with 0 warnings. See
+`blazor/`'s 60 written exercises — all of `01-beginner` plus ex036–ex060 of
+`02-intermediate` — carry 206 individual test facts; `dotnet test` shows 206
+failed/0 passed on the untouched tree, each failure traced to its own
+exercise's `NotImplementedException`, and `dotnet test -p:UseSolutions=true`
+shows 206 passed/0 failed (verified 2026-09-05). The `exercises/` build itself
+carries 10 expected `CS0169`/`CS0414`/`CS0649` warnings for fields that
+shape-B stubs declare for the learner to wire up — these are intentionally
+left unsuppressed; `solutions/` builds with 0 warnings. See
 `blazor/README.md` for the full list and for a sharp edge in ex035: a naive,
 unbounded parent-refresh callback hangs the test host rather than failing it.
+Two things the intermediate tier added to that README, both easy to get wrong:
+`BunitNavigationManager.History` is stack-ordered (`History.First()` is the
+*newest* navigation) and has no indexer, and `PersistentComponentState` is not
+in bUnit's default services at all — `tests/_support/PersistentStateHarness.cs`
+builds one from a `ComponentStatePersistenceManager`, and its registration must
+happen before anything resolves a service, which touching `BunitContext.Renderer`
+already does.
 
 ## The `uno/` track
 

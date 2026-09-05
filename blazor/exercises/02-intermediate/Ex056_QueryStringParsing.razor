@@ -1,0 +1,29 @@
+@* Exercise 056 - Query String Parsing (intermediate).
+   Goal:   Read paging and filter values out of the current URL's query string.
+   Drills: NavigationManager.Uri, QueryHelpers.ParseQuery, a key that carries several
+           values, percent-decoding, and falling back when a value is missing or
+           unparsable.
+   Passes: dotnet test --filter FullyQualifiedName~Ex056_ *@
+<span id="page">@Page</span>
+<span id="term">@Term</span>
+<span id="tags">@string.Join(",", Tags)</span>
+
+@code {
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    public int Page { get; private set; }
+    public string Term { get; private set; } = "";
+    public IReadOnlyList<string> Tags { get; private set; } = [];
+
+    // TODO: parse the query string of the current URL (Navigation.Uri) and fill the
+    // three members above:
+    //   "page" -> Page, as an int. 1 when the key is missing OR its value is not an
+    //             int - never throw on junk input.
+    //   "q"    -> Term, decoded ("hello%20world" is the two words, not the literal
+    //             percent escape). "" when the key is missing.
+    //   "tag"  -> Tags, every value the key carries, in URL order. Empty when missing.
+    // QueryHelpers.ParseQuery lives in Microsoft.AspNetCore.WebUtilities and hands
+    // back StringValues per key, which is what makes the repeated "tag" key work.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex056 - parse the query string");
+}

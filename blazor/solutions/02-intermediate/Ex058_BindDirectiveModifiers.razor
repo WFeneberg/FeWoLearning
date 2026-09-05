@@ -1,0 +1,20 @@
+@* Exercise 058 - Bind Directive Modifiers (intermediate).
+   Goal:   Change when a binding writes, how it renders, and what runs right after it.
+   Drills: @bind:event (a custom update trigger), @bind:format (display and parse
+           format), @bind:after (post-update hook).
+   Passes: dotnet test --filter FullyQualifiedName~Ex058_ *@
+<input id="note" @bind="_note" @bind:event="oninput" @bind:after="NoteChanged" />
+<input id="due" @bind="_due" @bind:format="yyyy-MM-dd" />
+
+<span id="echo">@_note</span>
+<span id="edits">@Edits</span>
+<span id="due-echo">@_due.ToString("yyyy-MM-dd")</span>
+
+@code {
+    private string _note = "";
+    private DateTime _due = new(2026, 1, 15);
+
+    public int Edits { get; private set; }
+
+    private void NoteChanged() => Edits++;
+}
