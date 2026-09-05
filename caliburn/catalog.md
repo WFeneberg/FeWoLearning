@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 20 ✅ / 80 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -48,11 +48,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 018 | BindingConventionTwoWay | `Mode` is `TwoWay` when the view-model property has a public setter and `OneWay` otherwise - the element has no say (`ConventionManager.ApplyBindingMode` never sees it); `UpdateSourceTrigger.PropertyChanged` always - not WPF's own `LostFocus` default for `TextBox.Text` | ✅ |
 | 019 | ElementConventionLookup | `ConventionManager.GetElementConvention` walks the type hierarchy (`CheckBox`→`ToggleButton`, `ComboBox`/`ListBox`→`Selector`) and never returns null for a `FrameworkElement` - an unregistered type falls back to the `Visibility` convention | ✅ |
 | 020 | CustomElementConvention | `ConventionManager.AddElementConvention<T>` registers a convention scoped to one owned type, turning a nonsense `Visibility` binding into the intended one | ✅ |
-| 021 | ConventionValueConverter | automatic converter application | ⬜ |
-| 022 | ActionConventionButton | button named after a method invokes it | ⬜ |
-| 023 | ActionGuardProperty | `CanXxx` gating `IsEnabled` | ⬜ |
-| 024 | ActionGuardRefresh | re-announcing a guard so the button re-evaluates | ⬜ |
-| 025 | MessageAttachExplicit | `cal:Message.Attach` instead of the naming convention | ⬜ |
+| 021 | ConventionValueConverter | `ConventionManager.ApplyValueConverter` inserts WPF's `BooleanToVisibilityConverter` only where the types need bridging (`bool` onto `Visibility`) - an `int` onto `TextBlock.Text` gets no converter and no `StringFormat` | ✅ |
+| 022 | ActionConventionButton | naming a `Button` after a public method wires a real `Microsoft.Xaml.Behaviors.EventTrigger`/`Caliburn.Micro.ActionMessage` at bind time, but the click only invokes the method once the view is hosted in a real window (`Show`) | ✅ |
+| 023 | ActionGuardProperty | a `CanXxx` property gates `IsEnabled` from the moment the view is bound - but by direct assignment, not a WPF `Binding` (`BindingOperations.GetBinding` on `IsEnabledProperty` returns `null` even though the gating works) | ✅ |
+| 024 | ActionGuardRefresh | a guard is only as fresh as its last announcement - silently mutating the guarded state leaves `IsEnabled` stale until `NotifyOfPropertyChange` fires; a `CanXxx` **method** guard is evaluated once at bind time and never re-evaluated, not even by a full `Refresh()` | ✅ |
+| 025 | MessageAttachExplicit | `cal:Message.Attach="Method('literal')"` (`xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro.Platform"`) wires the action explicitly, decoupling `x:Name` from the method and passing a literal string parameter | ✅ |
 | 026 | ActionParameters | passing parameters to an action | ⬜ |
 | 027 | ActionSpecialValues | `$eventArgs`, `$dataContext`, `$source` | ⬜ |
 | 028 | ActionTarget | `Action.Target` vs `Action.TargetWithoutContext` | ⬜ |
