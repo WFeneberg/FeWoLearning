@@ -125,6 +125,15 @@ Working as documented:
   `ReactiveUI.ViewForMixins`). Measured: activation count went 0 → 1 when the view was
   shown in a headless window. `ReactiveUserControl<TViewModel>` and
   `ReactiveWindow<TViewModel>` both exist in `ReactiveUI.Avalonia`.
+
+  **Two corrections to what this bullet first implied**, both measured while building
+  ex048:
+  - `ReactiveUserControl<T>` does **not** auto-forward activation to its view model,
+    despite implementing `IActivatableView`. The view must wire it explicitly:
+    `this.WhenActivated(register => register(ViewModel!.Activator.Activate()));`
+  - For a `Control` (as opposed to a bare `Visual`), activation is driven by
+    `Loaded`/`Unloaded`, **not** `AttachedToVisualTree`. So a test must call
+    `Dispatcher.UIThread.RunJobs()` after `Show()` before activation is observable.
 - **No ReactiveUI validation helpers exist**, so ex047 is plain `INotifyDataErrorInfo`
   with no extra package — which is what its catalog row already says.
 
@@ -136,6 +145,15 @@ The two that differ:
   there is no `AppLocator` type — that name appears in the assembly but resolves to
   nothing. Registering globally from the harness is the wrong answer anyway: the test
   harness must stay ignorant of exercise types.
+
+  Note also that **`ViewModelViewHost` only resolves on attach to the visual tree**,
+  which puts it beyond the reach of `GallerySmokeTests`: that test only *constructs*
+  each registered page, never shows one, so a stub-mode page would construct without
+  raising and the red/green invariant would silently not hold for it. ex050 therefore
+  has no gallery page, deliberately, and `GalleryCatalog`'s doc comment records why.
+  The general rule: **an exercise whose stub only fails on show or attach cannot be
+  covered by the gallery smoke test** — give it no page rather than a page that proves
+  nothing.
 
   The self-contained answer, measured working: set an explicit `IViewLocator` on the
   host. `ViewModelViewHost` exposes settable `ViewModel` (object), `ViewContract`
@@ -427,6 +445,14 @@ trap documented for `python/`.
   specific to the harness's per-test dispatcher isolation; a real desktop app has one
   dispatcher for its whole lifetime and the singleton is fine there — so say that in
   the exercise rather than teaching the workaround as though it were the idiom.
+- **An exercise's initial state must not be ambiguous between correct
+  implementations.** ex047's first draft seeded the view model with *invalid* defaults,
+  which made "freshly constructed, therefore no errors yet" depend on whether the
+  learner validates lazily or eagerly — two equally correct choices that disagree. The
+  mirror check caught it: a compute-on-demand solution failed a test the cached-
+  dictionary solution passed. Fixed by seeding **valid** defaults so the baseline is
+  the same either way. When designing the arrange, ask which legitimate
+  implementations would disagree about it.
 - **A cheat that hangs is not a cheat that failed.** ex039's synchronous-block cheat
   (`ReactiveCommand.Create(() => work().GetAwaiter().GetResult())`) deadlocked the test
   host: `Execute()` blocked the calling thread waiting on the gate, and the
