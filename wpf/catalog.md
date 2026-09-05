@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -59,11 +59,11 @@ Two deliberate content gaps:
 | 013 | TwoWayUpdateSourceTrigger | `UpdateSourceTrigger.Explicit`, `BindingExpression.UpdateSource` | ✅ |
 | 014 | StringFormatAndFallbacks | `StringFormat`, `FallbackValue`, `TargetNullValue` | ✅ |
 | 015 | RelativeSourceBinding | `RelativeSource.Self`, `FindAncestor`, `AncestorLevel` | ✅ |
-| 016 | DataContextInheritance | inherited `DataContext` down a tree, and where it stops | ⬜ |
-| 017 | ValueConverter | `IValueConverter`, `ConvertBack`, `DependencyProperty.UnsetValue` | ⬜ |
-| 018 | ConverterParameterAndCulture | `ConverterParameter`, `ConverterCulture` | ⬜ |
-| 019 | MultiBinding | `MultiBinding`, `IMultiValueConverter` | ⬜ |
-| 020 | RequerySuggested | `CommandManager.InvalidateRequerySuggested`, weak handler storage | ⬜ |
+| 016 | DataContextInheritance | inherited `DataContext` down a tree, and where it stops | ✅ |
+| 017 | ValueConverter | `IValueConverter`, `ConvertBack`, `DependencyProperty.UnsetValue` | ✅ |
+| 018 | ConverterParameterAndCulture | `ConverterParameter`, `ConverterCulture` | ✅ |
+| 019 | MultiBinding | `MultiBinding`, `IMultiValueConverter` | ✅ |
+| 020 | RequerySuggested | `CommandManager.InvalidateRequerySuggested`, weak handler storage | ✅ |
 | 021 | RoutedCommandBinding | `RoutedCommand`, `CommandBinding`, `ApplicationCommands` | ⬜ |
 | 022 | StyleSetters | `Style`, `Setter`, applying a style in code | ⬜ |
 | 023 | ImplicitStyleByType | `TargetType` style keyed by type in a dictionary | ⬜ |

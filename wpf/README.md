@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Six things that bite
+### Eight things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -110,6 +110,28 @@ no `Application` either; WPF resolves default control templates through
   `Explicit` alike, only `PropertyChanged` reads `False` — and `UpdateSource()`
   succeeds under every trigger, so there is no exception-shape check. Row 013 asserts
   both the focus-based behavior and the binding's declared `UpdateSourceTrigger`.
+- **A `GC.Collect()`-then-assert-it-still-works test is not reliably load-bearing on
+  this host, even in the safe direction.** Row 020 tried to prove "a handler stored in
+  a field survives a forced collection" as a deterministic stand-in for "weak handler
+  storage" — sound in theory (a rooted object's fields can never be collected out from
+  under it), but run against a deliberately broken implementation (an inline lambda
+  subscribed to `CommandManager.RequerySuggested` with no field anywhere), the forced
+  `GC.Collect()` did not reclaim the orphaned delegate in this Debug-build test host,
+  and the assertion passed on the broken code too. It was removed; the row proves the
+  same point through `Dispose()` instead — with nothing stored, there is nothing to
+  unsubscribe, and that failure does not depend on GC timing. Rows 071-075 (leaks,
+  `WeakEventManager`, leak diagnosis) need a real collection to have happened to prove
+  anything — expect the same unreliability there and look for a deterministic
+  consequence instead of forcing a GC and hoping.
+- **A field a stub pre-declares for the learner to assign later can warn even though
+  it compiles.** `CS0414` ("assigned but never used") fires specifically when a
+  nullable field is written a literal `null` and never read anywhere else in the stub
+  — even though the exact same field written a real (non-default) value, or a
+  non-nullable field written anything, does not warn. Row 020 hit this pre-declaring
+  `private EventHandler? _handler;` with a placeholder `= null;` for the learner to
+  replace. The fix, matching row 006's convention: leave the field itself out of the
+  stub and describe it in the TODO instead — it does not exist to warn about until the
+  learner adds it.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 
@@ -195,7 +217,7 @@ narrow question — does the WPF mechanism work — and deliberately does not at
 
 ## Writing an exercise without writing a test that lies
 
-Four failure modes, each of which has already shipped in some track of this repo:
+Five failure modes, each of which has already shipped in some track of this repo:
 
 - A test asserting only what the **signature** produces — wrong arity, wrong call
   style — passes before the stub's body ever runs. Assert on introspected metadata,
@@ -212,6 +234,12 @@ Four failure modes, each of which has already shipped in some track of this repo
   satisfies it, while a binding, a style setter or an animation would bypass it
   entirely. Any exercise about metadata, coercion or validation must also write
   through `SetValue` and read through `GetValue`.
+- **Every instruction in a stub's TODO must have an assertion behind it, or a learner
+  who ignores it goes green.** Row 015 shipped a TODO telling the learner to set
+  `StringFormat = "{0:0}"` with no test checking it — a learner who skipped that part
+  of the instruction still passed every test. Before shipping an exercise, map each
+  instruction in its TODO to the specific test that would fail if it were ignored; an
+  instruction with no such test gets an assertion added, or gets dropped.
 
 ## Deliberate gaps
 
