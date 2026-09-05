@@ -1,0 +1,15 @@
+@page "/intermediate/069"
+@rendermode InteractiveServer
+
+<h1>Exercise 069 - GenericConstraintComponent</h1>
+
+<p>Numbers:</p>
+<Ex069_GenericConstraintComponent T="int" Items="_numbers" />
+
+<p>Words:</p>
+<Ex069_GenericConstraintComponent T="string" Items="_words" />
+
+@code {
+    private readonly int[] _numbers = [3, 9, 1, 7];
+    private readonly string[] _words = ["pear", "apple", "quince"];
+}

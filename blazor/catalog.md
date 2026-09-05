@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 65 ✅ / 35 ⬜**
+**Status: 70 ✅ / 30 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -91,11 +91,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 063 | CancellationOnDispose | `CancellationTokenSource` created in `OnInitialized`, cancelled in `Dispose` | ✅ |
 | 064 | SetParametersAsyncOverride | overriding `SetParametersAsync`, calling `base` | ✅ |
 | 065 | DebouncedAsyncSearch | `Task.Delay`-based debounce, cancelling a superseded request | ✅ |
-| 066 | ErrorBoundaryBasics | `ErrorBoundary`, `ErrorContent`, `Recover()` | ⬜ |
-| 067 | ErrorBoundaryLoggingHandler | custom `ErrorBoundary` subclass, `OnErrorAsync` override | ⬜ |
-| 068 | GenericComponentBasics | `@typeparam T`, generic component parameter inference | ⬜ |
-| 069 | GenericConstraintComponent | generic type constraints (`where T : IComparable<T>`) on a component | ⬜ |
-| 070 | GenericListComponent | generic component wrapping a list, reusable `RenderFragment<T>` template | ⬜ |
+| 066 | ErrorBoundaryBasics | `ErrorBoundary`, `ErrorContent`, `Recover()` | ✅ |
+| 067 | ErrorBoundaryLoggingHandler | custom `ErrorBoundary` subclass, `OnErrorAsync` override | ✅ |
+| 068 | GenericComponentBasics | `@typeparam T`, generic component parameter inference | ✅ |
+| 069 | GenericConstraintComponent | generic type constraints (`where T : IComparable<T>`) on a component | ✅ |
+| 070 | GenericListComponent | generic component wrapping a list, reusable `RenderFragment<T>` template | ✅ |
 
 ## Advanced (071–090) — render performance, virtualization, custom inputs, auth, render modes
 

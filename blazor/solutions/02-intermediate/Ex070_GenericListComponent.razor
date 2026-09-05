@@ -1,0 +1,26 @@
+@typeparam TItem
+@* Exercise 070 - Generic List Component (intermediate).
+   Goal:   A list component that renders any element type, letting the call site
+           decide what one row looks like.
+   Drills: RenderFragment<TItem> as a reusable per-item template, a fallback when no
+           template was given, and a separate fragment for the empty case.
+   Passes: dotnet test --filter FullyQualifiedName~Ex070_ *@
+@if (Items.Count > 0)
+{
+    <ul id="list">
+        @foreach (var item in Items)
+        {
+            <li>@if (ItemTemplate is not null) { @ItemTemplate(item) } else { @item?.ToString() }</li>
+        }
+    </ul>
+}
+else if (EmptyTemplate is not null)
+{
+    @EmptyTemplate
+}
+
+@code {
+    [Parameter] public IReadOnlyList<TItem> Items { get; set; } = [];
+    [Parameter] public RenderFragment<TItem>? ItemTemplate { get; set; }
+    [Parameter] public RenderFragment? EmptyTemplate { get; set; }
+}

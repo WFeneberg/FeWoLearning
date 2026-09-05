@@ -1,0 +1,26 @@
+@typeparam T
+@* Exercise 069 - Generic Constraint Component (intermediate).
+   Goal:   Compare the values a generic component was handed, which an unconstrained
+           type argument does not let you do at all.
+   Drills: a type constraint on @typeparam, and CompareTo as the comparison the
+           constraint buys you.
+   Passes: dotnet test --filter FullyQualifiedName~Ex069_ *@
+<span id="min">@Min</span>
+<span id="max">@Max</span>
+
+@code {
+    [Parameter] public IReadOnlyList<T> Items { get; set; } = [];
+
+    // TODO: two things, and the first is the point of the exercise.
+    //   1. Constrain T on the @typeparam line above so that a T can be compared to
+    //      another T: `@typeparam T where T : …`. Without it, CompareTo below does
+    //      not compile - and a solution that reaches for LINQ's Min()/Max() instead
+    //      (which need no constraint) is not what this row is about.
+    //   2. Implement both members with CompareTo, returning default(T) for an empty
+    //      list. Note that default(T) for an unconstrained-but-comparable T is null
+    //      for a reference type and 0 for an int - that asymmetry is real, and the
+    //      tests only assert the empty case for a reference type.
+    public T? Min => throw new NotImplementedException("TODO: Ex069 - the smallest item");
+
+    public T? Max => throw new NotImplementedException("TODO: Ex069 - the largest item");
+}

@@ -1,0 +1,24 @@
+@using FeWoLearning.Blazor.Support
+@* Exercise 066 - Error Boundary Basics (intermediate).
+   Goal:   Contain a child's exception inside one region of the page and offer a way
+           back, instead of tearing the whole render down.
+   Drills: <ErrorBoundary>, its ChildContent/ErrorContent fragments, the exception
+           handed to ErrorContent, and Recover() on a captured boundary.
+   Passes: dotnet test --filter FullyQualifiedName~Ex066_ *@
+<ErrorBoundary @ref="_boundary">
+    <ChildContent>
+        <ExplodingChild Explode="Explode" />
+    </ChildContent>
+    <ErrorContent Context="error">
+        <span id="error">@error.Message</span>
+    </ErrorContent>
+</ErrorBoundary>
+<button id="recover" @onclick="Recover">recover</button>
+
+@code {
+    [Parameter] public bool Explode { get; set; }
+
+    private ErrorBoundary? _boundary;
+
+    private void Recover() => _boundary?.Recover();
+}

@@ -1,0 +1,13 @@
+@typeparam T
+@* Exercise 068 - Generic Component Basics (intermediate) - the generic component.
+   Goal:   Write a component that renders any type, and a template that receives that
+           same type rather than object.
+   Drills: @typeparam T, a T-typed parameter, RenderFragment<T?> as a typed template,
+           reading the type argument the call site inferred.
+   Passes: dotnet test --filter FullyQualifiedName~Ex068_ *@
+<span class="badge" data-type="@typeof(T).Name">@if (Template is not null) { @Template(Value) } else { @Value?.ToString() }</span>
+
+@code {
+    [Parameter] public T? Value { get; set; }
+    [Parameter] public RenderFragment<T?>? Template { get; set; }
+}

@@ -1,0 +1,13 @@
+@page "/intermediate/066"
+@rendermode InteractiveServer
+
+<h1>Exercise 066 - ErrorBoundaryBasics</h1>
+
+<p>Break the child, then recover it - the rest of the page keeps working.</p>
+<button id="break" @onclick="() => _explode = !_explode">@(_explode ? "fix" : "break")</button>
+
+<Ex066_ErrorBoundaryBasics Explode="_explode" />
+
+@code {
+    private bool _explode;
+}

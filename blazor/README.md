@@ -6,12 +6,13 @@
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
 plain C# language features — those belong to the `dotnet/` track. As of this
-writing, ex001–ex065 are written and verified: the whole **01-beginner** tier
+writing, ex001–ex070 are written and verified — the whole of **01-beginner**
 (ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
 `@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
-the first 30 rows of **02-intermediate** (ex036–ex065: `EditForm`/validation,
-DI and state containers, JS interop, navigation, persistent component state,
-`@ref` and the async lifecycle). ex066–ex100 are catalog rows only (⬜) — `catalog.md` is the source of truth.
+the whole of **02-intermediate** (ex036–ex070: `EditForm`/validation, DI and
+state containers, JS interop, navigation, persistent component state, `@ref`,
+the async lifecycle, error boundaries and generic components). **03-advanced**
+and **04-expert** (ex071–ex100) are catalog rows only (⬜) — `catalog.md` is the source of truth.
 
 ## 2. Prerequisites
 
@@ -29,7 +30,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 226 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 246 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -91,6 +92,12 @@ host/Components/Demos/Beginner/Ex001.razor         -> @page "/beginner/001"
   (`@namespace FeWoLearning.Blazor.Exercises.Beginner` and friends), because
   `01-beginner` is not a valid C# identifier and cannot itself form part of a
   namespace.
+- **Not every file of a multi-file exercise carries a TODO.** Where one half is
+  the subject and the other is only the setting, the setting ships finished and
+  is byte-identical in `exercises/` and `solutions/`: ex067's `.razor` merely
+  hosts the boundary (the exercise is the `.cs` subclass beside it), and ex068's
+  parent *is* the demonstration — its call sites are what the reader is meant to
+  study, so handing them over as a TODO would delete the lesson.
 - **Multi-file exercises** follow `ExNNN_<Slug>_<Part>.razor` — e.g. ex035's
   parent component is `Ex035_TabsComposition.razor`, and the child it
   cascades to is `Ex035_TabsComposition_Tab.razor`. This keeps every file that
@@ -98,7 +105,8 @@ host/Components/Demos/Beginner/Ex001.razor         -> @page "/beginner/001"
 - **`_support/` is a fixture folder, not an exercise.** Both `exercises/` and
   `solutions/` carry an identical `_support/` directory (`Person.cs`,
   `AlertSeverity.cs`, `Ticker.cs`, `AddButton.razor`, `RosterEntry.razor`,
-  `Level2.razor`, `Level3.razor`, plus its own `_Imports.razor`) holding types
+  `Level2.razor`, `Level3.razor`, `ExplodingChild.razor`, `ErrorLog.cs`, and
+  the DI fixtures, plus its own `_Imports.razor`) holding types
   and small components that several exercises' tests depend on. It never
   contains a TODO, is never itself a graded exercise, and never gets a
   `catalog.md` row.
@@ -166,6 +174,19 @@ material found online. This track uses the current names throughout:
   prove component *identity* (e.g. "the same child instance survived a
   reorder"), go through `cut.FindComponents<T>()[i].Instance`, not through an
   element handle.
+- **`<ErrorBoundary>` works in bUnit, `Recover()` included** — bUnit registers
+  an `IErrorBoundaryLogger` of its own, so nothing has to be wired up. Two
+  consequences worth knowing. A test can register its own
+  `IErrorBoundaryLogger` over bUnit's, which is the only way to observe whether
+  a custom boundary called `base.OnErrorAsync` (ex067 grades exactly that).
+  And a boundary with no `ErrorContent` rethrows, so `Render` itself fails —
+  meaning "the error content appeared" and "the exception was caught" are one
+  fact, not two.
+- **A custom `ErrorBoundary` subclass has to be a `.cs` file, not a `.razor`
+  one.** Every `.razor` file emits a `BuildRenderTree` override; on a subclass
+  of `ErrorBoundary` that silently replaces the base implementation and the
+  boundary renders nothing at all. ex067's subclass is therefore plain C# with
+  `[Inject]` property injection, which works on any component, markup or not.
 - **There is no parameterless `Render()` on a rendered component.** To push
   parameters again — which is how ex062 proves its load runs once and ex064
   counts sets — re-supply them: `cut.Render(p => p.Add(c => c.X, value))`.
@@ -296,6 +317,17 @@ concrete failure modes worth carrying into future batches:
   disposed once) still show a "correct" final count. Fixtures must observe
   the actual mechanism (the real event's invocation, the real list's
   contents), not a parallel bookkeeping variable that can drift from it.
+- **One fact in this track goes red on an assertion instead of on a
+  `NotImplementedException`, deliberately.** ex069's subject is a *type
+  constraint*, and no behaviour can prove one: `Items.Min()`/`Max()` need no
+  constraint and satisfy every behavioural fact. That row is graded by reading
+  the type parameter's metadata
+  (`typeof(C<>).GetGenericArguments()[0].GetGenericParameterConstraints()`),
+  which is red on the stub because the constraint is missing, not because
+  anything threw. Verified by mutation: replacing the solution with a
+  LINQ-based, unconstrained one takes down that fact and no other. Where a
+  requirement is invisible to behaviour, assert the metadata — but say so at
+  the fact, because it breaks the rule above.
 - **To make a negative assertion about async work mean something, drain the
   dispatcher first.** "The load that finished after disposal did not write
   `Result`" (ex063) and "the superseded search's answer did not overwrite the
@@ -333,4 +365,14 @@ concrete failure modes worth carrying into future batches:
   exactly the facts it should. The `base.SetParametersAsync` ordering mutation
   is the one worth remembering: it fails all four of ex064's facts, because
   once `base` has assigned the property there is no longer a previous value to
-  compare against, and every push looks unchanged.
+  compare against, and every push looks unchanged. ex066–ex070 likewise:
+  dropping `ErrorContent`, returning early instead of calling
+  `base.OnErrorAsync`, ignoring the `RenderFragment<T>`, swapping the
+  constrained comparison for LINQ, and rendering the `<ul>` unconditionally.
+- **`T?` on an unconstrained type parameter is an annotation, not
+  `Nullable<T>`.** ex068 renders a badge for `T="Guid"` with no value, and the
+  fallback is `Guid.Empty`, not nothing — a value-type `T` has no null to fall
+  back on. This was found by a green run failing, and is now asserted rather
+  than designed around, because it is the surprise a reader of a generic
+  component most needs to have had once. ex069 carries the same asymmetry in
+  its empty-list case, which is why only a reference type is asserted there.

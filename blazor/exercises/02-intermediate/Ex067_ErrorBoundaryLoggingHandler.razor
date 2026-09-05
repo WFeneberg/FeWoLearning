@@ -1,0 +1,21 @@
+@using FeWoLearning.Blazor.Support
+@* Exercise 067 - Error Boundary Logging Handler (intermediate) - the host half.
+   No TODO here: this file only wires up the boundary, which ex066 already drilled.
+   The exercise is in Ex067_ErrorBoundaryLoggingHandler_Boundary.cs. *@
+<Ex067_ErrorBoundaryLoggingHandler_Boundary @ref="_boundary">
+    <ChildContent>
+        <ExplodingChild Explode="Explode" />
+    </ChildContent>
+    <ErrorContent Context="error">
+        <span id="error">@error.Message</span>
+    </ErrorContent>
+</Ex067_ErrorBoundaryLoggingHandler_Boundary>
+<button id="recover" @onclick="Recover">recover</button>
+
+@code {
+    [Parameter] public bool Explode { get; set; }
+
+    private Ex067_ErrorBoundaryLoggingHandler_Boundary? _boundary;
+
+    private void Recover() => _boundary?.Recover();
+}

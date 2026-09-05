@@ -1,0 +1,17 @@
+@page "/intermediate/070"
+@rendermode InteractiveServer
+
+<h1>Exercise 070 - GenericListComponent</h1>
+
+<Ex070_GenericListComponent T="string" Items="_fruit">
+    <ItemTemplate Context="fruit"><b>@fruit</b> (@fruit.Length)</ItemTemplate>
+</Ex070_GenericListComponent>
+
+<Ex070_GenericListComponent T="string" Items="_none">
+    <EmptyTemplate><em>nothing to show</em></EmptyTemplate>
+</Ex070_GenericListComponent>
+
+@code {
+    private readonly string[] _fruit = ["pear", "apple", "quince"];
+    private readonly string[] _none = [];
+}

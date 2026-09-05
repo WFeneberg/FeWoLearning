@@ -1,0 +1,25 @@
+@typeparam T
+@* Exercise 068 - Generic Component Basics (intermediate) - the generic component.
+   Goal:   Write a component that renders any type, and a template that receives that
+           same type rather than object.
+   Drills: @typeparam T, a T-typed parameter, RenderFragment<T?> as a typed template,
+           reading the type argument the call site inferred.
+   Passes: dotnet test --filter FullyQualifiedName~Ex068_ *@
+
+@* TODO: render exactly one element:
+     <span class="badge" data-type="…">…</span>
+   where data-type is the NAME of the type argument T (Int32, String, Guid - the
+   call site never spells it out, so read it off typeof(T)), and the content is
+     - Template applied to Value, when a Template was given;
+     - otherwise Value's own text, and nothing at all when Value is null. Careful:
+       "T?" on an unconstrained T is a nullability annotation, not Nullable<T>, so a
+       value-type T has no null to fall back on - default(Guid) renders as the empty
+       Guid, and the tests pin that down rather than hiding it. *@
+
+@code {
+    [Parameter] public T? Value { get; set; }
+    [Parameter] public RenderFragment<T?>? Template { get; set; }
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex068 - render the generic badge");
+}

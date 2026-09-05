@@ -16,6 +16,10 @@ builder.Services.AddScoped<CounterStore>();
 builder.Services.AddScoped<ScopedCounter>();
 builder.Services.AddSingleton<SingletonCounter>();
 
+// Ex067: the custom ErrorBoundary subclass injects this, so it has to exist in the
+// host container the same way a real app's logging sink would.
+builder.Services.AddScoped<ErrorLog>();
+
 // Ex047: the options pattern needs an IOptions<GreetingOptions> registered somewhere
 // in the container - Configure<T> is how a real app would do it (appsettings-bound in
 // practice; a literal value here since this host has no configuration source for it).

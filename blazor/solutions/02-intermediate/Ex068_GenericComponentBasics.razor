@@ -1,0 +1,32 @@
+@* Exercise 068 - Generic Component Basics (intermediate) - the call sites.
+   No TODO here: this file is the demonstration the exercise is measured against.
+   Read it - every badge but the last states no type argument at all, because the
+   compiler infers T from Value. The last one has no Value to infer from, so T has
+   to be given explicitly. The exercise itself is in
+   Ex068_GenericComponentBasics_Badge.razor. *@
+<div id="number">
+    <Ex068_GenericComponentBasics_Badge Value="42" />
+</div>
+<div id="text">
+    <Ex068_GenericComponentBasics_Badge Value="@Name" />
+</div>
+<div id="templated">
+    @* The template's context is a string, not an object - that is inference reaching
+       into the fragment. ToUpperInvariant would not compile if T were not string. *@
+    <Ex068_GenericComponentBasics_Badge Value="@Name">
+        <Template Context="text"><b>@text!.ToUpperInvariant()</b></Template>
+    </Ex068_GenericComponentBasics_Badge>
+</div>
+<div id="explicit">
+    <Ex068_GenericComponentBasics_Badge T="string" />
+</div>
+<div id="struct">
+    @* Same shape, but T is a value type - so there is no null here to fall back on,
+       and default(T) renders as the empty Guid. "T?" on an unconstrained T is an
+       annotation, not Nullable<T>. *@
+    <Ex068_GenericComponentBasics_Badge T="Guid" />
+</div>
+
+@code {
+    [Parameter] public string Name { get; set; } = "ada";
+}

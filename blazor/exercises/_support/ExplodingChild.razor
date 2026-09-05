@@ -1,0 +1,19 @@
+@* Test fixture, not an exercise. Throws from its render when told to, which is what
+   an ErrorBoundary is there to catch (ex066, ex067). *@
+@if (Explode)
+{
+    <span>@Boom()</span>
+}
+else
+{
+    <span id="child">@Label</span>
+}
+
+@code {
+    [Parameter] public bool Explode { get; set; }
+    [Parameter] public string Label { get; set; } = "ok";
+
+    public const string Message = "the child blew up";
+
+    private static string Boom() => throw new InvalidOperationException(Message);
+}

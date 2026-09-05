@@ -1,0 +1,37 @@
+@typeparam T where T : IComparable<T>
+@* Exercise 069 - Generic Constraint Component (intermediate).
+   Goal:   Compare the values a generic component was handed, which an unconstrained
+           type argument does not let you do at all.
+   Drills: a type constraint on @typeparam, and CompareTo as the comparison the
+           constraint buys you.
+   Passes: dotnet test --filter FullyQualifiedName~Ex069_ *@
+<span id="min">@Min</span>
+<span id="max">@Max</span>
+
+@code {
+    [Parameter] public IReadOnlyList<T> Items { get; set; } = [];
+
+    public T? Min => Best((candidate, best) => candidate.CompareTo(best) < 0);
+
+    public T? Max => Best((candidate, best) => candidate.CompareTo(best) > 0);
+
+    private T? Best(Func<T, T, bool> isBetter)
+    {
+        if (Items.Count == 0)
+        {
+            return default;
+        }
+
+        var best = Items[0];
+
+        foreach (var candidate in Items)
+        {
+            if (isBetter(candidate, best))
+            {
+                best = candidate;
+            }
+        }
+
+        return best;
+    }
+}

@@ -1,0 +1,15 @@
+@page "/intermediate/067"
+@rendermode InteractiveServer
+@inject FeWoLearning.Blazor.Support.ErrorLog Log
+
+<h1>Exercise 067 - ErrorBoundaryLoggingHandler</h1>
+
+<button id="break" @onclick="() => _explode = !_explode">@(_explode ? "fix" : "break")</button>
+
+<Ex067_ErrorBoundaryLoggingHandler Explode="_explode" />
+
+<p>Logged so far: @Log.Entries.Count</p>
+
+@code {
+    private bool _explode;
+}
