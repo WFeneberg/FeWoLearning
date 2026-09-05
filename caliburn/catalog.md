@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -53,11 +53,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 023 | ActionGuardProperty | a `CanXxx` property gates `IsEnabled` from the moment the view is **loaded** (not merely bound - `Bind` alone leaves it ungated) - and by direct assignment, not a WPF `Binding` (`BindingOperations.GetBinding` on `IsEnabledProperty` returns `null` even though the gating works) | ✅ |
 | 024 | ActionGuardRefresh | a guard is only as fresh as its last announcement - silently mutating the guarded state leaves `IsEnabled` stale until `NotifyOfPropertyChange` fires; a `CanXxx` **method** guard is evaluated once on load and never re-evaluated, not even by a full `Refresh()` | ✅ |
 | 025 | MessageAttachExplicit | `cal:Message.Attach="Method('literal')"` (`xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro.Platform"`) wires the action explicitly, decoupling `x:Name` from the method and passing a literal string parameter | ✅ |
-| 026 | ActionParameters | passing parameters to an action | ⬜ |
-| 027 | ActionSpecialValues | `$eventArgs`, `$dataContext`, `$source` | ⬜ |
-| 028 | ActionTarget | `Action.Target` vs `Action.TargetWithoutContext` | ⬜ |
-| 029 | SimpleContainerBasics | `Singleton`, `PerRequest`, resolution | ⬜ |
-| 030 | SimpleContainerInstances | instance and handler registration | ⬜ |
+| 026 | ActionParameters | a bare identifier in an attach expression names an ELEMENT, not a view-model property, and `MessageBinder` coerces its convention parameter (a `TextBox`'s `Text`) to the target parameter's declared CLR type, read live at click time | ✅ |
+| 027 | ActionSpecialValues | `$eventArgs`, `$dataContext`, `$source`, `$view`, plus `$this` (not one of the five `SpecialValues` keys, yet it resolves); `$view` only diverges from `$source` once an ancestor's target was set explicitly via `Action.SetTarget` (ex028) - through a plain `DataContext` assignment it is identical to `$source` | ✅ |
+| 028 | ActionTarget | `Action.SetTarget` also sets the element's `DataContext`; `Action.SetTargetWithoutContext` leaves it untouched; both make the action invocable identically | ✅ |
+| 029 | SimpleContainerBasics | `RegisterSingleton` vs `RegisterPerRequest`, `GetInstance` returning `null` (not throwing) for an unregistered service, and constructor injection - which only applies once the CONSUMER type is itself registered | ✅ |
+| 030 | SimpleContainerInstances | `RegisterInstance` returns the exact registered object; `RegisterHandler`'s factory runs fresh on every resolution; `GetAllInstances` counts every registration for a service, including duplicates and mixed registration kinds | ✅ |
 | 031 | IoCFacade | `IoC.Get`, `GetAll`, `BuildUp` | ⬜ |
 | 032 | BootstrapperConfigure | `BootstrapperBase`, `Configure`, container wiring | ⬜ |
 | 033 | ConductorSingleActive | `Conductor<T>`, activating and replacing an item | ⬜ |
