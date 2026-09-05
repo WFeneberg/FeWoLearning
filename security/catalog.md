@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 5 ✅ / 55 ⬜**
+**Status: 10 ✅ / 50 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -27,11 +27,11 @@ implementations in `solutions/<block>/` at the same relative path.
 | 003 | ContentSecurityPolicy | CSP directives, per-request nonce, inline-script blocking | ✅ |
 | 004 | PathTraversalGuard | canonicalisation, root containment, safe static file serving | ✅ |
 | 005 | ModelBindingOverposting | mass assignment, BindNever, explicit DTO projection | ✅ |
-| 006 | SqlInjectionParameterization | parameterised commands, real SQLite, tautology payloads | ⬜ |
-| 007 | ContextualOutputEncoding | HtmlEncoder vs JavaScriptEncoder vs UrlEncoder, sink context | ⬜ |
-| 008 | AntiforgeryCsrf | antiforgery tokens, cross-origin POST, safe vs unsafe methods | ⬜ |
-| 009 | CorsPolicy | origin allowlists, credentials, why wildcard plus credentials fails | ⬜ |
-| 010 | CookieSecurityFlags | HttpOnly, Secure, SameSite, cookie scope | ⬜ |
+| 006 | SqlInjectionParameterization | parameterised commands, real SQLite, tautology payloads | ✅ |
+| 007 | ContextualOutputEncoding | HtmlEncoder vs JavaScriptEncoder vs UrlEncoder, sink context | ✅ |
+| 008 | AntiforgeryCsrf | antiforgery tokens, cross-origin POST, safe vs unsafe methods | ✅ |
+| 009 | CorsPolicy | origin allowlists, credentials, why wildcard plus credentials fails | ✅ |
+| 010 | CookieSecurityFlags | HttpOnly, Secure, SameSite, cookie scope | ✅ |
 | 011 | SessionFixation | identifier regeneration on privilege change | ⬜ |
 | 012 | PasswordHashingPbkdf2 | Rfc2898DeriveBytes, per-user salt, iteration count, fixed-time verify | ⬜ |
 | 013 | AuthenticationHandler | AuthenticationHandler, ClaimsPrincipal construction, scheme selection | ⬜ |
