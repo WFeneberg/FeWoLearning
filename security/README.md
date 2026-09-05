@@ -22,12 +22,49 @@ run headless, as a service, or in a session-0/RDP-disconnected context.
 
 Run every command **from inside `security/`**, not the repo root.
 
-**`dotnet test` does not work in this environment.** Measured on this
-machine: it reports "no tests were run", exit code 5 — in both Bash and
-PowerShell — and it does so for the pre-existing, already-verified `wpf/`
-track too, not only for this one. This is a property of the environment, not
-a defect of either track. The working recipe is `dotnet build`, then run the
-built test executable directly:
+`security/global.json` opts the test project into the
+**`Microsoft.Testing.Platform`** runner
+(`{"test":{"runner":"Microsoft.Testing.Platform"}}`), whose `dotnet test`
+front-end is built around `--project`/`--solution` rather than a bare,
+argument-less invocation. **Give it an explicit target:**
+
+| Run | Command |
+|---|---|
+| Stubs (red) | `dotnet test --solution FeWoLearning.Security.slnx` |
+| Solutions (green) | `dotnet test --solution FeWoLearning.Security.slnx -p:UseSolutions=true` |
+| One exercise | `dotnet test --project tests/FeWoLearning.Security.Tests.csproj --filter-class "*Ex001*"` |
+
+All three verified directly on this machine. The stub run reports **Total:
+326, Failed: 322, Passed: 3, Skipped: 1**, exit code 2 (nonzero because
+facts genuinely fail — that is the expected red picture, not a discovery
+failure); the solutions run reports **Total: 326, Failed: 0, Passed: 325,
+Skipped: 1**, run twice with identical results and 0 build warnings both
+times (the 3 passing on the stub run are the harness canaries — see
+"Per-row warnings" for the skip). `--filter-class "*Ex001*"` narrows
+correctly to that exercise's 5 facts. Per block: `01-web-aspnet` 127 facts,
+`02-web-blazor` 55, `03-desktop-core` 104, `04-desktop-wpf` 37 (one of which
+is the skip), plus the 3 harness canaries — 127+55+104+37+3 = 326.
+
+A caveat this session tried hard to reproduce and could not: the design spec
+and an earlier draft of this README claimed that a **bare, argument-less**
+`dotnet test` in this directory reports "Es wurden keine Tests ausgeführt"
+("no tests were run") with exit code 5, on the theory that MTP's front-end
+mis-resolves a directory holding a `.slnx` to the already-built test DLL
+rather than to the solution. Retested here five times — twice in Bash and
+once in PowerShell against the already-built tree, and once more each for
+`security/` and the pre-existing `wpf/` track in a throwaway `git worktree`
+that had never been built at all — and every one of those five bare
+invocations completed correctly with the full totals above (240 total / 235
+failed / 5 passed for `wpf/`), never the exit-5/zero-tests failure. Whatever
+produced the original observation was not reproducible in this environment
+just now. If a bare `dotnet test` does report zero tests on your machine, the
+fix is the explicit `--project`/`--solution` form above regardless of cause —
+but do not assume it is necessary here without checking; it may not be.
+
+The build-then-run-the-executable recipe below is still a valid fallback —
+it is how every batch in this track was actually verified, it sidesteps
+`dotnet test`'s front-end entirely, and it is what the `-filter` syntax
+further down applies to:
 
 | Step | Command |
 |---|---|
@@ -36,26 +73,22 @@ built test executable directly:
 | Build solutions (green) | `dotnet build -p:UseSolutions=true` |
 | Run solution tests | `artifacts-solutions\bin\FeWoLearning.Security.Tests\debug\FeWoLearning.Security.Tests.exe` |
 
-Verified end-to-end, two independent runs: the stub build is **Total: 326,
-Failed: 322, Skipped: 1** (the 3 passing are the harness canaries — see
-"Per-row warnings" for the skip); the solutions build is **Total: 326,
-Failed: 0, Skipped: 1**, run twice with identical results. Both builds emit
-**0 warnings**. Per block: `01-web-aspnet` 127 facts, `02-web-blazor` 55,
-`03-desktop-core` 104, `04-desktop-wpf` 37 (one of which is the skip), plus
-the 3 harness canaries — 127+55+104+37+3 = 326.
-
 **Build output is German-locale on this machine** ("0 Warnung(en)", not
-"0 Warning(s)"). A scripted check that greps for the English string silently
-passes regardless of the real warning count — read the numeric totals, not
-the words around them.
+"0 Warning(s)"; "Es wurden keine Tests ausgeführt" rather than "no tests were
+run"). A scripted check that greps for the English string silently passes
+(or silently fails to catch) regardless of the real result — read the
+numeric totals, not the words around them.
 
 ### Filter syntax
 
-The test executable's `-filter` takes the form `/Assembly/Namespace/Class/Method`,
-with wildcards allowed only at the start and/or end of a segment — not in the
-middle, and a `|`-joined single filter is rejected outright by xunit.v3
-("wildcards may only be at the beginning and/or end"). **A union of several
-things needs repeated `-filter` flags**, not one combined pattern.
+`dotnet test` itself takes `--filter-class "*Ex001*"` (verified above) to
+scope to one exercise. The **built executable**, used with the fallback
+recipe, has a separate, unrelated filter syntax: its `-filter` takes the
+form `/Assembly/Namespace/Class/Method`, with wildcards allowed only at the
+start and/or end of a segment — not in the middle — and a `|`-joined single
+filter is rejected outright by xunit.v3 ("wildcards may only be at the
+beginning and/or end"). **A union of several things needs repeated
+`-filter` flags**, not one combined pattern.
 
 One exercise:
 
