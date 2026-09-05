@@ -15,7 +15,6 @@
 //         as CurrentViewModel keeps changing after the initial navigation.
 
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;

@@ -56,5 +56,5 @@ public static class Ex044_DataErrorInfoLegacy
     /// this row's Concepts cell names, because unlike row 043's interface, it defaults off.
     /// </summary>
     public static void BindWithLegacyValidation(TextBox target, object source, string propertyPath)
-        => throw new NotImplementedException("TODO: Ex044 - target.DataContext = source, then target.SetBinding(TextBox.TextProperty, new Binding(propertyPath) { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged, ValidatesOnDataErrors = true })");
+        => throw new NotImplementedException("TODO: Ex044 - set source as target's DataContext, then bind TextBox.TextProperty to propertyPath: TwoWay, PropertyChanged trigger, and ValidatesOnDataErrors explicitly true - the flag this row's Concepts cell names");
 }

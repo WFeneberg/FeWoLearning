@@ -69,10 +69,18 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Twenty-one things that bite
+### Things that bite
 
-- **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
-  `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
+Every bullet below states the path that was actually measured, not the law inferred
+from it — a claim that holds on the path someone probed can still be false on a path
+nobody checked. This is the third time in this track's history a real measurement
+shipped as a broader law that a later batch found wrong on an unprobed path (after the
+implicit-style chain and the `SharedSizeGroup` law), so it is written down here as a
+rule rather than left to be re-learned a fourth time: name the specific path the
+measurement walked, not the general mechanism it seems to imply.
+
+#### Timing and the dispatcher
+
 - **Bindings update at `DispatcherPriority.DataBind`, not synchronously.** A test
   that mutates the source and asserts the target immediately reads the *old* value
   and passes or fails for the wrong reason. Call
@@ -83,62 +91,6 @@ no `Application` either; WPF resolves default control templates through
   reference to the delegate can have it collected before the event fires; keep the
   delegate in a local. And `InvalidateRequerySuggested()` posts at
   `DispatcherPriority.Background`, so `Pump()` before asserting.
-- **`FrameworkPropertyMetadataOptions.Inherits` only actually propagates when the
-  property is attached.** A plain `Register` flagged `Inherits` reads back `0.0`/
-  `null`/whatever the registered default is on every descendant — even one of the
-  *same* owning type as the ancestor that set it — because WPF's inheritance-context
-  walk only fires for properties registered via `RegisterAttached`. Row 008
-  (`MetadataInheritance`) and any later row that touches inheritance (016
-  `DataContextInheritance`, 060 `AttachedBehavior`) depend on this: register the
-  inheritable property as attached, the way `FontSize` and `DataContext` are, not as
-  an instance property on the class that happens to consume it.
-- **A `Binding`'s format culture never comes from `Thread.CurrentCulture`.** It comes
-  from `Binding.ConverterCulture`, falling back to the bound element's `Language`
-  property, which defaults to a hard-coded `en-US` regardless of the OS locale —
-  measured on this de-CH/de-DE machine: `StringFormat="{0:C}"` with no
-  `ConverterCulture` renders `$1,234.50`, not CHF, even after forcing
-  `Thread.CurrentCulture` to de-CH (which a plain `string.Format` with that culture
-  would render as `CHF 1'234.50`). Row 014 (`StringFormatAndFallbacks`) pins
-  `target.Language` explicitly anyway, so the row states its assumption instead of
-  relying on an invisible default — `ConverterCulture` itself stays row 069's subject.
-- **A push/no-push test for `UpdateSourceTrigger` needs real (logical) focus, not
-  just a target edit.** `TextBox.Text` defaults to `LostFocus`, not `PropertyChanged`,
-  and editing the target alone never raises it — move focus off the target with
-  `FocusManager.SetFocusedElement` (works on a windowless tree: no `Show(...)`, no
-  input simulation) to actually trigger it. `BindingExpression.IsDirty` can't
-  discriminate either — it reads `True` after an edit under unset, `LostFocus` and
-  `Explicit` alike, only `PropertyChanged` reads `False` — and `UpdateSource()`
-  succeeds under every trigger, so there is no exception-shape check. Row 013 asserts
-  both the focus-based behavior and the binding's declared `UpdateSourceTrigger`.
-- **A `GC.Collect()`-then-assert test can fail in two opposite ways, and the remedies
-  differ.** Row 020's first attempt asserted the *safe* direction — a handler stored
-  in a field survives a forced collection, because a rooted object's fields can never
-  be collected out from under it — but measured against a deliberately broken
-  implementation (an inline lambda with nothing stored anywhere), the forced
-  collection simply did not reclaim the orphaned delegate: a **false green**, not a
-  flake. Rows 071–075 (leaks, `WeakEventManager`) instead need the *unsafe* direction —
-  a `WeakReference` genuinely dead after dropping the last root — where the failure
-  mode flips to a **flaky red** on correct code if collection just hasn't happened yet.
-  Row 020 replaced its GC probe with a reflection check that the handler lives in a
-  delegate-typed field at all: `Dispose()` alone does not prove storage, because
-  `CommandManager` compares delegates structurally, so a freshly created method-group
-  delegate still unsubscribes correctly even with nothing stored anywhere.
-- **A field a stub pre-declares for the learner to assign later can warn even though
-  it compiles — and nullability is not the reason.** `CS0414` ("assigned but never
-  used") fires when a field's only assignment is a compile-time constant it never
-  reads elsewhere (a literal `null`, `null!`, or `7`); a non-constant initializer (a
-  parameter, `string.Empty`, a lambda) suppresses it regardless of nullability, and
-  omitting the initializer entirely gives `CS0169` instead. Row 020 hit this
-  pre-declaring `private EventHandler? _handler;` with a placeholder `= null;`. The
-  fix, matching row 006's convention: leave the field out of the stub and describe it
-  in the TODO instead — it does not exist to warn about until the learner adds it.
-- **`ResourceDictionary` lookup order, confirmed by direct measurement, not assumed:** a
-  dictionary's own entries win over anything reachable only through `MergedDictionaries`,
-  and among several merged dictionaries colliding on the same key, the one added LAST to
-  `MergedDictionaries` wins — swapping two dictionaries' add order swaps the winner too.
-  `ResourceDictionary.Keys` enumerates only a dictionary's own entries, never anything from
-  a merged one — row 026 uses that distinction to prove an entry was written directly into
-  the target rather than into a fresh merged dictionary the lookup happens to still find.
 - **A `DataTrigger`/`MultiDataTrigger` condition re-evaluates synchronously**, unlike a
   plain `Binding`'s target update. Measured directly: setting the bound source property and
   reading the trigger's `Setter` value straight back — with no `Pump()` at all — already
@@ -147,6 +99,46 @@ no `Application` either; WPF resolves default control templates through
   condition check is not that binding mechanism and fires inline, inside the source's
   `PropertyChanged` handler. Row 027 still calls `Pump()` after each mutation, defensively —
   a later row that depends on this instead being deferred would need its own check.
+- **A collection change reaches a generated container's CLR object synchronously, but its
+  templated child content does not.** Measured directly while building row 033: right after
+  `ObservableCollection<T>.Add(...)`, before any `Layout(...)` or `Pump()`,
+  `ItemContainerGenerator.ContainerFromItem(newItem)` already returns a non-null
+  `ContentPresenter` - the container itself needs no extra pump. But that `ContentPresenter`
+  has no templated child yet at that point (`VisualTreeHelper.GetChildrenCount` is 0), so its
+  bound text is not observable. Only after a second `Layout(...)` call (a plain `Pump()`
+  alone also works - either one drains whatever the template instantiation is queued on)
+  does the templated child exist and show the correct bound value. Row 033's tests call
+  `Layout(...)` again after every collection mutation for exactly this reason.
+- **A blocking `host.StartAsync().GetAwaiter().GetResult()` on this STA dispatcher does
+  NOT deadlock, for a host with no real hosted background work.** Measured directly
+  building row 038 (`ValidateOnStart()` failing synchronously, no other hosted services):
+  both a raw blocking `.GetResult()` call and an `await`ed `StartAsync()` inside an `async
+  Task` `[WpfFact]` complete and propagate `OptionsValidationException` unwrapped, on the
+  very STA thread doing the blocking - `[WpfFact]`'s `async Task` test methods do resume
+  on the same dispatcher, confirming the harness's own claim above. This is NOT a general
+  "async is safe here" finding: `DispatcherSynchronizationContext.Post` still queues
+  through `Dispatcher.BeginInvoke`, and a hosted service with a real suspension point
+  (actual I/O, `Task.Delay`, a background loop) resuming on that captured context while the
+  dispatcher thread sits blocked in `.GetResult()` with no `PushFrame` pumping it would
+  deadlock the classic way. Rows 046-050 (async commands, progress, dispatcher
+  priorities, cancellation) are exactly where that risk becomes real and must be
+  re-measured there when it does - this bullet is an inference about the mechanism from
+  the narrow case actually measured here, not a claim that a real deadlock was produced
+  and caught.
+- **`ValidateOnStart()` does not change WHETHER an options validation rule runs, only
+  WHEN.** Any `IValidateOptions<T>`/`.Validate(...)` rule already fires lazily on the
+  first `IOptions<T>.Value` access, with or without `ValidateOnStart()` - measured
+  directly: a host missing `.ValidateOnStart()` still throws `OptionsValidationException`
+  from `IOptions<T>.Value`, just never from `StartAsync()` itself. Row 038's tests start
+  the host and assert `StartAsync()` itself throws, never touching `.Value` directly -
+  that is what actually proves `ValidateOnStart()` ran, since a test that only resolves
+  `.Value` after starting cannot tell "validated at start" apart from "validated lazily,
+  same as always".
+
+#### Layout and sizing
+
+- **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
+  `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
 - **`ColumnDefinition.Width`'s and `RowDefinition.Height`'s own unassigned defaults are
   already `GridLength(1, GridUnitType.Star)`** — measured directly, not `Auto` and not
   zero, and true of both types. A test that only checks a Star column's or row's
@@ -165,6 +157,97 @@ no `Application` either; WPF resolves default control templates through
   stays inside the non-clamped range on purpose to keep the base contract legible; row 062
   (`CustomPanel`) and row 080 (layout invalidation cost) are where the clamping edge and the
   Measure/Arrange asymmetry actually start to matter.
+- **A definition inside a shared size group is measured as `Auto`, regardless of its own
+  `GridUnitType` - `SharedSizeGroup` on a `Star`-sized definition is not "broken", it is
+  simply never measured as `Star` at all.** Measured directly (building row 031): two
+  `Star`-sized rows tied together by the same `SharedSizeGroup` name, given real content of
+  height 20 and 80, equalize to `(80, 80)` - identical to the `Auto` case - because the
+  shared-size negotiation measures every participating definition as `Auto` and discards its
+  `Star` factor entirely: two rows explicitly given DIFFERENT factors (`1*` and `3*`), with
+  content heights 10 and 40, still equalize to `(40, 40)`, not anything those factors would
+  predict. A `Star` row with no children at all (no natural size to fall back to) measures
+  `(0, 0)` under the same grouping - an earlier measurement of exactly this childless case
+  was mistaken for evidence that `Star` breaks under `SharedSizeGroup`; it is only `Auto`'s
+  own behavior with nothing to measure. Row 031 stays built entirely on explicit `Auto`
+  definitions regardless - not because `Star` is broken, but because a `Star` factor
+  assigned inside a shared group is silently discarded, which would make the row's numbers
+  deceptive (readable as proving something about `Star` that the mechanism never touches)
+  rather than merely wrong. Confirmed separately: the sharing itself resolves within a single
+  `Layout(...)` call once the tree is initialized - no `Pump()` needed, and deleting the
+  extra `Pump()` plus second `Layout(...)` from row 031's tests changes nothing.
+
+#### Dependency properties and attached behavior
+
+- **`FrameworkPropertyMetadataOptions.Inherits` only actually propagates when the
+  property is attached.** A plain `Register` flagged `Inherits` reads back `0.0`/
+  `null`/whatever the registered default is on every descendant — even one of the
+  *same* owning type as the ancestor that set it — because WPF's inheritance-context
+  walk only fires for properties registered via `RegisterAttached`. Row 008
+  (`MetadataInheritance`) and any later row that touches inheritance (016
+  `DataContextInheritance`, 060 `AttachedBehavior`) depend on this: register the
+  inheritable property as attached, the way `FontSize` and `DataContext` are, not as
+  an instance property on the class that happens to consume it.
+
+#### Resources and template lookup
+
+- **Real WPF's implicit-style chain is the element tree's `Resources` then
+  `Application.Current.Resources` - and that is all of it, so with no `Application`
+  here (see "What the harness cannot do" below), the missing app-level stop is simply
+  absent.** Measured: the theme dictionaries are *not* part of this chain - they feed a
+  separate, lower rung reached through `DefaultStyleKey` (`BaseValueSource.DefaultStyle`),
+  which is why a plain `Button` here still resolves a real `Template` with no `Style` in
+  sight. An implicit style itself has nowhere but an element's own `Resources` to live
+  here; row 023 (`ImplicitStyleByType`) is built around this, and every later
+  style/resource row (026 onward) meets the same absence.
+- **`ResourceDictionary` lookup order, confirmed by direct measurement, not assumed:** a
+  dictionary's own entries win over anything reachable only through `MergedDictionaries`,
+  and among several merged dictionaries colliding on the same key, the one added LAST to
+  `MergedDictionaries` wins — swapping two dictionaries' add order swaps the winner too.
+  `ResourceDictionary.Keys` enumerates only a dictionary's own entries, never anything from
+  a merged one — row 026 uses that distinction to prove an entry was written directly into
+  the target rather than into a fresh merged dictionary the lookup happens to still find.
+- **A `DataTemplate`'s implicit key is `System.Windows.DataTemplateKey(type)`, not the bare
+  `Type` - unlike row 023's implicit `Style` key, and measured directly rather than assumed
+  from that convention.** `resources[typeof(X)] = template` compiles, adds to the dictionary,
+  and is never found: the `ContentPresenter` silently falls back to calling `ToString()` on
+  the content object, no exception anywhere to notice the miss by. Row 041 depends on the
+  wrapper key; any later row keying a `DataTemplate` implicitly needs the same care. A
+  `DataTemplate`'s own `DataType` plays no part in the lookup itself - a template registered
+  under the correct `DataTemplateKey` but with no `DataType` set at all still resolves; the
+  key is the whole mechanism.
+
+#### Validation
+
+- **`Binding.ValidatesOnNotifyDataErrors` and `Binding.ValidatesOnDataErrors` have opposite
+  defaults - measured directly, not assumed from the two interfaces looking alike.** The
+  first defaults `true`; the second defaults `false`. A `TextBox` bound to a source
+  implementing `INotifyDataErrorInfo`, with no flag touched anywhere, already shows
+  `Validation.GetHasError` the moment the source reports an error; the identical setup
+  against `IDataErrorInfo` shows no error at all until `ValidatesOnDataErrors` is set `true`
+  explicitly. Row 043 depends on the first default; row 044 exists specifically to teach the
+  second, which is why its own Concepts cell names the flag - forgetting it is silent, not a
+  compile error or an exception.
+- **A `Binding`'s `INotifyDataErrorInfo` revalidation takes two separate paths, and only
+  one of them needs `ErrorsChanged` to fire - measured directly, both directions.** A
+  target-to-source push (an edit through the bound element itself) revalidates as part of
+  that push: a source whose `HasErrors`/`GetErrors` are wired correctly but whose
+  error-setting method never raises `ErrorsChanged` still shows `Validation.GetHasError`
+  flip correctly right after the edit, no event needed. But an error that appears or clears
+  with NO push at all - set programmatically, never through an edit on the bound target -
+  reaches the target ONLY through `ErrorsChanged`: WPF's own `BindingExpression` is the
+  subscriber for that path, and without the event the target is left showing the previous
+  validation state indefinitely. A sharper trap on the same no-push path: an implementation
+  that raises `ErrorsChanged` BEFORE mutating its error store, instead of after, is exactly
+  as invisible to a push-triggered test as never raising the event at all, but silently
+  wrong here - every subscriber that re-queries during the event, `BindingExpression`
+  included, sees the PREVIOUS set. Row 043's push-triggered end-to-end test cannot tell a
+  correct implementation apart from either broken one, for exactly this reason, so the row
+  also binds a target, calls the error-setting method with no target edit anywhere, and
+  asserts the target directly - that is the only test in the row that shows what
+  `ErrorsChanged` is actually for.
+
+#### Initialization
+
 - **`IsInitialized` flips through `AddLogicalChild` - acquiring a logical child initializes
   BOTH the acquirer and the child - not through "any property set", and default Style/
   Template resolution is gated on exactly that flag.** This is the single most consequential
@@ -225,86 +308,18 @@ no `Application` either; WPF resolves default control templates through
   `ComboBox`/other `ItemsControl`-derived control's default appearance - anything built by
   plain code with no logical child and no `Content` needs `CompleteInitialization(...)`
   before its default Style/Template can be trusted.
-- **A definition inside a shared size group is measured as `Auto`, regardless of its own
-  `GridUnitType` - `SharedSizeGroup` on a `Star`-sized definition is not "broken", it is
-  simply never measured as `Star` at all.** Measured directly (building row 031): two
-  `Star`-sized rows tied together by the same `SharedSizeGroup` name, given real content of
-  height 20 and 80, equalize to `(80, 80)` - identical to the `Auto` case - because the
-  shared-size negotiation measures every participating definition as `Auto` and discards its
-  `Star` factor entirely: two rows explicitly given DIFFERENT factors (`1*` and `3*`), with
-  content heights 10 and 40, still equalize to `(40, 40)`, not anything those factors would
-  predict. A `Star` row with no children at all (no natural size to fall back to) measures
-  `(0, 0)` under the same grouping - an earlier measurement of exactly this childless case
-  was mistaken for evidence that `Star` breaks under `SharedSizeGroup`; it is only `Auto`'s
-  own behavior with nothing to measure. Row 031 stays built entirely on explicit `Auto`
-  definitions regardless - not because `Star` is broken, but because a `Star` factor
-  assigned inside a shared group is silently discarded, which would make the row's numbers
-  deceptive (readable as proving something about `Star` that the mechanism never touches)
-  rather than merely wrong. Confirmed separately: the sharing itself resolves within a single
-  `Layout(...)` call once the tree is initialized - no `Pump()` needed, and deleting the
-  extra `Pump()` plus second `Layout(...)` from row 031's tests changes nothing.
-- **A collection change reaches a generated container's CLR object synchronously, but its
-  templated child content does not.** Measured directly while building row 033: right after
-  `ObservableCollection<T>.Add(...)`, before any `Layout(...)` or `Pump()`,
-  `ItemContainerGenerator.ContainerFromItem(newItem)` already returns a non-null
-  `ContentPresenter` - the container itself needs no extra pump. But that `ContentPresenter`
-  has no templated child yet at that point (`VisualTreeHelper.GetChildrenCount` is 0), so its
-  bound text is not observable. Only after a second `Layout(...)` call (a plain `Pump()`
-  alone also works - either one drains whatever the template instantiation is queued on)
-  does the templated child exist and show the correct bound value. Row 033's tests call
-  `Layout(...)` again after every collection mutation for exactly this reason.
 
-- **A blocking `host.StartAsync().GetAwaiter().GetResult()` on this STA dispatcher does
-  NOT deadlock, for a host with no real hosted background work.** Measured directly
-  building row 038 (`ValidateOnStart()` failing synchronously, no other hosted services):
-  both a raw blocking `.GetResult()` call and an `await`ed `StartAsync()` inside an `async
-  Task` `[WpfFact]` complete and propagate `OptionsValidationException` unwrapped, on the
-  very STA thread doing the blocking - `[WpfFact]`'s `async Task` test methods do resume
-  on the same dispatcher, confirming the harness's own claim above. This is NOT a general
-  "async is safe here" finding: `DispatcherSynchronizationContext.Post` still queues
-  through `Dispatcher.BeginInvoke`, and a hosted service with a real suspension point
-  (actual I/O, `Task.Delay`, a background loop) resuming on that captured context while the
-  dispatcher thread sits blocked in `.GetResult()` with no `PushFrame` pumping it would
-  deadlock the classic way. Rows 046-050 (async commands, progress, dispatcher
-  priorities, cancellation) are exactly where that risk becomes real and must be
-  re-measured there when it does - this bullet is an inference about the mechanism from
-  the narrow case actually measured here, not a claim that a real deadlock was produced
-  and caught.
-- **`ValidateOnStart()` does not change WHETHER an options validation rule runs, only
-  WHEN.** Any `IValidateOptions<T>`/`.Validate(...)` rule already fires lazily on the
-  first `IOptions<T>.Value` access, with or without `ValidateOnStart()` - measured
-  directly: a host missing `.ValidateOnStart()` still throws `OptionsValidationException`
-  from `IOptions<T>.Value`, just never from `StartAsync()` itself. Row 038's tests start
-  the host and assert `StartAsync()` itself throws, never touching `.Value` directly -
-  that is what actually proves `ValidateOnStart()` ran, since a test that only resolves
-  `.Value` after starting cannot tell "validated at start" apart from "validated lazily,
-  same as always".
-- **`Binding.ValidatesOnNotifyDataErrors` and `Binding.ValidatesOnDataErrors` have opposite
-  defaults - measured directly, not assumed from the two interfaces looking alike.** The
-  first defaults `true`; the second defaults `false`. A `TextBox` bound to a source
-  implementing `INotifyDataErrorInfo`, with no flag touched anywhere, already shows
-  `Validation.GetHasError` the moment the source reports an error; the identical setup
-  against `IDataErrorInfo` shows no error at all until `ValidatesOnDataErrors` is set `true`
-  explicitly. Row 043 depends on the first default; row 044 exists specifically to teach the
-  second, which is why its own Concepts cell names the flag - forgetting it is silent, not a
-  compile error or an exception.
-- **A `Binding`'s `INotifyDataErrorInfo` revalidation does not depend on `ErrorsChanged`
-  firing at all.** Measured directly while building row 043's "never raises its change
-  notification" wrong-implementation check: a source whose `HasErrors`/`GetErrors` are wired
-  correctly but whose error-setting method never raises `ErrorsChanged` (nor
-  `PropertyChanged(HasErrors)`) still shows `Validation.GetHasError` flip correctly on the
-  very next target-to-source push through a bound `TextBox` - WPF re-queries the interface as
-  part of that push itself, not only in reaction to the event. `ErrorsChanged` only matters
-  for something re-checking without a new binding push (a details panel counting current
-  errors, say); row 043's tests catch a silent error-setter with two tests that subscribe to
-  the event/property directly, not with the end-to-end binding test, which cannot tell the
-  difference.
-- **A `DataTemplate`'s implicit key is `System.Windows.DataTemplateKey(type)`, not the bare
-  `Type` - unlike row 023's implicit `Style` key, and measured directly rather than assumed
-  from that convention.** `resources[typeof(X)] = template` compiles, adds to the dictionary,
-  and is never found: the `ContentPresenter` silently falls back to calling `ToString()` on
-  the content object, no exception anywhere to notice the miss by. Row 041 depends on the
-  wrapper key; any later row keying a `DataTemplate` implicitly needs the same care.
+#### Stub shape and compiler warnings
+
+- **A field a stub pre-declares for the learner to assign later can warn even though
+  it compiles — and nullability is not the reason.** `CS0414` ("assigned but never
+  used") fires when a field's only assignment is a compile-time constant it never
+  reads elsewhere (a literal `null`, `null!`, or `7`); a non-constant initializer (a
+  parameter, `string.Empty`, a lambda) suppresses it regardless of nullability, and
+  omitting the initializer entirely gives `CS0169` instead. Row 020 hit this
+  pre-declaring `private EventHandler? _handler;` with a placeholder `= null;`. The
+  fix, matching row 006's convention: leave the field out of the stub and describe it
+  in the TODO instead — it does not exist to warn about until the learner adds it.
 - **A primary-constructor parameter a stub's throwing method references only inside its
   `NotImplementedException` string (never in real code) triggers CS9113 ("parameter is
   unread") - a classic constructor assigning that same dependency to a private field does
@@ -314,6 +329,43 @@ no `Application` either; WPF resolves default control templates through
   `_dialogService` in the constructor body cleared the warning with no other change. Any
   later row whose TODO lives in a method of a constructor-injected class should use a classic
   constructor, not a primary constructor, for exactly this reason.
+
+#### Bindings and culture
+
+- **A `Binding`'s format culture never comes from `Thread.CurrentCulture`.** It comes
+  from `Binding.ConverterCulture`, falling back to the bound element's `Language`
+  property, which defaults to a hard-coded `en-US` regardless of the OS locale —
+  measured on this de-CH/de-DE machine: `StringFormat="{0:C}"` with no
+  `ConverterCulture` renders `$1,234.50`, not CHF, even after forcing
+  `Thread.CurrentCulture` to de-CH (which a plain `string.Format` with that culture
+  would render as `CHF 1'234.50`). Row 014 (`StringFormatAndFallbacks`) pins
+  `target.Language` explicitly anyway, so the row states its assumption instead of
+  relying on an invisible default — `ConverterCulture` itself stays row 069's subject.
+- **A push/no-push test for `UpdateSourceTrigger` needs real (logical) focus, not
+  just a target edit.** `TextBox.Text` defaults to `LostFocus`, not `PropertyChanged`,
+  and editing the target alone never raises it — move focus off the target with
+  `FocusManager.SetFocusedElement` (works on a windowless tree: no `Show(...)`, no
+  input simulation) to actually trigger it. `BindingExpression.IsDirty` can't
+  discriminate either — it reads `True` after an edit under unset, `LostFocus` and
+  `Explicit` alike, only `PropertyChanged` reads `False` — and `UpdateSource()`
+  succeeds under every trigger, so there is no exception-shape check. Row 013 asserts
+  both the focus-based behavior and the binding's declared `UpdateSourceTrigger`.
+
+#### GC, weak references and leak testing
+
+- **A `GC.Collect()`-then-assert test can fail in two opposite ways, and the remedies
+  differ.** Row 020's first attempt asserted the *safe* direction — a handler stored
+  in a field survives a forced collection, because a rooted object's fields can never
+  be collected out from under it — but measured against a deliberately broken
+  implementation (an inline lambda with nothing stored anywhere), the forced
+  collection simply did not reclaim the orphaned delegate: a **false green**, not a
+  flake. Rows 071–075 (leaks, `WeakEventManager`) instead need the *unsafe* direction —
+  a `WeakReference` genuinely dead after dropping the last root — where the failure
+  mode flips to a **flaky red** on correct code if collection just hasn't happened yet.
+  Row 020 replaced its GC probe with a reflection check that the handler lives in a
+  delegate-typed field at all: `Dispose()` alone does not prove storage, because
+  `CommandManager` compares delegates structurally, so a freshly created method-group
+  delegate still unsubscribes correctly even with nothing stored anywhere.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 
@@ -352,15 +404,9 @@ narrow question — does the WPF mechanism work — and deliberately does not at
   every test that ran after it. Anything whose subject is an `Application` member
   (`Application.Current`, `DispatcherUnhandledException`, resource lookup through
   `Application.Resources`, …) cannot be an exercise here; see row 067 for the
-  concrete case this ruled out. A direct consequence for implicit (`TargetType`-keyed)
-  styles: real WPF's implicit-style chain is the element tree's `Resources` then
-  `Application.Current.Resources` - and that is all of it, so the missing app-level
-  stop is simply absent here. Measured: the theme dictionaries are *not* part of this
-  chain - they feed a separate, lower rung reached through `DefaultStyleKey`
-  (`BaseValueSource.DefaultStyle`), which is why a plain `Button` here still resolves a
-  real `Template` with no `Style` in sight. An implicit style itself has nowhere but an
-  element's own `Resources` to live here; row 023 (`ImplicitStyleByType`) is built
-  around this, and every later style/resource row (026 onward) meets the same absence.
+  concrete case this ruled out. The direct consequence for implicit style and
+  `DataTemplate` lookup is recorded under "Resources and template lookup" in
+  "Things that bite" above.
 - **No time control and no wall-clock assertions.** There is no virtual clock and no
   exercise asserts elapsed time — that is noise on a loaded machine. This is also why
   the performance rows (076–080) assert *that* the mechanism fired (container identity

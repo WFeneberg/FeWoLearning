@@ -9,10 +9,26 @@ namespace FeWoLearning.Wpf.Tests.Intermediate;
 public class Ex043_NotifyDataErrorInfoTests : WpfTestContext
 {
     // Exposes SetErrors directly for the structural tests below, decoupled from any one
-    // property's own validation logic.
+    // property's own validation logic. Also carries a plain, unvalidated Name property (its
+    // own setter never calls SetErrors) so a test can bind a target to something real while
+    // setting errors purely programmatically, with no target edit anywhere.
     private sealed class TwoFieldProbe : Ex043_ValidatingViewModelBase
     {
+        private string _name = string.Empty;
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                RaisePropertyChanged(nameof(Name));
+            }
+        }
+
         public void SetErrorsFor(string propertyName, params string[] errors) => SetErrors(propertyName, errors);
+
+        public void SetErrorsFor(string propertyName, IReadOnlyList<string> errors) => SetErrors(propertyName, errors);
     }
 
     // A real validated property, for the end-to-end binding test - this is what a concrete
@@ -135,6 +151,47 @@ public class Ex043_NotifyDataErrorInfoTests : WpfTestContext
 
         probe.SetErrorsFor("Age");
         Assert.False(iface.HasErrors);
+    }
+
+    [WpfFact]
+    public void An_Error_Set_With_No_Target_Edit_Still_Reaches_A_Bound_Target_Through_ErrorsChanged()
+    {
+        var probe = new TwoFieldProbe { Name = "Wolfgang" };
+        var target = new TextBox();
+        target.SetBinding(TextBox.TextProperty, new Binding(nameof(TwoFieldProbe.Name)) { Source = probe });
+        Layout(target);
+        Pump();
+
+        // No target edit anywhere - SetErrors runs purely programmatically. This is the
+        // scenario that actually needs ErrorsChanged: an implementation that raises it
+        // BEFORE mutating the store lets every subscriber (WPF's own BindingExpression
+        // included) re-query the PREVIOUS set, so the target would still read no error here;
+        // an implementation that never raises it at all would never revalidate either.
+        probe.SetErrorsFor("Name", "Required");
+        Pump();
+
+        Assert.True(Validation.GetHasError(target));
+
+        probe.SetErrorsFor("Name");
+        Pump();
+
+        Assert.False(Validation.GetHasError(target));
+    }
+
+    [WpfFact]
+    public void SetErrors_Stores_Its_Own_Copy_Not_A_Reference_To_The_Callers_List()
+    {
+        var probe = new TwoFieldProbe();
+        var callerOwned = new List<string> { "Required" };
+
+        probe.SetErrorsFor("Name", callerOwned);
+
+        // Mutating the caller's own list AFTER the call must not be visible through the
+        // probe - an aliasing SetErrors that stores the reference verbatim would leak this.
+        callerOwned.Add("Also too long");
+        callerOwned[0] = "Changed";
+
+        Assert.Equal(new[] { "Required" }, ((INotifyDataErrorInfo)probe).GetErrors("Name").Cast<string>());
     }
 
     [WpfFact]

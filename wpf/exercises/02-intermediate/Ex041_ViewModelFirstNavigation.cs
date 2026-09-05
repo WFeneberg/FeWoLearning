@@ -16,7 +16,6 @@
 // Passes: dotnet test --filter FullyQualifiedName~Ex041_
 
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -62,9 +61,7 @@ public static class Ex041_ViewModelFirstNavigation
     /// depends on for implicit styles).
     /// </summary>
     public static void RegisterViewTemplate(ResourceDictionary resources, Type viewModelType, DataTemplate template)
-        // TODO: key the entry with `new DataTemplateKey(viewModelType)`, NOT viewModelType
-        // itself - a DataTemplate's implicit key is not the bare Type the way a Style's is.
-        => throw new NotImplementedException("TODO: Ex041 - resources[new DataTemplateKey(viewModelType)] = template");
+        => throw new NotImplementedException("TODO: Ex041 - add template to resources under the implicit content-template key for viewModelType: System.Windows.DataTemplateKey, not the bare Type (see the Drills comment above for why the bare Type does not work)");
 
     /// <summary>
     /// Wires <paramref name="host"/>.Content to follow <paramref name="shell"/>'s
@@ -72,6 +69,5 @@ public static class Ex041_ViewModelFirstNavigation
     /// moment this method runs.
     /// </summary>
     public static void BindShell(ContentControl host, Ex041_NavigationShell shell)
-        // TODO: host.SetBinding(ContentControl.ContentProperty, new Binding(nameof(Ex041_NavigationShell.CurrentViewModel)) { Source = shell })
-        => throw new NotImplementedException("TODO: Ex041 - host.SetBinding(ContentControl.ContentProperty, new Binding(nameof(Ex041_NavigationShell.CurrentViewModel)) { Source = shell })");
+        => throw new NotImplementedException("TODO: Ex041 - set up a live Binding (SetBinding), not a one-off assignment, from host's ContentProperty to shell's CurrentViewModel property, sourced on shell");
 }

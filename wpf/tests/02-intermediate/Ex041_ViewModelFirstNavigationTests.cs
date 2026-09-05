@@ -85,8 +85,7 @@ public class Ex041_ViewModelFirstNavigationTests : WpfTestContext
         // Type. A DataTemplate does not - it needs the wrapper key type.
         Assert.True(resources.Contains(new DataTemplateKey(typeof(PageA))));
         Assert.False(resources.Contains(typeof(PageA)));
-        var stored = Assert.IsType<DataTemplate>(resources[new DataTemplateKey(typeof(PageA))]);
-        Assert.Equal(typeof(PageA), stored.DataType);
+        Assert.Same(template, resources[new DataTemplateKey(typeof(PageA))]);
     }
 
     [WpfFact]
@@ -101,6 +100,10 @@ public class Ex041_ViewModelFirstNavigationTests : WpfTestContext
         Assert.NotNull(binding);
         Assert.Equal(nameof(Ex041_NavigationShell.CurrentViewModel), binding!.Path.Path);
         Assert.Same(shell, binding.Source);
+
+        // The Drills comment above calls this a "two-way-free" Binding: a navigation shell's
+        // CurrentViewModel is never meant to be written back to from the ContentControl side.
+        Assert.NotEqual(BindingMode.TwoWay, binding.Mode);
     }
 
     [WpfFact]

@@ -23,10 +23,7 @@ namespace FeWoLearning.Wpf.Exercises.Intermediate;
 public sealed class Ex045_NonEmptyValidationRule : ValidationRule
 {
     public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-        // TODO: if value is a string and NOT null/whitespace-only (after trimming), return
-        // ValidationResult.ValidResult; otherwise return a new ValidationResult(false,
-        // "Required") - the ErrorContent this row's tests check for.
-        => throw new NotImplementedException("TODO: Ex045 - trim value as a string; if it is non-empty, return ValidationResult.ValidResult; otherwise return new ValidationResult(false, \"Required\")");
+        => throw new NotImplementedException("TODO: Ex045 - reject value with an invalid ValidationResult carrying ErrorContent \"Required\" when it is not a string, or is empty/whitespace-only after trimming; accept it with ValidationResult.ValidResult otherwise");
 }
 
 public static class Ex045_ValidationRules

@@ -25,12 +25,12 @@ public interface Ex042_IDialogService
 }
 
 /// <summary>
-/// The real, production implementation - ready to use, and deliberately NOT exercised by any
-/// test in this row: MessageBox.Show pumps its own modal message loop on the calling thread,
-/// so a test invoking this on the harness's single STA dispatcher would hang the run rather
-/// than fail it. Testing Ex042_ItemViewModel through Ex042_IDialogService instead - never
-/// through this class - is exactly what the abstraction buys: full coverage of the decision
-/// logic below with no window ever opening.
+/// The real, production implementation. Read it, never call it: MessageBox.Show pumps its
+/// own modal message loop on the calling thread, so invoking Confirm or Notify on the
+/// harness's single STA dispatcher would hang the run rather than fail it - no test in this
+/// row constructs or calls this class. Testing Ex042_ItemViewModel through
+/// Ex042_IDialogService instead - never through this class - is exactly what the abstraction
+/// buys: full coverage of the decision logic below with no window ever opening.
 /// </summary>
 public sealed class Ex042_MessageBoxDialogService : Ex042_IDialogService
 {
