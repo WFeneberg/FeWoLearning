@@ -1,0 +1,77 @@
+@* Exercise 036 — SanitizingComponent (reference solution).
+   Goal:   Build a reusable sanitiser that renders untrusted HTML through an
+           allowlist of tag names, never a denylist: nothing survives except
+           the caller-supplied AllowedTags, and even those come through with
+           every attribute stripped. Implement Sanitize so Sanitized returns
+           markup safe to pass to MarkupString.
+   Drills: reusable sanitising component, allowlist over denylist.
+   Passes: attack facts - a tag absent from AllowedTags is stripped even if
+                          harmless-looking (this is an allowlist, not a
+                          denylist); every attribute is stripped from an
+                          allowed tag; an unclosed "<em" fragment is rendered
+                          as inert text rather than swallowing what follows;
+           use facts     - a tag present in AllowedTags survives with its
+                          text (minus its attributes), and an empty
+                          AllowedTags still renders the input's text content
+                          rather than nothing at all. *@
+@using System.Net
+@using System.Text
+@using System.Text.RegularExpressions
+
+<div id="sanitized">@((MarkupString)Sanitized)</div>
+
+@code {
+    [Parameter] public string Html { get; set; } = "";
+    [Parameter] public IReadOnlyCollection<string> AllowedTags { get; set; } = Array.Empty<string>();
+
+    private string Sanitized => Sanitize(Html, AllowedTags);
+
+    private static readonly Regex TagPattern = new(
+        @"<(/?)\s*([a-zA-Z][a-zA-Z0-9]*)((?:\s[^<>]*)?)\s*(/?)\s*>",
+        RegexOptions.Compiled);
+
+    // Allowlist, not denylist: walk the string as a run of tag tokens and
+    // plain-text runs. A tag survives only when its name is in allowedTags -
+    // and even then, only the bare "<name>"/"</name>" delimiters survive,
+    // never its attributes. An unclosed fragment like "<em" never finds a
+    // closing ">" before the next "<", so TagPattern never matches it: it
+    // falls through to the plain-text branch and is HTML-encoded like any
+    // other text, instead of becoming a live, unclosed element that could
+    // swallow whatever follows it once a browser parses the result.
+    public static string Sanitize(string html, IReadOnlyCollection<string> allowedTags)
+    {
+        ArgumentNullException.ThrowIfNull(html);
+        ArgumentNullException.ThrowIfNull(allowedTags);
+
+        var allowed = new HashSet<string>(allowedTags, StringComparer.OrdinalIgnoreCase);
+        var result = new StringBuilder();
+        var lastIndex = 0;
+
+        foreach (Match match in TagPattern.Matches(html))
+        {
+            if (match.Index > lastIndex)
+            {
+                result.Append(WebUtility.HtmlEncode(html[lastIndex..match.Index]));
+            }
+
+            var isClosing = match.Groups[1].Value == "/";
+            var tagName = match.Groups[2].Value;
+
+            if (allowed.Contains(tagName))
+            {
+                var canonical = tagName.ToLowerInvariant();
+                result.Append(isClosing ? $"</{canonical}>" : $"<{canonical}>");
+            }
+            // else: drop the tag - delimiters and any attributes - entirely.
+
+            lastIndex = match.Index + match.Length;
+        }
+
+        if (lastIndex < html.Length)
+        {
+            result.Append(WebUtility.HtmlEncode(html[lastIndex..]));
+        }
+
+        return result.ToString();
+    }
+}

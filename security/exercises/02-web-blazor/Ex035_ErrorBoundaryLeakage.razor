@@ -1,0 +1,40 @@
+@* Exercise 035 — ErrorBoundaryLeakage (web-blazor).
+   Goal:   Wrap ChildContent in an ErrorBoundary whose ErrorContent never
+           leaks what actually went wrong. OnInitialized must set
+           OperatorMessage and CorrelationId up front - neither one may ever
+           be derived from the exception ErrorContent eventually receives,
+           because by then it is too late to un-leak it.
+   Drills: ErrorBoundary, suppressing exception detail in the render tree.
+   Passes: attack facts - the rendered error content contains neither the
+                          exception's message, nor its type name, nor a
+                          stack frame;
+           use facts     - the error content shows a stable, non-empty
+                          operator-facing message and a correlation id; when
+                          the child does not throw, its normal content
+                          renders and no error content appears at all. *@
+
+<ErrorBoundary>
+    <ChildContent>
+        <div id="normal-content">@ChildContent</div>
+    </ChildContent>
+    <ErrorContent>
+        <div id="error-content">
+            <span id="error-message">@OperatorMessage</span>
+            <span id="error-correlation-id">@CorrelationId</span>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string OperatorMessage = "";
+    private string CorrelationId = "";
+
+    // Shape B: OnInitialized always runs, whether or not ChildContent below
+    // ever throws - the one place a stub can fail every fact in this class,
+    // including the no-exception case, which never touches ErrorContent.
+    protected override void OnInitialized() =>
+        throw new NotImplementedException(
+            "TODO: Ex035 - set OperatorMessage to a fixed, non-empty, operator-facing string that never mentions the exception, and CorrelationId to a fresh, non-empty identifier for this render (e.g. Guid.NewGuid())");
+}

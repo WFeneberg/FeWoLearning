@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 32 ✅ / 28 ⬜**
+**Status: 36 ✅ / 24 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -59,10 +59,10 @@ implementations in `solutions/<block>/` at the same relative path.
 | 030 | AntiforgeryInEditForm | EditForm, antiforgery in interactive and static rendering | ✅ |
 | 031 | SecretsNeverReachClient | configuration surface, what a component may receive | ✅ |
 | 032 | JsInteropInjection | passing untrusted data across JS interop, avoiding eval-shaped calls | ✅ |
-| 033 | NavigationManagerOpenRedirect | client-side redirect validation, external URI rejection | ⬜ |
-| 034 | PersistentStateLeak | PersistentComponentState, what must never survive prerendering | ⬜ |
-| 035 | ErrorBoundaryLeakage | ErrorBoundary, suppressing exception detail in the render tree | ⬜ |
-| 036 | SanitizingComponent | reusable sanitising component, allowlist over denylist | ⬜ |
+| 033 | NavigationManagerOpenRedirect | client-side redirect validation, external URI rejection | ✅ |
+| 034 | PersistentStateLeak | PersistentComponentState, what must never survive prerendering | ✅ |
+| 035 | ErrorBoundaryLeakage | ErrorBoundary, suppressing exception detail in the render tree | ✅ |
+| 036 | SanitizingComponent | reusable sanitising component, allowlist over denylist | ✅ |
 
 ## desktop-core (037–052) — the local attack surface
 

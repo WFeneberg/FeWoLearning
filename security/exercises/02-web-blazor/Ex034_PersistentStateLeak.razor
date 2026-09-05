@@ -1,0 +1,43 @@
+@* Exercise 034 — PersistentStateLeak (web-blazor).
+   Goal:   A component prerendered on the server and then re-created on the
+           interactive circuit needs SOME of its session data to survive the
+           handoff - but not all of it. Wire this component up to
+           PersistentComponentState so that only the display name and the
+           last-viewed page make the trip; the auth token, the email and the
+           user id never do, and the key they are filed under never encodes
+           who the user is either.
+   Drills: PersistentComponentState, what must never survive prerendering.
+   Passes: attack facts - after TriggerOnPersisting, the persisted payload
+                          contains neither SessionAuthToken nor SessionEmail,
+                          and PersistenceKey itself never contains
+                          SessionUserId;
+           use facts     - the persisted payload does contain
+                          SessionDisplayName and SessionLastViewedPage, and a
+                          later render's TryTakeFromJson restores them so the
+                          prerender-to-interactive handoff still works. *@
+@inject PersistentComponentState ApplicationState
+
+<div id="display-name">@DisplayName</div>
+<div id="last-viewed">@LastViewedPage</div>
+
+@code {
+    [Parameter] public string? SessionAuthToken { get; set; }
+    [Parameter] public string? SessionEmail { get; set; }
+    [Parameter] public string? SessionDisplayName { get; set; }
+    [Parameter] public string? SessionLastViewedPage { get; set; }
+    [Parameter] public string? SessionUserId { get; set; }
+
+    public string DisplayName { get; private set; } = "";
+    public string LastViewedPage { get; private set; } = "";
+
+    // Fixed and opaque on purpose - see the attack fact above about the key
+    // itself never encoding a user id.
+    public const string PersistenceKey = "ex034-session-snapshot";
+
+    // Shape B: the lifecycle method is what throws. Deciding WHICH fields
+    // survive persistence is a composition choice, not a single pure
+    // function the markup above could call instead.
+    protected override void OnInitialized() =>
+        throw new NotImplementedException(
+            "TODO: Ex034 - if ApplicationState.TryTakeFromJson<Ex034_SessionSnapshot>(PersistenceKey, ...) finds a snapshot, restore DisplayName/LastViewedPage from it; otherwise fall back to SessionDisplayName/SessionLastViewedPage. Either way, register ApplicationState.RegisterOnPersisting to persist ONLY an Ex034_SessionSnapshot built from SessionDisplayName/SessionLastViewedPage under PersistenceKey - never SessionAuthToken or SessionEmail");
+}

@@ -1,0 +1,61 @@
+@* Exercise 034 — PersistentStateLeak (reference solution).
+   Goal:   A component prerendered on the server and then re-created on the
+           interactive circuit needs SOME of its session data to survive the
+           handoff - but not all of it. Wire this component up to
+           PersistentComponentState so that only the display name and the
+           last-viewed page make the trip; the auth token, the email and the
+           user id never do, and the key they are filed under never encodes
+           who the user is either.
+   Drills: PersistentComponentState, what must never survive prerendering.
+   Passes: attack facts - after TriggerOnPersisting, the persisted payload
+                          contains neither SessionAuthToken nor SessionEmail,
+                          and PersistenceKey itself never contains
+                          SessionUserId;
+           use facts     - the persisted payload does contain
+                          SessionDisplayName and SessionLastViewedPage, and a
+                          later render's TryTakeFromJson restores them so the
+                          prerender-to-interactive handoff still works. *@
+@inject PersistentComponentState ApplicationState
+
+<div id="display-name">@DisplayName</div>
+<div id="last-viewed">@LastViewedPage</div>
+
+@code {
+    [Parameter] public string? SessionAuthToken { get; set; }
+    [Parameter] public string? SessionEmail { get; set; }
+    [Parameter] public string? SessionDisplayName { get; set; }
+    [Parameter] public string? SessionLastViewedPage { get; set; }
+    [Parameter] public string? SessionUserId { get; set; }
+
+    public string DisplayName { get; private set; } = "";
+    public string LastViewedPage { get; private set; } = "";
+
+    // Fixed and opaque on purpose - see the attack fact above about the key
+    // itself never encoding a user id.
+    public const string PersistenceKey = "ex034-session-snapshot";
+
+    protected override void OnInitialized()
+    {
+        if (ApplicationState.TryTakeFromJson<Ex034_SessionSnapshot>(PersistenceKey, out var restored) && restored is not null)
+        {
+            DisplayName = restored.DisplayName;
+            LastViewedPage = restored.LastViewedPage;
+        }
+        else
+        {
+            DisplayName = SessionDisplayName ?? "";
+            LastViewedPage = SessionLastViewedPage ?? "";
+        }
+
+        // Registered every time, not just on the fallback branch: the next
+        // prerender of THIS instance must still be able to hand its state
+        // forward, whether or not this particular render started from one.
+        ApplicationState.RegisterOnPersisting(() =>
+        {
+            ApplicationState.PersistAsJson(
+                PersistenceKey,
+                new Ex034_SessionSnapshot(SessionDisplayName ?? "", SessionLastViewedPage ?? ""));
+            return Task.CompletedTask;
+        });
+    }
+}

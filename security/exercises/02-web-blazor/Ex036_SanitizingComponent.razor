@@ -1,0 +1,33 @@
+@* Exercise 036 — SanitizingComponent (web-blazor).
+   Goal:   Build a reusable sanitiser that renders untrusted HTML through an
+           allowlist of tag names, never a denylist: nothing survives except
+           the caller-supplied AllowedTags, and even those come through with
+           every attribute stripped. Implement Sanitize so Sanitized returns
+           markup safe to pass to MarkupString.
+   Drills: reusable sanitising component, allowlist over denylist.
+   Passes: attack facts - a tag absent from AllowedTags is stripped even if
+                          harmless-looking (this is an allowlist, not a
+                          denylist); every attribute is stripped from an
+                          allowed tag; an unclosed "<em" fragment is rendered
+                          as inert text rather than swallowing what follows;
+           use facts     - a tag present in AllowedTags survives with its
+                          text (minus its attributes), and an empty
+                          AllowedTags still renders the input's text content
+                          rather than nothing at all. *@
+@using System.Net
+@using System.Text
+@using System.Text.RegularExpressions
+
+<div id="sanitized">@((MarkupString)Sanitized)</div>
+
+@code {
+    [Parameter] public string Html { get; set; } = "";
+    [Parameter] public IReadOnlyCollection<string> AllowedTags { get; set; } = Array.Empty<string>();
+
+    // Shape A: the member the markup calls is the member that throws.
+    private string Sanitized => Sanitize(Html, AllowedTags);
+
+    public static string Sanitize(string html, IReadOnlyCollection<string> allowedTags) =>
+        throw new NotImplementedException(
+            "TODO: Ex036 - keep only tags whose name is in allowedTags, stripped of all attributes; drop every other tag's delimiters (its inner text stays, HTML-encoded); an unclosed tag fragment must never survive as live markup");
+}
