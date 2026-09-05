@@ -56,6 +56,11 @@ public class Ex050_CommandCancellationTests : WpfTestContext
 
         Assert.True(command.IsExecuting);
 
+        // Load-bearing for CanExecute's own TODO half ("false while IsExecuting is true"): a
+        // CanExecute that ignores IsExecuting and always answers true would pass every OTHER
+        // test in this file, since none of them call CanExecute while a run is in flight.
+        Assert.False(command.CanExecute(null));
+
         command.Cancel(); // synchronous - see wpf/README.md on await CancelAsync()
 
         await WithTimeout(run);

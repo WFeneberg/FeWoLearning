@@ -76,11 +76,17 @@ public class Ex046_AsyncVoidToAsyncCommandTests : WpfTestContext
         Assert.False(run.IsCompleted, "ExecuteAsync's task completed before the gated operation did");
         Assert.True(command.IsExecuting);
 
+        // Load-bearing for CanExecute's own TODO half ("false while IsExecuting is true"): a
+        // CanExecute that ignores IsExecuting and always answers true would pass every OTHER
+        // test in this file, since none of them call CanExecute while a run is in flight.
+        Assert.False(command.CanExecute(null));
+
         command.Gate!.SetResult();
         await WithTimeout(run);
 
         Assert.True(run.IsCompletedSuccessfully);
         Assert.False(command.IsExecuting);
+        Assert.True(command.CanExecute(null));
     }
 
     [WpfFact]
