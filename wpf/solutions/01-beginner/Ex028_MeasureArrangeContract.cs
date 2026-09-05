@@ -18,9 +18,13 @@ using System.Windows;
 namespace FeWoLearning.Wpf.Exercises.Beginner;
 
 /// <summary>
-/// A leaf element that always wants to be <see cref="NaturalSize"/>, regardless of how
-/// little space is on offer, and that records what each layout hook actually received - so a
-/// test can inspect the contract directly instead of only the geometry it produces.
+/// A leaf element that reports <see cref="NaturalSize"/> as what it wants, and records what
+/// each layout hook actually received - so a test can inspect the contract directly instead
+/// of only the geometry it produces. Whether MeasureOverride returns NaturalSize verbatim or
+/// first clamps it down to constraint is not observable through this row's tests -
+/// DesiredSize ends up capped at the original Measure(...) argument either way. That
+/// difference only shows up as an actual layout clip, which is row 062/080 material, not
+/// this one.
 /// </summary>
 public class Ex028_MeasureArrangeElement : FrameworkElement
 {

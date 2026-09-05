@@ -20,7 +20,12 @@ public class Ex029_GridStarAndAutoTests : WpfTestContext
         Assert.Equal(GridUnitType.Star, star.GridUnitType);
         // Deliberately not 1.0 - ColumnDefinition's own unassigned default is ALSO Star(1),
         // measured directly on this machine, so this value is what tells "explicitly
-        // assigned Star(2)" apart from "never touched, still the default".
+        // assigned Star(2)" apart from "never touched, still the default". This one
+        // assertion is the row's entire defence for the star factor: with a single star
+        // column absorbing the remainder, Star(1) and Star(2) produce identical geometry,
+        // so no rectangle-based test anywhere in this file could catch a wrong factor - it
+        // cannot be strengthened by adding a second star column here without changing what
+        // the row is about.
         Assert.Equal(2.0, star.Value);
 
         var pixel = grid.ColumnDefinitions[2].Width;

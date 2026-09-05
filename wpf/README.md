@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Thirteen things that bite
+### Twelve things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -147,13 +147,14 @@ no `Application` either; WPF resolves default control templates through
   condition check is not that binding mechanism and fires inline, inside the source's
   `PropertyChanged` handler. Row 027 still calls `Pump()` after each mutation, defensively —
   a later row that depends on this instead being deferred would need its own check.
-- **`ColumnDefinition.Width`'s own unassigned default is already `GridLength(1,
-  GridUnitType.Star)`** — measured directly, not `Auto` and not zero. A test that only
-  checks a Star column's `GridUnitType` cannot tell "explicitly assigned Star" apart from
-  "never touched, still the default" for that reason; row 029 assigns a Star factor other
-  than 1 (2) so the numeric `Value`, not just the `GridUnitType`, is what proves the
-  assignment actually happened. Any later Grid-building row needs the same care whenever a
-  column's intended sizing happens to be plain Star(1).
+- **`ColumnDefinition.Width`'s and `RowDefinition.Height`'s own unassigned defaults are
+  already `GridLength(1, GridUnitType.Star)`** — measured directly, not `Auto` and not
+  zero, and true of both types. A test that only checks a Star column's or row's
+  `GridUnitType` cannot tell "explicitly assigned Star" apart from "never touched, still
+  the default" for that reason; row 029 assigns a Star factor other than 1 (2) so the
+  numeric `Value`, not just the `GridUnitType`, is what proves the assignment actually
+  happened. Row 031 (`SharedSizeGroup`) builds `RowDefinitions` next and needs the same
+  care whenever a row's or column's intended sizing happens to be plain Star(1).
 - **`MeasureOverride`'s `constraint` and `ArrangeOverride`'s `finalSize` are both already
   reduced by `Margin`** before either override ever sees them, and `DesiredSize` adds
   `Margin` back onto whatever `MeasureOverride` returned — but capped at the *original*,
@@ -164,12 +165,6 @@ no `Application` either; WPF resolves default control templates through
   stays inside the non-clamped range on purpose to keep the base contract legible; row 062
   (`CustomPanel`) and row 080 (layout invalidation cost) are where the clamping edge and the
   Measure/Arrange asymmetry actually start to matter.
-- **`HorizontalAlignment`/`VerticalAlignment` take effect on a bare top-level element handed
-  straight to `Arrange(...)`, with no parent panel involved.** The alignment logic lives in
-  `FrameworkElement`'s own arrange machinery, not in whichever panel calls `Arrange` on a
-  child, so `WpfTestContext.Layout(element, availableSize)` alone is enough to see
-  `RenderSize` shrink to the element's natural size and its `VisualOffset` move to a corner
-  of `availableSize` — row 030 needs no wrapping panel at all to exercise this.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 
@@ -229,7 +224,13 @@ narrow question — does the WPF mechanism work — and deliberately does not at
   `Layout(element, available)` measures and arranges against `available ?? new
   Size(800, 600)` — rows 028–031 (measure/arrange contract, star/auto sizing, margins,
   shared size groups) and row 080 (layout invalidation cost) depend on both the
-  default and the ability to override it.
+  default and the ability to override it. This is also why `HorizontalAlignment`/
+  `VerticalAlignment` take effect on a bare top-level element with no parent panel
+  involved at all: the alignment logic lives in `FrameworkElement`'s own arrange
+  machinery, not in whichever panel calls `Arrange` on a child, so `Layout(element,
+  availableSize)` alone is enough to see `RenderSize` shrink to the element's natural
+  size and its `VisualOffset` move to a corner of `availableSize` — row 030 needs no
+  wrapping panel to exercise this.
 - **`CommandManager` coalescing.** A second `InvalidateRequerySuggested()` call while
   one is still pending is swallowed — it posts at `DispatcherPriority.Background`, so
   a test that invalidates twice without a `Pump()` between them observes only one

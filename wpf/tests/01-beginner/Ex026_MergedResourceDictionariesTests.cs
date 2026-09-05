@@ -66,14 +66,36 @@ public class Ex026_MergedResourceDictionariesTests : WpfTestContext
     [WpfFact]
     public void An_Own_Entry_Always_Wins_Over_Merged_Dictionaries_Regardless_Of_Their_Order()
     {
+        // "Their order" means two different things, and this test tries both - a merge
+        // order swap alone is not enough: an AddOwnEntry that (wrongly) appended the entry
+        // as one more merged dictionary instead of writing into target directly would still
+        // win by ordinary last-wins as long as it runs LAST, no matter which of first/second
+        // was merged first. What actually closes that gap is reversing the CALL order -
+        // AddOwnEntry before MergeInOrder - which only a genuine own-entry write survives,
+        // because an own entry wins regardless of when it was added, while a same-bug entry
+        // merely disguised as a third merged dictionary would then be the OLDEST one and
+        // lose to whichever real merged dictionary landed last.
         var target = new ResourceDictionary();
         var first = new ResourceDictionary { { "Brush", "FromFirst" } };
         var second = new ResourceDictionary { { "Brush", "FromSecond" } };
         Ex026_MergedResourceDictionaries.MergeInOrder(target, first, second);
-
         Ex026_MergedResourceDictionaries.AddOwnEntry(target, "Brush", "FromTargetItself");
 
         Assert.Equal("FromTargetItself", target["Brush"]);
+
+        // Merge order swapped too, for completeness.
+        var swappedTarget = new ResourceDictionary();
+        Ex026_MergedResourceDictionaries.MergeInOrder(swappedTarget, second, first);
+        Ex026_MergedResourceDictionaries.AddOwnEntry(swappedTarget, "Brush", "FromTargetItself");
+
+        Assert.Equal("FromTargetItself", swappedTarget["Brush"]);
+
+        // Call order reversed: AddOwnEntry BEFORE the merges happen at all.
+        var reversedTarget = new ResourceDictionary();
+        Ex026_MergedResourceDictionaries.AddOwnEntry(reversedTarget, "Brush", "FromTargetItself");
+        Ex026_MergedResourceDictionaries.MergeInOrder(reversedTarget, first, second);
+
+        Assert.Equal("FromTargetItself", reversedTarget["Brush"]);
     }
 
     [WpfFact]

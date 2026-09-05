@@ -23,6 +23,7 @@ public class Ex027_DataTriggerTests : WpfTestContext
         Assert.Equal(true, trigger.Value);
         Assert.Equal(nameof(Ex027_TaskItem.IsUrgent), ((Binding)trigger.Binding!).Path.Path);
         var triggerSetters = trigger.Setters.Cast<Setter>().ToList();
+        Assert.Single(triggerSetters);
         Assert.Contains(triggerSetters, s => s.Property == Button.WidthProperty && Equals(s.Value, 220.0));
     }
 
@@ -105,6 +106,10 @@ public class Ex027_DataTriggerTests : WpfTestContext
         Assert.Equal(65.0, button.Width);
 
         item.IsUrgent = true;
+        // Defensive, not dead weight: DataTrigger conditions re-evaluate synchronously (see
+        // README), so this Pump() is a no-op today - but if that ever became deferred, a
+        // missing Pump() here would make "must not fire yet" pass for the wrong reason (a
+        // stale read) instead of the right one.
         Pump();
         Assert.Equal(65.0, button.Width); // only one of two conditions holds - must not fire yet
 
