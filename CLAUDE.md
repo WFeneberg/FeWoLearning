@@ -62,6 +62,7 @@ tests there — do not add `solutions/` to a project/module.
 | `wpf/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `MicroServices/`| — (restore on first `dotnet test`)| `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `security/`| — (restore on first `dotnet test`)      | `dotnet test --solution FeWoLearning.Security.slnx` | `dotnet test --project tests/FeWoLearning.Security.Tests.csproj --filter-class "*Ex001*"` |
+| `Architecture/`| — (restore on first `dotnet test`) | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 
 Run every command **from inside the track folder**, not the repo root.
 
@@ -69,7 +70,9 @@ For `blazor/`, `uno/`, `caliburn/` and `wpf/`, `dotnet test -p:UseSolutions=true
 suite against the reference solutions instead of the stubs. `MicroServices/` supports the same
 `-p:UseSolutions=true` flag, plus `-p:Containers=true` to additionally run the container-backed
 rows (skipped by default). `dotnet run --project playground -- --exercise exNNN` runs a single
-exercise in the Aspire dashboard. `security/` supports the same `-p:UseSolutions=true` flag for
+exercise in the Aspire dashboard. `Architecture/` supports `-p:UseSolutions=true` for its green run and
+`-p:Containers=true` for its eight container-backed rows. `security/` supports the same
+`-p:UseSolutions=true` flag for
 its green run: `dotnet test --solution FeWoLearning.Security.slnx -p:UseSolutions=true`.
 
 A footnote in the same spirit as the `wpf/`/`MicroServices/` entries below: `security/global.json`
@@ -692,6 +695,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
+| `Architecture/`| 16 / 60 (verified) | 44 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above
@@ -887,6 +891,69 @@ recorded in `wpf/catalog.md`: WinForms interop (row 088 uses
 `HwndSource`/`HwndHost` plus P/Invoke rather than pulling `UseWindowsForms`
 into both content libraries), and wall-clock performance assertions (rows
 076–080 assert that the mechanism fired, never how fast).
+
+## The `Architecture/` track
+
+Application and system architecture on .NET 10 — **60 rows in four subject-area
+blocks**, not 100 rows in four difficulty tiers, for the same reason `security/`
+departs: "beginner architecture" is not a meaningful axis, and difficulty rises
+*within* each block instead. `01-web` 001–016, `02-desktop` 017–028,
+`03-services-data` 029–052, `04-cross-cutting` 053–060. The folder is capitalised
+like `MicroServices/`; deliberate, do not "fix" it.
+
+It is **not** a second `MicroServices/`: that track teaches Aspire and the
+deployment topology, this one teaches the patterns inside the process — what an
+outbox guarantees, why a cache-aside loader must be counted rather than observed,
+what a saga compensates. It is **not** a UI track either: block `02-desktop` is
+deliberately UI-framework-free (MVVM composition, navigation, messaging, plugin
+loading, offline sync, undo/redo are all testable without a rendering stack), so
+unlike `wpf/`, `caliburn/` and `security/`'s block 04, **the whole track is
+headless and needs no Windows desktop session**. Everything targets plain
+`net10.0`.
+
+Three projects on the `UseSolutions` mechanism shared with `blazor/`, `uno/`,
+`wpf/`, `caliburn/`, `avalonia/` and `security/`. `dotnet test` is red,
+`-p:UseSolutions=true` green, `-p:Containers=true` additionally runs the eight
+container-backed rows (032, 036, 037, 038, 039, 046, 047, 050), which are
+otherwise skipped — every one of those exercises is still fully graded without
+Docker by its in-process facts.
+
+**Toolchain, all measured.** xunit.v3 **3.2.2** + `xunit.runner.visualstudio`
+**3.1.5** + `Microsoft.NET.Test.Sdk` 17.14.1 on the classic VSTest path, and
+**no `global.json`** — copied from `MicroServices/` because xunit.v3 4.0.0 plus a
+`Microsoft.Testing.Platform` `global.json` is what makes `dotnet test` exit 5 with
+zero tests discovered here. `MQTTnet` 5 **splits its broker into a separate
+`MQTTnet.Server` package**, which lives in `tests/` only. Unlike `security/`, this
+track does **not** pin `SQLitePCLRaw.lib.e_sqlite3`: `Microsoft.Data.Sqlite`
+10.0.11 no longer drags in the 2.1.11 carrying GHSA-2m69-gcr7-jv3q, and both
+builds measure 0 warnings without it. `tests/` suppresses `xUnit1051` only;
+`exercises/` additionally emits `CS9113` for primary-constructor parameters a stub
+does not read yet, left unsuppressed like the other stub warnings.
+
+**MQTT is graded in the DEFAULT run, not behind Docker.** `tests/_harness/MqttBrokerFixture`
+starts a real MQTTnet 5 broker in-process on a loopback port, so rows 049–051 get
+real protocol frames, real QoS 1 redelivery, real retained messages and a real
+last will with no container at all. `SqliteScratch` is a temp **file** database
+and deliberately not `:memory:` — the outbox, unit-of-work and locking rows prove
+a transaction boundary by opening a *second* connection, and every `:memory:`
+connection gets its own private database, which would make those facts pass
+vacuously.
+
+**The recurring bug class — read `Architecture/README.md`'s "How an architecture
+test lies" before writing a fact.** Architecture tests lie in three ways: the
+outcome is reachable *without* the pattern (an outbox test asserting only "the
+message arrived" passes a direct publish; a cache test asserting only "the value
+came back" passes having no cache); the pattern is asserted but never *exercised*
+(an idempotency test that delivers each message once grades nothing); and a test
+asserts *structure the runtime does not enforce*, which is why rows 001, 011, 026,
+041, 058 and 060 read assembly metadata by reflection and go red on an assertion
+rather than on a `NotImplementedException`. Every batch is therefore checked with
+**two** probes, not one: the degenerate implementation, and then the *plausible
+wrong* one — the pattern implemented earnestly with the wrong mechanism. The
+second probe is the one that finds things. Measured in the first batch: Ex004's
+status fact asserted 200, which is `DefaultHttpContext`'s own default, so an empty
+pipeline passed it — the terminal middleware now sets 202, and **any fact about a
+response status must assert a value the default is not**.
 
 ## Known gaps
 
