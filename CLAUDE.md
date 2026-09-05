@@ -78,9 +78,10 @@ suite against the reference solutions instead of the stubs.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-04: ex001-ex010 (53 test facts) are red on the
-  untouched tree, and 58 facts — the 53 plus the harness smoke tests — pass
-  under `-p:UseSolutions=true`. **`wpf/`** is verified end-to-end on its first
+  verified as of 2026-09-04: ex001-ex015 (80 exercise test facts) are red on
+  the untouched tree — `dotnet test` shows 80 failed, 7 passed (the 7 harness
+  smoke tests, which pass in both modes) — and `dotnet test
+  -p:UseSolutions=true` shows 87 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
   five exercises as of 2026-09-04, on **.NET 10.0.400** with **xunit.v3 4.0.0**
   and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11):
   `dotnet test` shows 4 passed (the harness smoke tests) and 37 exercise facts
@@ -260,13 +261,7 @@ suite against the reference solutions instead of the stubs.
   `FrameworkElement.Name` (`CS0108`). Exercises use `UserName`-style names.
   The `exercises/` build emits expected `CS0067`/`CS0649` warnings from stubs
   whose members throw; `solutions/` builds with 0 warnings — same stance as
-  `blazor/`. **Forward risk:** the harness resets only three process-global
-  statics per test (`PlatformProvider.Current`, `AssemblySource.Instance`, the
-  `IoC` delegates) — not `ViewLocator`'s `NameTransformer`, `ConventionManager`,
-  `MessageBinder`, or the other Caliburn statics the planned ex015/ex020/ex063/
-  ex068-073/ex087/ex095/ex096 will touch; the first of those to mutate one must
-  extend `CaliburnCoreContext` to snapshot and restore it, or later tests fail
-  in ways that look like their own bugs. See `caliburn/README.md`.
+  `blazor/`.
   Caliburn.Micro 5 marks `Screen.OnInitializeAsync` and `Screen.OnActivateAsync`
   `[Obsolete]`, with the messages "Override OnInitializedAsync" and "Override
   OnActivatedAsync". Overriding the obsolete pair puts `CS0672` in the build,
@@ -276,6 +271,25 @@ suite against the reference solutions instead of the stubs.
   → `OnActivatedAsync` — so they are the same lifecycle point and the
   non-obsolete name is the one to override. `OnDeactivateAsync` is **not**
   obsolete and has no `OnDeactivatedAsync` counterpart.
+  `tests/_harness/CaliburnCoreContext.cs` resets four process-global Caliburn
+  statics before every test — `PlatformProvider.Current`,
+  `AssemblySource.Instance`, the `IoC` delegates, and
+  `ViewLocator.NameTransformer` — and that list is incomplete **by design**:
+  it does not yet reset `ViewLocator.LocateTypeForModelType`,
+  `ViewModelLocator`'s own separate `NameTransformer` and locator delegates,
+  `ViewModelBinder.*`, `ConventionManager.ElementConventions`,
+  `MessageBinder.*`, `ActionMessage.*`, `LogManager.GetLog` or
+  `BindingScope.GetNamedElements`. Whoever writes the first exercise that
+  mutates one of those must extend the harness in the same style, or their
+  mutation leaks into every later test in the serial run. `caliburn/README.md`
+  carries the full register. A subtle trap found while building that reset,
+  worth recording because it is not Caliburn-specific: the pristine snapshot
+  must be taken in an **explicit static constructor**, not a static field
+  initializer — a field initializer leaves the type `beforefieldinit`, which
+  lets the runtime defer initialization until the first read of that field,
+  and that read happens *after* the same instance constructor's `Clear()`
+  call, so the snapshot comes back empty and permanently zeroes the
+  collection for the whole run. Measured on this machine.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -369,7 +383,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 10 / 100 (verified) | 90 |
 | `blazor/` | 70 / 100 (verified) | 30 |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 10 / 100 (verified) | 90 |
+| `caliburn/`| 15 / 100 (verified) | 85 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `blazor/`,
