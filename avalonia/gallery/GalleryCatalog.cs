@@ -1,4 +1,5 @@
 using FeWoLearning.Avalonia.Gallery.Pages.Beginner;
+using FeWoLearning.Avalonia.Gallery.Pages.Intermediate;
 
 namespace FeWoLearning.Avalonia.Gallery;
 
@@ -6,7 +7,10 @@ public static class GalleryCatalog
 {
     /// <summary>
     /// One entry per exercise whose result is visual. View-model-only exercises
-    /// (ex008, ex009) deliberately have no page.
+    /// (ex008, ex009, ex036-ex048, ex050) deliberately have no page - ex050's
+    /// ViewModelViewHost only resolves its content on attach-to-visual-tree, so a
+    /// page merely constructed (never shown) by the gallery smoke test could not
+    /// honestly surface its stub's NotImplementedException.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [
@@ -43,5 +47,6 @@ public static class GalleryCatalog
         new("033", "StyledPropertyBasics", () => new Ex033()),
         new("034", "AttachedPropertyUsage", () => new Ex034()),
         new("035", "ScrollViewerAndSizing", () => new Ex035()),
+        new("049", "ViewForBinding", () => new Ex049()),
     ];
 }

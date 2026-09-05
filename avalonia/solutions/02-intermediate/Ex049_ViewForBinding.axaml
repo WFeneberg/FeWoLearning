@@ -1,0 +1,8 @@
+<!-- Exercise 049 - ViewForBinding (intermediate). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex049_ViewForBinding"
+             x:DataType="i:Ex049_ViewForBindingViewModel">
+  <TextBlock x:Name="GreetingText" Text="{CompiledBinding Greeting}" />
+</UserControl>

@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 45 ✅ / 55 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -78,11 +78,11 @@ not a valid C# identifier.
 | 043 | ThrottledSearch | `Throttle` plus `DistinctUntilChanged` | ✅ |
 | 044 | SequencerScheduling | `ISequencer`, virtual time in tests | ✅ |
 | 045 | MainThreadMarshalling | `AvaloniaScheduler` / `RxSchedulers`, `Dispatcher.UIThread` | ✅ |
-| 046 | InteractionDialog | `Interaction<TIn, TOut>` for a dialog result | ⬜ |
-| 047 | ValidationNotifyDataErrorInfo | `INotifyDataErrorInfo`, per-property errors | ⬜ |
-| 048 | ViewModelActivation | `IActivatableViewModel`, `WhenActivated` disposal | ⬜ |
-| 049 | ViewForBinding | `IViewFor<T>`, `ReactiveUserControl` | ⬜ |
-| 050 | ViewModelViewHost | resolving a view from a view model | ⬜ |
+| 046 | InteractionDialog | `Interaction<TIn, TOut>` for a dialog result | ✅ |
+| 047 | ValidationNotifyDataErrorInfo | `INotifyDataErrorInfo`, per-property errors | ✅ |
+| 048 | ViewModelActivation | `IActivatableViewModel`, `WhenActivated` disposal | ✅ |
+| 049 | ViewForBinding | `IViewFor<T>`, `ReactiveUserControl` | ✅ |
+| 050 | ViewModelViewHost | resolving a view from a view model | ✅ |
 | 051 | RoutingStateNavigation | `RoutingState` navigate and navigate-back | ⬜ |
 | 052 | RoutedViewHostShell | a shell hosting a router | ⬜ |
 | 053 | ViewLocatorConvention | the default view-locator naming convention | ⬜ |

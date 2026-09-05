@@ -1,0 +1,21 @@
+<!-- Exercise 049 - ViewForBinding (intermediate).
+     Goal:   Prove the IViewFor<T> contract end to end: a ReactiveUserControl<T>
+     keeps its DataContext synced to whatever is assigned to its ViewModel
+     property, entirely on its own - the point of this exercise is to bind
+     against that synced DataContext, not to set DataContext by hand.
+     Drills: IViewFor<T>, ReactiveUserControl<T>, {CompiledBinding}.
+     Passes: dotnet test, filtered to Ex049_ (see Ex049_ViewForBinding.axaml.cs
+     for the exact command - an XML comment cannot hold two hyphens in a row). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex049_ViewForBinding"
+             x:DataType="i:Ex049_ViewForBindingViewModel">
+  <!-- TODO: replace Text="TODO" with {CompiledBinding Greeting}. Keep the
+       x:Name="GreetingText" - the test looks the control up by that name.
+       Do NOT set DataContext anywhere in the code-behind: ReactiveUserControl<T>
+       (the base class in Ex049_ViewForBinding.axaml.cs) keeps DataContext synced
+       to ViewModel automatically - that sync IS the lesson, not something to
+       route around. -->
+  <TextBlock x:Name="GreetingText" Text="TODO" />
+</UserControl>
