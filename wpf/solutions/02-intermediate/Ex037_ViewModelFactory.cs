@@ -1,5 +1,4 @@
-// Exercise 037 - View-model factory (intermediate).
-// REFERENCE SOLUTION.
+// Exercise 037 - View-model factory (intermediate). REFERENCE SOLUTION.
 // Goal:   Give a shell a way to mint a NEW child view model each time it navigates,
 //         instead of either hand-rolling `new DetailViewModel(...)` (which skips DI
 //         entirely) or registering it as a singleton (which would hand the same instance
@@ -67,10 +66,14 @@ public delegate Ex037_DetailViewModel Ex037_DetailViewModelFactory(string topic)
 public static class Ex037_ViewModelFactory
 {
     /// <summary>
-    /// Builds a provider with <paramref name="audit"/> registered as the singleton
-    /// Ex037_IAuditLog, and Ex037_DetailViewModelFactory registered so resolving it returns
-    /// a delegate that builds a brand-new Ex037_DetailViewModel - with the container's
-    /// audit log injected - every time it is invoked.
+    /// Builds a provider whose container can produce <paramref name="audit"/> itself (as
+    /// the registered Ex037_IAuditLog - the exact same object passed in, not a copy) AND an
+    /// Ex037_DetailViewModelFactory delegate that, each time it is invoked, builds a
+    /// brand-new Ex037_DetailViewModel wired to that same container-resolved audit log.
+    /// Both halves are observable from outside this method: a caller can resolve
+    /// Ex037_IAuditLog directly and must get <paramref name="audit"/> back, and can resolve
+    /// the factory delegate directly and invoke it without ever calling
+    /// CreateDetailViewModel below.
     /// </summary>
     public static IServiceProvider BuildProvider(Ex037_IAuditLog audit)
     {
@@ -82,8 +85,10 @@ public static class Ex037_ViewModelFactory
     }
 
     /// <summary>
-    /// Resolves the factory delegate from <paramref name="provider"/> and invokes it with
-    /// <paramref name="topic"/> - never construct Ex037_DetailViewModel directly here.
+    /// Produces a detail view model for <paramref name="topic"/> by going THROUGH
+    /// <paramref name="provider"/>'s registered factory delegate - never construct
+    /// Ex037_DetailViewModel directly in this method, that would make the factory
+    /// registered above pointless.
     /// </summary>
     public static Ex037_DetailViewModel CreateDetailViewModel(IServiceProvider provider, string topic)
         => provider.GetRequiredService<Ex037_DetailViewModelFactory>()(topic);

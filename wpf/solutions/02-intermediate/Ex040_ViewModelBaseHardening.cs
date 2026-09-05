@@ -1,5 +1,4 @@
-// Exercise 040 - Hardening the observable view-model base (intermediate).
-// REFERENCE SOLUTION.
+// Exercise 040 - Hardening the observable view-model base (intermediate). REFERENCE SOLUTION.
 // Goal:   Take the SetProperty every earlier exercise built (row 003) and the fan-out
 //         pattern built on top of it (row 010), and harden both: let a caller supply its
 //         own IEqualityComparer<T> instead of always taking EqualityComparer<T>.Default,
@@ -27,13 +26,14 @@ public abstract class Ex040_ObservableViewModelBase : INotifyPropertyChanged
     /// <paramref name="comparer"/> is null), raises <see cref="PropertyChanged"/> for the
     /// caller's property name, and returns whether anything changed.
     ///
-    /// Guarded against reentrancy: if a handler reacting to this same property's
-    /// PropertyChanged calls SetProperty again for the SAME property name while that first
-    /// raise is still in progress, this method must still assign the new field value, but
-    /// must NOT raise a second, nested PropertyChanged for that property - the raise
-    /// already in progress is the only notification that property gets for this call
-    /// stack. A different property name raising from inside that handler is NOT affected
-    /// by the guard.
+    /// Reentrancy: a handler reacting to this same property's PropertyChanged is allowed
+    /// to call SetProperty again for the SAME property name while that first raise is
+    /// still on the call stack. The field must still end up holding whatever that
+    /// reentrant call assigned, but this method must not let that reentrant call trigger a
+    /// SECOND, nested PropertyChanged for the property already in the middle of raising -
+    /// the <see cref="_raising"/> set is provided as the obvious place to track that. A
+    /// DIFFERENT property name raising from inside that same handler must be entirely
+    /// unaffected - the guard is scoped per property name, not a single global flag.
     /// </summary>
     protected bool SetProperty<T>(ref T field, T value, IEqualityComparer<T>? comparer = null, [CallerMemberName] string? propertyName = null)
     {

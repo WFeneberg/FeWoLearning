@@ -1,5 +1,4 @@
-// Exercise 036 - Generic host bootstrap (intermediate).
-// REFERENCE SOLUTION.
+// Exercise 036 - Generic host bootstrap (intermediate). REFERENCE SOLUTION.
 // Goal:   Replace the App.xaml.cs singleton and a bare `new MainViewModel()` sitting in a
 //         constructor with a resolved service: build a Microsoft.Extensions.Hosting host,
 //         register the shell view model and its dependency in it, and resolve the view
@@ -58,10 +57,11 @@ public sealed class Ex036_ShellViewModel : INotifyPropertyChanged
 public static class Ex036_GenericHostBootstrap
 {
     /// <summary>
-    /// Builds (does not start) a host whose container has <paramref name="greeter"/>
-    /// registered as the singleton Ex036_IGreeter, and Ex036_ShellViewModel registered as a
-    /// singleton, so ResolveShellViewModel below always hands back the same instance for
-    /// the life of the host - the seam that replaces a bare `new Ex036_ShellViewModel(...)`.
+    /// Builds (does not start) a host whose container can produce an Ex036_ShellViewModel
+    /// on demand - registered as a SINGLETON, together with <paramref name="greeter"/> as
+    /// the Ex036_IGreeter it depends on. "Registered as a singleton" is an externally
+    /// observable contract, not an implementation detail: resolving the view model twice
+    /// from the same host must hand back the identical object both times.
     /// </summary>
     public static IHost BuildHost(Ex036_IGreeter greeter)
     {
@@ -72,8 +72,12 @@ public static class Ex036_GenericHostBootstrap
     }
 
     /// <summary>
-    /// Resolves the shell view model from the host's container - never call `new
-    /// Ex036_ShellViewModel(...)` here, that would defeat the whole point of the row.
+    /// Hands back the shell view model that lives in <paramref name="host"/>'s own
+    /// container. This must be a genuine resolution through <paramref name="host"/> -
+    /// caching or constructing the view model anywhere outside the container (a static
+    /// field, a `new` call) would make this method's result stop being the same object the
+    /// container itself would hand back if asked directly, which is exactly what this row
+    /// is about.
     /// </summary>
     public static Ex036_ShellViewModel ResolveShellViewModel(IHost host)
         => host.Services.GetRequiredService<Ex036_ShellViewModel>();

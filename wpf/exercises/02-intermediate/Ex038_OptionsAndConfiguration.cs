@@ -7,14 +7,17 @@
 //         the lesson is IOptions<T> binding and start-time validation, not file loading,
 //         and a real file would be this track's first non-.cs build item, duplicated
 //         byte-for-byte into two content libraries for no benefit to what this row teaches.
-// Drills: IOptions<T>, binding a configuration section onto an options type (Bind), and
-//         ValidateOnStart() so validation runs at Host.StartAsync rather than lazily on
-//         first IOptions<T>.Value access.
+// Drills: IOptions<T>, binding a configuration SECTION (not the whole configuration tree)
+//         onto an options type, and ValidateOnStart() so validation runs at
+//         Host.StartAsync rather than lazily on first IOptions<T>.Value access.
 // Passes: dotnet test --filter FullyQualifiedName~Ex038_
 
+using System.ComponentModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FeWoLearning.Wpf.Exercises.Intermediate;
 
@@ -29,26 +32,49 @@ public sealed class Ex038_ShellOptions
     public int RefreshIntervalSeconds { get; set; }
 }
 
+/// <summary>
+/// Ready to use - the bindable object a real Window would set as its DataContext. Not the
+/// subject of this row; what matters is what BuildHost feeds into IOptions&lt;T&gt;.Value
+/// before this is ever constructed.
+/// </summary>
+public sealed class Ex038_ShellViewModel : INotifyPropertyChanged
+{
+    private string _windowTitle;
+
+    public Ex038_ShellViewModel(IOptions<Ex038_ShellOptions> options)
+    {
+        _windowTitle = options.Value.WindowTitle;
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string WindowTitle
+    {
+        get => _windowTitle;
+        set
+        {
+            if (_windowTitle == value) return;
+            _windowTitle = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WindowTitle)));
+        }
+    }
+}
+
 public static class Ex038_OptionsAndConfiguration
 {
     /// <summary>
-    /// Builds (does not start) a host whose configuration comes from
-    /// <paramref name="configuration"/> - an in-memory source - bound onto
-    /// Ex038_ShellOptions under Ex038_ShellOptions.SectionName, validated so that
-    /// WindowTitle is non-empty and RefreshIntervalSeconds is greater than zero, with that
-    /// validation running at host start rather than only on first
-    /// IOptions&lt;Ex038_ShellOptions&gt;.Value access.
+    /// Builds (does not start) a host whose OWN IConfiguration contains
+    /// <paramref name="configuration"/> (an in-memory source), with Ex038_ShellOptions
+    /// bound from the "Shell" SECTION of that configuration specifically - not from the
+    /// configuration root, which would also see any unrelated top-level keys - and
+    /// validated so that WindowTitle is non-empty and RefreshIntervalSeconds is greater
+    /// than zero, with that validation running at host START rather than only whenever
+    /// something first happens to touch IOptions&lt;Ex038_ShellOptions&gt;.Value. Default
+    /// console logging should be turned off, the way row 039 already does, so a green run
+    /// stays quiet.
     /// </summary>
     public static IHost BuildHost(IDictionary<string, string?> configuration)
-        // TODO: var builder = Host.CreateApplicationBuilder();
-        //       builder.Configuration.AddInMemoryCollection(configuration);
-        //       builder.Services.AddOptions<Ex038_ShellOptions>()
-        //           .Bind(builder.Configuration.GetSection(Ex038_ShellOptions.SectionName))
-        //           .Validate(o => !string.IsNullOrWhiteSpace(o.WindowTitle), "WindowTitle is required")
-        //           .Validate(o => o.RefreshIntervalSeconds > 0, "RefreshIntervalSeconds must be greater than zero")
-        //           .ValidateOnStart();
-        //       return builder.Build();
-        => throw new NotImplementedException("TODO: Ex038 - AddInMemoryCollection(configuration), bind Ex038_ShellOptions to the \"Shell\" section, add Validate rules (WindowTitle non-empty, RefreshIntervalSeconds > 0), call ValidateOnStart(), return builder.Build()");
+        => throw new NotImplementedException("TODO: Ex038 - add configuration as an in-memory configuration source on the host's own IConfiguration; bind Ex038_ShellOptions from the \"Shell\" section (not the configuration root); add validation rules requiring a non-empty WindowTitle and a positive RefreshIntervalSeconds; call ValidateOnStart(); clear default logging providers; return the built host");
 
     /// <summary>
     /// Starts <paramref name="host"/> synchronously, so a caller (and every test below) can

@@ -66,24 +66,24 @@ public delegate Ex037_DetailViewModel Ex037_DetailViewModelFactory(string topic)
 public static class Ex037_ViewModelFactory
 {
     /// <summary>
-    /// Builds a provider with <paramref name="audit"/> registered as the singleton
-    /// Ex037_IAuditLog, and Ex037_DetailViewModelFactory registered so resolving it returns
-    /// a delegate that builds a brand-new Ex037_DetailViewModel - with the container's
-    /// audit log injected - every time it is invoked.
+    /// Builds a provider whose container can produce <paramref name="audit"/> itself (as
+    /// the registered Ex037_IAuditLog - the exact same object passed in, not a copy) AND an
+    /// Ex037_DetailViewModelFactory delegate that, each time it is invoked, builds a
+    /// brand-new Ex037_DetailViewModel wired to that same container-resolved audit log.
+    /// Both halves are observable from outside this method: a caller can resolve
+    /// Ex037_IAuditLog directly and must get <paramref name="audit"/> back, and can resolve
+    /// the factory delegate directly and invoke it without ever calling
+    /// CreateDetailViewModel below.
     /// </summary>
     public static IServiceProvider BuildProvider(Ex037_IAuditLog audit)
-        // TODO: var services = new ServiceCollection();
-        //       services.AddSingleton(audit);
-        //       services.AddTransient<Ex037_DetailViewModelFactory>(sp =>
-        //           topic => new Ex037_DetailViewModel(sp.GetRequiredService<Ex037_IAuditLog>(), topic));
-        //       return services.BuildServiceProvider();
-        => throw new NotImplementedException("TODO: Ex037 - register audit as a singleton and Ex037_DetailViewModelFactory as a factory delegate that closes over IServiceProvider, then BuildServiceProvider()");
+        => throw new NotImplementedException("TODO: Ex037 - register audit as the resolvable Ex037_IAuditLog and register Ex037_DetailViewModelFactory as a delegate that resolves Ex037_IAuditLog from the container (not from a captured local) and constructs a new Ex037_DetailViewModel with it; return the built provider");
 
     /// <summary>
-    /// Resolves the factory delegate from <paramref name="provider"/> and invokes it with
-    /// <paramref name="topic"/> - never construct Ex037_DetailViewModel directly here.
+    /// Produces a detail view model for <paramref name="topic"/> by going THROUGH
+    /// <paramref name="provider"/>'s registered factory delegate - never construct
+    /// Ex037_DetailViewModel directly in this method, that would make the factory
+    /// registered above pointless.
     /// </summary>
     public static Ex037_DetailViewModel CreateDetailViewModel(IServiceProvider provider, string topic)
-        // TODO: return provider.GetRequiredService<Ex037_DetailViewModelFactory>()(topic);
         => throw new NotImplementedException("TODO: Ex037 - resolve Ex037_DetailViewModelFactory from provider and invoke it with topic");
 }

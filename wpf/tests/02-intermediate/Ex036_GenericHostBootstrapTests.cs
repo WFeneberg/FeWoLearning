@@ -1,6 +1,7 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 using FeWoLearning.Wpf.Exercises.Intermediate;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace FeWoLearning.Wpf.Tests.Intermediate;
@@ -54,7 +55,22 @@ public class Ex036_GenericHostBootstrapTests : WpfTestContext
     }
 
     [WpfFact]
-    public void A_Real_Binding_To_The_Resolved_View_Model_Reads_And_Follows_Its_Title()
+    public void ResolveShellViewModel_Returns_Exactly_What_The_Container_Itself_Resolves()
+    {
+        var host = CreateHost("Container Check");
+
+        var vm = Ex036_GenericHostBootstrap.ResolveShellViewModel(host);
+
+        // The discriminating check for this whole row: ResolveShellViewModel could pass
+        // every other test here by caching a hand-built Ex036_ShellViewModel in a static
+        // field and returning an otherwise-empty host - this fails that bypass directly,
+        // by asking the SAME container for the SAME service and requiring an identical
+        // object back.
+        Assert.Same(vm, host.Services.GetRequiredService<Ex036_ShellViewModel>());
+    }
+
+    [WpfFact]
+    public void A_Real_Binding_Follows_A_Mutation_Made_Through_A_Second_Resolution_Of_The_Same_Singleton()
     {
         var host = CreateHost("Bound At Startup");
         var vm = Ex036_GenericHostBootstrap.ResolveShellViewModel(host);
@@ -66,13 +82,16 @@ public class Ex036_GenericHostBootstrapTests : WpfTestContext
 
         Assert.Equal("Bound At Startup", textBlock.Text);
 
-        // The resolved object is the one a real Binding is watching - mutate it and prove
-        // the same instance the container handed back is genuinely bindable, not merely
-        // constructible.
-        vm.Title = "Retitled After Bind";
+        // Resolve a SECOND time, independently of the reference already in hand, and
+        // mutate through THAT reference. If ResolveShellViewModel did not hand back the
+        // container's real singleton - or if the binding above were satisfied by some
+        // other mechanism than a live Binding - this mutation would never reach the
+        // TextBlock the first resolution is bound to.
+        var vmResolvedAgain = Ex036_GenericHostBootstrap.ResolveShellViewModel(host);
+        vmResolvedAgain.Title = "Retitled Through The Second Resolution";
         Pump();
 
-        Assert.Equal("Retitled After Bind", textBlock.Text);
+        Assert.Equal("Retitled Through The Second Resolution", textBlock.Text);
     }
 
     public override void Dispose()

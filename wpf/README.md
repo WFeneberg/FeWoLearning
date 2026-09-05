@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Eighteen things that bite
+### Seventeen things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -258,16 +258,18 @@ no `Application` either; WPF resolves default control templates through
   NOT deadlock, for a host with no real hosted background work.** Measured directly
   building row 038 (`ValidateOnStart()` failing synchronously, no other hosted services):
   both a raw blocking `.GetResult()` call and an `await`ed `StartAsync()` inside an `async
-  Task` `[WpfFact]` complete in one to two seconds and propagate `OptionsValidationException`
-  unwrapped, on the very STA thread doing the blocking - `[WpfFact]`'s `async Task` test
-  methods do resume on the same dispatcher, confirming the harness's own claim above. This
-  is NOT a general "async is safe here" finding: `DispatcherSynchronizationContext.Post`
-  still queues through `Dispatcher.BeginInvoke`, and a hosted service with a real
-  suspension point (actual I/O, `Task.Delay`, a background loop) resuming on that captured
-  context while the dispatcher thread sits blocked in `.GetResult()` with no `PushFrame`
-  pumping it would deadlock the classic way. Rows 046-050 (async commands, progress,
-  dispatcher priorities, cancellation) are exactly where that risk becomes real and must
-  be re-measured there, not assumed safe from this one narrow case.
+  Task` `[WpfFact]` complete and propagate `OptionsValidationException` unwrapped, on the
+  very STA thread doing the blocking - `[WpfFact]`'s `async Task` test methods do resume
+  on the same dispatcher, confirming the harness's own claim above. This is NOT a general
+  "async is safe here" finding: `DispatcherSynchronizationContext.Post` still queues
+  through `Dispatcher.BeginInvoke`, and a hosted service with a real suspension point
+  (actual I/O, `Task.Delay`, a background loop) resuming on that captured context while the
+  dispatcher thread sits blocked in `.GetResult()` with no `PushFrame` pumping it would
+  deadlock the classic way. Rows 046-050 (async commands, progress, dispatcher
+  priorities, cancellation) are exactly where that risk becomes real and must be
+  re-measured there when it does - this bullet is an inference about the mechanism from
+  the narrow case actually measured here, not a claim that a real deadlock was produced
+  and caught.
 - **`ValidateOnStart()` does not change WHETHER an options validation rule runs, only
   WHEN.** Any `IValidateOptions<T>`/`.Validate(...)` rule already fires lazily on the
   first `IOptions<T>.Value` access, with or without `ValidateOnStart()` - measured
@@ -277,14 +279,6 @@ no `Application` either; WPF resolves default control templates through
   that is what actually proves `ValidateOnStart()` ran, since a test that only resolves
   `.Value` after starting cannot tell "validated at start" apart from "validated lazily,
   same as always".
-- **A primary-constructor parameter never referenced anywhere in the class body warns
-  `CS9113` ("parameter is unread"), even though the class still compiles.** This sits
-  alongside the CS0414/CS0169 field-initializer trap above but hits a different stub
-  shape: a class whose subject method still `throw`s and would only start reading an
-  injected constructor parameter once the learner implements the body. Row 039 hit this
-  designing `Ex039_MeterReadingViewModel`; the fix is the same convention CS0414 already
-  established - an explicit constructor assigning a private field, not a primary
-  constructor, whenever the parameter goes unread until the learner's own code uses it.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 

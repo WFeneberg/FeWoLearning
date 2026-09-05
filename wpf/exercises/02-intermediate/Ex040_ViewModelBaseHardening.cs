@@ -26,29 +26,17 @@ public abstract class Ex040_ObservableViewModelBase : INotifyPropertyChanged
     /// <paramref name="comparer"/> is null), raises <see cref="PropertyChanged"/> for the
     /// caller's property name, and returns whether anything changed.
     ///
-    /// Guarded against reentrancy: if a handler reacting to this same property's
-    /// PropertyChanged calls SetProperty again for the SAME property name while that first
-    /// raise is still in progress, this method must still assign the new field value, but
-    /// must NOT raise a second, nested PropertyChanged for that property - the raise
-    /// already in progress is the only notification that property gets for this call
-    /// stack. A different property name raising from inside that handler is NOT affected
-    /// by the guard.
+    /// Reentrancy: a handler reacting to this same property's PropertyChanged is allowed
+    /// to call SetProperty again for the SAME property name while that first raise is
+    /// still on the call stack. The field must still end up holding whatever that
+    /// reentrant call assigned, but this method must not let that reentrant call trigger a
+    /// SECOND, nested PropertyChanged for the property already in the middle of raising -
+    /// the <see cref="_raising"/> set is provided as the obvious place to track that. A
+    /// DIFFERENT property name raising from inside that same handler must be entirely
+    /// unaffected - the guard is scoped per property name, not a single global flag.
     /// </summary>
     protected bool SetProperty<T>(ref T field, T value, IEqualityComparer<T>? comparer = null, [CallerMemberName] string? propertyName = null)
-        // TODO: var effectiveComparer = comparer ?? EqualityComparer<T>.Default;
-        //       if (effectiveComparer.Equals(field, value)) return false;
-        //       field = value;
-        //       if (propertyName is not null && _raising.Add(propertyName))
-        //       {
-        //           try { RaisePropertyChanged(propertyName); }
-        //           finally { _raising.Remove(propertyName); }
-        //       }
-        //       return true;
-        //
-        // _raising.Add returns false when propertyName is already present - that IS the
-        // reentrant case, and it must skip the raise entirely (the field write above still
-        // happens either way).
-        => throw new NotImplementedException("TODO: Ex040 - compare via comparer ?? EqualityComparer<T>.Default, assign field, guard a reentrant raise for the same propertyName using _raising (Add/Remove), otherwise raise PropertyChanged once, return true whenever the value changed");
+        => throw new NotImplementedException("TODO: Ex040 - compare field and value using comparer, falling back to EqualityComparer<T>.Default when comparer is null; if equal, change nothing and return false; otherwise assign the field and return true, raising PropertyChanged for propertyName UNLESS a raise for that same propertyName is already in progress higher up the call stack");
 
     /// <summary>Raises PropertyChanged directly - for a computed property fanning out from
     /// a field SetProperty already assigned. Ready to use.</summary>

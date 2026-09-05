@@ -77,13 +77,13 @@ public class Ex040_ViewModelBaseHardeningTests : WpfTestContext
     [WpfFact]
     public void Without_An_Explicit_Comparer_The_Default_Still_Distinguishes_Case()
     {
-        var probe = new ComparerProbe(comparer: null) { Name = "Wolfgang" };
+        var probe = new ComparerProbe(comparer: null) { Name = "Feneberg" };
         var names = Record(probe);
 
-        probe.Name = "WOLFGANG";
+        probe.Name = "FENEBERG";
 
         Assert.Equal(new string?[] { nameof(ComparerProbe.Name) }, names);
-        Assert.Equal("WOLFGANG", probe.Name);
+        Assert.Equal("FENEBERG", probe.Name);
     }
 
     [WpfFact]

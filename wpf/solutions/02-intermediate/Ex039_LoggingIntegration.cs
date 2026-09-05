@@ -1,5 +1,4 @@
-// Exercise 039 - Logging integration (intermediate).
-// REFERENCE SOLUTION.
+// Exercise 039 - Logging integration (intermediate). REFERENCE SOLUTION.
 // Goal:   Give a view model a real, host-provided ILogger<T> instead of Console.WriteLine
 //         or nothing at all, and use a scope to tag every log line one operation produces
 //         with context that stays attached for as long as that operation runs.
@@ -93,7 +92,10 @@ public sealed class Ex039_MeterReadingViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>Ready to use - what a real status TextBlock would bind to. RecordReading is
-    /// responsible for keeping this current; it is not updated anywhere else.</summary>
+    /// responsible for keeping this current; it is not updated anywhere else. Must be
+    /// culture-invariant text (a raw interpolated string is NOT: this machine's own
+    /// culture formats a decimal differently from others), since nothing here is meant to
+    /// be locale-sensitive display text yet - that is row 066's subject.</summary>
     public string LastReadingSummary
     {
         get => _lastReadingSummary;
@@ -106,10 +108,11 @@ public sealed class Ex039_MeterReadingViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Records a meter reading. Every log line this produces must be tagged with a scope
-    /// identifying meterId, so several readings from different meters interleaved in one
-    /// log stream can still be told apart, and LastReadingSummary must reflect this
-    /// reading afterward.
+    /// Records a meter reading: <paramref name="meterId"/> must be attached as a logger
+    /// SCOPE around a single Information-level log line reporting <paramref name="value"/>
+    /// - not folded into the message text itself, so several meters' readings interleaved
+    /// in one log stream can still be told apart by scope alone - and LastReadingSummary
+    /// must reflect this reading afterward, formatted culture-invariantly.
     /// </summary>
     public void RecordReading(string meterId, double value)
     {
@@ -118,7 +121,7 @@ public sealed class Ex039_MeterReadingViewModel : INotifyPropertyChanged
             _logger.LogInformation("Reading recorded: {Value}", value);
         }
 
-        LastReadingSummary = $"{meterId}: {value}";
+        LastReadingSummary = FormattableString.Invariant($"{meterId}: {value}");
     }
 }
 
