@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 40 ✅ / 60 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -84,11 +84,11 @@ Two deliberate content gaps:
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | GenericHostBootstrap | `Host.CreateApplicationBuilder`, resolve the shell view model instead of `new`ing it | ⬜ |
-| 037 | ViewModelFactory | `IServiceProvider`, transient view models, a factory delegate | ⬜ |
-| 038 | OptionsAndConfiguration | `IOptions<T>`, configuration binding, validation on start | ⬜ |
-| 039 | LoggingIntegration | `ILogger<T>` in a view model, scopes | ⬜ |
-| 040 | ViewModelBaseHardening | `SetProperty` with a comparer, dependent-property fan-out, reentrancy guard | ⬜ |
+| 036 | GenericHostBootstrap | `Host.CreateApplicationBuilder`, resolve the shell view model instead of `new`ing it | ✅ |
+| 037 | ViewModelFactory | `IServiceProvider`, transient view models, a factory delegate | ✅ |
+| 038 | OptionsAndConfiguration | `IOptions<T>`, configuration binding, validation on start | ✅ |
+| 039 | LoggingIntegration | `ILogger<T>` in a view model, scopes | ✅ |
+| 040 | ViewModelBaseHardening | `SetProperty` with a comparer, dependent-property fan-out, reentrancy guard | ✅ |
 | 041 | ViewModelFirstNavigation | `CurrentViewModel` + `ContentControl` + `DataType`-keyed `DataTemplate` | ⬜ |
 | 042 | DialogServiceAbstraction | `IDialogService` behind an interface, asserted without a window | ⬜ |
 | 043 | NotifyDataErrorInfo | `INotifyDataErrorInfo`, per-property errors, `HasErrors` | ⬜ |
