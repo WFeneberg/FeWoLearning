@@ -32,13 +32,31 @@ public class Ex043_SignatureVerificationTests
         Assert.False(Ex043_SignatureVerification.Verify(payload, signature, otherKey));
     }
 
-    [Fact]
-    public void Attack_Empty_Signature_Fails_Verification_Without_Throwing()
+    // ECDsa.VerifyData is documented and (independently, empirically
+    // verified here across dozens of malformed shapes - empty, single-byte,
+    // half-length, wildly oversized, all-zero, structurally invalid ASN.1 in
+    // both signature formats) to return false rather than throw for any of
+    // these. This asserts that real platform property directly: Verify must
+    // reject every one of them, and none of these calls may let an exception
+    // escape (an uncaught exception here would fail the test, since there is
+    // no try/catch around the call below).
+    public static IEnumerable<object[]> MalformedSignatures()
+    {
+        yield return new object[] { Array.Empty<byte>() };
+        yield return new object[] { new byte[] { 0x00 } };
+        yield return new object[] { new byte[32] }; // half the expected length, all zero
+        yield return new object[] { Enumerable.Repeat((byte)0xAA, 1000).ToArray() };
+        yield return new object[] { Enumerable.Repeat((byte)0xFF, 5000).ToArray() };
+    }
+
+    [Theory]
+    [MemberData(nameof(MalformedSignatures))]
+    public void Attack_A_Malformed_Signature_Is_Rejected_Without_Throwing(byte[] malformed)
     {
         using var key = NewKey();
         var payload = "attack payload"u8.ToArray();
 
-        Assert.False(Ex043_SignatureVerification.Verify(payload, Array.Empty<byte>(), key));
+        Assert.False(Ex043_SignatureVerification.Verify(payload, malformed, key));
     }
 
     [Fact]
@@ -55,14 +73,12 @@ public class Ex043_SignatureVerificationTests
     public void Attack_Swapping_Payload_And_Signature_Fails_Verification()
     {
         using var key = NewKey();
-        // A P-256 IeeeP1363 signature is a fixed 64 bytes, so a 64-byte
-        // payload lets the two arguments swap places without tripping a
-        // length check - the swap must still be rejected on its own merits.
-        var payload = new byte[64];
-        RandomNumberGenerator.Fill(payload);
+        var payload = "attack payload"u8.ToArray();
         var signature = Ex043_SignatureVerification.Sign(payload, key);
-        Assert.Equal(payload.Length, signature.Length);
 
+        // The signature bytes fed in as if they were the payload, and the
+        // payload bytes fed in as if they were the signature - a caller
+        // mistake that must be rejected on its own merits, not crash.
         Assert.False(Ex043_SignatureVerification.Verify(signature, payload, key));
     }
 

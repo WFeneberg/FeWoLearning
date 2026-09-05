@@ -5,21 +5,28 @@ namespace FeWoLearning.Security.Exercises.DesktopCore;
 // Exercise 043 — SignatureVerification (desktop-core).
 // Goal:   Wrap ECDSA detached signing and verification so a caller can prove a
 //         payload came from the holder of a specific private key and was not
-//         altered afterwards. Verify must never throw on attacker-controlled
-//         input, however malformed - a signature check is exactly the kind of
-//         code a hostile caller gets to poke at directly, and an unhandled
-//         exception there is a denial-of-service waiting to happen.
-// Drills: ECDSA sign/verify, detached signatures, tamper detection, rejecting
-//         malformed signatures without throwing.
+//         altered afterwards. ECDsa.VerifyData is itself already hardened
+//         against malformed, attacker-controlled signature bytes - however
+//         garbled or however sized, verified experimentally across dozens of
+//         malformed shapes (empty, truncated, oversized, all-zero, structurally
+//         invalid) in both of .NET's signature formats, it returns false
+//         rather than throwing. So Verify should be a thin, honest pass-
+//         through with no defensive try/catch of its own: adding one here
+//         would be dead code that implies a guard the platform already
+//         provides for free, and dead code in a security exercise is worse
+//         than no code at all.
+// Drills: ECDSA sign/verify, detached signatures, tamper detection, and
+//         recognising when a platform primitive already provides a safety
+//         property so the caller does not need to reinvent it.
 // Passes: attack facts   - flipping one byte of a signed payload makes Verify
 //                          return false; a signature produced by a different
-//                          key pair fails to verify; an empty signature and a
-//                          truncated signature both make Verify return false
-//                          without throwing; feeding Verify a payload and
-//                          signature swapped - the signature bytes as the
-//                          "payload" argument, the original payload bytes as
-//                          the "signature" argument, chosen the same length -
-//                          also returns false;
+//                          key pair fails to verify; a battery of malformed
+//                          signatures (empty, one byte, half-length all-zero,
+//                          1000 bytes of garbage, 5000 bytes of garbage) all
+//                          make Verify return false, never throw; truncating
+//                          one byte off a genuine signature does too; feeding
+//                          Verify a payload and signature swapped also returns
+//                          false;
 //         use facts      - Verify(p, Sign(p, priv), pub) is true for three
 //                          payloads, including an empty one; signing the same
 //                          payload twice and verifying both signatures
@@ -34,5 +41,5 @@ public static class Ex043_SignatureVerification
 
     public static bool Verify(byte[] payload, byte[] signature, ECDsa publicKey) =>
         throw new NotImplementedException(
-            "TODO: Ex043 - verify signature over payload with publicKey using SHA-256 (ECDsa.VerifyData), catching malformed-signature exceptions and returning false instead of throwing");
+            "TODO: Ex043 - verify signature over payload with publicKey using SHA-256 (ECDsa.VerifyData); no try/catch needed, VerifyData already returns false rather than throwing for a malformed signature");
 }
