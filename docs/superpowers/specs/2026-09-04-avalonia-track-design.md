@@ -526,6 +526,22 @@ trap documented for `python/`.
   dictionary solution passed. Fixed by seeding **valid** defaults so the baseline is
   the same either way. When designing the arrange, ask which legitimate
   implementations would disagree about it.
+- **Run the mirror check; do not reason about it.** Three defects in this track were
+  found by building a differently-written *correct* solution and running the real tests
+  against it, and by nothing else: ex047's ambiguous initial state, the `Styles` scan
+  that rejected a style scoped to an inner panel, and ex056's column-order pinning. In
+  the ex056 case the reasoning-only pass had declared it fine.
+
+  ex056 is the sharpest illustration, because the failure was not merely a rejected
+  variant. Reordering the columns broke the two order-pinned assertions **and** left the
+  sort test passing — while it silently sorted the wrong column. A test that passes for
+  the wrong reason is worse than one that fails, and only an executed mirror surfaced
+  it. The fix was to look cells up through `DataGridColumn.GetCellContent(row)` keyed by
+  header, which is order-independent.
+
+  So: **an assertion that reaches a cell, child or column by index is pinning position.**
+  Reach it by name, header, or type instead, and if the exercise's subject really is
+  ordering, assert the ordering explicitly rather than relying on it everywhere else.
 - **Wipe the build between cheat overlays, and treat a falling test count as
   staleness rather than as a result.** Repeatedly swapping a file at the same path
   during cheat verification produced inconsistent counts on the same suite — 13, then
