@@ -348,6 +348,26 @@ trap documented for `python/`.
   lookup table seeded with that one pair. Drive both directions from inputs the test
   did not itself just produce, and use at least two distinct values per direction so
   no single hard-coded pair satisfies the suite.
+- **A cheat that hangs is not a cheat that failed.** ex039's synchronous-block cheat
+  (`ReactiveCommand.Create(() => work().GetAwaiter().GetResult())`) deadlocked the test
+  host: `Execute()` blocked the calling thread waiting on the gate, and the
+  `gate.SetResult(...)` that would release it was the next statement on that same
+  thread. Killing it needed an external `timeout`. A learner who writes that plausible
+  code gets a hung `dotnet test`, not a red test — which defeats the red/green
+  invariant the track rests on. Where a wrong implementation could block, bound the
+  call from **outside**: run it on another thread and race it against a delay, failing
+  with a message that names the likely cause. That is the one legitimate use of a
+  wall-clock delay in this track — as a **failure ceiling**, never as a
+  synchronisation device. The happy path stays gate-and-await.
+- **Prefer an available assertion over a documented carve-out.** The "not mechanically
+  provable" escape applies where no public distinction exists (`DirectProperty`
+  bindings, `RadioButton.GroupName`). It does not apply merely because an assertion
+  takes thought. ex037 and ex038 both name `ObservableAsPropertyHelper` in their
+  catalog concepts and both shipped tests that a hand-rolled computed getter with a
+  manual `RaisePropertyChanged` passed — yet reflecting over the instance's fields
+  **by type** for an `ObservableAsPropertyHelper<T>` costs three lines and rejects the
+  bypass while accepting every legitimate overload. Reflect by type, never by name, so
+  a renamed field still passes.
 - **Prove a discriminator by writing the cheat and running it.** Every defect of this
   class found in this track was found that way and none was found by reading. Before
   accepting an exercise, implement the laziest wrong version you can think of, run
