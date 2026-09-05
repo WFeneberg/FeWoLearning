@@ -231,12 +231,19 @@ cannot be written.
 - [ ] **Step 8: Create `security/tests/AssemblyInfo.cs`**
 
 ```csharp
+using Xunit.Sdk;
+using Xunit.v3;
+
 // Rows 050 (named pipes) and 055 (the system clipboard) touch machine-global and
 // process-global state, so the suite must not run in parallel.
 // CollectionBehavior(DisableTestParallelization = true) is Obsolete(error: true) in
 // xunit.v3 4.0.0 and does not compile - this is the replacement.
-[assembly: Xunit.Parallelization(Mode = Xunit.ParallelMode.None)]
+[assembly: Parallelization(Mode = ParallelMode.None)]
 ```
+
+`ParallelizationAttribute` and `ParallelMode` live in `Xunit.Sdk` / `Xunit.v3`,
+**not** in the bare `Xunit` namespace — writing `[assembly: Xunit.Parallelization(...)]`
+fails `CS0234`. `wpf/tests/_harness/AssemblyInfo.cs` carries the identical shape.
 
 - [ ] **Step 9: Create `security/FeWoLearning.Security.slnx`**
 
