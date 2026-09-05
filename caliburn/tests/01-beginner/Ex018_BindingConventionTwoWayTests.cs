@@ -29,7 +29,7 @@ public class Ex018_BindingConventionTwoWayTests : CaliburnViewContext
     }
 
     [WpfFact]
-    public void Settable_String_On_A_TwoWay_Capable_Element_Is_TwoWay_With_PropertyChanged()
+    public void Settable_String_Is_TwoWay_With_PropertyChanged()
     {
         var (subject, view) = Bound();
         var userName = (TextBox)view.FindName("UserName")!;

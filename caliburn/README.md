@@ -185,8 +185,7 @@ later test in the run unless whoever writes it first extends `CaliburnCoreContex
 `CaliburnViewContext`) the same way ex015's `NameTransformer` reset was added: snapshot the
 pristine value once, in an **explicit** static constructor, and re-apply it at the start of
 every test's instance constructor. Until then, a later exercise failing for no visible
-reason of its own is this, not a bug
-in that exercise.
+reason of its own is this, not a bug in that exercise.
 
 `tests/_harness/HarnessSmokeTests.cs` proves the harness itself: `HarnessCoreSmokeTests`
 (3 `[Fact]`) exercises the core context with no view at all — including that a

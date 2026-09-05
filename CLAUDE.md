@@ -78,10 +78,10 @@ suite against the reference solutions instead of the stubs.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-04: ex001-ex015 (80 exercise test facts) are red on
-  the untouched tree — `dotnet test` shows 80 failed, 7 passed (the 7 harness
+  verified as of 2026-09-04: ex001-ex020 (111 exercise test facts) are red on
+  the untouched tree — `dotnet test` shows 111 failed, 7 passed (the 7 harness
   smoke tests, which pass in both modes) — and `dotnet test
-  -p:UseSolutions=true` shows 87 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
+  -p:UseSolutions=true` shows 118 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
   five exercises as of 2026-09-04, on **.NET 10.0.400** with **xunit.v3 4.0.0**
   and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11):
   `dotnet test` shows 4 passed (the harness smoke tests) and 37 exercise facts
@@ -390,7 +390,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 10 / 100 (verified) | 90 |
 | `blazor/` | 90 / 100 (verified) | 10 |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 15 / 100 (verified) | 85 |
+| `caliburn/`| 20 / 100 (verified) | 80 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `blazor/`,
