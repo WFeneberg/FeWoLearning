@@ -11,11 +11,15 @@
 //         each row sizing independently, which is exactly what BuildTwoRowsSharingSize's
 //         applySharedSizeScope=false path proves. Both RowDefinitions here are explicitly
 //         GridUnitType.Auto, not left at ColumnDefinition/RowDefinition's own unassigned
-//         default (also Star(1), same trap as row 029) - and deliberately NOT Star, because
-//         SharedSizeGroup only equalizes Auto and pixel sizes; measured directly, giving a
-//         Star-sized RowDefinition a SharedSizeGroup does not make it merely inert, it breaks
-//         its ordinary Star measurement outright (collapses to zero), so this row's evidence
-//         is built entirely on Auto rows.
+//         default (also Star(1), same trap as row 029) - and deliberately NOT Star, because a
+//         definition inside a shared size group is measured as Auto regardless of its own
+//         GridUnitType (measured directly: two Star rows with real content equalize exactly
+//         like two Auto rows would, and their own Star factors are silently discarded - a
+//         1* row and a 3* row with different content still equalize to the same height,
+//         nothing the factors would predict). Building this row on Star would make its
+//         numbers deceptive rather than wrong - a "successful" Star row here would prove
+//         nothing about Star, since the mechanism never measures it as Star at all - so this
+//         row's evidence is built entirely on Auto rows instead.
 
 using System.Windows;
 using System.Windows.Controls;

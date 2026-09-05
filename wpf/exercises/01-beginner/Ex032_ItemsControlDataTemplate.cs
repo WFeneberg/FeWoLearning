@@ -16,7 +16,6 @@
 //         CompleteInitialization(...) call is for; see WpfTestContext for the measured detail.
 // Passes: dotnet test --filter FullyQualifiedName~Ex032_
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;

@@ -32,6 +32,22 @@ public class Ex034_DataTemplateSelectorTests : WpfTestContext
         Assert.Same(normal, result);
     }
 
+    [WpfFact]
+    public void SelectTemplate_Returns_The_Normal_Template_For_An_Item_That_Is_Not_An_ExpenseItem()
+    {
+        // Every other test here only ever passes an Ex034_ExpenseItem, so a hard cast
+        // ((Ex034_ExpenseItem)item).IsOverBudget instead of a type-checking pattern would
+        // pass every one of them - this is the only test that would throw an
+        // InvalidCastException against that mutant instead of returning NormalTemplate the
+        // documented "otherwise" way.
+        var (normal, overBudget) = NewTemplates();
+        var selector = new Ex034_ExpenseTemplateSelector { NormalTemplate = normal, OverBudgetTemplate = overBudget };
+
+        var result = selector.SelectTemplate("not an expense item", new Border());
+
+        Assert.Same(normal, result);
+    }
+
     private static string TemplatedText(ItemContainerGenerator generator, object item)
     {
         var container = generator.ContainerFromItem(item);

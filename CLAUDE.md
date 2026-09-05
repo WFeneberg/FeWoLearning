@@ -81,12 +81,14 @@ suite against the reference solutions instead of the stubs.
   verified as of 2026-09-05: ex001-ex030 (171 exercise test facts) are red on
   the untouched tree — `dotnet test` shows 171 failed, 7 passed (the 7 harness
   smoke tests, which pass in both modes) — and `dotnet test
-  -p:UseSolutions=true` shows 178 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
-  five exercises as of 2026-09-04, on **.NET 10.0.400** with **xunit.v3 4.0.0**
-  and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11):
-  `dotnet test` shows 4 passed (the harness smoke tests) and 37 exercise facts
-  red on the untouched tree; the same 41 facts pass under `-p:UseSolutions=true`.
-  Windows-only, because WPF is. `Xunit.StaFact` 4.x depends on
+  -p:UseSolutions=true` shows 178 passed, 0 failed. **`wpf/`**'s beginner tier
+  (35/100, `01-beginner` ex001-ex035) is verified end-to-end as of 2026-09-05, on
+  **.NET 10.0.400** with **xunit.v3 4.0.0** and **Xunit.StaFact 4.0.23**
+  (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5 passed (the
+  harness smoke tests) and 205 exercise facts red on the untouched tree; all
+  210 facts pass under `-p:UseSolutions=true`, twice in a row, with zero
+  warnings on both `--no-incremental` builds. Windows-only, because WPF is.
+  `Xunit.StaFact` 4.x depends on
   `xunit.v3.extensibility.core` 4.0.0, so this track sits on xunit.v3 **4.0.0**
   while `avalonia/` and `caliburn/` sit on 3.2.2 — pinned independently, and
   adding xunit 2.x to any of them puts `FactAttribute` in two assemblies
@@ -419,7 +421,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 30 / 100 (verified) | 70 |
-| `wpf/`    | 5 / 100 (verified) | 95 |
+| `wpf/`    | 35 / 100 (verified) | 65 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/` and
 `wpf/`, all three still being built out — see the table above
@@ -550,8 +552,8 @@ record in the assembly with an `Id`-shaped member that is not `partial`.
 
 ## The `wpf/` track
 
-WPF on .NET 10, verified end-to-end on its first five exercises (`01-beginner`
-ex001–ex005). The solution is `FeWoLearning.Wpf.slnx`. It shares the
+WPF on .NET 10, verified end-to-end on its complete beginner tier (`01-beginner`
+ex001–ex035, 35/100). The solution is `FeWoLearning.Wpf.slnx`. It shares the
 `UseSolutions` mechanism with `blazor/`, `uno/`, `avalonia/` and `caliburn/`:
 `exercises/` and `solutions/` compile the same type names into the same
 namespaces (`FeWoLearning.Wpf.Exercises.<Tier>`) and `tests/` references

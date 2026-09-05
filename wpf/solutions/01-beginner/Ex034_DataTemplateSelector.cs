@@ -9,7 +9,6 @@
 //         side by side in the same list is what actually proves the selector - not just a
 //         style property - decided which one rendered.
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;

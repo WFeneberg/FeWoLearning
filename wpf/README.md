@@ -165,52 +165,84 @@ no `Application` either; WPF resolves default control templates through
   stays inside the non-clamped range on purpose to keep the base contract legible; row 062
   (`CustomPanel`) and row 080 (layout invalidation cost) are where the clamping edge and the
   Measure/Arrange asymmetry actually start to matter.
-- **A `FrameworkElement` built by plain code never completes `ISupportInitialize`, and
-  default Style/Template resolution is gated on exactly that.** This is the single most
-  consequential harness fact found while building rows 031-034 — it was expected to be a
-  virtualization problem (the way `uno/`'s `ItemsControl`/`ListView` never realise their
-  items at all, see that track's README) and turned out to be something else entirely, one
-  level earlier: measured directly, a bare `new Button()` or `new ItemsControl()` built and
-  configured through ordinary property assignment (no XAML, no explicit `BeginInit()`/
-  `EndInit()`) has `IsInitialized == false` **forever** — neither `Layout(...)` nor `Pump()`
-  ever flips it — and `IsInitialized` is what gates a `Control`'s *unset* default Style/
-  Template ever resolving. With no default Template, `ItemsControl.ItemContainerGenerator`
-  never leaves `GeneratorStatus.NotStarted`, so `ContainerFromItem` returns `null` for every
-  item forever, and no exception is thrown anywhere — the tree just silently behaves as
-  still mid-construction. `Grid`'s `SharedSizeGroup` scope registration is gated on the same
-  flag, even though `Grid` is a `Panel`, not a themed `Control` — row 031 hit this too.
-  `HarnessSmokeTests`' own `Button` dodges this by setting `Content`, which - measured
-  directly - flips `IsInitialized` as a side effect (`Tag` and `Width` do not; this is
-  `ContentControl.Content` specific, not "any property set"). Rows 001-030 never hit this
-  because each one either uses a `Panel` (no Style/Template involved at all, e.g. `Grid` in
-  row 029) or assigns `Style` explicitly (row 027 sets `button.Style = ...` directly,
-  bypassing default-style resolution entirely) - rows 031-034 are the first rows in this
-  track to depend on an *unset* default Style/Template actually resolving. The fix,
-  factored into `WpfTestContext.CompleteInitialization(element)`: one `BeginInit()`/
-  `EndInit()` call on the root of an already-built tree is enough - measured directly,
-  `EndInit()` reaches every descendant already attached under it at the time it is called,
-  not just the element it is called on, and it does not matter whether `BeginInit()`
-  precedes construction or is called together with `EndInit()` only at the very end, after
-  every property is already set. `Show(...)` also works (a real `PresentationSource` always
-  initializes), but opens a window, so `CompleteInitialization` is what rows 032-034 use.
-  This is a live trap for the `02-intermediate` tier's five `CollectionViewSourceBasics`/
-  `SortAndGroup`/`FilterPredicate`/`DeferRefresh`/`EditableObjectTransactions` rows
-  (053-057) and any later row driving a `ListBox`/`ComboBox`/other `ItemsControl`-derived
-  control's default appearance - anything built by plain code needs
-  `CompleteInitialization(...)` before its default Style/Template can be trusted.
-- **`SharedSizeGroup` on a `Star`-sized definition is not merely inert - it is actively
-  broken.** Measured directly (in the course of building row 031): the claim "SharedSizeGroup
-  has no effect on Star" undersells it - assigning a `SharedSizeGroup` name to a `Star`-sized
-  `RowDefinition`/`ColumnDefinition` collapses its `ActualHeight`/`ActualWidth` to zero
-  outright, even with real content and a real available size, rather than leaving it to size
-  normally as an un-grouped `Star` definition would. Row 031 is built entirely on `Auto`
-  definitions for this reason - it does not merely avoid relying on `Star`'s own unassigned
-  default (already documented above for row 029), it avoids `Star` for the shared rows
-  altogether, because the combination has no sane behavior to assert on. Confirmed
-  separately: the sharing itself (two `Auto` rows in two different `Grid`s, tied together by
-  a `SharedSizeGroup` name under a common `Grid.IsSharedSizeScope` ancestor) resolves within
-  a single `Layout(...)` call once the tree is properly initialized - no `Pump()` needed, and
-  the two rows' `ActualHeight` already agree before the first `Pump()` even runs.
+- **`IsInitialized` flips through `AddLogicalChild` - acquiring a logical child initializes
+  BOTH the acquirer and the child - not through "any property set", and default Style/
+  Template resolution is gated on exactly that flag.** This is the single most consequential
+  harness fact found while building rows 031-034 - it was expected to be a virtualization
+  problem (the way `uno/`'s `ItemsControl`/`ListView` never realise their items at all, see
+  that track's README) and turned out to be something else entirely, one level earlier.
+  Measured directly, all of these flip `IsInitialized` on BOTH ends, parent and child:
+  `Panel.Children.Add(child)` (any `Panel`), `Border.Child = child`, `TextBlock.Inlines.Add`,
+  `Grid.RowDefinitions.Add(...)`, and `ContentControl.Content = value` for ANY value, not just
+  a string or a `FrameworkElement` - a boxed `int` (`Content = 42`) flips it too. Measured
+  NOT to flip it: `ItemsControl.Items.Add(...)` and `ItemsControl.ItemsSource = ...` alone -
+  an `ItemsControl`'s items are not logical children of the `ItemsControl` itself (they only
+  become logical children of their generated containers, which do not exist without the flip
+  already having happened, so this is not circular help). A childless element with no
+  `Content` ever set (a bare `new Border()` with only `Width` assigned, say) stays
+  `IsInitialized == false` forever - neither `Layout(...)` nor `Pump()` ever flips it either.
+
+  With `IsInitialized` false, a `Control`'s *unset* default Style/Template never resolves:
+  `Button.Template` stays null and `DesiredSize` stays `(0,0)` after `Layout(...)`;
+  `ItemsControl.ItemContainerGenerator.Status` never leaves `NotStarted`, so
+  `ContainerFromItem` returns `null` for every item forever - no exception anywhere, the tree
+  just silently behaves as still mid-construction. `HarnessSmokeTests`' own `Button` test has
+  been passing since this track's very first exercise for an incidental reason, not a
+  deliberate one: it sets `Content = "Measure me"`, which is exactly the logical-child
+  acquisition above - a bare `new Button()` with nothing set stays uninitialized and its
+  `Template` stays null even after `Layout(...)`. That smoke test now asserts `IsInitialized`
+  directly, and a fifth smoke test proves the *un*-initialized case fails the way described
+  here (see `HarnessSmokeTests` below).
+
+  Rows 001-030 never depended on the flip either way: a `Panel` holding a child (`Grid` in
+  row 029, say) IS initialized by the rule above, it simply has no `ControlTemplate` to
+  resolve in the first place (`Panel`, not `Control`); row 027 sets `Style` explicitly,
+  bypassing default-style resolution entirely regardless of `IsInitialized`. Rows 031-034 are
+  the first rows in this track to depend on an *unset* default Style/Template actually
+  resolving - and of those, only 032-034 actually need the fix. Row 031's `Grid`s each
+  already acquire a `RowDefinition` and a child `Border`, which - per the rule above -
+  already flips `IsInitialized` with no extra call needed (confirmed directly: deleting
+  `CompleteInitialization` from row 031's tests changes nothing, all three still pass).
+  `ItemsControl` in rows 032-034 has no such incidental path - `ItemsSource`/`Items.Add` do
+  not flip it, and it has no `Content` property to assign - so it genuinely needs the
+  explicit fix, factored into `WpfTestContext.CompleteInitialization(element)`: one
+  `BeginInit()`/`EndInit()` call on the root of an already-built tree is enough, because
+  `EndInit()` reaches every descendant already attached under it at the time it is called
+  (measured directly), regardless of whether `BeginInit()` precedes construction or is called
+  together with `EndInit()` only at the very end. `Show(...)` also works, but for the same
+  reason as everything above, not because of `PresentationSource` itself: `Window.Content =
+  element` is itself a `Content` assignment - a logical-child acquisition - so it flips
+  `IsInitialized` the same way `Border.Child = ...` does; it also opens a window, so
+  `CompleteInitialization` is what rows 032-034 use instead.
+
+  Verified forecast for the next tier: a root `ListBox` with two items reaches
+  `ContainersGenerated` with BOTH containers realized after `CompleteInitialization` +
+  `Layout(...)` - `VirtualizingStackPanel` (the default panel for `ListBox`/`ListView`,
+  unlike `ItemsControl`'s plain, non-virtualizing `StackPanel`) does not reproduce `uno/`'s
+  one-item realization limit here. This is a live trap for the `02-intermediate` tier's five
+  `CollectionViewSourceBasics`/`SortAndGroup`/`FilterPredicate`/`DeferRefresh`/
+  `EditableObjectTransactions` rows (053-057) and any later row driving a `ListBox`/
+  `ComboBox`/other `ItemsControl`-derived control's default appearance - anything built by
+  plain code with no logical child and no `Content` needs `CompleteInitialization(...)`
+  before its default Style/Template can be trusted.
+- **A definition inside a shared size group is measured as `Auto`, regardless of its own
+  `GridUnitType` - `SharedSizeGroup` on a `Star`-sized definition is not "broken", it is
+  simply never measured as `Star` at all.** Measured directly (building row 031): two
+  `Star`-sized rows tied together by the same `SharedSizeGroup` name, given real content of
+  height 20 and 80, equalize to `(80, 80)` - identical to the `Auto` case - because the
+  shared-size negotiation measures every participating definition as `Auto` and discards its
+  `Star` factor entirely: two rows explicitly given DIFFERENT factors (`1*` and `3*`), with
+  content heights 10 and 40, still equalize to `(40, 40)`, not anything those factors would
+  predict. A `Star` row with no children at all (no natural size to fall back to) measures
+  `(0, 0)` under the same grouping - an earlier measurement of exactly this childless case
+  was mistaken for evidence that `Star` breaks under `SharedSizeGroup`; it is only `Auto`'s
+  own behavior with nothing to measure. Row 031 stays built entirely on explicit `Auto`
+  definitions regardless - not because `Star` is broken, but because a `Star` factor
+  assigned inside a shared group is silently discarded, which would make the row's numbers
+  deceptive (readable as proving something about `Star` that the mechanism never touches)
+  rather than merely wrong. Confirmed separately: the sharing itself resolves within a single
+  `Layout(...)` call once the tree is initialized - no `Pump()` needed, and deleting the
+  extra `Pump()` plus second `Layout(...)` from row 031's tests changes nothing.
 - **A collection change reaches a generated container's CLR object synchronously, but its
   templated child content does not.** Measured directly while building row 033: right after
   `ObservableCollection<T>.Add(...)`, before any `Layout(...)` or `Pump()`,
@@ -239,10 +271,14 @@ and input rows had to be re-scoped or dropped, and several catalog rows there sa
 `[assembly: Parallelization(Mode = ParallelMode.None)]`. `SystemResources`,
 the theme dictionaries and `Application.Current` are process-global.
 
-`HarnessSmokeTests` exists for the same reason `uno/`'s does: it asserts STA, that a
-`Button` resolves its default template and measures non-zero, that a binding pushes
-after a pump, and that `Show(...)` raises `Loaded`. **If those fail, the harness is
-broken and every other failure in the run is noise.**
+`HarnessSmokeTests` exists for the same reason `uno/`'s does: it asserts STA, that an
+initialized `Button` resolves its default template and measures non-zero (and now also
+asserts `IsInitialized` directly, naming the `Content` side effect that makes it true - see
+the `IsInitialized`/`AddLogicalChild` finding above), that a bare, never-initialized
+`Button` stays template-less and `(0,0)` even after `Layout(...)` (the fifth smoke test,
+proving the *failure* mode this track now depends on `CompleteInitialization` to avoid),
+that a binding pushes after a pump, and that `Show(...)` raises `Loaded`. **If those fail,
+the harness is broken and every other failure in the run is noise.**
 
 ## What the harness cannot do
 

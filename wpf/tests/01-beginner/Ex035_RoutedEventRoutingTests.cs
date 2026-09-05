@@ -26,15 +26,25 @@ public class Ex035_RoutedEventRoutingTests : WpfTestContext
         grandparent.Children.Add(parent);
 
         var order = new List<string>();
+        RoutedEventArgs? seenDuringTunnel = null;
+        RoutedEventArgs? seenDuringBubble = null;
         grandparent.AddHandler(Ex035_RoutedEventRouting.PreviewItemActivatedEvent, new RoutedEventHandler((_, _) => order.Add("gp-preview")));
         parent.AddHandler(Ex035_RoutedEventRouting.PreviewItemActivatedEvent, new RoutedEventHandler((_, _) => order.Add("parent-preview")));
-        child.AddHandler(Ex035_RoutedEventRouting.PreviewItemActivatedEvent, new RoutedEventHandler((_, _) => order.Add("child-preview")));
+        child.AddHandler(Ex035_RoutedEventRouting.PreviewItemActivatedEvent, new RoutedEventHandler((_, e) =>
+        {
+            order.Add("child-preview");
+            seenDuringTunnel = e;
+        }));
 
-        child.AddHandler(Ex035_RoutedEventRouting.ItemActivatedEvent, new RoutedEventHandler((_, _) => order.Add("child-bubble")));
+        child.AddHandler(Ex035_RoutedEventRouting.ItemActivatedEvent, new RoutedEventHandler((_, e) =>
+        {
+            order.Add("child-bubble");
+            seenDuringBubble = e;
+        }));
         parent.AddHandler(Ex035_RoutedEventRouting.ItemActivatedEvent, new RoutedEventHandler((_, _) => order.Add("parent-bubble")));
         grandparent.AddHandler(Ex035_RoutedEventRouting.ItemActivatedEvent, new RoutedEventHandler((_, _) => order.Add("gp-bubble")));
 
-        Ex035_RoutedEventRouting.RaiseItemActivatedPair(child);
+        var returned = Ex035_RoutedEventRouting.RaiseItemActivatedPair(child);
 
         // Tunnel top-down (root to source), THEN bubble bottom-up (source to root) - the
         // one order this mechanism can produce; a bubble-then-tunnel or all-at-once
@@ -42,6 +52,16 @@ public class Ex035_RoutedEventRoutingTests : WpfTestContext
         Assert.Equal(
             new[] { "gp-preview", "parent-preview", "child-preview", "child-bubble", "parent-bubble", "gp-bubble" },
             order);
+
+        // The stated central mechanism, actually asserted: the tunnel phase and the bubble
+        // phase must see the SAME RoutedEventArgs instance (reassigning .RoutedEvent between
+        // two RaiseEvent calls on one object), not two different instances with Handled
+        // copied by hand - a mutant using two instances still reproduces the order above,
+        // but fails this identity check.
+        Assert.NotNull(seenDuringTunnel);
+        Assert.NotNull(seenDuringBubble);
+        Assert.Same(seenDuringTunnel, seenDuringBubble);
+        Assert.Same(seenDuringTunnel, returned);
     }
 
     [WpfFact]

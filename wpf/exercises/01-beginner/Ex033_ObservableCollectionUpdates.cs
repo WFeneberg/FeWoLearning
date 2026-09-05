@@ -8,7 +8,7 @@
 //         ObservableCollection<T> instance after the ItemsControl was built generates a new
 //         container for the new item, and removing an item removes its container - neither
 //         happens if ItemsSource was assigned a *copy* of the collection (a wrong
-//         implementation naturally reaches for `products.ToList()` or `new List<T>(...)`,
+//         implementation naturally reaches for `tasks.ToList()` or `new List<T>(...)`,
 //         both of which sever the live link this row is about). IMPORTANT, measured directly:
 //         a collection change reaches the generator's CONTAINER OBJECT synchronously (a
 //         ContainerFromItem lookup right after Add already returns non-null, no Layout or

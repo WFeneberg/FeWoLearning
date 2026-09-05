@@ -15,7 +15,6 @@
 //         ISupportInitialize protocol first, which is what the test's
 //         CompleteInitialization(...) call is for; see WpfTestContext for the measured detail.
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;

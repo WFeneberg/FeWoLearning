@@ -10,7 +10,6 @@
 //         style property - decided which one rendered.
 // Passes: dotnet test --filter FullyQualifiedName~Ex034_
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
