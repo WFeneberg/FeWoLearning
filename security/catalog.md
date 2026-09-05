@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 52 ✅ / 8 ⬜**
+**Status: 56 ✅ / 4 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -89,10 +89,10 @@ implementations in `solutions/<block>/` at the same relative path.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 053 | PasswordBoxNoPlaintextBinding | PasswordBox, why Password is not a DependencyProperty | ⬜ |
-| 054 | SensitiveBufferLifetime | clearing sensitive buffers, bounded lifetime of plaintext | ⬜ |
-| 055 | ClipboardHygiene | clipboard as shared state, excluding data from history | ⬜ |
-| 056 | DragDropUntrustedPayload | validating dropped formats and paths before acting | ⬜ |
+| 053 | PasswordBoxNoPlaintextBinding | PasswordBox, why Password is not a DependencyProperty | ✅ |
+| 054 | SensitiveBufferLifetime | clearing sensitive buffers, bounded lifetime of plaintext | ✅ |
+| 055 | ClipboardHygiene | clipboard as shared state, excluding data from history | ✅ |
+| 056 | DragDropUntrustedPayload | validating dropped formats and paths before acting | ✅ |
 | 057 | EmbeddedBrowserNavigationPolicy | navigation allowlists, scheme restrictions, host object exposure | ⬜ |
 | 058 | XamlReaderUntrustedMarkup | XamlReader.Parse as code execution, restricting parsed markup | ⬜ |
 | 059 | BindingErrorLeakage | binding failure surfaces, tooltips and traces as leak channels | ⬜ |
