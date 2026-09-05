@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 41 ✅ / 19 ⬜**
+**Status: 46 ✅ / 14 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -73,11 +73,11 @@ implementations in `solutions/<block>/` at the same relative path.
 | 039 | AesGcmAuthenticatedEncryption | AES-GCM, nonce uniqueness, tag verification, tamper detection | ✅ |
 | 040 | KeyDerivationAndRotation | key derivation, versioned key material, decrypting older versions | ✅ |
 | 041 | FixedTimeComparison | CryptographicOperations.FixedTimeEquals, why length-first exits leak | ✅ |
-| 042 | CryptographicRandomness | RandomNumberGenerator over System.Random, token generation | ⬜ |
-| 043 | SignatureVerification | detached signatures, public-key verification, rejecting tampered data | ⬜ |
-| 044 | UpdateIntegrityAndRollback | hash manifests, signed manifests, monotonic version enforcement | ⬜ |
-| 045 | UnsafeDeserialization | polymorphic type handling, type allowlists, rejecting arbitrary types | ⬜ |
-| 046 | XmlExternalEntity | XmlReaderSettings, DtdProcessing, XmlResolver, entity expansion | ⬜ |
+| 042 | CryptographicRandomness | RandomNumberGenerator over System.Random, token generation | ✅ |
+| 043 | SignatureVerification | detached signatures, public-key verification, rejecting tampered data | ✅ |
+| 044 | UpdateIntegrityAndRollback | hash manifests, signed manifests, monotonic version enforcement | ✅ |
+| 045 | UnsafeDeserialization | polymorphic type handling, type allowlists, rejecting arbitrary types | ✅ |
+| 046 | XmlExternalEntity | XmlReaderSettings, DtdProcessing, XmlResolver, entity expansion | ✅ |
 | 047 | ZipSlipExtraction | archive entry path containment, absolute and relative escapes | ⬜ |
 | 048 | PathCanonicalization | full-path containment, UNC and device-name traps, alternate streams | ⬜ |
 | 049 | ProcessArgumentInjection | ProcessStartInfo.ArgumentList over a joined Arguments string | ⬜ |
