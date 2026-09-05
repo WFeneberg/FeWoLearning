@@ -8,4 +8,11 @@
   <Folder Name="/tests/">
     <Project Path="tests/FeWoLearning.MicroServices.Tests.csproj" />
   </Folder>
+  <Folder Name="/services/">
+    <Project Path="services/Catalog/Catalog.csproj" />
+    <Project Path="services/Orders/Orders.csproj" />
+  </Folder>
+  <Folder Name="/playground/">
+    <Project Path="playground/Playground.AppHost.csproj" />
+  </Folder>
 </Solution>

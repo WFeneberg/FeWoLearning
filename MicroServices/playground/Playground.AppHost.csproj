@@ -1,0 +1,30 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.5.3">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\services\Catalog\Catalog.csproj" />
+    <ProjectReference Include="..\services\Orders\Orders.csproj" />
+  </ItemGroup>
+
+  <!-- Always the EXERCISES library: the playground exists so the learner can watch
+       their own work run in the dashboard. IsAspireProjectResource="false" because
+       this is a class library, not a service to orchestrate as its own process -
+       ExerciseRegistry needs it as a normal compile-time reference (it calls static
+       Configure methods on its types), and the Aspire AppHost SDK otherwise treats
+       every ProjectReference as an orchestration resource and skips
+       ReferenceOutputAssembly, which left ExerciseRegistry.cs unable to see the
+       FeWoLearning namespace at all (CS0246). ASPIRE004 flags exactly this. -->
+  <ItemGroup>
+    <ProjectReference Include="..\exercises\FeWoLearning.MicroServices.Exercises.csproj"
+                       IsAspireProjectResource="false" />
+  </ItemGroup>
+
+</Project>
