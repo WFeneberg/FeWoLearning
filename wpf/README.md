@@ -69,7 +69,7 @@ theme resolution and the whole binding engine work on a disconnected tree. There
 no `Application` either; WPF resolves default control templates through
 `SystemResources` without one.
 
-### Four things that bite
+### Six things that bite
 
 - **Nothing about a `FrameworkElement` is trustworthy before `Layout(...)`.**
   `DesiredSize` and `ActualWidth` are zero and template children do not exist yet.
@@ -92,6 +92,32 @@ no `Application` either; WPF resolves default control templates through
   `DataContextInheritance`, 060 `AttachedBehavior`) depend on this: register the
   inheritable property as attached, the way `FontSize` and `DataContext` are, not as
   an instance property on the class that happens to consume it.
+- **A `Binding`'s format culture never comes from `Thread.CurrentCulture`.** It comes
+  from `Binding.ConverterCulture`, falling back to the bound element's `Language`
+  property, which defaults to `en-US` regardless of the machine's OS locale. Measured
+  on this machine (OS culture de-CH, UI culture de-DE): a `TextBlock` bound with
+  `StringFormat="{0:C}"` and no `ConverterCulture` renders `$1,234.50` — US-dollar
+  formatting, not CHF and not a de-CH decimal comma — because `Language` resolves to
+  its hard-coded `en-US` default, not the OS locale. Row 014
+  (`StringFormatAndFallbacks`) pins `target.Language` explicitly before asserting, so
+  the row is deterministic on any machine without ever touching `ConverterCulture`
+  (that stays row 069's subject). Any later row whose test formats a culture-sensitive
+  value must pin culture the same way — never assume the CI/dev machine's locale, and
+  never "fix" it by setting `Thread.CurrentCulture`, which a `Binding` does not consult
+  at all.
+- **A negative assertion about `UpdateSourceTrigger` can't tell `Explicit` apart from
+  an unset default.** `TextBox.Text`'s own default trigger is `LostFocus`, not
+  `PropertyChanged` — and this harness never simulates real keyboard/focus input (see
+  "What the harness cannot do" below), so `LostFocus` never fires here either. A test
+  that only asserts "editing the target and pumping leaves the source unchanged, then
+  `BindingExpression.UpdateSource()` pushes it" passes identically whether the
+  learner set `UpdateSourceTrigger.Explicit` or left it unset entirely — both look
+  inert under this harness, for different reasons. Row 013
+  (`TwoWayUpdateSourceTrigger`) found this by actually building that wrong
+  implementation and running the real test against it: only asserting the binding's
+  declared `UpdateSourceTrigger` via `BindingOperations.GetBinding` catches it. Any row
+  whose subject is a specific `UpdateSourceTrigger` value must assert the declaration,
+  not only the observed push/no-push behavior.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 

@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -54,11 +54,11 @@ Two deliberate content gaps:
 | 008 | MetadataInheritance | `FrameworkPropertyMetadata`, `Inherits`, `AffectsMeasure` | ✅ |
 | 009 | PropertyValuePrecedence | local value vs style setter vs default, `DependencyPropertyHelper.GetValueSource` | ✅ |
 | 010 | DependentPropertyFanOut | one field change raising several `PropertyChanged` names | ✅ |
-| 011 | NotifyAllProperties | `PropertyChangedEventArgs(string.Empty)` semantics | ⬜ |
-| 012 | LegacyEventToInpc | replace a bespoke `XChanged` event with `INotifyPropertyChanged` | ⬜ |
-| 013 | TwoWayUpdateSourceTrigger | `UpdateSourceTrigger.Explicit`, `BindingExpression.UpdateSource` | ⬜ |
-| 014 | StringFormatAndFallbacks | `StringFormat`, `FallbackValue`, `TargetNullValue` | ⬜ |
-| 015 | RelativeSourceBinding | `RelativeSource.Self`, `FindAncestor`, `AncestorLevel` | ⬜ |
+| 011 | NotifyAllProperties | `PropertyChangedEventArgs(string.Empty)` semantics | ✅ |
+| 012 | LegacyEventToInpc | replace a bespoke `XChanged` event with `INotifyPropertyChanged` | ✅ |
+| 013 | TwoWayUpdateSourceTrigger | `UpdateSourceTrigger.Explicit`, `BindingExpression.UpdateSource` | ✅ |
+| 014 | StringFormatAndFallbacks | `StringFormat`, `FallbackValue`, `TargetNullValue` | ✅ |
+| 015 | RelativeSourceBinding | `RelativeSource.Self`, `FindAncestor`, `AncestorLevel` | ✅ |
 | 016 | DataContextInheritance | inherited `DataContext` down a tree, and where it stops | ⬜ |
 | 017 | ValueConverter | `IValueConverter`, `ConvertBack`, `DependencyProperty.UnsetValue` | ⬜ |
 | 018 | ConverterParameterAndCulture | `ConverterParameter`, `ConverterCulture` | ⬜ |
