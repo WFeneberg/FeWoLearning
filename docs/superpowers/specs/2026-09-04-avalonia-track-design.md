@@ -90,10 +90,25 @@ Two related facts measured at the same time:
   does not compile. Use `await command.Execute().FirstAsync()` or
   `await command.Execute().ToTask()` — both from `ReactiveUI.Primitives.LinqExtensions`.
   Awaiting is how an async-command test stays deterministic; never sleep on a guess.
-- **There is no virtual-time or `TestScheduler` facility** in ReactiveUI.Primitives, and
-  `RxApp` does not exist as a type. Exercises whose catalog rows imply virtual time
-  (ex044 `SequencerScheduling`) must be re-scoped around gating an async body on a
-  `TaskCompletionSource` instead, which is the deterministic technique that does work.
+- **Correction — virtual time DOES exist, and it works.** An earlier note here claimed
+  otherwise; that was wrong, and the mistake was mine: the type is undocumented in the
+  package's XML, so a search of the docs missed it. `ReactiveUI.Primitives.Concurrency`
+  ships `VirtualClock` (concrete; the generic base is `VirtualTimeSequencer<TAbsolute,
+  TRelative>`), with the classic `AdvanceBy`/`AdvanceTo` API, and time-based operators
+  take an `ISequencer` overload — `Throttle(TimeSpan, ISequencer)`.
+
+  Measured end to end: three rapid emissions through
+  `Throttle(300ms, virtualClock).DistinctUntilChanged()` produced **nothing**;
+  `AdvanceBy(299ms)` produced **nothing**; a further `AdvanceBy(2ms)` produced exactly
+  one emission, the last value. Fully deterministic, no wall-clock at all.
+
+  So `Throttle`, `Debounce`, `Delay` and `SequencerScheduling` exercises get real
+  virtual time and must **not** be written against wall-clock durations. The
+  `TaskCompletionSource` gate remains the right tool for *async command* state, which
+  is a different problem — virtual time does not advance a real `Task`.
+- **`RxApp` does not exist as a type** in ReactiveUI 24. Where a catalog row says
+  `RxApp.MainThreadScheduler`, the replacements are `AvaloniaScheduler` / `RxSchedulers`
+  from `ReactiveUI.Avalonia`, alongside Avalonia's own `Dispatcher.UIThread`.
 
 ### 2.1 Seven constraints discovered by the probe
 
