@@ -363,6 +363,26 @@ trap documented for `python/`.
   lookup table seeded with that one pair. Drive both directions from inputs the test
   did not itself just produce, and use at least two distinct values per direction so
   no single hard-coded pair satisfies the suite.
+- **An observation point downstream of a de-duplicating component cannot detect a
+  missing de-duplicator upstream.** ex043 drills `Throttle` *plus*
+  `DistinctUntilChanged`, and its first design watched the resulting property's own
+  `PropertyChanged`. The "Throttle but no DistinctUntilChanged" cheat passed 3/3 —
+  because `ObservableAsPropertyHelper` **itself** suppresses a consecutive same-value
+  assignment, so the property-level signal is identical either way. The fix was to
+  observe *upstream* of the OAPH: a second independent subscriber to the pre-`ToProperty`
+  observable increments a counter standing for "a search would have been issued". When
+  an exercise's subject is de-duplication, count emissions before anything that
+  de-duplicates for you.
+- **ReactiveUI's static scheduler singletons are captured too early for this harness.**
+  `RxSchedulers.MainThreadScheduler` and `AvaloniaScheduler.Instance` are resolved once
+  at assembly load — the `[ModuleInitializer]` — which happens before any individual
+  `[AvaloniaFact]`'s dispatcher exists. Measured inside a real test:
+  `AvaloniaScheduler.Instance.Dispatcher != Dispatcher.UIThread`, and a job scheduled
+  through the singleton never runs even after `RunJobs()`. Construct
+  `new AvaloniaScheduler(Dispatcher.UIThread)` at point of use instead. This is
+  specific to the harness's per-test dispatcher isolation; a real desktop app has one
+  dispatcher for its whole lifetime and the singleton is fine there — so say that in
+  the exercise rather than teaching the workaround as though it were the idiom.
 - **A cheat that hangs is not a cheat that failed.** ex039's synchronous-block cheat
   (`ReactiveCommand.Create(() => work().GetAwaiter().GetResult())`) deadlocked the test
   host: `Execute()` blocked the calling thread waiting on the gate, and the
