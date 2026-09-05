@@ -150,23 +150,41 @@ ex011–ex015) `ViewLocator.NameTransformer`, the first of these globals an exer
 actually mutated. It still does **not** reset `ViewLocator.LocateTypeForModelType` (a
 second writable static delegate field on the very type ex013–ex015 already touch, sitting
 right next to the one that now is reset), `ViewModelBinder.BindProperties`/`BindActions`,
-`ConventionManager.ElementConventions`, `MessageBinder.SpecialValues`/`CustomConverters`,
-`ActionMessage.InvokeAction`/`ApplyAvailabilityEffect`, `LogManager.GetLog`, or
-`BindingScope.GetNamedElements` — all equally static and equally process-global. Nor does
-it reset `Caliburn.Micro.ViewModelLocator` — a **separate type** from `ViewLocator`, with
-its **own** `NameTransformer` static field plus `LocateTypeForViewType`/`LocateForViewType`/
-`LocateForView`, used for view-first resolution. **ex016 (`ViewModelLocator`) is the very
-next catalog row and is exactly the exercise likely to need this**, the same way ex015
-needed the extension this batch made to `ViewLocator.NameTransformer` — do not assume
-ex015's reset covers it; `ViewModelLocator.NameTransformer` is a distinct object. Beyond
-that, nothing shipped today touches ex020 (`CustomElementConvention`), ex063, ex068–ex073,
-ex087, ex095 or ex096's statics either, but those will. Because the
-assembly runs serially with no restore between tests, the first of those to mutate one
-of these statics will leak into every later test in the run unless whoever writes it
-first extends `CaliburnCoreContext` (or `CaliburnViewContext`) the same way ex015's
-`NameTransformer` reset was added: snapshot the pristine value once, in an **explicit**
-static constructor, and re-apply it at the start of every test's instance constructor.
-Until then, a later exercise failing for no visible reason of its own is this, not a bug
+`MessageBinder.SpecialValues`/`CustomConverters`, `ActionMessage.InvokeAction`/
+`ApplyAvailabilityEffect`, `LogManager.GetLog`, or `BindingScope.GetNamedElements` — all
+equally static and equally process-global. Nor does it reset `Caliburn.Micro.ViewModelLocator`
+— a **separate type** from `ViewLocator`, with its **own** `NameTransformer` static field
+(measured: `ReferenceEquals(ViewModelLocator.NameTransformer, ViewLocator.NameTransformer)`
+is `false` — a genuinely different object, both starting at 4 rules) plus
+`LocateTypeForViewType`/`LocateForViewType`/`LocateForView`, used for view-first
+resolution. ex016 (`ViewModelLocator`) only *reads* these — it never calls `AddRule` on
+`ViewModelLocator.NameTransformer` — so it needed no harness extension; the first exercise
+that *mutates* it still must extend `CaliburnCoreContext` the same way ex015 did for
+`ViewLocator`'s, snapshotting it in an **explicit** static constructor and re-applying it
+per test. Do not assume ex015's reset covers it — `ViewModelLocator.NameTransformer` is a
+distinct object.
+
+There is no public `ConventionManager.ElementConventions`. The real surface is
+`ConventionManager.GetElementConvention(Type)` (read) and
+`ConventionManager.AddElementConvention(...)` (write), backed by a **private** static
+dictionary with **no public removal method at all** — unlike every static named above, this one cannot be
+snapshotted and restored by `CaliburnCoreContext`, because there is nothing to call to undo
+an `AddElementConvention`. ex020 (`CustomElementConvention`) is the first exercise to write
+to it, and deliberately does **not** attempt a harness reset: it registers a convention for
+`Ex020_RatingControl`, a type declared inside that exercise itself and never referenced by
+any other exercise's test, so the permanent, unresettable dictionary entry it leaves behind
+can never be observed by anything else. This is the pattern any future exercise touching
+`ConventionManager`'s convention dictionary should follow — register only for a type you own,
+rather than trying to reset a static that has no public way to be reset.
+
+Beyond that, nothing shipped so far touches ex063, ex068–ex073, ex087, ex095 or ex096's
+statics, but those will. Because the assembly runs serially with no restore between tests,
+the first of those to mutate one of the *resettable* statics above will leak into every
+later test in the run unless whoever writes it first extends `CaliburnCoreContext` (or
+`CaliburnViewContext`) the same way ex015's `NameTransformer` reset was added: snapshot the
+pristine value once, in an **explicit** static constructor, and re-apply it at the start of
+every test's instance constructor. Until then, a later exercise failing for no visible
+reason of its own is this, not a bug
 in that exercise.
 
 `tests/_harness/HarnessSmokeTests.cs` proves the harness itself: `HarnessCoreSmokeTests`

@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -43,11 +43,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 013 | ViewLocatorConvention | `FooViewModel` → `FooView`, `AssemblySource`, missing view yields a placeholder `TextBlock` | ✅ |
 | 014 | ViewLocatorContext | context convention is namespace-based, not suffix-based | ✅ |
 | 015 | NameTransformerRule | custom `NameTransformer` mapping rule | ✅ |
-| 016 | ViewModelLocator | view-first resolution | ⬜ |
-| 017 | ViewModelBinderNames | element named after a property binds to it | ⬜ |
-| 018 | BindingConventionTwoWay | convention-chosen binding mode and update trigger | ⬜ |
-| 019 | ElementConventionLookup | what `ConventionManager` knows out of the box | ⬜ |
-| 020 | CustomElementConvention | registering an `ElementConvention` for a new control | ⬜ |
+| 016 | ViewModelLocator | view-first resolution via `ViewModelLocator.LocateTypeForViewType`/`LocateForView`, constructed through `IoC`; its own `NameTransformer`, a different object from `ViewLocator`'s | ✅ |
+| 017 | ViewModelBinderNames | `ViewModelBinder.Bind` matches an element's `x:Name` to a same-named view-model property; an unmatched name gets no `Binding` at all, not even a fallback one | ✅ |
+| 018 | BindingConventionTwoWay | convention picks `TwoWay` only when the property is settable AND the element's bindable property is two-way capable, else `OneWay`; `UpdateSourceTrigger.PropertyChanged` always - not WPF's own `LostFocus` default for `TextBox.Text` | ✅ |
+| 019 | ElementConventionLookup | `ConventionManager.GetElementConvention` walks the type hierarchy (`CheckBox`→`ToggleButton`, `ComboBox`/`ListBox`→`Selector`) and never returns null for a `FrameworkElement` - an unregistered type falls back to the `Visibility` convention | ✅ |
+| 020 | CustomElementConvention | `ConventionManager.AddElementConvention<T>` registers a convention scoped to one owned type, turning a nonsense `Visibility` binding into the intended one | ✅ |
 | 021 | ConventionValueConverter | automatic converter application | ⬜ |
 | 022 | ActionConventionButton | button named after a method invokes it | ⬜ |
 | 023 | ActionGuardProperty | `CanXxx` gating `IsEnabled` | ⬜ |
