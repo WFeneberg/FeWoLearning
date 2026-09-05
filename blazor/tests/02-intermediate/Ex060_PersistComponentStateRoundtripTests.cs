@@ -1,8 +1,5 @@
 using Bunit;
 using FeWoLearning.Blazor.Exercises.Intermediate;
-using FeWoLearning.Blazor.Tests.Support;
-using Microsoft.AspNetCore.Components.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace FeWoLearning.Blazor.Tests.Intermediate;
@@ -13,47 +10,10 @@ public class Ex060_PersistComponentStateRoundtripTests : BunitContext
 {
     private const string Key = Ex060_PersistComponentStateRoundtrip.StateKey;
 
-    private readonly RecordingStateStore _store = new();
-
-    /// Simulates the earlier pass having persisted a whole draft, through the real
-    /// serializer - so this asserts a round-trip, not a guessed JSON shape.
-    private async Task SeedPersistedDraftAsync(DraftState draft)
-    {
-        var previous = PersistentStateHarness.CreateManager();
-        await previous.RestoreStateAsync(new RecordingStateStore());
-        previous.State.RegisterOnPersisting(() =>
-        {
-            previous.State.PersistAsJson(Key, draft);
-            return Task.CompletedTask;
-        });
-
-        await previous.PersistStateAsync(_store, Renderer);
-    }
-
-    /// Opens the pass the component under test runs in, handing its
-    /// PersistentComponentState to the component through DI. Registration has to come
-    /// before anything resolves a service out of BunitContext.Services - which the
-    /// Renderer property does - so a test opens the pass first, seeds what the earlier
-    /// pass left behind, and only then restores.
-    private ComponentStatePersistenceManager BeginPass()
-    {
-        var manager = PersistentStateHarness.CreateManager();
-        Services.AddSingleton(manager.State);
-        return manager;
-    }
-
-    private async Task<DraftState?> ReadBackAsync()
-    {
-        var next = PersistentStateHarness.CreateManager();
-        await next.RestoreStateAsync(_store);
-        return next.State.TryTakeFromJson<DraftState>(Key, out var draft) ? draft : null;
-    }
-
     [Fact]
-    public async Task Starts_At_The_Default_Draft_When_Nothing_Was_Persisted()
+    public void Starts_At_The_Default_Draft_When_Nothing_Was_Persisted()
     {
-        var manager = BeginPass();
-        await manager.RestoreStateAsync(_store);
+        AddBunitPersistentComponentState();
 
         var cut = Render<Ex060_PersistComponentStateRoundtrip>();
 
@@ -64,11 +24,10 @@ public class Ex060_PersistComponentStateRoundtripTests : BunitContext
     // The list is what makes this a typed round-trip rather than a scalar one: a
     // per-property persist ("title", "tags") cannot restore it in one TryTake.
     [Fact]
-    public async Task Adopts_The_Whole_Persisted_Record()
+    public void Adopts_The_Whole_Persisted_Record()
     {
-        var manager = BeginPass();
-        await SeedPersistedDraftAsync(new DraftState("spec", ["draft", "q3"]));
-        await manager.RestoreStateAsync(_store);
+        var state = AddBunitPersistentComponentState();
+        state.Persist(Key, new DraftState("spec", ["draft", "q3"]));
 
         var cut = Render<Ex060_PersistComponentStateRoundtrip>();
 
@@ -77,18 +36,17 @@ public class Ex060_PersistComponentStateRoundtripTests : BunitContext
     }
 
     [Fact]
-    public async Task Persists_The_Draft_As_It_Stands_When_The_Callback_Runs()
+    public void Persists_The_Draft_As_It_Stands_When_The_Callback_Runs()
     {
-        var manager = BeginPass();
-        await manager.RestoreStateAsync(_store);
+        var state = AddBunitPersistentComponentState();
         var cut = Render<Ex060_PersistComponentStateRoundtrip>();
 
         cut.Find("#rename").Click();
         cut.WaitForAssertion(() => Assert.Equal("spec review", cut.Find("#title").TextContent));
 
-        await manager.PersistStateAsync(_store, Renderer);
+        state.TriggerOnPersisting();
 
-        var persisted = await ReadBackAsync();
+        Assert.True(state.TryTake<DraftState>(Key, out var persisted));
         Assert.NotNull(persisted);
         Assert.Equal("spec review", persisted.Title);
         Assert.Equal(["edited"], persisted.Tags);
@@ -101,15 +59,14 @@ public class Ex060_PersistComponentStateRoundtripTests : BunitContext
     [Fact]
     public async Task Disposed_Component_Stops_Persisting()
     {
-        var manager = BeginPass();
-        await manager.RestoreStateAsync(_store);
+        var state = AddBunitPersistentComponentState();
         var cut = Render<Ex060_PersistComponentStateRoundtrip>();
         cut.Find("#rename").Click();
         cut.WaitForAssertion(() => Assert.Equal("spec review", cut.Find("#title").TextContent));
 
         await DisposeComponentsAsync();
-        await manager.PersistStateAsync(_store, Renderer);
+        state.TriggerOnPersisting();
 
-        Assert.False(_store.Persisted.ContainsKey(Key));
+        Assert.False(state.TryTake<DraftState>(Key, out _));
     }
 }

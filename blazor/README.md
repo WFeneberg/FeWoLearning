@@ -97,11 +97,6 @@ host/Components/Demos/Beginner/Ex001.razor         -> @page "/beginner/001"
   and small components that several exercises' tests depend on. It never
   contains a TODO, is never itself a graded exercise, and never gets a
   `catalog.md` row.
-- **`tests/_support/` is the same idea on the test side** — fixtures that are
-  test infrastructure rather than anything a component under test can see, so
-  they must *not* go into the two RCLs' `_support/`. It currently holds
-  `PersistentStateHarness.cs` (ex059/ex060), and like `_support/` it never
-  gets a `catalog.md` row.
 
 ## 6. Why `solutions/` is a real project here
 
@@ -179,19 +174,19 @@ material found online. This track uses the current names throughout:
   does re-arm navigation. That handler runs *outside* the render loop, though,
   so it must not call `StateHasChanged`; ex057 counts blocks into a property
   the test reads off `cut.Instance` instead of rendering them.
-- **`PersistentComponentState` is not in bUnit's default services** — it is
-  registered by `AddRazorComponents()` in a real host, which bUnit does not
-  call. `tests/_support/PersistentStateHarness.cs` supplies it: construct a
-  `ComponentStatePersistenceManager` (its `ILogger`-only constructor is
-  public), register `manager.State` as a singleton, `RestoreStateAsync` a
-  fake `IPersistentComponentStateStore` into it before rendering, and
-  `PersistStateAsync(store, Renderer)` afterwards to run the component's
-  persisting callbacks. Two traps: **registration must precede the first
-  service resolution**, and touching `BunitContext.Renderer` *is* a
-  resolution — so a test opens the pass (registers `manager.State`) before it
-  seeds the store, not after; and seed the store by persisting through a
-  second, throwaway manager rather than hand-writing JSON bytes, so the test
-  asserts a real round-trip instead of a guessed serialization shape.
+- **`PersistentComponentState` is not in bUnit's default services, but bUnit
+  ships the test double for it** — `AddBunitPersistentComponentState()`
+  registers it and hands back a `BunitPersistentComponentState` with three
+  members that are the whole of ex059/ex060's test surface: `Persist<T>(key,
+  value)` seeds what an earlier render pass left behind, `TriggerOnPersisting()`
+  runs the callbacks the component registered, and `TryTake<T>(key, out value)`
+  reads back what they wrote. Like every service registration it has to happen
+  before the first render. This one is easy to miss and expensive to miss:
+  building the equivalent by hand out of `ComponentStatePersistenceManager`,
+  a fake `IPersistentComponentStateStore` and `PersistStateAsync(store,
+  Renderer)` works, but is ~40 lines of fixture, and touching
+  `BunitContext.Renderer` counts as the first service resolution — which locks
+  the service collection and makes the ordering rules subtle for no gain.
 
 ## 9. The stub build is not warning-free — by design
 

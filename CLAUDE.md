@@ -431,10 +431,13 @@ unbounded parent-refresh callback hangs the test host rather than failing it.
 Two things the intermediate tier added to that README, both easy to get wrong:
 `BunitNavigationManager.History` is stack-ordered (`History.First()` is the
 *newest* navigation) and has no indexer, and `PersistentComponentState` is not
-in bUnit's default services at all — `tests/_support/PersistentStateHarness.cs`
-builds one from a `ComponentStatePersistenceManager`, and its registration must
-happen before anything resolves a service, which touching `BunitContext.Renderer`
-already does.
+in bUnit's default services — `AddBunitPersistentComponentState()` registers it
+and returns the double ex059/ex060 drive it with (`Persist` /
+`TriggerOnPersisting` / `TryTake`). Hand-building that out of
+`ComponentStatePersistenceManager` and a fake store also works and is what this
+batch tried first; it is ~40 lines of fixture for nothing, and it drags in the
+rule that touching `BunitContext.Renderer` counts as the first service
+resolution.
 
 ## The `uno/` track
 
