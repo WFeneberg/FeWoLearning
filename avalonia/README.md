@@ -149,8 +149,97 @@ Two more gotchas from Task 1, worth knowing before you hit them yourself:
   reference an Avalonia type fully qualified —
   `Avalonia.Media.TextWrapping` fails CS0234, because the leading segment
   binds to the enclosing namespace instead. `using` directives are exempt.
+  This applies inside `tests/` too, whose namespace is
+  `FeWoLearning.Avalonia.Tests.…`: `Avalonia.Media.TransformGroup` fails the
+  same way there.
 - Every `DataTemplate` needs an explicit `x:DataType`, because compiled
   bindings are this project's default.
+
+## The suite must stay serial, and a parallel run lies about it
+
+`tests/_harness/AssemblyInfo.cs` carries
+`[assembly: CollectionBehavior(DisableTestParallelization = true)]`. **Do not
+remove it.** Every `[AvaloniaFact]` runs on the one headless dispatcher that
+`AvaloniaTestApplication` sets up, against a single `Application` for the whole
+assembly, and xunit.v3 runs collections in parallel by default — so two test
+classes starting at once contend for that dispatcher and the run deadlocks.
+
+The failure mode is what makes this worth a section rather than a comment: the
+run does not error, it simply **stops**, and whatever finished before the
+deadlock is still reported with a normal-looking summary line. A truncated run
+therefore reads as a completed one — only the test count and the missing exit
+code give it away. Measured on this machine before the attribute existed: the
+beginner tier passed cleanly as two halves of 52 and 59 tests, hung after 4 when
+asked for all 111 at once, and a plain `dotnet test` hung after 27 of 225. So
+when you check a batch, **read the test count, not just the word `Failed`**.
+
+`uno/` and `caliburn/` carry the same one-line attribute; `wpf/` needs the other
+spelling (`[assembly: Parallelization(Mode = ParallelMode.None)]`) because
+`DisableTestParallelization` is `Obsolete(error: true)` from xunit.v3 4.0.0 on.
+
+## Animation and transitions: what is assertable, and what is not
+
+Animation **progress** cannot be observed in this harness, and no amount of
+cleverness changes that. `AvaloniaHeadlessPlatform.ForceRenderTimerTick(n)`
+looks like the animation clock but forces *frames*, not time: a 200 ms
+`DoubleTransition` on `Opacity` moved from 1.000 to only 0.990 across 505 forced
+ticks, which is exactly the ~2 ms of real time those ticks took. Nor can a
+controllable clock be injected — measured by reflection, `IClock`, `ClockBase`,
+`Clock` and `IGlobalClock` are all **internal** in Avalonia 12.1.1, and
+`Animatable.Clock`'s accessors are internal too. There is no public seam.
+
+So never write a test that waits for an animation to advance. What *is*
+deterministic, all measured, is enough to grade ex063–ex065 honestly:
+
+- **A transition defers the value, which is a clean binary discriminator.**
+  Setting `Opacity = 0.0` on a plain `Border` reads back `0.000` at once; on a
+  `Border` carrying a `DoubleTransition` it reads back `1.000`, because the
+  transition owns the property. Give the transition a long duration (5 s) so a
+  few milliseconds of real time cannot blur the reading.
+- **A style animation is attached and observable immediately.** A `Border`
+  matched by a `Style` carrying `Style.Animations` reads
+  `GetDiagnostic(Visual.OpacityProperty).Priority == BindingPriority.Animation`
+  right after `Show`, and holds a value inside the range its keyframes declare.
+  That is a real attachment proof, it needs no clock, and — unlike scanning
+  `view.Styles` — it does not care where the markup lives. Require
+  `IterationCount="Infinite"`: a finite animation runs out and hands the
+  property back, so ownership would otherwise depend on when the test looked.
+- **Transitions and animations are structurally inspectable.**
+  `transitions.OfType<DoubleTransition>()` yields the instance with
+  `Property.Name` and `Duration` readable; an `Animation` exposes `Duration`,
+  `IterationCount.IsInfinite`, `PlaybackDirection` and `Children`. One catch:
+  `KeyFrame.Setters` is typed as `IAnimationSetter`, whose `Property` and
+  `Value` are **not publicly accessible** (CS0122) — cast the items to
+  `Avalonia.Styling.Setter`, which is measured to be their concrete type.
+- **`Transitions` is itself a styled property**, so `GetDiagnostic(...).Priority`
+  separates a `<Setter Property="Transitions">` in a `Style` from a
+  `<Border.Transitions>` element nested in the markup. The two defer values
+  identically, so without the priority check the row's own subject goes
+  ungraded.
+
+Two things specific to transforms:
+
+- **You cannot animate `RenderTransform` itself.** A keyframe
+  `<Setter Property="RenderTransform" Value="scale(2.5)" />` throws at
+  style-attach time with `InvalidOperationException: No animator registered for
+  the property RenderTransform`. Animate a transform *sub*-property instead,
+  spelled with its owning type: `Property="RotateTransform.Angle"`. Avalonia
+  then installs a `TransformGroup` on the control holding one transform of every
+  kind (measured: `ScaleTransform, SkewTransform, RotateTransform,
+  TranslateTransform, Rotate3DTransform`) and animates the matching one inside
+  it. That group is itself the attachment evidence, since an un-animated control
+  has a null `RenderTransform` — note that `RenderTransform`'s own priority
+  stays `LocalValue` here, so the `BindingPriority.Animation` trick above does
+  **not** transfer to transforms.
+- **`RenderTransformOrigin="0.5,0.5"` is not the centre.** It parses as
+  `RelativeUnit.Absolute` — half a device pixel from the corner, near enough the
+  default to change nothing. Only the percentage spelling, `"50%,50%"`, is
+  relative to the control's own size, and it equals `RelativePoint.Center`.
+  Assert the `RelativePoint`, not the numbers.
+
+Transform *state*, by contrast, needs no clock at all: `Transform.Value` gives
+the `Matrix` directly, and a `ScaleTransform(2, 3)` measures `M11 = 2`,
+`M22 = 3`.
 
 ## Non-goals
 

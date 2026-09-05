@@ -231,6 +231,42 @@ suite against the reference solutions instead of the stubs.
   only rendered text can be satisfied by a hard-coded literal in the XAML, so
   every binding exercise must change the view model afterwards, call
   `Dispatcher.UIThread.RunJobs()`, and assert the text followed.
+
+  **The suite must stay serial, and a parallel run lies about it.**
+  `avalonia/tests/_harness/AssemblyInfo.cs` carries
+  `[assembly: CollectionBehavior(DisableTestParallelization = true)]` — the same
+  one-liner `uno/` and `caliburn/` have, and the same need `wpf/` meets with
+  `[assembly: Parallelization(Mode = ParallelMode.None)]`. It was **missing here
+  until 2026-09-05**, and the consequence is worth knowing because it is silent:
+  every `[AvaloniaFact]` runs on the one headless dispatcher against a single
+  `Application`, so two collections starting at once deadlock, and the run does
+  not error — it simply stops, still printing a normal-looking summary for
+  whatever had finished. Measured before the fix: the beginner tier passed as two
+  halves of 52 and 59 tests but hung after 4 when asked for all 111, and a plain
+  `dotnet test` hung after 27 of 225. Any earlier claim about this track rests on
+  filtered per-batch runs; the full suite first ran end to end on 2026-09-05
+  (225 tests: 218 red / 7 green — the 7 being the harness and gallery smoke
+  tests — and 225 / 0 under `-p:UseSolutions=true`). **Read the test count, not
+  just the word `Failed`.**
+
+  **Animation progress is not assertable, by construction.**
+  `ForceRenderTimerTick(n)` forces frames, not time, and there is no seam to
+  inject a clock: `IClock`, `ClockBase`, `Clock` and `IGlobalClock` are all
+  internal in Avalonia 12.1.1, as are `Animatable.Clock`'s accessors. What is
+  deterministic instead: a transition **defers** the value (a plain `Border`
+  reads `0.000` right after `Opacity = 0.0`, one carrying a `DoubleTransition`
+  reads `1.000`); a style animation takes ownership immediately, so
+  `GetDiagnostic(Visual.OpacityProperty).Priority == BindingPriority.Animation`
+  is a location-free attachment proof when `IterationCount` is `Infinite`; and
+  `Transform.Value` gives the matrix directly. Three traps behind that:
+  `KeyFrame.Setters` is typed `IAnimationSetter`, whose `Property`/`Value` are
+  not publicly accessible (CS0122) — cast to `Avalonia.Styling.Setter`;
+  `RenderTransform` itself **cannot** be animated ("No animator registered"), so
+  animate a sub-property such as `RotateTransform.Angle`, after which Avalonia
+  installs a `TransformGroup` and `RenderTransform`'s priority stays
+  `LocalValue`; and `RenderTransformOrigin="0.5,0.5"` parses as **absolute** half
+  a pixel, not the centre — `"50%,50%"` is `RelativePoint.Center`. The full
+  register is in `avalonia/README.md`.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -417,7 +453,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 10 / 100 (verified) | 90 |
+| `avalonia/`| 65 / 100 (verified) | 35 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 30 / 100 (verified) | 70 |

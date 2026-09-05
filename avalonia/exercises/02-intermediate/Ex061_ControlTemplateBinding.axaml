@@ -1,0 +1,57 @@
+<!-- Exercise 061 - ControlTemplateBinding (intermediate).
+     Goal:   Give the supplied Ex061_Gauge templated control its visual from a
+     ControlTheme written in XAML, reaching the control's own Caption and Accent
+     properties from inside the ControlTemplate with the TemplateBinding markup
+     extension. Two properties, and one of them is not text, so a hard-coded
+     visual cannot stand in for either.
+     Drills: ControlTheme in XAML, ControlTemplate, TemplateBinding, Theme plus
+     StaticResource, templated parent versus DataContext.
+     Passes: dotnet test, filtered to Ex061_ (see
+     Ex061_ControlTemplateBinding.axaml.cs for the exact command, because an XML
+     comment may not hold two hyphens in a row). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex061_ControlTemplateBinding">
+  <!-- TODO: Ex061_Gauge (in the code-behind, given) is a TemplatedControl with
+       no visual of its own. Supply one.
+
+       Add a ControlTheme to this UserControl's Resources:
+
+         <UserControl.Resources>
+           <ControlTheme x:Key="GaugeTheme" TargetType="i:Ex061_Gauge">
+             <Setter Property="Template">
+               <ControlTemplate>
+                 <Border Name="PART_Root"
+                         Background="{TemplateBinding Accent}"
+                         Padding="8">
+                   <TextBlock Name="PART_Caption" Text="{TemplateBinding Caption}" />
+                 </Border>
+               </ControlTemplate>
+             </Setter>
+           </ControlTheme>
+         </UserControl.Resources>
+
+       and replace the placeholder below with the gauge itself:
+
+         <StackPanel>
+           <i:Ex061_Gauge Name="Gauge"
+                          Theme="{StaticResource GaugeTheme}"
+                          Caption="Gauge A"
+                          Accent="#FF3366" />
+         </StackPanel>
+
+       Why TemplateBinding and not Binding: inside a ControlTemplate, plain
+       Binding resolves against the DataContext, which the template's children
+       inherit from whatever the control was given. TemplateBinding resolves
+       against the TEMPLATED PARENT, which is the gauge itself, and that is a
+       different object. The test sets the gauge's DataContext to a decoy
+       exposing its own Caption of "WRONG" and then re-reads the rendered
+       caption, so a Binding answer is visibly wrong rather than merely
+       unidiomatic. A literal Text and a literal Background reproduce the
+       resting visual exactly, so the test also changes Caption and Accent after
+       the view is shown and asserts both followed. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

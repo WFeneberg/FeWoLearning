@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex064_KeyFrameAnimation">
+  <StackPanel Spacing="8">
+    <StackPanel.Styles>
+      <Style Selector="Border#Pulser">
+        <Style.Animations>
+          <Animation Duration="0:0:5"
+                     IterationCount="Infinite"
+                     PlaybackDirection="Alternate">
+            <KeyFrame Cue="0%">
+              <Setter Property="Opacity" Value="1.0" />
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+              <Setter Property="Opacity" Value="0.2" />
+            </KeyFrame>
+          </Animation>
+        </Style.Animations>
+      </Style>
+    </StackPanel.Styles>
+    <Border Name="Pulser" Width="40" Height="40" Background="#FF3366" />
+    <Border Name="Still" Width="40" Height="40" Background="#CCCCCC" />
+  </StackPanel>
+</UserControl>

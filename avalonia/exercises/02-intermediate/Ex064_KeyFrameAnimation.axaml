@@ -1,0 +1,57 @@
+<!-- Exercise 064 - KeyFrameAnimation (intermediate).
+     Goal:   Declare a keyframe Animation inside a Style and let it take over one
+     named Border's Opacity, leaving the sibling Border alone. Where ex063 used a
+     Transition, which reacts to a value CHANGING, this one runs unprompted from
+     the moment the style attaches.
+     Drills: Style.Animations, Animation with Duration, IterationCount and
+     PlaybackDirection, KeyFrame with Cue, and animation Setters.
+     Passes: dotnet test, filtered to Ex064_ (see Ex064_KeyFrameAnimation.axaml.cs
+     for the exact command, because an XML comment may not hold two hyphens in a
+     row).
+
+     WHAT THIS EXERCISE DOES NOT ASSERT, AND WHY: how far the animation has got.
+     Nothing pumps the animation clock in a headless test, and nothing public can
+     be made to - IClock, ClockBase and Animatable.Clock are all internal in
+     Avalonia 12.1.1, and forcing render-timer ticks advances frames, not time.
+     What IS deterministic, and measured: the instant the style attaches, the
+     animation takes ownership of Opacity at BindingPriority.Animation and holds a
+     value inside the range its keyframes declare. That is a real attachment
+     proof, it needs no clock, and it is what the test checks. An honest gap here
+     beats a wall-clock race. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex064_KeyFrameAnimation">
+  <!-- TODO: replace the placeholder below with two Borders and a Style whose
+       Animations run on the first of them only:
+
+         <StackPanel Spacing="8">
+           <StackPanel.Styles>
+             <Style Selector="Border#Pulser">
+               <Style.Animations>
+                 <Animation Duration="0:0:5"
+                            IterationCount="Infinite"
+                            PlaybackDirection="Alternate">
+                   <KeyFrame Cue="0%">
+                     <Setter Property="Opacity" Value="1.0" />
+                   </KeyFrame>
+                   <KeyFrame Cue="100%">
+                     <Setter Property="Opacity" Value="0.2" />
+                   </KeyFrame>
+                 </Animation>
+               </Style.Animations>
+             </Style>
+           </StackPanel.Styles>
+           <Border Name="Pulser" Width="40" Height="40" Background="#FF3366" />
+           <Border Name="Still" Width="40" Height="40" Background="#CCCCCC" />
+         </StackPanel>
+
+       IterationCount="Infinite" is not decoration: a finite animation would run
+       out and hand Opacity back, so ownership would depend on when the test
+       looked. Infinite makes the attachment permanent and therefore assertable.
+       Still must be left out of the selector - the test asserts that its Opacity
+       is NOT owned by an animation, which a selector of plain "Border" would
+       break. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

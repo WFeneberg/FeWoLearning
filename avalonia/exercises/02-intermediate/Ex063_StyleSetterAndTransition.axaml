@@ -1,0 +1,54 @@
+<!-- Exercise 063 - StyleSetterAndTransition (intermediate).
+     Goal:   Drive one named Border entirely from a Style: a plain Setter for its
+     Background, and a Setter for Transitions carrying a DoubleTransition on
+     Opacity. Leave the sibling Border untouched, so the selector has to be
+     scoped rather than hitting every Border in the view.
+     Drills: Style Selector by name, Setter, the Transitions property as a Style
+     Setter, DoubleTransition, and the fact that a transition DEFERS a value
+     instead of applying it at once.
+     Passes: dotnet test, filtered to Ex063_ (see
+     Ex063_StyleSetterAndTransition.axaml.cs for the exact command, because an
+     XML comment may not hold two hyphens in a row).
+
+     WHAT THIS EXERCISE DOES NOT ASSERT, AND WHY: animation progress. In this
+     headless harness nothing pumps the animation clock, and there is no public
+     way to pump it either - IClock, ClockBase and Animatable.Clock are all
+     internal in Avalonia 12.1.1. Measured: a 200 ms transition moved 0.010 across
+     505 forced render-timer ticks, which was just the 2 ms of real time those
+     ticks took. So a test that waits for Opacity to reach its target would be a
+     wall-clock race. What IS deterministic is that the transition is attached and
+     that it holds the old value at the instant the new one is assigned, which is
+     exactly what the test below checks. The long 5 second duration is chosen so
+     that a few milliseconds of real time cannot blur that reading. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex063_StyleSetterAndTransition">
+  <!-- TODO: replace the placeholder below with two Borders and a Style that
+       matches only the first of them:
+
+         <StackPanel Spacing="8">
+           <StackPanel.Styles>
+             <Style Selector="Border#Fader">
+               <Setter Property="Background" Value="#FF3366" />
+               <Setter Property="Transitions">
+                 <Transitions>
+                   <DoubleTransition Property="Opacity" Duration="0:0:5" />
+                 </Transitions>
+               </Setter>
+             </Style>
+           </StackPanel.Styles>
+           <Border Name="Fader" Width="40" Height="40" />
+           <Border Name="Instant" Width="40" Height="40" Background="#CCCCCC" />
+         </StackPanel>
+
+       Two things the test pins down, so shortcuts do not score. First, the
+       Background and the Transitions must arrive at STYLE priority: setting
+       Background="#FF3366" directly on the Border, or nesting a
+       <Border.Transitions> element inside it, produces the same rendered result
+       at LocalValue priority and is rejected. Second, Instant must keep no
+       transitions at all, so a selector of plain "Border" - which would sweep up
+       both - is rejected as well. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

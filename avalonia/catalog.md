@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 60 ✅ / 40 ⬜**
+**Status: 65 ✅ / 35 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -93,11 +93,11 @@ not a valid C# identifier.
 | 058 | SelectionModel | `SelectionModel` multi-selection | ✅ |
 | 059 | TemplatedControlBasics | `TemplatedControl` with a `ControlTheme` | ✅ |
 | 060 | TemplatePartLookup | `OnApplyTemplate`, finding a named part | ✅ |
-| 061 | ControlTemplateBinding | `TemplateBinding` inside a control template | ⬜ |
-| 062 | AttachedPropertyAuthoring | registering your own attached property | ⬜ |
-| 063 | StyleSetterAndTransition | `Transitions` on a styled property | ⬜ |
-| 064 | KeyFrameAnimation | `Animation` with `KeyFrame`s | ⬜ |
-| 065 | RenderTransformAnimation | animating a `RenderTransform` | ⬜ |
+| 061 | ControlTemplateBinding | `TemplateBinding` inside a control template | ✅ |
+| 062 | AttachedPropertyAuthoring | registering your own attached property | ✅ |
+| 063 | StyleSetterAndTransition | `Transitions` on a styled property | ✅ |
+| 064 | KeyFrameAnimation | `Animation` with `KeyFrame`s | ✅ |
+| 065 | RenderTransformAnimation | animating a `RenderTransform` | ✅ |
 | 066 | MultiValueConverter | `IMultiValueConverter` over several bindings | ⬜ |
 | 067 | MarkupExtensionBasics | a custom `MarkupExtension` | ⬜ |
 | 068 | AsyncImageLoading | async load with placeholder and cancellation | ⬜ |

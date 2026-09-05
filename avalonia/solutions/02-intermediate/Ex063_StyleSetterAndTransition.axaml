@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex063_StyleSetterAndTransition">
+  <StackPanel Spacing="8">
+    <StackPanel.Styles>
+      <Style Selector="Border#Fader">
+        <Setter Property="Background" Value="#FF3366" />
+        <Setter Property="Transitions">
+          <Transitions>
+            <DoubleTransition Property="Opacity" Duration="0:0:5" />
+          </Transitions>
+        </Setter>
+      </Style>
+    </StackPanel.Styles>
+    <Border Name="Fader" Width="40" Height="40" />
+    <Border Name="Instant" Width="40" Height="40" Background="#CCCCCC" />
+  </StackPanel>
+</UserControl>
