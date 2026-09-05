@@ -43,7 +43,8 @@ Every task's requirements implicitly include this section. Values are copied ver
 | `security/exercises/FeWoLearning.Security.Exercises.csproj` | Stub content library. |
 | `security/solutions/FeWoLearning.Security.Solutions.csproj` | Reference content library, same namespaces. |
 | `security/tests/FeWoLearning.Security.Tests.csproj` | The single test project; references exactly one content library. |
-| `security/exercises/_Imports.razor`, `security/solutions/_Imports.razor` | `@namespace FeWoLearning.Security.Exercises.WebBlazor` plus shared `@using`s. Identical in both. |
+| `security/{exercises,solutions}/02-web-blazor/_Imports.razor` | `@namespace FeWoLearning.Security.Exercises.WebBlazor` plus shared `@using`s. Folder-level, never project-root. Identical in both libraries. |
+| `security/{exercises,solutions}/_support/_Imports.razor` | `@namespace FeWoLearning.Security.Exercises.Support`, so `SmokeGreeter.razor` lands in the namespace the harness smoke test imports. |
 | `security/exercises/_support/`, `security/solutions/_support/` | Identical shared fixtures: SQLite seed, key generation, recording logger, attack-payload corpus. Never a catalog row. |
 | `security/tests/_harness/WebHarness.cs` | Hosts an exercise's pipeline in `TestServer`, hands back an `HttpClient`. Sole owner of `UseTestServer`. |
 | `security/tests/_harness/BlazorHarness.cs` | `BunitContext` plus the services block 02 needs. |
@@ -62,9 +63,9 @@ Every task's requirements implicitly include this section. Values are copied ver
 - Create: `security/Directory.Build.props`
 - Create: `security/global.json`
 - Create: `security/exercises/FeWoLearning.Security.Exercises.csproj`
-- Create: `security/exercises/_Imports.razor`
+- Create: `security/exercises/02-web-blazor/_Imports.razor`, `security/exercises/_support/_Imports.razor`
 - Create: `security/solutions/FeWoLearning.Security.Solutions.csproj`
-- Create: `security/solutions/_Imports.razor`
+- Create: `security/solutions/02-web-blazor/_Imports.razor`, `security/solutions/_support/_Imports.razor`
 - Create: `security/tests/FeWoLearning.Security.Tests.csproj`
 - Create: `security/tests/AssemblyInfo.cs`
 - Create: `security/.gitignore`
@@ -157,9 +158,14 @@ Identical to Step 4 except the one line below. Copy the file and change only `As
     <AssemblyName>FeWoLearning.Security.Solutions</AssemblyName>
 ```
 
-- [ ] **Step 6: Create both `_Imports.razor` files (identical content)**
+- [ ] **Step 6: Create the folder-level `_Imports.razor` files**
 
-Write the same bytes to `security/exercises/_Imports.razor` and `security/solutions/_Imports.razor`:
+`_Imports.razor` must be **per folder**, not at the project root: a root-level
+`@namespace` would also capture `_support/SmokeGreeter.razor` (Task 2) and put it
+in `…WebBlazor` instead of `…Support`, contradicting the `using` in Task 2 Step 5.
+
+Write these same bytes to **`security/exercises/02-web-blazor/_Imports.razor`**
+and **`security/solutions/02-web-blazor/_Imports.razor`**:
 
 ```razor
 @namespace FeWoLearning.Security.Exercises.WebBlazor
@@ -169,6 +175,18 @@ Write the same bytes to `security/exercises/_Imports.razor` and `security/soluti
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 ```
+
+And these to **`security/exercises/_support/_Imports.razor`** and
+**`security/solutions/_support/_Imports.razor`**:
+
+```razor
+@namespace FeWoLearning.Security.Exercises.Support
+@using Microsoft.AspNetCore.Components
+```
+
+Create the two `02-web-blazor/` directories now even though block 02 has no
+exercises until Task 9 — an `_Imports.razor` in a directory that does not exist
+cannot be written.
 
 - [ ] **Step 7: Create `security/tests/FeWoLearning.Security.Tests.csproj`**
 
@@ -687,7 +705,7 @@ Tasks 4 through 17 each deliver a batch of exercises. They share one procedure; 
 - Consumes: `WebHarness.StartAsync` from Task 2.
 - Produces: the style template for block 01 — every later block-01 batch reads `Ex001_SecurityHeaders.cs` and its test.
 
-**Batch filter:** `-filter "/*/*/Ex001*|/*/*/Ex002*|/*/*/Ex003*|/*/*/Ex004*|/*/*/Ex005*"`
+**Batch filter:** `-filter "/*/*/Ex001*" -filter "/*/*/Ex002*" -filter "/*/*/Ex003*" -filter "/*/*/Ex004*" -filter "/*/*/Ex005*"`
 
 - [ ] **Step 1: Write `Ex001_SecurityHeaders` as the block's worked example**
 
@@ -874,7 +892,7 @@ Batch filter as given at the top of this task. Commit message: `security: ex001�
 - Consumes: `WebHarness` (Task 2); the block-01 style established by `Ex001` (Task 4).
 - Produces: `_support/Ex006_UserDatabase` — an in-memory SQLite fixture reused by no other row.
 
-**Batch filter:** `-filter "/*/*/Ex006*|/*/*/Ex007*|/*/*/Ex008*|/*/*/Ex009*|/*/*/Ex010*"`
+**Batch filter:** `-filter "/*/*/Ex006*" -filter "/*/*/Ex007*" -filter "/*/*/Ex008*" -filter "/*/*/Ex009*" -filter "/*/*/Ex010*"`
 
 - [ ] **Step 1: Write the SQLite fixture into both content libraries**
 
@@ -985,7 +1003,7 @@ Trap: parse the `Set-Cookie` header rather than asserting the whole string equal
 
 ## Task 6: Exercises 011–015 (web-aspnet)
 
-**Batch filter:** `-filter "/*/*/Ex011*|/*/*/Ex012*|/*/*/Ex013*|/*/*/Ex014*|/*/*/Ex015*"`
+**Batch filter:** `-filter "/*/*/Ex011*" -filter "/*/*/Ex012*" -filter "/*/*/Ex013*" -filter "/*/*/Ex014*" -filter "/*/*/Ex015*"`
 
 **Interfaces:** Consumes `WebHarness`. Produces `Ex012_PasswordHasher.Hash`/`Verify`, reused conceptually by row 018's test but not referenced by it.
 
@@ -1024,7 +1042,7 @@ Trap: parse the `Set-Cookie` header rather than asserting the whole string equal
 
 ## Task 7: Exercises 016–020 (web-aspnet)
 
-**Batch filter:** `-filter "/*/*/Ex016*|/*/*/Ex017*|/*/*/Ex018*|/*/*/Ex019*|/*/*/Ex020*"`
+**Batch filter:** `-filter "/*/*/Ex016*" -filter "/*/*/Ex017*" -filter "/*/*/Ex018*" -filter "/*/*/Ex019*" -filter "/*/*/Ex020*"`
 
 **Interfaces:** Consumes `WebHarness`, `Microsoft.IdentityModel.JsonWebTokens`. Produces `Ex017_TokenFactory` (test-side helper for minting tokens with chosen issuer, audience, lifetime and key), which Task 7 Step 3 reuses.
 
@@ -1078,7 +1096,7 @@ Trap: parse the `Set-Cookie` header rather than asserting the whole string equal
 
 ## Task 8: Exercises 021–024 (web-aspnet) — block 01 completes
 
-**Batch filter:** `-filter "/*/*/Ex021*|/*/*/Ex022*|/*/*/Ex023*|/*/*/Ex024*"`
+**Batch filter:** `-filter "/*/*/Ex021*" -filter "/*/*/Ex022*" -filter "/*/*/Ex023*" -filter "/*/*/Ex024*"`
 
 - [ ] **Step 1: `Ex021_SsrfOutboundGuard`** — contract: `public static class Ex021_SsrfOutboundGuard { public static bool IsAllowedTarget(string url); }`. Attack facts, all `false`: `http://127.0.0.1/admin`, `http://localhost/`, `http://169.254.169.254/latest/meta-data/`, `http://10.0.0.5/`, `http://192.168.1.1/`, `file:///C:/Windows/win.ini`, `gopher://example.com/`, and a URL whose host is `[::1]`. Use facts: `https://api.example.com/v1/items` is `true`, and `https://example.com:8443/path?q=1` is `true`.
 
@@ -1112,7 +1130,7 @@ Commit message: `security: ex021–ex024 - the web-aspnet block is complete`.
 
 **Interfaces:** Consumes `BlazorHarness` (Task 2). Produces the block-02 style template.
 
-**Batch filter:** `-filter "/*/*/Ex025*|/*/*/Ex026*|/*/*/Ex027*|/*/*/Ex028*"`
+**Batch filter:** `-filter "/*/*/Ex025*" -filter "/*/*/Ex026*" -filter "/*/*/Ex027*" -filter "/*/*/Ex028*"`
 
 **Every test file in this block needs `using TestContext = Xunit.TestContext;`** alongside `using Bunit;`, or it fails `CS0104`.
 
@@ -1216,7 +1234,7 @@ Note the pairing: the four attack facts alone are satisfied by `Sanitize` return
 
 ## Task 10: Exercises 029–032 (web-blazor)
 
-**Batch filter:** `-filter "/*/*/Ex029*|/*/*/Ex030*|/*/*/Ex031*|/*/*/Ex032*"`
+**Batch filter:** `-filter "/*/*/Ex029*" -filter "/*/*/Ex030*" -filter "/*/*/Ex031*" -filter "/*/*/Ex032*"`
 
 - [ ] **Step 1: `Ex029_ClientAuthIsNotEnforcement`** — the block's centrepiece. Contract: `public sealed class Ex029_PayrollService { public bool TryApprove(ClaimsPrincipal caller, int requestId, out string? denial); }` plus a component `Ex029_ClientAuthIsNotEnforcement.razor` that wraps its Approve button in `AuthorizeView Roles="approver"`. Attack facts: calling `TryApprove` **directly**, bypassing the component entirely, with a non-approver principal returns `false` — this is the fact that fails a solution which only hides the button; and with an anonymous principal returns `false`. Use facts: the component renders the button for an approver and hides it for everyone else (so the UI trimming is still implemented), and `TryApprove` returns `true` for an approver.
 
@@ -1234,7 +1252,7 @@ Note the pairing: the four attack facts alone are satisfied by `Sanitize` return
 
 ## Task 11: Exercises 033–036 (web-blazor) — block 02 completes
 
-**Batch filter:** `-filter "/*/*/Ex033*|/*/*/Ex034*|/*/*/Ex035*|/*/*/Ex036*"`
+**Batch filter:** `-filter "/*/*/Ex033*" -filter "/*/*/Ex034*" -filter "/*/*/Ex035*" -filter "/*/*/Ex036*"`
 
 - [ ] **Step 1: `Ex033_NavigationManagerOpenRedirect`** — contract: `public static class Ex033_NavigationManagerOpenRedirect { public static void GoTo(NavigationManager navigation, string? candidate); }`. Attack facts, all landing on the app's own `/` instead: `https://evil.example/`, `//evil.example/`, a `javascript:` URI, `null`. Use facts: `/dashboard` navigates to the app-relative `/dashboard`; `/reports?year=2026` preserves the query. Read the result from bUnit's `BunitNavigationManager.History` — note `History.First()` is the **newest** entry and there is no indexer.
 
@@ -1261,7 +1279,7 @@ Commit message: `security: ex033–ex036 - the web-blazor block is complete`.
 
 **Interfaces:** Consumes nothing from earlier blocks — these are plain classes with plain `[Fact]` tests, no harness. Produces the block-03 style template.
 
-**Batch filter:** `-filter "/*/*/Ex037*|/*/*/Ex038*|/*/*/Ex039*|/*/*/Ex040*|/*/*/Ex041*"`
+**Batch filter:** `-filter "/*/*/Ex037*" -filter "/*/*/Ex038*" -filter "/*/*/Ex039*" -filter "/*/*/Ex040*" -filter "/*/*/Ex041*"`
 
 - [ ] **Step 1: `Ex037_DpapiProtectedData`** — contract:
   ```csharp
@@ -1271,7 +1289,7 @@ Commit message: `security: ex033–ex036 - the web-blazor block is complete`.
       public static byte[] Unprotect(byte[] ciphertext, byte[] entropy);
   }
   ```
-  Attack facts: the protected bytes never contain the plaintext as a subsequence; `Unprotect` with different entropy throws `CryptographicException`, not the plaintext; protecting the same plaintext twice yields different ciphertexts. Use facts: `Unprotect(Protect(p, e), e)` equals `p` for several inputs including an empty array; and a 1 MB payload round-trips.
+  Attack facts: for a **non-empty, distinctive** plaintext, the protected bytes never contain it as a contiguous subsequence (scope this fact to non-empty input — every byte array contains the empty one, so the empty case from the use facts would make it vacuous); `Unprotect` with different entropy throws `CryptographicException` rather than returning plaintext; protecting the same plaintext twice yields different ciphertexts. Use facts: `Unprotect(Protect(p, e), e)` equals `p` for several inputs including an empty array; and a 1 MB payload round-trips.
 
 - [ ] **Step 2: `Ex038_CredentialStorage`** — contract:
   ```csharp
@@ -1323,7 +1341,7 @@ Commit message: `security: ex033–ex036 - the web-blazor block is complete`.
 
 ## Task 13: Exercises 042–046 (desktop-core)
 
-**Batch filter:** `-filter "/*/*/Ex042*|/*/*/Ex043*|/*/*/Ex044*|/*/*/Ex045*|/*/*/Ex046*"`
+**Batch filter:** `-filter "/*/*/Ex042*" -filter "/*/*/Ex043*" -filter "/*/*/Ex044*" -filter "/*/*/Ex045*" -filter "/*/*/Ex046*"`
 
 - [ ] **Step 1: `Ex042_CryptographicRandomness`** — contract: `public static class Ex042_CryptographicRandomness { public static string NewToken(int byteCount); }`. Attack facts: 1000 tokens contain no duplicate; a token is not reproducible by any seeded `System.Random` — assert by generating 1000 tokens and confirming none equals the first token a `new Random(seed)`-driven generator would produce for seeds 0–999; `NewToken(0)` throws `ArgumentOutOfRangeException`. Use facts: `NewToken(32)` decodes to exactly 32 bytes; the encoding is URL-safe (no `+`, `/` or `=` in the output).
 
@@ -1364,7 +1382,7 @@ Commit message: `security: ex033–ex036 - the web-blazor block is complete`.
 
 ## Task 14: Exercises 047–052 (desktop-core) — block 03 completes
 
-**Batch filter:** `-filter "/*/*/Ex047*|/*/*/Ex048*|/*/*/Ex049*|/*/*/Ex050*|/*/*/Ex051*|/*/*/Ex052*"`
+**Batch filter:** `-filter "/*/*/Ex047*" -filter "/*/*/Ex048*" -filter "/*/*/Ex049*" -filter "/*/*/Ex050*" -filter "/*/*/Ex051*" -filter "/*/*/Ex052*"`
 
 This batch is six rather than five so block 03 closes on a task boundary.
 
@@ -1396,7 +1414,7 @@ Commit message: `security: ex047–ex052 - the desktop-core block is complete`.
 
 **Interfaces:** Consumes `WpfPump.Pump` (Task 2). Every test in this block uses `[WpfFact]`, never `[Fact]`.
 
-**Batch filter:** `-filter "/*/*/Ex053*|/*/*/Ex054*|/*/*/Ex055*|/*/*/Ex056*"`
+**Batch filter:** `-filter "/*/*/Ex053*" -filter "/*/*/Ex054*" -filter "/*/*/Ex055*" -filter "/*/*/Ex056*"`
 
 - [ ] **Step 1: `Ex053_PasswordBoxNoPlaintextBinding`** — contract:
   ```csharp
@@ -1445,7 +1463,7 @@ Commit message: `security: ex047–ex052 - the desktop-core block is complete`.
 
 ## Task 16: Exercises 057–060 (desktop-wpf) — block 04 completes, all 60 written
 
-**Batch filter:** `-filter "/*/*/Ex057*|/*/*/Ex058*|/*/*/Ex059*|/*/*/Ex060*"`
+**Batch filter:** `-filter "/*/*/Ex057*" -filter "/*/*/Ex058*" -filter "/*/*/Ex059*" -filter "/*/*/Ex060*"`
 
 - [ ] **Step 1: `Ex057_EmbeddedBrowserNavigationPolicy`** — contract:
   ```csharp
