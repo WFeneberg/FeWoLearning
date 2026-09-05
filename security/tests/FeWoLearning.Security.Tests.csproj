@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>FeWoLearning.Security.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- No OutputType here: xunit.v3 sets it to Exe through its own build props. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
+    <PackageReference Include="Xunit.StaFact" Version="4.0.23" />
+    <PackageReference Include="bunit" Version="2.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Exactly one of the two content libraries, never both: that is what keeps the
+       identical namespaces and type names from colliding. -->
+  <ItemGroup Condition="'$(UseSolutions)' != 'true'">
+    <ProjectReference Include="..\exercises\FeWoLearning.Security.Exercises.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseSolutions)' == 'true'">
+    <ProjectReference Include="..\solutions\FeWoLearning.Security.Solutions.csproj" />
+  </ItemGroup>
+
+</Project>

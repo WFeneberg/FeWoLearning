@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FeWoLearning.Security.Exercises</RootNamespace>
+    <AssemblyName>FeWoLearning.Security.Exercises</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Required, or the Razor source generator cannot resolve
+       Microsoft.AspNetCore.Components and every .razor file fails CS0234. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Row 006 only: SQL injection cannot be honestly proven against a fake.
+         Microsoft.Extensions.Hosting and System.Security.Cryptography.ProtectedData
+         are deliberately absent - both ship in the shared framework for this TFM and
+         referencing them emits NU1510. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+    <!-- Pinned above Microsoft.Data.Sqlite 10.0.0's own transitive 2.1.11, which
+         carries GHSA-2m69-gcr7-jv3q (high severity) and emits NU1903 on every build.
+         The bundle package cannot fix this: bundle and lib versions are decoupled. -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
+    <!-- Rows 017, 018. -->
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.16.0" />
+  </ItemGroup>
+
+</Project>
