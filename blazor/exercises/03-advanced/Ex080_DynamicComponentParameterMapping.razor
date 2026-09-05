@@ -1,0 +1,41 @@
+@* Exercise 080 - Dynamic Component Parameter Mapping (advanced).
+   Goal:   Turn untyped name/value text - a query string, a CMS record, a config
+           file - into a parameter dictionary a <DynamicComponent> will accept.
+   Drills: reflecting over a component's [Parameter] properties, converting values
+           to their declared types, and refusing what does not fit instead of
+           letting DynamicComponent throw at render time.
+   Passes: dotnet test --filter FullyQualifiedName~Ex080_ *@
+
+@* TODO: render a <DynamicComponent> for ComponentType, handing it the dictionary
+   that OnParametersSet built. *@
+
+@code {
+    [Parameter] public Type ComponentType { get; set; } = typeof(DynamicBadge);
+
+    /// Raw text, as it would arrive from outside the app.
+    [Parameter] public IReadOnlyDictionary<string, string> RawValues { get; set; }
+        = new Dictionary<string, string>();
+
+    /// One line per raw entry that could not be mapped. Order follows RawValues.
+    public IReadOnlyList<string> Problems { get; private set; } = [];
+
+    public const string UnknownParameter = "unknown parameter";
+    public const string NotConvertible = "not convertible";
+
+    // TODO: build the dictionary <DynamicComponent> is handed, and the Problems list
+    // beside it. For each entry of RawValues, matching by exact name:
+    //   - the target type has a public property with that name AND a [Parameter]
+    //     attribute -> convert the text to the property's type and include it.
+    //     Convert against CultureInfo.InvariantCulture; a plain string needs no
+    //     conversion at all.
+    //   - no such property, or a property that is public but NOT a [Parameter]
+    //     -> "<name>: unknown parameter", and leave it out.
+    //   - the text does not convert -> "<name>: not convertible", and leave it out.
+    // Leaving a bad entry in is not an option: DynamicComponent throws on a name the
+    // target does not declare, which takes the whole render down instead of the one
+    // value that was wrong.
+    // Do the mapping here, once per parameter push, rather than from the markup -
+    // a render expression that assigns Problems writes state while rendering it.
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex080 - map the raw values onto the component's parameters");
+}

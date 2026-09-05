@@ -1,0 +1,15 @@
+@* Exercise 076 - Custom Input Base Numeric (advanced) - the form around it.
+   No TODO here; the exercise is Ex076_CustomInputBaseNumeric.razor. *@
+<EditForm Model="Model">
+    <Ex076_CustomInputBaseNumeric id="rate" @bind-Value="Model.Rate" />
+    <ValidationMessage For="() => Model.Rate" />
+</EditForm>
+
+@code {
+    public sealed class RateModel
+    {
+        public decimal Rate { get; set; }
+    }
+
+    [Parameter] public RateModel Model { get; set; } = new();
+}

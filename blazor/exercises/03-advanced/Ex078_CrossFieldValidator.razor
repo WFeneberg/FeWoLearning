@@ -1,0 +1,31 @@
+@implements IDisposable
+@* Exercise 078 - Cross Field Validator (advanced).
+   Goal:   A rule that no single field can satisfy on its own - the end of a range
+           must come after its start.
+   Drills: EditContext.OnValidationRequested and OnFieldChanged for a rule that
+           spans two fields, and attaching the message to the field the user should
+           look at rather than to the model.
+   Passes: dotnet test --filter FullyQualifiedName~Ex078_ *@
+@* Renders nothing; it only attaches the rule to the cascaded context. *@
+
+@code {
+    [CascadingParameter] public EditContext EditContext { get; set; } = default!;
+
+    public const string RangeError = "End must be after Start.";
+
+    // TODO: report RangeError on the End field whenever End <= Start, and take it
+    // away again as soon as that stops being true.
+    //   - Wire up both EditContext events, as in ex077.
+    //   - The catch specific to a cross-field rule: when Start changes, the field
+    //     whose message has to be recomputed is End - not the field that changed.
+    //     A handler that only ever re-checks e.FieldIdentifier leaves a stale
+    //     message sitting on End after the user fixes the range by moving Start.
+    //   - Clear the End field's messages before re-adding, so the rule cannot
+    //     accumulate duplicates across passes.
+    // Unsubscribe in Dispose, and call NotifyValidationStateChanged after writing.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex078 - attach the cross-field rule");
+
+    public void Dispose()
+        => throw new NotImplementedException("TODO: Ex078 - detach the cross-field rule");
+}

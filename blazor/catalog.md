@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 75 ✅ / 25 ⬜**
+**Status: 80 ✅ / 20 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -106,11 +106,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 073 | VirtualizeItemsProvider | `Virtualize`, `ItemsProviderResult<T>`, paged loading | ✅ |
 | 074 | VirtualizeFixedItemSize | `Virtualize` with `ItemSize`, placeholder rendering, overscan | ✅ |
 | 075 | CustomInputBaseText | `InputBase<T>` derivative, `TryParseValueFromString` override | ✅ |
-| 076 | CustomInputBaseNumeric | `InputBase<T>` for a value type, `FormatValueAsString`, `CurrentValueAsString` | ⬜ |
-| 077 | CustomValidatorComponent | custom validator component wired into `EditContext` | ⬜ |
-| 078 | CrossFieldValidator | cross-field validation via `EditContext.OnValidationRequested` | ⬜ |
-| 079 | DynamicComponentBasics | `DynamicComponent`, `Type` + `Parameters` dictionary | ⬜ |
-| 080 | DynamicComponentParameterMapping | building and validating a `DynamicComponent` parameter dictionary | ⬜ |
+| 076 | CustomInputBaseNumeric | `InputBase<T>` for a value type, `FormatValueAsString`, `CurrentValueAsString` | ✅ |
+| 077 | CustomValidatorComponent | custom validator component wired into `EditContext` | ✅ |
+| 078 | CrossFieldValidator | cross-field validation via `EditContext.OnValidationRequested` | ✅ |
+| 079 | DynamicComponentBasics | `DynamicComponent`, `Type` + `Parameters` dictionary | ✅ |
+| 080 | DynamicComponentParameterMapping | building and validating a `DynamicComponent` parameter dictionary | ✅ |
 | 081 | CascadingAuthStateBasics | `CascadingAuthenticationState`, `AuthenticationStateProvider`, `AuthorizeView` | ⬜ |
 | 082 | CustomAuthenticationStateProvider | custom `AuthenticationStateProvider`, `NotifyAuthenticationStateChanged` | ⬜ |
 | 083 | HandleEventCustomSync | `IHandleEvent` override, suppressing the automatic post-event re-render | ⬜ |

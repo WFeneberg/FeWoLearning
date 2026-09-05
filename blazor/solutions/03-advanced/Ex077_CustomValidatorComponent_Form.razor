@@ -1,0 +1,28 @@
+@* Exercise 077 - Custom Validator Component (advanced) - the form around it.
+   No TODO here. Both fields' rules come from the one custom validator, so both
+   messages live in the same ValidationMessageStore - which is what lets a test see
+   a per-field clear go wrong. The exercise is Ex077_CustomValidatorComponent.razor. *@
+<EditForm Model="Model">
+    @if (ValidatorAttached)
+    {
+        <Ex077_CustomValidatorComponent />
+    }
+    <InputText id="sku" @bind-Value="Model.Sku" />
+    <div id="sku-messages"><ValidationMessage For="() => Model.Sku" /></div>
+    <InputText id="note" @bind-Value="Model.Note" />
+    <div id="note-messages"><ValidationMessage For="() => Model.Note" /></div>
+    <button id="submit" type="submit">save</button>
+</EditForm>
+
+@code {
+    public sealed class OrderModel
+    {
+        public string Sku { get; set; } = "";
+        public string Note { get; set; } = "";
+    }
+
+    [Parameter] public OrderModel Model { get; set; } = new();
+
+    /// Lets a test take the validator out of the tree, which is what disposes it.
+    [Parameter] public bool ValidatorAttached { get; set; } = true;
+}

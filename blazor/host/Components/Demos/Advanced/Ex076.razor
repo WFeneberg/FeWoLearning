@@ -1,0 +1,14 @@
+@page "/advanced/076"
+@rendermode InteractiveServer
+
+<h1>Exercise 076 - CustomInputBaseNumeric</h1>
+
+<p>The box shows percent, the model stores a fraction. Clearing it is an error.</p>
+
+<Ex076_CustomInputBaseNumeric_Form Model="_model" />
+
+<p>Model: @_model.Rate</p>
+
+@code {
+    private readonly Ex076_CustomInputBaseNumeric_Form.RateModel _model = new() { Rate = 0.15m };
+}

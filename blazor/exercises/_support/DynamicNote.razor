@@ -1,0 +1,7 @@
+@* Test fixture, not an exercise. A second <DynamicComponent> target, so a test can
+   tell "rendered the type it was given" from "rendered the only type there is". *@
+<p class="note">@Text</p>
+
+@code {
+    [Parameter] public string Text { get; set; } = "";
+}

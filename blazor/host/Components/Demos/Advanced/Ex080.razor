@@ -1,0 +1,28 @@
+@page "/advanced/080"
+@rendermode InteractiveServer
+
+<h1>Exercise 080 - DynamicComponentParameterMapping</h1>
+
+<p>Raw text in, a typed parameter dictionary out. "Secret" is public but not a
+   [Parameter], and "Count=x" does not convert.</p>
+
+<Ex080_DynamicComponentParameterMapping @ref="_mapper"
+                                        ComponentType="typeof(DynamicBadge)"
+                                        RawValues="_raw" />
+
+<button id="show" @onclick="() => { }">refresh problems</button>
+<ul>
+    @foreach (var problem in _mapper?.Problems ?? [])
+    {
+        <li>@problem</li>
+    }
+</ul>
+
+@code {
+    private Ex080_DynamicComponentParameterMapping? _mapper;
+
+    private readonly Dictionary<string, string> _raw = new()
+    {
+        ["Label"] = "ready", ["Count"] = "x", ["Secret"] = "hunter2",
+    };
+}

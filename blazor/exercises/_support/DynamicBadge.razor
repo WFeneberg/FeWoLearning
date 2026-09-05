@@ -1,0 +1,11 @@
+@* Test fixture, not an exercise. A target for <DynamicComponent> (ex079, ex080).
+   Secret is deliberately public but NOT a [Parameter]: a parameter dictionary that
+   tries to set it is wrong, and ex080 has to notice. *@
+<span class="badge" data-count="@Count">@Label</span>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public int Count { get; set; }
+
+    public string Secret { get; set; } = "";
+}

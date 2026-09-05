@@ -1,0 +1,12 @@
+@page "/advanced/078"
+@rendermode InteractiveServer
+
+<h1>Exercise 078 - CrossFieldValidator</h1>
+
+<p>The message belongs to End, but moving Start has to clear it too.</p>
+
+<Ex078_CrossFieldValidator_Form Model="_model" />
+
+@code {
+    private readonly Ex078_CrossFieldValidator_Form.RangeModel _model = new() { Start = 5, End = 3 };
+}

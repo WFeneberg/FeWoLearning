@@ -1,0 +1,78 @@
+@implements IDisposable
+@* Exercise 077 - Custom Validator Component (advanced).
+   Goal:   A validator that keeps its messages in step with the form, rather than
+           only recomputing them when the whole form is validated.
+   Drills: ValidationMessageStore, both EditContext events (OnValidationRequested
+           and OnFieldChanged), per-field clearing, and unsubscribing on disposal.
+           ex041 wired up the first of those events; this row is about the rest.
+   Passes: dotnet test --filter FullyQualifiedName~Ex077_ *@
+@* This component renders nothing - it only attaches rules to the cascaded context. *@
+
+@code {
+    [CascadingParameter] public EditContext EditContext { get; set; } = default!;
+
+    public const string SkuError = "SKU must be uppercase letters and digits.";
+    public const string NoteError = "Note must be five characters or fewer.";
+
+    private static bool IsValidSku(string? sku)
+        => !string.IsNullOrEmpty(sku) && sku.All(c => char.IsAsciiLetterUpper(c) || char.IsAsciiDigit(c));
+
+    private static bool IsValidNote(string? note) => (note ?? "").Length <= 5;
+
+    private ValidationMessageStore? _messages;
+
+    protected override void OnInitialized()
+    {
+        _messages = new ValidationMessageStore(EditContext);
+        EditContext.OnValidationRequested += HandleValidationRequested;
+        EditContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs e)
+    {
+        _messages!.Clear();
+        Validate(SkuField());
+        Validate(NoteField());
+        EditContext.NotifyValidationStateChanged();
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // This field only: clearing the whole store here would also drop the other
+        // field's message, which nothing would re-add until the next full pass.
+        _messages!.Clear(e.FieldIdentifier);
+        Validate(e.FieldIdentifier);
+        EditContext.NotifyValidationStateChanged();
+    }
+
+    private void Validate(FieldIdentifier field)
+    {
+        if (EditContext.Model is not Ex077_CustomValidatorComponent_Form.OrderModel model)
+        {
+            return;
+        }
+
+        if (field.Equals(SkuField()) && !IsValidSku(model.Sku))
+        {
+            _messages!.Add(field, SkuError);
+        }
+        else if (field.Equals(NoteField()) && !IsValidNote(model.Note))
+        {
+            _messages!.Add(field, NoteError);
+        }
+    }
+
+    private FieldIdentifier SkuField()
+        => new(EditContext.Model, nameof(Ex077_CustomValidatorComponent_Form.OrderModel.Sku));
+
+    private FieldIdentifier NoteField()
+        => new(EditContext.Model, nameof(Ex077_CustomValidatorComponent_Form.OrderModel.Note));
+
+    public void Dispose()
+    {
+        EditContext.OnValidationRequested -= HandleValidationRequested;
+        EditContext.OnFieldChanged -= HandleFieldChanged;
+        _messages?.Clear();
+        EditContext.NotifyValidationStateChanged();
+    }
+}

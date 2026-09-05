@@ -1,0 +1,41 @@
+@inherits InputBase<decimal>
+@using System.Diagnostics.CodeAnalysis
+@* Exercise 076 - Custom Input Base Numeric (advanced).
+   Goal:   The same InputBase<T> seam as ex075, but over a value type - where the
+           empty input is no longer a legal value and the display unit is not the
+           stored one.
+   Drills: FormatValueAsString/TryParseValueFromString for a struct TValue, and
+           parsing against a fixed culture rather than the ambient one.
+   Passes: dotnet test --filter FullyQualifiedName~Ex076_ *@
+<input class="@CssClass" value="@CurrentValueAsString"
+       @onchange="@(e => CurrentValueAsString = e.Value?.ToString())"
+       @attributes="AdditionalAttributes" />
+
+@code {
+    public const string ParseError = "Enter a percentage between 0 and 100.";
+
+    // The model stores a fraction (0.15); the input shows percent (15).
+
+    // TODO: render Value as its percentage - 0.15 becomes "15", 0.125 becomes "12.5".
+    // Format with CultureInfo.InvariantCulture, so what this writes is what the
+    // parser below reads back regardless of the machine's culture (ex009 is the
+    // exercise about why that matters). Watch the trailing zeros: decimal keeps its
+    // scale through multiplication, so 0.15m * 100m is 15.00 and a bare ToString
+    // would put "15.00" in the box.
+    // Note the signature: TValue is a struct here, so there is no null to handle -
+    // "TValue?" on an unconstrained parameter is an annotation, not Nullable<T>.
+    protected override string FormatValueAsString(decimal value)
+        => throw new NotImplementedException("TODO: Ex076 - format the fraction as a percentage");
+
+    // TODO: the other direction, also InvariantCulture.
+    //   - a number from 0 to 100 -> that number divided by 100, no error, true.
+    //   - anything else, INCLUDING empty or whitespace -> false with
+    //     validationErrorMessage set to ParseError. Unlike ex075's string[], a
+    //     decimal has no empty value to fall back on, so clearing the field is an
+    //     error rather than a way to say "nothing".
+    protected override bool TryParseValueFromString(
+        string? value,
+        [MaybeNullWhen(false)] out decimal result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
+        => throw new NotImplementedException("TODO: Ex076 - parse the typed percentage");
+}

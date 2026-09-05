@@ -1,0 +1,20 @@
+@* Exercise 078 - Cross Field Validator (advanced) - the form around it.
+   No TODO here; the exercise is Ex078_CrossFieldValidator.razor. *@
+<EditForm Model="Model">
+    <Ex078_CrossFieldValidator />
+    <InputNumber id="start" @bind-Value="Model.Start" />
+    <div id="start-messages"><ValidationMessage For="() => Model.Start" /></div>
+    <InputNumber id="end" @bind-Value="Model.End" />
+    <div id="end-messages"><ValidationMessage For="() => Model.End" /></div>
+    <button id="submit" type="submit">save</button>
+</EditForm>
+
+@code {
+    public sealed class RangeModel
+    {
+        public int Start { get; set; }
+        public int End { get; set; }
+    }
+
+    [Parameter] public RangeModel Model { get; set; } = new();
+}

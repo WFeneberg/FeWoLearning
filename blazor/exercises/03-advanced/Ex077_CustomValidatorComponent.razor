@@ -1,0 +1,41 @@
+@implements IDisposable
+@* Exercise 077 - Custom Validator Component (advanced).
+   Goal:   A validator that keeps its messages in step with the form, rather than
+           only recomputing them when the whole form is validated.
+   Drills: ValidationMessageStore, both EditContext events (OnValidationRequested
+           and OnFieldChanged), per-field clearing, and unsubscribing on disposal.
+           ex041 wired up the first of those events; this row is about the rest.
+   Passes: dotnet test --filter FullyQualifiedName~Ex077_ *@
+@* This component renders nothing - it only attaches rules to the cascaded context. *@
+
+@code {
+    [CascadingParameter] public EditContext EditContext { get; set; } = default!;
+
+    public const string SkuError = "SKU must be uppercase letters and digits.";
+    public const string NoteError = "Note must be five characters or fewer.";
+
+    private static bool IsValidSku(string? sku)
+        => !string.IsNullOrEmpty(sku) && sku.All(c => char.IsAsciiLetterUpper(c) || char.IsAsciiDigit(c));
+
+    private static bool IsValidNote(string? note) => (note ?? "").Length <= 5;
+
+    // TODO: create a ValidationMessageStore over EditContext and subscribe to BOTH
+    // of its events, then keep the store honest. Both rules above live in this one
+    // store, which is what makes the second event's job delicate:
+    //   OnValidationRequested - a full pass: clear everything, then re-check both
+    //                           Sku and Note and add SkuError/NoteError as needed.
+    //   OnFieldChanged        - one field just changed: clear ONLY that field's
+    //                           messages and re-check ONLY that field. A blanket
+    //                           store.Clear() here also drops the OTHER field's
+    //                           message, which nobody is going to re-add until the
+    //                           next full pass - that is the bug this row teaches.
+    // Call EditContext.NotifyValidationStateChanged() after touching the store, or
+    // nothing on screen moves.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex077 - attach the store and both handlers");
+
+    // TODO: unsubscribe both handlers and clear the messages this validator owns -
+    // a validator that is gone should not leave its verdicts behind.
+    public void Dispose()
+        => throw new NotImplementedException("TODO: Ex077 - detach and clean up");
+}

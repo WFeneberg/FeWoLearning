@@ -1,0 +1,16 @@
+@page "/advanced/077"
+@rendermode InteractiveServer
+
+<h1>Exercise 077 - CustomValidatorComponent</h1>
+
+<p>Submit with a lowercase SKU and a long note, then fix only the SKU: the note's
+   message has to stay.</p>
+
+<Ex077_CustomValidatorComponent_Form Model="_model" ValidatorAttached="_attached" />
+
+<button id="detach" @onclick="() => _attached = !_attached">@(_attached ? "detach" : "attach") validator</button>
+
+@code {
+    private readonly Ex077_CustomValidatorComponent_Form.OrderModel _model = new() { Sku = "abc", Note = "far too long" };
+    private bool _attached = true;
+}

@@ -1,0 +1,39 @@
+@inherits InputBase<decimal>
+@using System.Diagnostics.CodeAnalysis
+@* Exercise 076 - Custom Input Base Numeric (advanced).
+   Goal:   The same InputBase<T> seam as ex075, but over a value type - where the
+           empty input is no longer a legal value and the display unit is not the
+           stored one.
+   Drills: FormatValueAsString/TryParseValueFromString for a struct TValue, and
+           parsing against a fixed culture rather than the ambient one.
+   Passes: dotnet test --filter FullyQualifiedName~Ex076_ *@
+<input class="@CssClass" value="@CurrentValueAsString"
+       @onchange="@(e => CurrentValueAsString = e.Value?.ToString())"
+       @attributes="AdditionalAttributes" />
+
+@code {
+    public const string ParseError = "Enter a percentage between 0 and 100.";
+
+    // "0.####" rather than a plain ToString: decimal multiplication keeps its scale,
+    // so 0.15m * 100m is 15.00, not 15.
+    protected override string FormatValueAsString(decimal value)
+        => (value * 100m).ToString("0.####", CultureInfo.InvariantCulture);
+
+    protected override bool TryParseValueFromString(
+        string? value,
+        [MaybeNullWhen(false)] out decimal result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var percent)
+            && percent >= 0m && percent <= 100m)
+        {
+            result = percent / 100m;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        result = default;
+        validationErrorMessage = ParseError;
+        return false;
+    }
+}

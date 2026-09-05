@@ -1,0 +1,20 @@
+@* Exercise 079 - Dynamic Component Basics (advanced).
+   Goal:   Render a component whose type is not known until run time.
+   Drills: <DynamicComponent> with Type and a Parameters dictionary, and the
+           Instance it exposes for the component it built.
+   Passes: dotnet test --filter FullyQualifiedName~Ex079_ *@
+
+@* TODO: render a <DynamicComponent> for ComponentType, handing it Parameters, and
+   capture it with @ref so Rendered below can return its Instance - the live
+   component object DynamicComponent created, not a new one. *@
+
+@code {
+    [Parameter] public Type ComponentType { get; set; } = typeof(DynamicBadge);
+    [Parameter] public IDictionary<string, object>? Parameters { get; set; }
+
+    /// The component <DynamicComponent> built, or null before the first render.
+    public object? Rendered => throw new NotImplementedException("TODO: Ex079 - expose the built instance");
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex079 - render the dynamic component");
+}

@@ -1,0 +1,30 @@
+@page "/advanced/079"
+@rendermode InteractiveServer
+
+<h1>Exercise 079 - DynamicComponentBasics</h1>
+
+<button id="swap" @onclick="Swap">swap type</button>
+
+<Ex079_DynamicComponentBasics ComponentType="_type" Parameters="_parameters" />
+
+@code {
+    private Type _type = typeof(DynamicBadge);
+    private IDictionary<string, object> _parameters = new Dictionary<string, object>
+    {
+        ["Label"] = "ready", ["Count"] = 3,
+    };
+
+    private void Swap()
+    {
+        if (_type == typeof(DynamicBadge))
+        {
+            _type = typeof(DynamicNote);
+            _parameters = new Dictionary<string, object> { ["Text"] = "a note instead" };
+        }
+        else
+        {
+            _type = typeof(DynamicBadge);
+            _parameters = new Dictionary<string, object> { ["Label"] = "ready", ["Count"] = 3 };
+        }
+    }
+}

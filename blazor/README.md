@@ -6,15 +6,16 @@
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
 plain C# language features — those belong to the `dotnet/` track. As of this
-writing, ex001–ex075 are written and verified — the whole of **01-beginner**
+writing, ex001–ex080 are written and verified — the whole of **01-beginner**
 (ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
 `@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
 the whole of **02-intermediate** (ex036–ex070: `EditForm`/validation, DI and
 state containers, JS interop, navigation, persistent component state, `@ref`,
 the async lifecycle, error boundaries and generic components), plus the first
-five rows of **03-advanced** (ex071–ex075: `ShouldRender`, `@key` diffing,
-`Virtualize`, a custom `InputBase<T>`). ex076–ex100 are catalog rows only
-(⬜) — `catalog.md` is the source of truth.
+ten rows of **03-advanced** (ex071–ex080: `ShouldRender`, `@key` diffing,
+`Virtualize`, custom `InputBase<T>` inputs, custom and cross-field validators,
+`DynamicComponent`). ex081–ex100 are catalog rows only (⬜) — `catalog.md` is
+the source of truth.
 
 ## 2. Prerequisites
 
@@ -32,7 +33,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 269 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 295 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -107,8 +108,9 @@ host/Components/Demos/Beginner/Ex001.razor         -> @page "/beginner/001"
 - **`_support/` is a fixture folder, not an exercise.** Both `exercises/` and
   `solutions/` carry an identical `_support/` directory (`Person.cs`,
   `AlertSeverity.cs`, `Ticker.cs`, `AddButton.razor`, `RosterEntry.razor`,
-  `Level2.razor`, `Level3.razor`, `ExplodingChild.razor`, `ErrorLog.cs`, and
-  the DI fixtures, plus its own `_Imports.razor`) holding types
+  `Level2.razor`, `Level3.razor`, `ExplodingChild.razor`, `ErrorLog.cs`,
+  `DynamicBadge.razor`, `DynamicNote.razor`, and the DI fixtures, plus its own
+  `_Imports.razor`) holding types
   and small components that several exercises' tests depend on. It never
   contains a TODO, is never itself a graded exercise, and never gets a
   `catalog.md` row.
@@ -388,7 +390,18 @@ concrete failure modes worth carrying into future batches:
   click (both click facts), dropping the `@key` (four of five), materialising
   the whole list instead of paging it, not forwarding `ItemSize`/
   `OverscanCount` to `<Virtualize>`, and accepting invalid input in
-  `TryParseValueFromString` instead of reporting it.
+  `TryParseValueFromString` instead of reporting it. And ex076–ex080: parsing
+  against `CurrentCulture`, clearing the whole `ValidationMessageStore` on a
+  field change instead of the one field, re-checking only the field that
+  changed when the rule spans two, handing back a freshly constructed instance
+  rather than `DynamicComponent.Instance`, and accepting any public property as
+  a parameter.
+- **A stub whose TODO is only markup needs a throwing lifecycle method too.**
+  ex079's first draft left the `<DynamicComponent>` markup as the TODO and threw
+  only from a property one fact touched; the other three failed on a missing
+  element instead — red, but not traceably red. Adding a throwing
+  `OnParametersSet` (the ex023/ex025 shape) makes every fact of the exercise
+  fail with its own message. Check the red run's *reasons*, not just its count.
 - **Mutate the solution before writing what a fact proves, not after.** ex075's
   test carried a comment claiming that assigning a half-parsed array before
   returning `false` from `TryParseValueFromString` would fail it. The mutation
@@ -402,6 +415,11 @@ concrete failure modes worth carrying into future batches:
   that reason — ComponentBase renders once before it ever asks. Its assertions
   now ride along inside the fact that pushes a second time. Any fact about a
   gate must arrange for the gate to be consulted.
+- **`decimal` keeps its scale through arithmetic.** ex076 stores a fraction and
+  shows a percentage, and `0.15m * 100m` is `15.00`, not `15` — a bare
+  `ToString` puts the trailing zeros in the input box. Found by a green run
+  failing, and now part of what the exercise teaches rather than something the
+  test was loosened to accept.
 - **`T?` on an unconstrained type parameter is an annotation, not
   `Nullable<T>`.** ex068 renders a badge for `T="Guid"` with no value, and the
   fallback is `Guid.Empty`, not nothing — a value-type `T` has no null to fall

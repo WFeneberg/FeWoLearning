@@ -1,0 +1,16 @@
+@* Exercise 079 - Dynamic Component Basics (advanced).
+   Goal:   Render a component whose type is not known until run time.
+   Drills: <DynamicComponent> with Type and a Parameters dictionary, and the
+           Instance it exposes for the component it built.
+   Passes: dotnet test --filter FullyQualifiedName~Ex079_ *@
+<DynamicComponent @ref="_dynamic" Type="ComponentType" Parameters="Parameters" />
+
+@code {
+    [Parameter] public Type ComponentType { get; set; } = typeof(DynamicBadge);
+    [Parameter] public IDictionary<string, object>? Parameters { get; set; }
+
+    private DynamicComponent? _dynamic;
+
+    /// The component <DynamicComponent> built, or null before the first render.
+    public object? Rendered => _dynamic?.Instance;
+}

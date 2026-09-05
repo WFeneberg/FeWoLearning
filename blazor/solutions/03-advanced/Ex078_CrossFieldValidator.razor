@@ -1,0 +1,60 @@
+@implements IDisposable
+@* Exercise 078 - Cross Field Validator (advanced).
+   Goal:   A rule that no single field can satisfy on its own - the end of a range
+           must come after its start.
+   Drills: EditContext.OnValidationRequested and OnFieldChanged for a rule that
+           spans two fields, and attaching the message to the field the user should
+           look at rather than to the model.
+   Passes: dotnet test --filter FullyQualifiedName~Ex078_ *@
+@* Renders nothing; it only attaches the rule to the cascaded context. *@
+
+@code {
+    [CascadingParameter] public EditContext EditContext { get; set; } = default!;
+
+    public const string RangeError = "End must be after Start.";
+
+    private ValidationMessageStore? _messages;
+
+    protected override void OnInitialized()
+    {
+        _messages = new ValidationMessageStore(EditContext);
+        EditContext.OnValidationRequested += HandleValidationRequested;
+        EditContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs e)
+        => Revalidate();
+
+    // Either field moving can make the pair valid or invalid, and the verdict always
+    // belongs to End - so this recomputes the rule rather than the changed field.
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+        => Revalidate();
+
+    private void Revalidate()
+    {
+        if (EditContext.Model is not Ex078_CrossFieldValidator_Form.RangeModel model)
+        {
+            return;
+        }
+
+        var end = new FieldIdentifier(model, nameof(Ex078_CrossFieldValidator_Form.RangeModel.End));
+
+        // Clear first: without it the same message piles up on every pass.
+        _messages!.Clear(end);
+
+        if (model.End <= model.Start)
+        {
+            _messages.Add(end, RangeError);
+        }
+
+        EditContext.NotifyValidationStateChanged();
+    }
+
+    public void Dispose()
+    {
+        EditContext.OnValidationRequested -= HandleValidationRequested;
+        EditContext.OnFieldChanged -= HandleFieldChanged;
+        _messages?.Clear();
+        EditContext.NotifyValidationStateChanged();
+    }
+}

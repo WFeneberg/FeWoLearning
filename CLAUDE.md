@@ -276,11 +276,18 @@ suite against the reference solutions instead of the stubs.
   `AssemblySource.Instance`, the `IoC` delegates, and
   `ViewLocator.NameTransformer` — and that list is incomplete **by design**:
   it does not yet reset `ViewLocator.LocateTypeForModelType`,
-  `ViewModelLocator`'s own separate `NameTransformer` and locator delegates,
-  `ViewModelBinder.*`, `ConventionManager.ElementConventions`,
-  `MessageBinder.*`, `ActionMessage.*`, `LogManager.GetLog` or
-  `BindingScope.GetNamedElements`. Whoever writes the first exercise that
-  mutates one of those must extend the harness in the same style, or their
+  `ViewModelLocator`'s own separate `NameTransformer` (measured: a genuinely
+  different object from `ViewLocator.NameTransformer`, not an alias) and
+  locator delegates, `ViewModelBinder.*`, `MessageBinder.*`,
+  `ActionMessage.*`, `LogManager.GetLog` or `BindingScope.GetNamedElements`.
+  There is no public `ConventionManager.ElementConventions` — the real
+  surface is `ConventionManager.AddElementConvention`, which writes into a
+  **private** static dictionary with no public removal, so it cannot be
+  reset the way the others above can; ex020 (`CustomElementConvention`)
+  handles this by registering its convention only for a type the exercise
+  itself owns, so the unresettable leak can never affect another test.
+  Whoever writes the first exercise that mutates one of the resettable
+  statics above must extend the harness in the same style, or their
   mutation leaks into every later test in the serial run. `caliburn/README.md`
   carries the full register. A subtle trap found while building that reset,
   worth recording because it is not Caliburn-specific: the pristine snapshot
@@ -381,7 +388,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 75 / 100 (verified) | 25 |
+| `blazor/` | 80 / 100 (verified) | 20 |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 15 / 100 (verified) | 85 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
@@ -432,10 +439,10 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 75 written exercises — all of `01-beginner`, all of
-`02-intermediate`, and ex071–ex075 of `03-advanced` — carry 269 individual test
-facts; `dotnet test` shows 269 failed/0 passed on the untouched tree and
-`dotnet test -p:UseSolutions=true` shows 269 passed/0 failed (verified
+`blazor/`'s 80 written exercises — all of `01-beginner`, all of
+`02-intermediate`, and ex071–ex080 of `03-advanced` — carry 295 individual test
+facts; `dotnet test` shows 295 failed/0 passed on the untouched tree and
+`dotnet test -p:UseSolutions=true` shows 295 passed/0 failed (verified
 2026-09-05). Every failure but one traces
 to its own exercise's `NotImplementedException`; the exception is ex069, whose
 subject is a generic *type constraint* that no behaviour can prove (LINQ's
