@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Reflection;
+using ReactiveUI;
 using FeWoLearning.Avalonia.Exercises.Intermediate;
 
 namespace FeWoLearning.Avalonia.Tests.Intermediate;
@@ -66,5 +68,27 @@ public class Ex037_OutputPropertyTests
         vm.Celsius = 15;
 
         Assert.DoesNotContain(nameof(Ex037_OutputPropertyViewModel.Fahrenheit), raised);
+    }
+
+    // Structural check: this exercise's catalog concept is literally
+    // ToProperty/ObservableAsPropertyHelper. A plain computed getter whose
+    // setter manually calls this.RaisePropertyChanged(nameof(Fahrenheit)) can
+    // reproduce every behavioural assertion above without ever using either -
+    // so assert the mechanism directly. Reflect by FIELD TYPE, not by name, so
+    // a learner who renames or restructures the field is still free to pass,
+    // as long as a real ObservableAsPropertyHelper<double> backs the property.
+    [Fact]
+    public void Fahrenheit_Is_Backed_By_A_Real_ObservableAsPropertyHelper()
+    {
+        var vm = new Ex037_OutputPropertyViewModel();
+
+        var hasOaph = vm.GetType()
+            .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Any(f => f.FieldType == typeof(ObservableAsPropertyHelper<double>) && f.GetValue(vm) is not null);
+
+        Assert.True(hasOaph,
+            "Fahrenheit must be backed by a real ObservableAsPropertyHelper<double> field - a plain " +
+            "computed getter, even one that manually raises PropertyChanged, is not the mechanism " +
+            "(ToProperty / ObservableAsPropertyHelper) this exercise teaches.");
     }
 }

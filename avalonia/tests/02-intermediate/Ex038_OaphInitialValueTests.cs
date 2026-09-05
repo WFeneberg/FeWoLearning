@@ -1,3 +1,5 @@
+using System.Reflection;
+using ReactiveUI;
 using FeWoLearning.Avalonia.Exercises.Intermediate;
 
 namespace FeWoLearning.Avalonia.Tests.Intermediate;
@@ -106,5 +108,29 @@ public class Ex038_OaphInitialValueTests
         var vm = new Ex038_OaphInitialValueViewModel(source, initialValue: -42);
 
         Assert.Equal(-42, vm.Value);
+    }
+
+    // Structural check: a lazy `bool _subscribed` flag guarding a manual
+    // source.Subscribe(...) on first read, seeded from the initial value, can
+    // reproduce every assertion above (subscribe-count gating, the missed
+    // pre-read emission, the forwarded initial value) without ever
+    // constructing an ObservableAsPropertyHelper<T>. Reflect by FIELD TYPE, not
+    // by name, so a learner who renames or restructures the field is still
+    // free to pass, as long as a real ObservableAsPropertyHelper<int> backs
+    // Value.
+    [Fact]
+    public void Value_Is_Backed_By_A_Real_ObservableAsPropertyHelper()
+    {
+        var source = new CountingSource();
+        var vm = new Ex038_OaphInitialValueViewModel(source, initialValue: 7);
+
+        var hasOaph = vm.GetType()
+            .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Any(f => f.FieldType == typeof(ObservableAsPropertyHelper<int>) && f.GetValue(vm) is not null);
+
+        Assert.True(hasOaph,
+            "Value must be backed by a real ObservableAsPropertyHelper<int> field - a hand-rolled " +
+            "bool flag plus a manual Subscribe call is not the mechanism (ToProperty / " +
+            "ObservableAsPropertyHelper) this exercise teaches.");
     }
 }

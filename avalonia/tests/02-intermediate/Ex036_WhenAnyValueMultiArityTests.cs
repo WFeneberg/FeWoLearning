@@ -45,6 +45,15 @@ public class Ex036_WhenAnyValueMultiArityTests
     // The discriminator: a wiring that reacts to only one or two of the three
     // sources looks right until you touch one of the OTHERS on its own. Change
     // all three, one at a time, in sequence, and check Summary after each.
+    //
+    // Deliberately permissive: this does NOT require the canonical 3-arity
+    // WhenAnyValue(FirstName, LastName, Age) overload specifically - three
+    // separate single-property WhenAnyValue subscriptions, each recomputing
+    // Summary from all three CURRENT values, satisfy this test too, and that is
+    // a legitimate alternative (ReactiveUI subscriptions expose nothing that
+    // would let a test tell them apart structurally). Do not tighten this into
+    // rejecting that variant - it is not a cheat, only the under-wired version
+    // that reacts to fewer than all three sources is.
     [Fact]
     public void Each_Source_Independently_Moves_Summary_In_Sequence()
     {
