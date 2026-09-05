@@ -30,15 +30,15 @@ public class Ex030_SimpleContainerInstances
 {
     /// <summary>Registers a ready-made object as the resolution result for TService - GetInstance will return THAT object, not a new one.</summary>
     public void RegisterInstance<TService>(SimpleContainer container, TService instance) where TService : class =>
-        throw new NotImplementedException("TODO: Ex030 - container.RegisterInstance(typeof(TService), null, instance)");
+        throw new NotImplementedException("TODO: Ex030 - register via container.RegisterInstance");
 
     /// <summary>Registers a FACTORY for TService - every resolution runs the factory afresh and returns whatever it produces.</summary>
     public void RegisterHandler<TService>(SimpleContainer container, Func<SimpleContainer, object> factory) =>
-        throw new NotImplementedException("TODO: Ex030 - container.RegisterHandler(typeof(TService), null, factory)");
+        throw new NotImplementedException("TODO: Ex030 - register via container.RegisterHandler");
 
     /// <summary>How many registrations currently exist for TService - GetAllInstances, not GetInstance, is what surfaces every one, duplicates included.</summary>
     public int CountRegistrations<TService>(SimpleContainer container) =>
-        throw new NotImplementedException("TODO: Ex030 - container.GetAllInstances(typeof(TService), null).Count()");
+        throw new NotImplementedException("TODO: Ex030 - count via container.GetAllInstances");
 }
 
 /// <summary>A service with an identity you can compare across resolutions.</summary>

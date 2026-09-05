@@ -75,6 +75,25 @@ public class Ex026_ActionParametersTests : CaliburnViewContext
     }
 
     [WpfFact]
+    public void Clicking_Without_Touching_Box_Receives_The_Documented_Initial_Value_42()
+    {
+        // Neither click test above ever observes the view's INITIAL Text - both overwrite it
+        // with "99" first. This one never touches Box.Text at all, so a solution that omitted
+        // Text="42" from the XAML entirely would still go green everywhere else and only fail
+        // here.
+        var (vm, view, _, fromElementButton, coercedButton) = Built();
+        Show(view);
+
+        fromElementButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        Pump();
+        coercedButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        Pump();
+
+        Assert.Equal("42", vm.FromElementValue);
+        Assert.Equal(42, vm.CoercedValue);
+    }
+
+    [WpfFact]
     public void Clicking_FromElement_Twice_Invokes_Twice_Not_Once()
     {
         var (vm, view, _, fromElementButton, _) = Built();

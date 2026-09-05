@@ -35,16 +35,16 @@ public class Ex029_SimpleContainerBasics
     /// <summary>Registers TService as a SINGLETON backed by TImplementation - every resolution afterwards returns the exact same instance.</summary>
     public void RegisterSingleton<TService, TImplementation>(SimpleContainer container)
         where TImplementation : class, TService =>
-        throw new NotImplementedException("TODO: Ex029 - container.RegisterSingleton(typeof(TService), null, typeof(TImplementation))");
+        throw new NotImplementedException("TODO: Ex029 - register via container.RegisterSingleton");
 
     /// <summary>Registers TService as PER-REQUEST backed by TImplementation - every resolution afterwards returns a fresh instance.</summary>
     public void RegisterPerRequest<TService, TImplementation>(SimpleContainer container)
         where TImplementation : class, TService =>
-        throw new NotImplementedException("TODO: Ex029 - container.RegisterPerRequest(typeof(TService), null, typeof(TImplementation))");
+        throw new NotImplementedException("TODO: Ex029 - register via container.RegisterPerRequest");
 
     /// <summary>Resolves TService from the container - null, not a thrown exception, if nothing is registered for it.</summary>
     public TService? Resolve<TService>(SimpleContainer container) where TService : class =>
-        throw new NotImplementedException("TODO: Ex029 - container.GetInstance(typeof(TService), null) as TService");
+        throw new NotImplementedException("TODO: Ex029 - resolve via container.GetInstance");
 }
 
 /// <summary>A service with an identity you can compare across resolutions.</summary>

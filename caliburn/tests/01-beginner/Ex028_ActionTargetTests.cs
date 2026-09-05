@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Markup;
+using Caliburn.Micro;
 using FeWoLearning.Caliburn.Exercises.Beginner;
 // This test namespace nests inside FeWoLearning.Caliburn too, so a fully qualified
 // Caliburn.Micro.Action reference resolves "Caliburn" against the ancestor namespace instead of
@@ -89,6 +90,26 @@ public class Ex028_ActionTargetTests : CaliburnViewContext
         Pump();
 
         Assert.Equal(1, vmB.CallCount);
+    }
+
+    [WpfFact]
+    public void A_Plain_Bind_Sets_The_Same_Target_As_This_Exercises_SetTarget_Not_SetTargetWithoutContext()
+    {
+        // The mechanism this exercise exposes directly is not a special case: ViewModelBinder.Bind
+        // (ex017) has been calling Action.SetTarget under the hood the whole time - which is why
+        // ex027's $view resolves to the bound root. Proven here on a FRESH view/vm pair, entirely
+        // independent of the subject under test.
+        var boundView = (FrameworkElement)XamlReader.Parse(Xaml);
+        var boundVm = new Ex028_Vm();
+        ViewModelBinder.Bind(boundVm, boundView, null);
+
+        Assert.NotNull(CaliburnAction.GetTarget(boundView));
+        Assert.Null(CaliburnAction.GetTargetWithoutContext(boundView));
+
+        // And this exercises the actual subject under test, so an untouched stub still fails here.
+        var (subject, _, buttonA, _, vmA, _) = Built();
+        subject.AttachWithContext(buttonA, vmA);
+        Assert.Same(vmA, buttonA.DataContext);
     }
 
     [WpfFact]

@@ -21,6 +21,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using Caliburn.Micro;
 
 namespace FeWoLearning.Caliburn.Exercises.Beginner;
@@ -28,9 +29,9 @@ namespace FeWoLearning.Caliburn.Exercises.Beginner;
 public class Ex026_ActionParameters
 {
     /// <summary>
-    /// Builds a view carrying a TextBox named Box plus two buttons whose cal:Message.Attach
-    /// reads Box as a bare identifier - one calling FromElement(Box), the other Coerced(Box) -
-    /// and gives the view the supplied viewModel's DataContext.
+    /// Builds a view carrying a TextBox named Box (initial Text "42") plus two buttons whose
+    /// cal:Message.Attach reads Box as a bare identifier - one calling FromElement(Box), the
+    /// other Coerced(Box) - and gives the view the supplied viewModel's DataContext.
     /// </summary>
     public (FrameworkElement View, TextBox Box, Button FromElementButton, Button CoercedButton) BuildView(object viewModel) =>
         throw new NotImplementedException("TODO: Ex026 - XamlReader.Parse a TextBox 'Box' plus buttons attached to FromElement(Box) and Coerced(Box); set view.DataContext = viewModel");

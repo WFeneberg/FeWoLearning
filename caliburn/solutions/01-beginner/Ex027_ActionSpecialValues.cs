@@ -14,11 +14,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using Caliburn.Micro;
-// FeWoLearning.Caliburn.Exercises.Beginner nests inside FeWoLearning.Caliburn, so a fully
-// qualified Caliburn.Micro.Action reference resolves "Caliburn" against THIS namespace's own
-// ancestor instead of the package root (CS0234) - the same trap avalonia/ hit with
-// Avalonia.Media.TextWrapping (see the root CLAUDE.md). A using-alias is exempt.
-using CaliburnAction = Caliburn.Micro.Action;
 
 namespace FeWoLearning.Caliburn.Exercises.Beginner;
 
@@ -38,9 +33,9 @@ public class Ex027_ActionSpecialValues
     {
         var view = (FrameworkElement)XamlReader.Parse(Xaml);
         var button = (Button)view.FindName("Go")!;
-        // A plain view.DataContext = viewModel would leave $view identical to $source (see the
-        // header comment) - SetTarget on the root is what makes $view resolve to the root itself.
-        CaliburnAction.SetTarget(view, viewModel);
+        // ViewModelBinder.Bind calls Action.SetTarget on the root under the hood (see the header
+        // comment) - that is what makes $view resolve to the root itself.
+        ViewModelBinder.Bind(viewModel, view, null);
         return (view, button);
     }
 }
