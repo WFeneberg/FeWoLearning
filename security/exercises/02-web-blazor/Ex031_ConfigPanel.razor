@@ -1,0 +1,18 @@
+@using System.Text.Json
+@* Exercise 031 — SecretsNeverReachClient (web-blazor).
+   Goal:   Render the client-safe view of a settings object - implemented in
+           Ex031_SecretsNeverReachClient.ToClientView - as JSON, so a leak in
+           that projection would show up here too.
+   Drills: configuration surface, what a component may receive.
+   Passes: attack facts - the rendered output contains neither the ApiKey
+                          value nor the string "ApiKey";
+           use facts     - the rendered output contains the PublicBaseUrl
+                          value. *@
+
+<pre id="cfg">@Json</pre>
+
+@code {
+    [Parameter] public Ex031_ApiSettings Settings { get; set; } = new("", "");
+
+    private string Json => JsonSerializer.Serialize(Ex031_SecretsNeverReachClient.ToClientView(Settings));
+}

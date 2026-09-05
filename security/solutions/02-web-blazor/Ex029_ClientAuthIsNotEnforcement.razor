@@ -1,0 +1,20 @@
+@* Exercise 029 — ClientAuthIsNotEnforcement (reference solution).
+   Goal:   Hide the Approve button from anyone who is not an approver. This is
+           the UI-trimming half of the exercise; the enforcement half lives in
+           Ex029_PayrollService.TryApprove, which a test calls directly,
+           bypassing this component entirely, to prove that hiding the button
+           is not enough on its own. Implement ApproverRole so the
+           AuthorizeView below requires the right role name.
+   Drills: UI trimming is not authorization, server-side enforcement.
+   Passes: use facts - an approver-role state renders the Approve button; any
+                       other state (including anonymous) does not. *@
+
+<AuthorizeView Roles="@ApproverRole()">
+    <Authorized>
+        <button id="approve">Approve</button>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    private static string ApproverRole() => "approver";
+}

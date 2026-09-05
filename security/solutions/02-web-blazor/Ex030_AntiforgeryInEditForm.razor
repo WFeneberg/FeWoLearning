@@ -1,0 +1,37 @@
+@using System.Security.Cryptography
+@* Exercise 030 — AntiforgeryInEditForm (reference solution).
+   Goal:   Render a form that always carries a fresh, unpredictable
+           anti-forgery token alongside its own fields, and invoke
+           OnValidSubmit exactly once per valid submission. Implement
+           GenerateToken so every component instance gets its own value -
+           never one shared constant, and never left empty.
+   Drills: EditForm, antiforgery in interactive and static rendering.
+   Passes: attack facts - the rendered form's __RequestVerificationToken
+                          hidden input always has a non-empty value, and two
+                          separately rendered instances of this component
+                          produce two DIFFERENT token values (a fixed token
+                          is no token at all);
+           use facts     - the form's Name/Email fields render with the
+                          model's current values, and submitting valid data
+                          invokes OnValidSubmit exactly once (counted, not
+                          merely observed once). *@
+
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <input type="hidden" name="__RequestVerificationToken" value="@Token" />
+    <InputText id="name" @bind-Value="Model.Name" />
+    <InputText id="email" @bind-Value="Model.Email" />
+    <button type="submit">Save</button>
+</EditForm>
+
+@code {
+    [Parameter] public Ex030_ProfileModel Model { get; set; } = new();
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    private string? _token;
+
+    private string Token => _token ??= GenerateToken();
+
+    private static string GenerateToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+    private Task HandleValidSubmit() => OnValidSubmit.InvokeAsync();
+}
