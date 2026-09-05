@@ -36,7 +36,26 @@ public abstract class CaliburnCoreContext
     // CaliburnCoreContext is ever constructed, would silently poison this snapshot for the whole run.
     static readonly List<NameTransformer.Rule> PristineNameTransformerRules;
 
-    static CaliburnCoreContext() => PristineNameTransformerRules = ViewLocator.NameTransformer.ToList();
+    // Added for ex032 (BootstrapperConfigure): BootstrapperBase.Initialize()'s runtime path calls
+    // AssemblySourceCache.Install() (see Caliburn.Micro's BootstrapperBase.StartRuntime()), which
+    // permanently replaces AssemblySource.FindTypeByNames with a CACHED lookup that only ever
+    // finds types satisfying AssemblySourceCache.ExtractTypes - by default, types assignable to
+    // INotifyPropertyChanged (WPF's BootstrapperBase widens that to also include UIElement, which
+    // is why ex013's ViewLocator - resolving TO a view, itself a UIElement - keeps working, while
+    // ex016's ViewModelLocator - resolving TO a plain, non-notifying view model - stops finding
+    // anything at all). AssemblySourceCache guards the swap with a private, never-reset
+    // "isInstalled" flag, so this is a ONE-TIME, PERMANENT, PROCESS-GLOBAL mutation: once any
+    // single test anywhere in the run calls a real BootstrapperBase.Initialize() (ex032 is the
+    // first exercise that does), every OTHER test's plain-POCO view-model lookups would silently
+    // start failing for the rest of the process - unless undone here, the same way the
+    // NameTransformer leak above is undone.
+    static readonly Func<IEnumerable<string>, Type> PristineFindTypeByNames;
+
+    static CaliburnCoreContext()
+    {
+        PristineNameTransformerRules = ViewLocator.NameTransformer.ToList();
+        PristineFindTypeByNames = AssemblySource.FindTypeByNames;
+    }
 
     protected SimpleContainer Container { get; } = new();
 
@@ -54,6 +73,12 @@ public abstract class CaliburnCoreContext
         AssemblySource.Instance.Clear();
         AssemblySource.Instance.Add(typeof(TrackMarker).Assembly);
         AssemblySource.Instance.Add(typeof(CaliburnCoreContext).Assembly);
+
+        // Undo whatever ex032's (or any future exercise's) real BootstrapperBase.Initialize()
+        // call left behind: AssemblySourceCache.Install() only ever runs its replacement in
+        // once per process (see the static constructor's comment above), so restoring the
+        // pristine, uncached delegate here is what makes that one-time install harmless.
+        AssemblySource.FindTypeByNames = PristineFindTypeByNames;
 
         // Not optional even with no UI at all: Coroutine.BeginExecute calls IoC.BuildUp,
         // so an otherwise pure-core coroutine test throws "IoC is not initialized".

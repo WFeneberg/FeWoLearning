@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -58,11 +58,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 028 | ActionTarget | `Action.SetTarget` also sets the element's `DataContext`; `Action.SetTargetWithoutContext` leaves it untouched; both make the action invocable identically | ✅ |
 | 029 | SimpleContainerBasics | `RegisterSingleton` vs `RegisterPerRequest`, `GetInstance` returning `null` (not throwing) for an unregistered service, and constructor injection - which only applies once the CONSUMER type is itself registered | ✅ |
 | 030 | SimpleContainerInstances | `RegisterInstance` returns the exact registered object; `RegisterHandler`'s factory runs fresh on every resolution; `GetAllInstances` counts every registration for a service, including duplicates and mixed registration kinds | ✅ |
-| 031 | IoCFacade | `IoC.Get`, `GetAll`, `BuildUp` | ⬜ |
-| 032 | BootstrapperConfigure | `BootstrapperBase`, `Configure`, container wiring | ⬜ |
-| 033 | ConductorSingleActive | `Conductor<T>`, activating and replacing an item | ⬜ |
-| 034 | ConductorOneActive | `Conductor<T>.Collection.OneActive`, `Items`, `ActiveItem` | ⬜ |
-| 035 | ConductorAllActive | `Conductor<T>.Collection.AllActive` | ⬜ |
+| 031 | IoCFacade | `IoC.Get`/`GetAll`/`BuildUp` forwarding to whatever delegates are installed; `GetAll` (not `Get`) is the safe way to probe "nothing registered" - `Get` inherits the harness's `Activator.CreateInstance` fallback | ✅ |
+| 032 | BootstrapperConfigure | `BootstrapperBase(useApplication: false)` headless; `Configure` does not run until `Initialize()`, which is idempotent and installs the override triad behind `IoC` | ✅ |
+| 033 | ConductorSingleActive | `Conductor<T>`, activating and replacing an item - the replaced item is CLOSED (`OnDeactivateAsync(close: true)`), and a refusing `CanCloseAsync` blocks the replacement entirely | ✅ |
+| 034 | ConductorOneActive | `Conductor<T>.Collection.OneActive`, `Items` (a `BindableCollection<T>`), `ActiveItem` - the outgoing item is only deactivated (`close: false`), not closed, and stays in `Items` until explicitly closed | ✅ |
+| 035 | ConductorAllActive | `Conductor<T>.Collection.AllActive` - every item in `Items` active simultaneously; no `ActiveItem` property exists at all (measured by reflection) | ✅ |
 | 036 | ParentChildRelationship | `IChild`, `Parent`, set by the conductor | ⬜ |
 | 037 | EventAggregatorBasics | `Subscribe`, `PublishAsync`, `IHandle<T>` | ⬜ |
 | 038 | EventAggregatorMultipleMessages | one subscriber handling several message types | ⬜ |
