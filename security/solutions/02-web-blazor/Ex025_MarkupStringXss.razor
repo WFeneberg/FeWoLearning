@@ -1,0 +1,74 @@
+@using System.Net
+@using System.Text
+@using System.Text.RegularExpressions
+@* Exercise 025 — MarkupStringXss (reference solution).
+   Goal:   Render a comment body that may contain a small amount of formatting
+           without handing an attacker a script injection. Implement Sanitize so
+           that Rendered returns markup safe to pass to MarkupString.
+   Drills: MarkupString as a sink, sanitisation, when raw HTML is never safe.
+   Passes: attack facts - script elements, event-handler attributes and
+                          javascript: URLs never survive into the rendered output;
+           use facts     - <em> and <strong> do survive, and plain text renders
+                          unchanged. *@
+
+<div id="comment">@((MarkupString)Rendered)</div>
+
+@code {
+    [Parameter] public string Body { get; set; } = "";
+
+    // Shape A: the member the markup calls is the member that throws.
+    private string Rendered => Sanitize(Body);
+
+    // Allowlist, not denylist: walk the string as a run of tag tokens ("<...>")
+    // and plain-text runs. A tag survives only when it is exactly one of
+    // em/strong/b/i with no attributes at all - anything else (a different
+    // element, or one of these four WITH attributes) is dropped in full,
+    // attributes and all, rather than having its angle brackets encoded. Encoding
+    // the delimiters and leaving the attribute text behind would still let words
+    // like "onerror" or "javascript:" show up verbatim in the rendered HTML, even
+    // though they are inert as plain text - dropping the whole tag keeps the
+    // sanitizer honest against that. Every plain-text run is HTML-encoded so it
+    // can never be mistaken for markup.
+    private static readonly HashSet<string> AllowedTags =
+        new(StringComparer.OrdinalIgnoreCase) { "em", "strong", "b", "i" };
+
+    private static readonly Regex TagPattern = new(
+        @"<(/?)\s*([a-zA-Z][a-zA-Z0-9]*)((?:\s[^<>]*)?)\s*(/?)\s*>",
+        RegexOptions.Compiled);
+
+    public static string Sanitize(string untrusted)
+    {
+        ArgumentNullException.ThrowIfNull(untrusted);
+
+        var result = new StringBuilder();
+        var lastIndex = 0;
+
+        foreach (Match match in TagPattern.Matches(untrusted))
+        {
+            if (match.Index > lastIndex)
+            {
+                result.Append(WebUtility.HtmlEncode(untrusted[lastIndex..match.Index]));
+            }
+
+            var isClosing = match.Groups[1].Value == "/";
+            var tagName = match.Groups[2].Value;
+            var hasAttributes = match.Groups[3].Value.Length > 0;
+
+            if (!hasAttributes && AllowedTags.Contains(tagName))
+            {
+                var canonical = tagName.ToLowerInvariant();
+                result.Append(isClosing ? $"</{canonical}>" : $"<{canonical}>");
+            }
+            // else: drop the tag - and any attributes it carries - entirely.
+
+            lastIndex = match.Index + match.Length;
+        }
+
+        if (lastIndex < untrusted.Length)
+        {
+            result.Append(WebUtility.HtmlEncode(untrusted[lastIndex..]));
+        }
+
+        return result.ToString();
+    }
+}

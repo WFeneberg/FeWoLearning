@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 24 ✅ / 36 ⬜**
+**Status: 28 ✅ / 32 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -51,10 +51,10 @@ implementations in `solutions/<block>/` at the same relative path.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 025 | MarkupStringXss | MarkupString as a sink, sanitisation, when raw HTML is never safe | ⬜ |
-| 026 | RenderTreeEncodingDefaults | automatic encoding of text and attributes, attribute injection | ⬜ |
-| 027 | CspNonceFlow | nonce propagation to components, eliminating inline handlers | ⬜ |
-| 028 | AuthorizeViewAndAuthState | AuthenticationStateProvider, AuthorizeView, cascading auth state | ⬜ |
+| 025 | MarkupStringXss | MarkupString as a sink, sanitisation, when raw HTML is never safe | ✅ |
+| 026 | RenderTreeEncodingDefaults | automatic encoding of text and attributes, attribute injection | ✅ |
+| 027 | CspNonceFlow | nonce propagation to components, eliminating inline handlers | ✅ |
+| 028 | AuthorizeViewAndAuthState | AuthenticationStateProvider, AuthorizeView, cascading auth state | ✅ |
 | 029 | ClientAuthIsNotEnforcement | UI trimming is not authorization, server-side enforcement | ⬜ |
 | 030 | AntiforgeryInEditForm | EditForm, antiforgery in interactive and static rendering | ⬜ |
 | 031 | SecretsNeverReachClient | configuration surface, what a component may receive | ⬜ |

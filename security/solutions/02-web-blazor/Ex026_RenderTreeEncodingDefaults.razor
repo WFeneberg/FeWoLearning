@@ -1,0 +1,40 @@
+@* Exercise 026 — RenderTreeEncodingDefaults (reference solution).
+   Goal:   Name which render-tree sinks Blazor encodes for you and which one it
+           does not, by implementing RequiresManualEncoding. The markup below
+           needs no new code of its own - @Text and @CssClass are already safe
+           sinks - but every render is routed through RequiresManualEncoding
+           first, so it (and the rest of the component) stays red until it is
+           implemented.
+   Drills: automatic encoding of text and attributes, attribute injection.
+   Passes: attack facts - a <script> payload in Text produces no <script>
+                          element, and an attribute-break payload in CssClass
+                          produces no onmouseover attribute (Blazor already
+                          encodes both sinks - these facts document that, they
+                          are not new code to write);
+           use facts    - RequiresManualEncoding("MarkupString") is true,
+                          RequiresManualEncoding("text") and
+                          RequiresManualEncoding("attribute") are both false,
+                          and plain text/class still render correctly. *@
+
+<span id="out" class="@CssClass">@Text</span>
+
+@code {
+    [Parameter] public string Text { get; set; } = "";
+    [Parameter] public string CssClass { get; set; } = "";
+
+    protected override void OnParametersSet() => _ = RequiresManualEncoding("text");
+
+    // The render tree encodes a plain child-content text sink and a plain
+    // attribute-value sink for you (that is what @Text and @CssClass above
+    // are). A MarkupString is the one sink that opts OUT of that encoding by
+    // design - it is how a component says "render this string as raw HTML" -
+    // so it is the only sink whose caller must encode (or otherwise sanitise)
+    // untrusted input themselves before it ever reaches the render tree.
+    public static bool RequiresManualEncoding(string sink) => sink switch
+    {
+        "MarkupString" => true,
+        "text" => false,
+        "attribute" => false,
+        _ => throw new ArgumentOutOfRangeException(nameof(sink), sink, "Unknown render-tree sink"),
+    };
+}

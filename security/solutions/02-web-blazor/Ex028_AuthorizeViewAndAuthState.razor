@@ -1,0 +1,32 @@
+@* Exercise 028 — AuthorizeViewAndAuthState (reference solution).
+   Goal:   Gate two sections of a page by authorization state: one visible to
+           any authenticated user, one visible only to the "manager" role.
+           Implement ResolveManagerRole so the manager AuthorizeView requires
+           the right role name.
+   Drills: AuthenticationStateProvider, AuthorizeView, cascading auth state.
+   Passes: attack facts - an anonymous state renders neither the manager nor
+                          the authenticated section; a state authenticated
+                          without the manager role renders the authenticated
+                          section but not the manager section;
+           use facts     - a manager-role state renders both sections, and the
+                          anonymous state renders the NotAuthorized content, so
+                          the page is not simply blank. *@
+
+<AuthorizeView Roles="@ResolveManagerRole()">
+    <Authorized>
+        <div id="manager-section">Manager tools.</div>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView>
+    <Authorized>
+        <div id="authenticated-section">Member area.</div>
+    </Authorized>
+    <NotAuthorized>
+        <div id="anonymous-section">Please sign in to continue.</div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private static string ResolveManagerRole() => "manager";
+}

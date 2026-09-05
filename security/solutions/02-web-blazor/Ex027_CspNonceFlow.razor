@@ -1,0 +1,28 @@
+@* Exercise 027 — CspNonceFlow (reference solution).
+   Goal:   Emit an inline <script> only when a nonce has been cascaded to this
+           component, carrying that exact nonce - never one this component
+           invents or omits. Implement NonceValue so the script renders only
+           when Nonce is present, using its Value verbatim.
+   Drills: nonce propagation to components, eliminating inline handlers.
+   Passes: attack facts - the rendered markup never contains an inline
+                          event-handler attribute, and rendering with no
+                          cascaded Ex027_CspNonce produces no <script> element
+                          at all - never one with a missing or empty nonce;
+           use facts     - with a nonce cascaded, the script element's nonce
+                          attribute equals that value exactly, and the
+                          script's body content still renders. *@
+
+@if (NonceValue is not null)
+{
+    <script id="s" nonce="@NonceValue">@ScriptBody</script>
+}
+
+@code {
+    [CascadingParameter] public Ex027_CspNonce? Nonce { get; set; }
+    [Parameter] public string ScriptBody { get; set; } = "console.log('ready');";
+
+    // Project the cascaded value's Value verbatim; null (no cascaded nonce)
+    // flows straight through, which is exactly what suppresses the <script>
+    // element above rather than rendering one with an empty nonce attribute.
+    private string? NonceValue => Nonce?.Value;
+}

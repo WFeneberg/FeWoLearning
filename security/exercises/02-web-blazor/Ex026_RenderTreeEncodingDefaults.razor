@@ -1,0 +1,36 @@
+@* Exercise 026 — RenderTreeEncodingDefaults (web-blazor).
+   Goal:   Name which render-tree sinks Blazor encodes for you and which one it
+           does not, by implementing RequiresManualEncoding. The markup below
+           needs no new code of its own - @Text and @CssClass are already safe
+           sinks - but every render is routed through RequiresManualEncoding
+           first, so it (and the rest of the component) stays red until it is
+           implemented.
+   Drills: automatic encoding of text and attributes, attribute injection.
+   Passes: attack facts - a <script> payload in Text produces no <script>
+                          element, and an attribute-break payload in CssClass
+                          produces no onmouseover attribute (Blazor already
+                          encodes both sinks - these facts document that, they
+                          are not new code to write);
+           use facts    - RequiresManualEncoding("MarkupString") is true,
+                          RequiresManualEncoding("text") and
+                          RequiresManualEncoding("attribute") are both false,
+                          and plain text/class still render correctly. *@
+
+<span id="out" class="@CssClass">@Text</span>
+
+@code {
+    [Parameter] public string Text { get; set; } = "";
+    [Parameter] public string CssClass { get; set; } = "";
+
+    // Shape B: rendering itself needs no learner code - Blazor already encodes
+    // both @Text and @CssClass below - so the throwing member is not something
+    // the markup computes, it is the lifecycle hook that runs before every
+    // render. That keeps the whole component (attack facts included) red until
+    // RequiresManualEncoding is implemented, even though its own answer never
+    // changes what gets rendered.
+    protected override void OnParametersSet() => _ = RequiresManualEncoding("text");
+
+    public static bool RequiresManualEncoding(string sink) =>
+        throw new NotImplementedException(
+            "TODO: Ex026 - true only for the one sink Blazor does not already encode for you");
+}

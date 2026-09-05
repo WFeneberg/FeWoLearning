@@ -1,0 +1,22 @@
+@* Exercise 025 — MarkupStringXss (web-blazor).
+   Goal:   Render a comment body that may contain a small amount of formatting
+           without handing an attacker a script injection. Implement Sanitize so
+           that Rendered returns markup safe to pass to MarkupString.
+   Drills: MarkupString as a sink, sanitisation, when raw HTML is never safe.
+   Passes: attack facts - script elements, event-handler attributes and
+                          javascript: URLs never survive into the rendered output;
+           use facts     - <em> and <strong> do survive, and plain text renders
+                          unchanged. *@
+
+<div id="comment">@((MarkupString)Rendered)</div>
+
+@code {
+    [Parameter] public string Body { get; set; } = "";
+
+    // Shape A: the member the markup calls is the member that throws.
+    private string Rendered => Sanitize(Body);
+
+    public static string Sanitize(string untrusted) =>
+        throw new NotImplementedException(
+            "TODO: Ex025 - return only allowlisted markup; strip everything else");
+}
