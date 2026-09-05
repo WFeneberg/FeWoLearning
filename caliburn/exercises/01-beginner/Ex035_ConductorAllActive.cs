@@ -28,7 +28,7 @@ public class Ex035_ConductorAllActive : Conductor<Ex035_Child>.Collection.AllAct
 {
     /// <summary>Activates this conductor first if it is not already active, then activates every item in items.</summary>
     public Task ActivateAllAsync(IEnumerable<Ex035_Child> items) =>
-        throw new NotImplementedException("TODO: Ex035 - activate this conductor if needed, then ActivateItemAsync each item in items");
+        throw new NotImplementedException("TODO: Ex035 - activate this conductor if it is not already active, then activate every item in items");
 }
 
 /// <summary>A screen that records how it was deactivated - one of this conductor's items.</summary>

@@ -82,10 +82,10 @@ exercise in the Aspire dashboard.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-05: ex001-ex030 (171 exercise test facts) are red on
-  the untouched tree — `dotnet test` shows 171 failed, 7 passed (the 7 harness
-  smoke tests, which pass in both modes) — and `dotnet test
-  -p:UseSolutions=true` shows 178 passed, 0 failed. **`wpf/`**'s beginner tier
+  verified as of 2026-09-05: ex001-ex035 (199 exercise test facts, completing
+  the beginner tier) are red on the untouched tree — `dotnet test` shows 199
+  failed, 7 passed (the 7 harness smoke tests, which pass in both modes) — and
+  `dotnet test -p:UseSolutions=true` shows 206 passed, 0 failed. **`wpf/`**'s beginner tier
   (35/100, `01-beginner` ex001-ex035) is verified end-to-end as of 2026-09-05, on
   **.NET 10.0.400** with **xunit.v3 4.0.0** and **Xunit.StaFact 4.0.23**
   (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5 passed (the
@@ -331,9 +331,12 @@ exercise in the Aspire dashboard.
   view never reaches that view's children. An element must not be named
   after a `FrameworkElement` member: `x:Name="Name"` hides
   `FrameworkElement.Name` (`CS0108`). Exercises use `UserName`-style names.
-  The `exercises/` build emits expected `CS0067`/`CS0649` warnings from stubs
-  whose members throw; `solutions/` builds with 0 warnings — same stance as
-  `blazor/`.
+  The `exercises/` build emits expected `CS0067`/`CS0649`/`CS0169`/`CS0414`
+  warnings from stubs whose members throw; `solutions/` builds with **0
+  warnings** and a warning there is a finding; `tests/` suppresses
+  `xUnit1051` only, via `NoWarn` in its `.csproj`, and any other warning there
+  is a finding too — the full register is in `caliburn/README.md`. Same
+  stance as `blazor/`.
   Caliburn.Micro 5 marks `Screen.OnInitializeAsync` and `Screen.OnActivateAsync`
   `[Obsolete]`, with the messages "Override OnInitializedAsync" and "Override
   OnActivatedAsync". Overriding the obsolete pair puts `CS0672` in the build,
@@ -343,10 +346,11 @@ exercise in the Aspire dashboard.
   → `OnActivatedAsync` — so they are the same lifecycle point and the
   non-obsolete name is the one to override. `OnDeactivateAsync` is **not**
   obsolete and has no `OnDeactivatedAsync` counterpart.
-  `tests/_harness/CaliburnCoreContext.cs` resets four process-global Caliburn
+  `tests/_harness/CaliburnCoreContext.cs` resets six process-global Caliburn
   statics before every test — `PlatformProvider.Current`,
-  `AssemblySource.Instance`, the `IoC` delegates, and
-  `ViewLocator.NameTransformer` — and that list is incomplete **by design**:
+  `AssemblySource.Instance`, the `IoC` delegates,
+  `ViewLocator.NameTransformer`, and (see below) `AssemblySource.FindTypeByNames`
+  and `AssemblySourceCache.ExtractTypes` — and that list is incomplete **by design**:
   it does not yet reset `ViewLocator.LocateTypeForModelType`,
   `ViewModelLocator`'s own separate `NameTransformer` (measured: a genuinely
   different object from `ViewLocator.NameTransformer`, not an alias) and
@@ -369,6 +373,21 @@ exercise in the Aspire dashboard.
   and that read happens *after* the same instance constructor's `Clear()`
   call, so the snapshot comes back empty and permanently zeroes the
   collection for the whole run. Measured on this machine.
+  **`BootstrapperBase.Initialize()` permanently rewires type lookup.** It
+  calls `AssemblySourceCache.Install()`, which swaps
+  `AssemblySource.FindTypeByNames` for a cached lookup that only finds types
+  assignable to `INotifyPropertyChanged` (the WPF bootstrapper widens it to
+  `UIElement` as well), guarded by a private `isInstalled` flag so it never
+  happens twice and never reverts. Measured consequence: once any test calls
+  `Initialize()`, exercises resolving plain POCO view models — ex016's
+  `ViewModelLocator` — fail for the rest of the run.
+  `tests/_harness/CaliburnCoreContext.cs` therefore snapshots and restores
+  both `AssemblySource.FindTypeByNames` and `AssemblySourceCache.ExtractTypes`;
+  the harness now resets **six** process-globals per test.
+  **`SimpleContainer.BuildUp` injects interface-typed properties only.**
+  Measured: an interface-typed property is injected whether its setter is
+  public or private; a **concrete**-typed property is never injected, even
+  when that exact concrete type is registered; fields are never injected.
   The same namespace-shadowing trap the file already records for `avalonia/`
   applies here: a file whose own namespace starts `FeWoLearning.Caliburn.…`
   cannot reference a Caliburn type fully qualified —
@@ -527,7 +546,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 65 / 100 (verified) | 35 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 30 / 100 (verified) | 70 |
+| `caliburn/`| 35 / 100 (verified) | 65 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 

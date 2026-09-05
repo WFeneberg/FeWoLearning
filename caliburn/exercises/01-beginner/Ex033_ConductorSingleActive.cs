@@ -27,7 +27,7 @@ public class Ex033_ConductorSingleActive : Conductor<Ex033_Child>
 {
     /// <summary>Activates this conductor first if it is not already active, then activates item into it - closing whatever item was shown before.</summary>
     public Task ShowAsync(Ex033_Child item) =>
-        throw new NotImplementedException("TODO: Ex033 - activate this conductor if needed, then ActivateItemAsync(item)");
+        throw new NotImplementedException("TODO: Ex033 - activate this conductor if it is not already active, then activate item into it");
 }
 
 /// <summary>A screen that records how it was deactivated - the item this conductor shows and replaces.</summary>

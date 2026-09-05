@@ -29,7 +29,7 @@ public class Ex034_ConductorOneActive : Conductor<Ex034_Child>.Collection.OneAct
 {
     /// <summary>Closes whichever item is currently ActiveItem, if any - a no-op when nothing is active.</summary>
     public Task CloseActiveAsync() =>
-        throw new NotImplementedException("TODO: Ex034 - if ActiveItem is not null, DeactivateItemAsync(ActiveItem, close: true)");
+        throw new NotImplementedException("TODO: Ex034 - close whichever item is currently active, doing nothing if none is");
 }
 
 /// <summary>A screen that records how it was deactivated - one of this conductor's items.</summary>
