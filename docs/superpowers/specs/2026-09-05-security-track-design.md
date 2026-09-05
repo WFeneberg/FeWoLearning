@@ -95,22 +95,39 @@ parameterised query returns 0). 3.53.3 also works and also clears the warning;
 2.1.13 is chosen as the smallest move inside the line `Microsoft.Data.Sqlite`
 10.0.0 was built against.
 
-### 2.4 `dotnet test` does not discover tests in this environment
+### 2.4 Bare `dotnet test` mis-resolves; use `--solution` or `--project`
 
-Measured 2026-09-05: `dotnet test` reports **"no tests were run", exit code 5**,
-in Bash *and* in PowerShell — and it does so for the **existing, already-verified
-`wpf/` track** too, not only for this design's probe. Running the built
-executable directly works perfectly:
-`wpf/tests/bin/Debug/net10.0-windows/FeWoLearning.Wpf.Tests.exe` reports
-**144 total, 140 failed**, exactly the stub picture its catalog predicts.
+**Corrected 2026-09-05, after the original measurement here proved misleading.**
 
-Consequence for this track: **the verification recipe is `dotnet build`, then
-run `tests/bin/Debug/net10.0-windows/FeWoLearning.Security.Tests.exe` directly**,
-with a filter for batch runs. `dotnet test` stays documented in the README as
-the intended command with this caveat attached. This is an environment finding,
-not a defect of the design, and it means `wpf/README.md`'s current claim about
-`dotnet test` is not reproducible here — worth a follow-up, out of scope for
-this track.
+`security/global.json` opts into the `Microsoft.Testing.Platform` runner, whose
+`dotnet test` front-end takes `--project` / `--solution` rather than a positional
+path. Invoked with **no arguments** in a directory holding a `.slnx`, it
+auto-resolves to the built test **dll** instead of the solution and reports
+`Es wurden keine Tests ausgeführt` with exit code 5. Measured for `security/`
+and, identically, for the pre-existing `wpf/` track — so it is a property of the
+MTP opt-in, not of either track.
+
+Given an argument it works correctly:
+
+| Command | Result |
+|---|---|
+| `dotnet test` | exit 5, `gesamt: 0` |
+| `dotnet test --solution FeWoLearning.Security.slnx` | 326 total, 322 failed, 3 passed, 1 skipped, exit 2 |
+| `dotnet test --project tests/FeWoLearning.Security.Tests.csproj` | identical |
+| `… --filter-class "*Ex001*"` | 5 tests — filtering works |
+
+Ruled out as causes: the shell sandbox (it fails with the sandbox disabled too),
+a stale build server (`dotnet build-server shutdown` changed nothing), the SDK
+version, and environment variables.
+
+The original entry here claimed `dotnet test` was simply broken in this
+environment and that building plus running the test executable directly was the
+only option. That conclusion was wrong, and it was wrong in the most expensive
+direction: it would have told a reader the tool does not work when in fact they
+were one flag away. Building and running
+`tests/bin/Debug/net10.0-windows/FeWoLearning.Security.Tests.exe` directly does
+work, is how every batch in this track was verified, and remains a useful
+fallback — but it is not the only way.
 
 ### 2.5 Consequences of the platform choice
 
