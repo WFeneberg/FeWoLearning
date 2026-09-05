@@ -211,6 +211,40 @@ Measured on 2026-09-05, for ex051–ex055.
   without an explicit x:DataType directive"), even when every inner `DataTemplate`
   carries one.
 
+### 2.5 Two controls are not in core, and the version pin has two documented exceptions
+
+Measured on 2026-09-05 while preparing ex056–ex060.
+
+`DataGrid` and `ItemsRepeater` (with `UniformGridLayout`) are **not** in core Avalonia
+12.1.1 — both fail to compile with CS0246. Each lives in its own package whose release
+line lags Avalonia's, so the otherwise absolute "everything pinned at 12.1.1" rule gets
+exactly two exceptions, both verified to compile **and render** against 12.1.1:
+
+| package | version | why not 12.1.1 |
+|---|---|---|
+| `Avalonia.Controls.DataGrid` | **12.1.0** | its line stops there; one minor behind |
+| `Avalonia.Controls.ItemsRepeater` | **12.0.0** | its latest release is 12.0.0; two minors behind |
+
+Neither produced a version-conflict warning, and both were measured rendering:
+
+- **`DataGrid` renders nothing without its theme.** With the package referenced and
+  columns bound, `Columns.Count` was 2 and `ItemsSource` was set, but the rendered text
+  was **empty** — the control has no template. Adding
+  `<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />`
+  produced `[Name, Age, Ada, 36, Grace, 45]`.
+
+  Crucially, the include works **inside the exercise's own `UserControl.Styles`** — it
+  does not need to go into the shared test harness. Keep it in the exercise: the
+  harness must stay ignorant of exercise dependencies, and "you must include DataGrid's
+  theme" is itself worth teaching.
+- **`ItemsRepeater` + `UniformGridLayout` lay out correctly.** Five 80×20 items in a
+  200-wide host measured at `(0,0) (80,0) (0,20) (80,20) (0,40)` — a real two-column
+  uniform grid — with all five realized and their text rendered.
+
+These two additions are the only permitted deviation from the version pin. Adding any
+other package still requires the same treatment: probe that it compiles *and* renders
+before committing to an exercise built on it.
+
 ### 2.1 Seven constraints discovered by the probe
 
 A throwaway probe in the scratchpad — a ReactiveUI view model plus a real
