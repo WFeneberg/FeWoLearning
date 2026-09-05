@@ -134,6 +134,23 @@ measurement walked, not the general mechanism it seems to imply.
   that is what actually proves `ValidateOnStart()` ran, since a test that only resolves
   `.Value` after starting cannot tell "validated at start" apart from "validated lazily,
   same as always".
+- **`await CancellationTokenSource.CancelAsync()` does NOT reproduce `uno/`'s stack overflow
+  on this dispatcher.** Measured directly for row 050, outside the repo: a single cancellation
+  and a chain of 20,000 cancel-then-await rounds on a real yield point both complete cleanly,
+  because `DispatcherSynchronizationContext.Post` always queues through `Dispatcher.BeginInvoke`
+  rather than ever running a continuation inline. Row 050 still ships the synchronous `Cancel()`
+  regardless - this measurement is not a license to use `CancelAsync()` untested elsewhere.
+- **`Progress<T>` captures the ambient `SynchronizationContext` at construction, not at
+  `Report` time.** Measured directly for row 047: one built on the dispatcher thread always
+  reports back on it; the identical type built on a ThreadPool thread with no ambient context
+  reports on a pool thread instead, even when `Report` is called from the dispatcher - silently,
+  no exception anywhere. It also always POSTS, even back to its own constructing thread, so a
+  test must wait for the callback rather than assume it already ran once the reporting call returns.
+- **A dispatcher-priority test asserting only the final order from a scrambled call order can
+  pass against code that never uses real per-item priority at all.** Measured directly building
+  row 048: an implementation that pre-sorts its own items and queues all of them at one uniform
+  priority passed that simple test outright; only interleaving a marker queued from OUTSIDE the
+  code under test, at a real priority between two of its items, exposed it.
 
 #### Layout and sizing
 

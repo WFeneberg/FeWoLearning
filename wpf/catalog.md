@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 45 ✅ / 55 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -94,11 +94,11 @@ Two deliberate content gaps:
 | 043 | NotifyDataErrorInfo | `INotifyDataErrorInfo`, per-property errors, `HasErrors` | ✅ |
 | 044 | DataErrorInfoLegacy | `IDataErrorInfo`, `ValidatesOnDataErrors` | ✅ |
 | 045 | ValidationRules | `ValidationRule`, `Validation.GetErrors`, `Validation.HasError` | ✅ |
-| 046 | AsyncVoidToAsyncCommand | an async command with `IsExecuting` gating instead of `async void` | ⬜ |
-| 047 | ProgressReporting | `IProgress<T>`, `Progress<T>` marshalling back to the dispatcher | ⬜ |
-| 048 | DispatcherInvokeAsyncPriorities | `Dispatcher.InvokeAsync`, execution order across priorities | ⬜ |
-| 049 | SynchronizationContextCapture | why `await` returns to the UI thread; the cost of `ConfigureAwait(false)` | ⬜ |
-| 050 | CommandCancellation | `CancellationTokenSource`, cancelling a running command | ⬜ |
+| 046 | AsyncVoidToAsyncCommand | an async command with `IsExecuting` gating instead of `async void` | ✅ |
+| 047 | ProgressReporting | `IProgress<T>`, `Progress<T>` marshalling back to the dispatcher | ✅ |
+| 048 | DispatcherInvokeAsyncPriorities | `Dispatcher.InvokeAsync`, execution order across priorities | ✅ |
+| 049 | SynchronizationContextCapture | why `await` returns to the UI thread; the cost of `ConfigureAwait(false)` | ✅ |
+| 050 | CommandCancellation | `CancellationTokenSource`, cancelling a running command | ✅ |
 | 051 | CollectionSynchronization | `BindingOperations.EnableCollectionSynchronization` | ⬜ |
 | 052 | BackgroundWorkerToTask | migrate `ProgressChanged`/`RunWorkerCompleted` to `Task` + `IProgress<T>` | ⬜ |
 | 053 | CollectionViewSourceBasics | `ICollectionView`, `CurrentItem`, `MoveCurrentTo` | ⬜ |

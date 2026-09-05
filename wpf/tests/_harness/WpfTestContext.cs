@@ -43,6 +43,34 @@ public abstract class WpfTestContext : IDisposable
     }
 
     /// <summary>
+    /// Awaits <paramref name="task"/>, but bounded: if <paramref name="timeout"/> (5 seconds by
+    /// default) elapses first, throws a <see cref="TimeoutException"/> instead of waiting
+    /// forever. Rows 046-050 are this track's first genuinely async tests, and xunit waits for
+    /// the async work a test started - a stuck gate (an unsettled <see cref="TaskCompletionSource"/>,
+    /// a production bug that swallows a cancellation and never completes) would otherwise hang
+    /// the whole serial run, not just its own test, and leave a testhost process holding the
+    /// output DLL. Every wait on production-controlled async work in that tier goes through
+    /// this instead of a bare <c>await</c>, so a stuck gate becomes a failing assertion here.
+    /// </summary>
+    protected static async Task WithTimeout(Task task, TimeSpan? timeout = null)
+    {
+        var winner = await Task.WhenAny(task, Task.Delay(timeout ?? TimeSpan.FromSeconds(5)));
+        if (!ReferenceEquals(winner, task))
+        {
+            throw new TimeoutException("Bounded wait exceeded its timeout - a gate was never settled. See wpf/README.md, 'Timing and the dispatcher'.");
+        }
+
+        await task; // surfaces a fault/cancellation as a real exception instead of hiding it
+    }
+
+    /// <summary>Same as the non-generic overload, for a task that produces a value.</summary>
+    protected static async Task<T> WithTimeout<T>(Task<T> task, TimeSpan? timeout = null)
+    {
+        await WithTimeout((Task)task, timeout);
+        return await task;
+    }
+
+    /// <summary>
     /// Explicitly completes WPF's <see cref="ISupportInitialize"/> protocol - what the XAML
     /// parser does automatically around every element it builds, and what plain code never
     /// triggers on its own unless it happens to acquire a logical child or a
