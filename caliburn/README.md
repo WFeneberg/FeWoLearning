@@ -238,6 +238,17 @@ and deliberately left unsuppressed: silencing them would silence the same
 warning class a real unused-field bug produces. `solutions/` builds with
 **0 warnings** — a warning there is a finding.
 
+The project-wide warning stance, stated once here: `exercises/` carries its
+expected stub warnings above and nothing else; `solutions/` is **0 warnings**,
+full stop — a warning there is a finding. `tests/` suppresses exactly one rule,
+`xUnit1051` ("pass `TestContext.Current.CancellationToken` through"), via
+`<NoWarn>` in `FeWoLearning.Caliburn.Tests.csproj` — the suite runs serially
+(`DisableTestParallelization`) with no timeouts and nothing that ever wants
+cooperative cancellation, and threading a token through every Caliburn call in
+a beginner-tier file would bury the framework's own API shape
+(`ActivateItemAsync`, `CanCloseAsync`, `OnDeactivateAsync`) under xUnit
+ceremony unrelated to the lesson. Any *other* warning in `tests/` is a finding.
+
 ## Why `solutions/` is in the build
 
 The repo-wide convention (see the root `CLAUDE.md`) keeps `solutions/` out of

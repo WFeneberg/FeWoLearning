@@ -8,7 +8,6 @@
 // Passes: dotnet test --filter FullyQualifiedName~Ex031_
 
 using System.Collections.Generic;
-using System.Linq;
 using Caliburn.Micro;
 
 namespace FeWoLearning.Caliburn.Exercises.Beginner;
@@ -21,7 +20,7 @@ public class Ex031_IoCFacade
 
     /// <summary>Resolves every current registration for TService through the currently installed IoC delegates.</summary>
     public IEnumerable<TService> ResolveAll<TService>() where TService : class =>
-        IoC.GetAll<TService>().ToList();
+        IoC.GetAll<TService>();
 
     /// <summary>Runs property injection over an already-constructed instance through the currently installed IoC delegates.</summary>
     public void Inject(object instance) =>
@@ -50,9 +49,14 @@ public class Ex031_Other : IEx031_Other
     public Guid Id { get; } = Guid.NewGuid();
 }
 
-/// <summary>Two settable properties: one whose service type gets registered, one whose never does.</summary>
+/// <summary>
+/// Three settable properties: an interface type that gets registered, an interface type that
+/// never does, and a CONCRETE type registered under its own name - BuildUp only ever considers
+/// interface-typed properties, so the concrete one stays null no matter what is registered for it.
+/// </summary>
 public class Ex031_PropertyConsumer
 {
     public IEx031_Thing? Thing { get; set; }
     public IEx031_Other? Other { get; set; }
+    public Ex031_Thing? ConcreteThing { get; set; }
 }

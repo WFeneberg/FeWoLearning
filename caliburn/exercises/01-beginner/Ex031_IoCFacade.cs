@@ -16,10 +16,13 @@
 // separate registrations of the same service, not just the newest one.
 //
 // IoC.BuildUp(instance) delegates straight to the installed container's BuildUp, which walks an
-// object's public settable properties and injects whichever ones have a currently-registered
-// type - measured to do this even with SimpleContainer.EnablePropertyInjection at its default of
-// false, so that flag is not the gate here. A property whose type was never registered is not
-// touched at all - it is left exactly as it was, not forced to some placeholder.
+// object's INTERFACE-typed properties - setter accessibility does not matter, a private setter is
+// injected exactly like a public one - and injects whichever ones have a currently-registered
+// type, measured to do this even with SimpleContainer.EnablePropertyInjection at its default of
+// false, so that flag is not the gate here. A CONCRETE-typed property is never touched, even when
+// that exact concrete type is itself registered, and neither are fields - only interface-typed
+// PROPERTIES are candidates at all. A property whose interface type was never registered is left
+// exactly as it was, not forced to some placeholder.
 //
 // A trap deliberately NOT exercised here: the test harness's own IoC.GetInstance falls back to
 // Activator.CreateInstance for anything unregistered, so "resolve something unregistered" does
@@ -69,9 +72,14 @@ public class Ex031_Other : IEx031_Other
     public Guid Id { get; } = Guid.NewGuid();
 }
 
-/// <summary>Two settable properties: one whose service type gets registered, one whose never does.</summary>
+/// <summary>
+/// Three settable properties: an interface type that gets registered, an interface type that
+/// never does, and a CONCRETE type registered under its own name - BuildUp only ever considers
+/// interface-typed properties, so the concrete one stays null no matter what is registered for it.
+/// </summary>
 public class Ex031_PropertyConsumer
 {
     public IEx031_Thing? Thing { get; set; }
     public IEx031_Other? Other { get; set; }
+    public Ex031_Thing? ConcreteThing { get; set; }
 }

@@ -8,7 +8,7 @@ public class Ex035_ConductorAllActiveTests : CaliburnCoreContext
     [Fact]
     public async Task CanCloseAsync_Returns_True_By_Default_And_False_When_RefuseClose_Is_Set()
     {
-        var vm = new Ex035_ConductorAllActive();
+        var vm = new Ex035_Child();
         Assert.True(await vm.CanCloseAsync());
 
         vm.RefuseClose = true;
@@ -16,33 +16,30 @@ public class Ex035_ConductorAllActiveTests : CaliburnCoreContext
     }
 
     [Fact]
-    public async Task Activating_A_Second_Item_Leaves_Both_Simultaneously_Active()
+    public async Task ActivateAllAsync_Activates_The_Conductor_Itself_And_Leaves_Every_Item_Simultaneously_Active()
     {
-        var conductor = new Conductor<Ex035_ConductorAllActive>.Collection.AllActive();
-        await ((IActivate)conductor).ActivateAsync();
-        var h1 = new Ex035_ConductorAllActive();
-        var h2 = new Ex035_ConductorAllActive();
+        var conductor = new Ex035_ConductorAllActive();
+        var h1 = new Ex035_Child();
+        var h2 = new Ex035_Child();
 
-        await conductor.ActivateItemAsync(h1);
-        await conductor.ActivateItemAsync(h2);
+        await conductor.ActivateAllAsync([h1, h2]);
 
+        // ActivateAllAsync alone had to activate the conductor - nothing else here does.
+        Assert.True(conductor.IsActive);
         // The defining behaviour of AllActive: activating h2 never deactivates h1, unlike
         // Conductor<T> (ex033) or OneActive (ex034).
         Assert.True(h1.IsActive);
         Assert.True(h2.IsActive);
         Assert.Equal(2, conductor.Items.Count);
-        // Force this test red on the untouched stub via the guard - nothing above calls a
-        // throwing member on its own.
-        Assert.True(await h1.CanCloseAsync());
     }
 
     [Fact]
     public async Task Closing_One_Item_Deactivates_Only_That_Item_The_Other_Stays_Active()
     {
-        var conductor = new Conductor<Ex035_ConductorAllActive>.Collection.AllActive();
-        await ((IActivate)conductor).ActivateAsync();
-        var h1 = new Ex035_ConductorAllActive();
-        var h2 = new Ex035_ConductorAllActive();
+        var conductor = new Ex035_ConductorAllActive();
+        await conductor.ActivateAllAsync([]);
+        var h1 = new Ex035_Child();
+        var h2 = new Ex035_Child();
         await conductor.ActivateItemAsync(h1);
         await conductor.ActivateItemAsync(h2);
 
@@ -61,10 +58,9 @@ public class Ex035_ConductorAllActiveTests : CaliburnCoreContext
     [Fact]
     public async Task A_Refusing_Item_Cannot_Be_Closed_And_Stays_Active_And_In_Items()
     {
-        var conductor = new Conductor<Ex035_ConductorAllActive>.Collection.AllActive();
-        await ((IActivate)conductor).ActivateAsync();
-        var only = new Ex035_ConductorAllActive { RefuseClose = true };
-        await conductor.ActivateItemAsync(only);
+        var conductor = new Ex035_ConductorAllActive();
+        var only = new Ex035_Child { RefuseClose = true };
+        await conductor.ActivateAllAsync([only]);
 
         await conductor.DeactivateItemAsync(only, true);
 
@@ -77,14 +73,14 @@ public class Ex035_ConductorAllActiveTests : CaliburnCoreContext
     [Fact]
     public async Task AllActive_Has_No_ActiveItem_Property()
     {
-        var vm = new Ex035_ConductorAllActive();
+        var vm = new Ex035_Child();
         // Force this test red on the untouched stub - the reflection check below never calls
         // a throwing member on its own.
         Assert.True(await vm.CanCloseAsync());
 
         // Measured: AllActive does not inherit ConductorBaseWithActiveItem<T> the way
         // Conductor<T> and OneActive both do - "the one active item" is not a concept it has.
-        var property = typeof(Conductor<Ex035_ConductorAllActive>.Collection.AllActive).GetProperty("ActiveItem");
+        var property = typeof(Ex035_ConductorAllActive).GetProperty("ActiveItem");
         Assert.Null(property);
     }
 }

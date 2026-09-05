@@ -68,8 +68,10 @@ public class Ex032_BootstrapperConfigureTests : CaliburnCoreContext
         boot.Initialize();
         boot.Initialize();
 
-        // Calling Initialize() repeatedly must not re-run Configure() every time - a naive
-        // "call Configure() from Initialize() unconditionally" reimplementation would report 3.
+        // Not a learner choice - Initialize() itself is BootstrapperBase's, not overridden here -
+        // but worth knowing: a real app calls Initialize() from OnStartup, and a second call
+        // (however that might happen) must not re-run Configure(). ConfigureCallCount is what
+        // the learner's own Configure() increments, so this still exercises their code.
         Assert.Equal(1, boot.ConfigureCallCount);
     }
 }

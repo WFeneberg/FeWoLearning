@@ -1,8 +1,12 @@
 // Exercise 035 - Conductor All Active (beginner).
-// Goal:   Learn Conductor<T>.Collection.AllActive: every item in Items is active AT THE SAME
-//         TIME - there is no single "current" item, and no ActiveItem property to ask for one.
-// Drills: overriding CanCloseAsync to let an item refuse being closed, and OnDeactivateAsync to
-//         record that closing one item never touches any of the others.
+// Goal:   Learn Conductor<T>.Collection.AllActive from the inside: every item in Items is
+//         active AT THE SAME TIME - there is no single "current" item, and no ActiveItem
+//         property to ask for one.
+// Drills: writing the conductor itself (this class IS an AllActive) - ActivateAllAsync must
+//         activate the conductor before it can activate any child, then activate every item
+//         handed to it, one after another; overriding CanCloseAsync on the child to let it
+//         refuse being closed, and OnDeactivateAsync to record that closing one item never
+//         touches any of the others.
 // Passes: dotnet test --filter FullyQualifiedName~Ex035_
 //
 // Measured on this machine (Caliburn.Micro 5.0.258), on an ACTIVE AllActive conductor (activate
@@ -14,12 +18,21 @@
 // inherit ConductorBaseWithActiveItem<T> the way Conductor<T> and OneActive both do, because
 // "the one active item" is not a concept AllActive has anything to offer.
 
+using System.Collections.Generic;
 using System.Threading;
 using Caliburn.Micro;
 
 namespace FeWoLearning.Caliburn.Exercises.Beginner;
 
-public class Ex035_ConductorAllActive : Screen
+public class Ex035_ConductorAllActive : Conductor<Ex035_Child>.Collection.AllActive
+{
+    /// <summary>Activates this conductor first if it is not already active, then activates every item in items.</summary>
+    public Task ActivateAllAsync(IEnumerable<Ex035_Child> items) =>
+        throw new NotImplementedException("TODO: Ex035 - activate this conductor if needed, then ActivateItemAsync each item in items");
+}
+
+/// <summary>A screen that records how it was deactivated - one of this conductor's items.</summary>
+public class Ex035_Child : Screen
 {
     /// <summary>When true, CanCloseAsync refuses. Toggled directly by the test - no dialog.</summary>
     public bool RefuseClose { get; set; }
@@ -31,7 +44,7 @@ public class Ex035_ConductorAllActive : Screen
     public bool? LastDeactivateWasClose { get; private set; }
 
     public override Task<bool> CanCloseAsync(CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException("TODO: Ex035 - return !RefuseClose");
+        throw new NotImplementedException("TODO: Ex035 - guard the close using RefuseClose");
 
     protected override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken) =>
         throw new NotImplementedException("TODO: Ex035 - increment DeactivateCount and record close");

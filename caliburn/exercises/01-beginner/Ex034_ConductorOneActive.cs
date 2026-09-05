@@ -1,11 +1,13 @@
 // Exercise 034 - Conductor One Active (beginner).
-// Goal:   Learn Conductor<T>.Collection.OneActive: many items live in Items at once, but only
-//         one of them is ever active - and unlike Conductor<T> (ex033), the outgoing item is
-//         merely set aside, not closed.
-// Drills: overriding CanCloseAsync to let an item refuse being closed, and OnDeactivateAsync to
-//         record the close flag the conductor actually passed - close:false when it is simply
-//         displaced by another item becoming active, close:true only when it is genuinely
-//         removed from Items.
+// Goal:   Learn Conductor<T>.Collection.OneActive from the inside: many items live in Items at
+//         once, but only one of them is ever active - and unlike Conductor<T> (ex033), the
+//         outgoing item is merely set aside, not closed, until it is explicitly closed.
+// Drills: writing the conductor itself (this class IS a OneActive) - CloseActiveAsync must read
+//         ActiveItem itself and hand it to DeactivateItemAsync with close:true, doing nothing
+//         when there is no active item to close; overriding CanCloseAsync on the child to let
+//         it refuse being closed, and OnDeactivateAsync to record the close flag the conductor
+//         actually passed - close:false when merely displaced by another item becoming active,
+//         close:true only when genuinely removed from Items.
 // Passes: dotnet test --filter FullyQualifiedName~Ex034_
 //
 // Measured on this machine (Caliburn.Micro 5.0.258), on an ACTIVE OneActive conductor (activate
@@ -23,7 +25,15 @@ using Caliburn.Micro;
 
 namespace FeWoLearning.Caliburn.Exercises.Beginner;
 
-public class Ex034_ConductorOneActive : Screen
+public class Ex034_ConductorOneActive : Conductor<Ex034_Child>.Collection.OneActive
+{
+    /// <summary>Closes whichever item is currently ActiveItem, if any - a no-op when nothing is active.</summary>
+    public Task CloseActiveAsync() =>
+        throw new NotImplementedException("TODO: Ex034 - if ActiveItem is not null, DeactivateItemAsync(ActiveItem, close: true)");
+}
+
+/// <summary>A screen that records how it was deactivated - one of this conductor's items.</summary>
+public class Ex034_Child : Screen
 {
     /// <summary>When true, CanCloseAsync refuses. Toggled directly by the test - no dialog.</summary>
     public bool RefuseClose { get; set; }
@@ -35,7 +45,7 @@ public class Ex034_ConductorOneActive : Screen
     public bool? LastDeactivateWasClose { get; private set; }
 
     public override Task<bool> CanCloseAsync(CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException("TODO: Ex034 - return !RefuseClose");
+        throw new NotImplementedException("TODO: Ex034 - guard the close using RefuseClose");
 
     protected override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken) =>
         throw new NotImplementedException("TODO: Ex034 - increment DeactivateCount and record close");

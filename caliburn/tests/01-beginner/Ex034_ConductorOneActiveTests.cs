@@ -8,7 +8,7 @@ public class Ex034_ConductorOneActiveTests : CaliburnCoreContext
     [Fact]
     public async Task CanCloseAsync_Returns_True_By_Default_And_False_When_RefuseClose_Is_Set()
     {
-        var vm = new Ex034_ConductorOneActive();
+        var vm = new Ex034_Child();
         Assert.True(await vm.CanCloseAsync());
 
         vm.RefuseClose = true;
@@ -18,13 +18,13 @@ public class Ex034_ConductorOneActiveTests : CaliburnCoreContext
     [Fact]
     public async Task Activating_A_Second_Item_Keeps_Both_In_Items_But_Only_Deactivates_The_First_Without_Closing_It()
     {
-        var conductor = new Conductor<Ex034_ConductorOneActive>.Collection.OneActive();
+        var conductor = new Ex034_ConductorOneActive();
         await ((IActivate)conductor).ActivateAsync();
-        var c1 = new Ex034_ConductorOneActive();
-        var c2 = new Ex034_ConductorOneActive();
+        var c1 = new Ex034_Child();
+        var c2 = new Ex034_Child();
 
         await conductor.ActivateItemAsync(c1);
-        Assert.IsType<BindableCollection<Ex034_ConductorOneActive>>(conductor.Items);
+        Assert.IsType<BindableCollection<Ex034_Child>>(conductor.Items);
 
         await conductor.ActivateItemAsync(c2);
 
@@ -40,16 +40,16 @@ public class Ex034_ConductorOneActiveTests : CaliburnCoreContext
     }
 
     [Fact]
-    public async Task Closing_The_Active_Item_Removes_It_And_Promotes_The_Remaining_Item()
+    public async Task CloseActiveAsync_Removes_The_Active_Item_And_Promotes_The_Remaining_Item()
     {
-        var conductor = new Conductor<Ex034_ConductorOneActive>.Collection.OneActive();
+        var conductor = new Ex034_ConductorOneActive();
         await ((IActivate)conductor).ActivateAsync();
-        var c1 = new Ex034_ConductorOneActive();
-        var c2 = new Ex034_ConductorOneActive();
+        var c1 = new Ex034_Child();
+        var c2 = new Ex034_Child();
         await conductor.ActivateItemAsync(c1);
         await conductor.ActivateItemAsync(c2);
 
-        await conductor.DeactivateItemAsync(c2, true);
+        await conductor.CloseActiveAsync();
 
         Assert.DoesNotContain(c2, conductor.Items);
         Assert.Single(conductor.Items);
@@ -60,14 +60,27 @@ public class Ex034_ConductorOneActiveTests : CaliburnCoreContext
     }
 
     [Fact]
-    public async Task A_Refusing_Item_Cannot_Be_Closed_And_Stays_Active_And_In_Items()
+    public async Task CloseActiveAsync_Is_A_NoOp_When_Nothing_Is_Active()
     {
-        var conductor = new Conductor<Ex034_ConductorOneActive>.Collection.OneActive();
+        var conductor = new Ex034_ConductorOneActive();
+
+        // No exception, no throw from DeactivateItemAsync(null, ...) - and this alone still
+        // forces the stub red, since an unimplemented CloseActiveAsync throws regardless.
+        await conductor.CloseActiveAsync();
+
+        Assert.Empty(conductor.Items);
+        Assert.Null(conductor.ActiveItem);
+    }
+
+    [Fact]
+    public async Task A_Refusing_Active_Item_Cannot_Be_Closed_And_Stays_Active_And_In_Items()
+    {
+        var conductor = new Ex034_ConductorOneActive();
         await ((IActivate)conductor).ActivateAsync();
-        var only = new Ex034_ConductorOneActive { RefuseClose = true };
+        var only = new Ex034_Child { RefuseClose = true };
         await conductor.ActivateItemAsync(only);
 
-        await conductor.DeactivateItemAsync(only, true);
+        await conductor.CloseActiveAsync();
 
         // A wrong implementation that ignores RefuseClose would let this succeed - it does not.
         Assert.Contains(only, conductor.Items);
@@ -78,11 +91,11 @@ public class Ex034_ConductorOneActiveTests : CaliburnCoreContext
     [Fact]
     public async Task Activating_A_Third_Item_Only_Deactivates_The_Second_Items_Keeps_Growing()
     {
-        var conductor = new Conductor<Ex034_ConductorOneActive>.Collection.OneActive();
+        var conductor = new Ex034_ConductorOneActive();
         await ((IActivate)conductor).ActivateAsync();
-        var g1 = new Ex034_ConductorOneActive();
-        var g2 = new Ex034_ConductorOneActive();
-        var g3 = new Ex034_ConductorOneActive();
+        var g1 = new Ex034_Child();
+        var g2 = new Ex034_Child();
+        var g3 = new Ex034_Child();
 
         await conductor.ActivateItemAsync(g1);
         await conductor.ActivateItemAsync(g2);

@@ -7,6 +7,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- xUnit1051 ("pass TestContext.Current.CancellationToken through") is suppressed here,
+         deliberately and only here - see caliburn/README.md's warning-stance note. This suite
+         runs serially (DisableTestParallelization, see tests/AssemblyInfo.cs) with no timeouts
+         and nothing that ever wants cooperative cancellation; threading a CancellationToken
+         through every Caliburn call in a beginner file buries the framework API shape
+         (ActivateItemAsync, CanCloseAsync, OnDeactivateAsync) under xUnit ceremony that has
+         nothing to do with the lesson. Any OTHER warning in this project is a real finding.
+    -->
+    <NoWarn>$(NoWarn);xUnit1051</NoWarn>
   </PropertyGroup>
 
   <!-- Xunit.StaFact supplies [WpfFact]: an STA thread with a real WPF Dispatcher.

@@ -8,7 +8,7 @@ public class Ex033_ConductorSingleActiveTests : CaliburnCoreContext
     [Fact]
     public async Task CanCloseAsync_Returns_True_By_Default_And_False_When_RefuseClose_Is_Set()
     {
-        var vm = new Ex033_ConductorSingleActive();
+        var vm = new Ex033_Child();
         Assert.True(await vm.CanCloseAsync());
 
         vm.RefuseClose = true;
@@ -16,18 +16,28 @@ public class Ex033_ConductorSingleActiveTests : CaliburnCoreContext
     }
 
     [Fact]
-    public async Task Activating_A_Second_Item_Deactivates_And_Closes_The_First()
+    public async Task ShowAsync_Activates_The_Conductor_Itself_Before_Activating_The_Item()
     {
-        var conductor = new Conductor<Ex033_ConductorSingleActive>();
-        await ((IActivate)conductor).ActivateAsync();
-        var a = new Ex033_ConductorSingleActive();
-        var b = new Ex033_ConductorSingleActive();
+        var conductor = new Ex033_ConductorSingleActive();
+        var a = new Ex033_Child();
 
-        await conductor.ActivateItemAsync(a);
+        await conductor.ShowAsync(a);
+
+        // ShowAsync alone had to activate the conductor - nothing else here does.
+        Assert.True(conductor.IsActive);
         Assert.True(a.IsActive);
         Assert.Same(conductor, a.Parent);
+    }
 
-        await conductor.ActivateItemAsync(b);
+    [Fact]
+    public async Task Showing_A_Second_Item_Deactivates_And_Closes_The_First()
+    {
+        var conductor = new Ex033_ConductorSingleActive();
+        var a = new Ex033_Child();
+        var b = new Ex033_Child();
+
+        await conductor.ShowAsync(a);
+        await conductor.ShowAsync(b);
 
         Assert.False(a.IsActive);
         Assert.Equal(1, a.DeactivateCount);
@@ -42,13 +52,12 @@ public class Ex033_ConductorSingleActiveTests : CaliburnCoreContext
     [Fact]
     public async Task A_Refusing_Item_Blocks_Replacement_And_Keeps_ActiveItem()
     {
-        var conductor = new Conductor<Ex033_ConductorSingleActive>();
-        await ((IActivate)conductor).ActivateAsync();
-        var c = new Ex033_ConductorSingleActive { RefuseClose = true };
-        var d = new Ex033_ConductorSingleActive();
-        await conductor.ActivateItemAsync(c);
+        var conductor = new Ex033_ConductorSingleActive();
+        var c = new Ex033_Child { RefuseClose = true };
+        var d = new Ex033_Child();
+        await conductor.ShowAsync(c);
 
-        await conductor.ActivateItemAsync(d);
+        await conductor.ShowAsync(d);
 
         // A wrong implementation that ignores RefuseClose (always returns true) would let d
         // take over here - it does not.
@@ -58,20 +67,19 @@ public class Ex033_ConductorSingleActiveTests : CaliburnCoreContext
     }
 
     [Fact]
-    public async Task Replacing_Twice_Only_Closes_The_Item_That_Was_Actually_Active_At_The_Time()
+    public async Task Showing_A_Third_Item_Only_Closes_The_Item_That_Was_Actually_Active_At_The_Time()
     {
-        var conductor = new Conductor<Ex033_ConductorSingleActive>();
-        await ((IActivate)conductor).ActivateAsync();
-        var a = new Ex033_ConductorSingleActive();
-        var b = new Ex033_ConductorSingleActive();
-        var c = new Ex033_ConductorSingleActive();
+        var conductor = new Ex033_ConductorSingleActive();
+        var a = new Ex033_Child();
+        var b = new Ex033_Child();
+        var c = new Ex033_Child();
 
-        await conductor.ActivateItemAsync(a);
-        await conductor.ActivateItemAsync(b);
-        await conductor.ActivateItemAsync(c);
+        await conductor.ShowAsync(a);
+        await conductor.ShowAsync(b);
+        await conductor.ShowAsync(c);
 
-        // a was closed exactly once, when b replaced it - activating c afterwards must not
-        // touch a again.
+        // a was closed exactly once, when b replaced it - showing c afterwards must not touch
+        // a again.
         Assert.Equal(1, a.DeactivateCount);
         Assert.True(a.LastDeactivateWasClose);
         Assert.Equal(1, b.DeactivateCount);
@@ -84,10 +92,11 @@ public class Ex033_ConductorSingleActiveTests : CaliburnCoreContext
     public async Task A_Conductor_That_Is_Never_Activated_Never_Truly_Activates_Its_Item()
     {
         // The ordering trap this whole batch is built around: a conductor only activates its
-        // children while the conductor itself is active. Deliberately do NOT activate the
-        // conductor here.
-        var conductor = new Conductor<Ex033_ConductorSingleActive>();
-        var vm = new Ex033_ConductorSingleActive();
+        // children while the conductor itself is active. Bypass ShowAsync deliberately and
+        // call the framework's own ActivateItemAsync directly, without ever activating the
+        // conductor, to prove the trap is real and not just something ShowAsync papers over.
+        var conductor = new Ex033_ConductorSingleActive();
+        var vm = new Ex033_Child();
 
         await conductor.ActivateItemAsync(vm);
 

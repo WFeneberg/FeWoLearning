@@ -1,3 +1,4 @@
+using System.Reflection;
 using Caliburn.Micro;
 using FeWoLearning.Caliburn.Exercises;
 
@@ -51,10 +52,27 @@ public abstract class CaliburnCoreContext
     // NameTransformer leak above is undone.
     static readonly Func<IEnumerable<string>, Type> PristineFindTypeByNames;
 
+    // Also added for ex032: StartRuntime() (see above) wraps AssemblySourceCache.ExtractTypes
+    // in a NEW closure on every call, unconditionally - unlike FindTypeByNames, this wrapping is
+    // NOT guarded by AssemblySourceCache's "isInstalled" flag, so it happens again every time
+    // ANY BootstrapperBase.Initialize() runs on a fresh instance (a per-INSTANCE "isInitialized"
+    // field, not a per-process one - a new bootstrapper always calls StartRuntime() again).
+    // Install()'s CollectionChanged subscription on AssemblySource.Instance, once attached, is
+    // itself permanent for the rest of the process, and fires on every Clear()/Add() below - so
+    // without this reset, ex032's handful of Initialize() calls would leave an ever-deeper chain
+    // of ExtractTypes wrappers that every one of THIS constructor's three AssemblySource.Instance
+    // mutations, across all ~200 other tests, would re-invoke for no reason. Restoring
+    // FindTypeByNames above already makes this chain inert for correctness (FindTypeByNames no
+    // longer consults the cache ExtractTypes feeds at all), but resetting ExtractTypes too is
+    // what stops the chain from growing forever - verified safe: ExtractTypes is read fresh by
+    // the CollectionChanged handler on every invocation, never captured once by closure.
+    static readonly Func<Assembly, IEnumerable<Type>> PristineExtractTypes;
+
     static CaliburnCoreContext()
     {
         PristineNameTransformerRules = ViewLocator.NameTransformer.ToList();
         PristineFindTypeByNames = AssemblySource.FindTypeByNames;
+        PristineExtractTypes = AssemblySourceCache.ExtractTypes;
     }
 
     protected SimpleContainer Container { get; } = new();
@@ -79,6 +97,9 @@ public abstract class CaliburnCoreContext
         // once per process (see the static constructor's comment above), so restoring the
         // pristine, uncached delegate here is what makes that one-time install harmless.
         AssemblySource.FindTypeByNames = PristineFindTypeByNames;
+        // ...and undo the ExtractTypes wrapping every Initialize() call adds - see the static
+        // constructor's comment on PristineExtractTypes for why this one is NOT one-time.
+        AssemblySourceCache.ExtractTypes = PristineExtractTypes;
 
         // Not optional even with no UI at all: Coroutine.BeginExecute calls IoC.BuildUp,
         // so an otherwise pure-core coroutine test throws "IoC is not initialized".

@@ -59,10 +59,13 @@ public class Ex031_IoCFacadeTests : CaliburnCoreContext
     }
 
     [Fact]
-    public void Inject_Populates_A_Registered_Property_But_Leaves_An_Unregistered_One_Untouched()
+    public void Inject_Populates_An_Interface_Typed_Property_But_Leaves_Unregistered_And_Concrete_Typed_Properties_Untouched()
     {
         var subject = new Ex031_IoCFacade();
         Container.RegisterSingleton(typeof(IEx031_Thing), null, typeof(Ex031_Thing));
+        // Also register the CONCRETE type under its own name - proves the next assertion is
+        // about interface-vs-concrete, not merely "nothing was registered for it".
+        Container.RegisterSingleton(typeof(Ex031_Thing), null, typeof(Ex031_Thing));
         var consumer = new Ex031_PropertyConsumer();
 
         subject.Inject(consumer);
@@ -72,6 +75,9 @@ public class Ex031_IoCFacadeTests : CaliburnCoreContext
         // IEx031_Other was never registered - a real BuildUp leaves it alone rather than
         // throwing or forcing some default.
         Assert.Null(consumer.Other);
+        // Measured: SimpleContainer.BuildUp only ever injects INTERFACE-typed properties - a
+        // concrete-typed property is left alone even though its own concrete type IS registered.
+        Assert.Null(consumer.ConcreteThing);
     }
 
     [Fact]
