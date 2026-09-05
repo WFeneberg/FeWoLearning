@@ -526,6 +526,22 @@ trap documented for `python/`.
   dictionary solution passed. Fixed by seeding **valid** defaults so the baseline is
   the same either way. When designing the arrange, ask which legitimate
   implementations would disagree about it.
+- **Wipe the build between cheat overlays, and treat a falling test count as
+  staleness rather than as a result.** Repeatedly swapping a file at the same path
+  during cheat verification produced inconsistent counts on the same suite — 13, then
+  8, then 5 — until `obj/`, `bin/` and `artifacts-solutions/` were deleted. Nothing was
+  wrong with the tests; the build simply had not noticed. A cheat that appears to
+  "fail" because tests vanished proves nothing. Wipe between substitutions, and re-run
+  clean before believing any drop.
+- **`DataGridColumn.Sort(ListSortDirection)` inverts the direction** on
+  `Avalonia.Controls.DataGrid` 12.1.0 — `Ascending` produced descending order and vice
+  versa. Measured. ex056's test therefore asserts *that the order changed*, not which
+  literal enum value produces which order, so it neither encodes the bug nor breaks
+  when the package fixes it.
+- **`FindControl<T>(name)` throws on a type mismatch**, it does not return null. A
+  cheat that swaps the control for a different type fails with an exception naming both
+  types — which is a perfectly good red, and a clearer one than a null-reference
+  further down.
 - **A cheat that hangs is not a cheat that failed.** ex039's synchronous-block cheat
   (`ReactiveCommand.Create(() => work().GetAwaiter().GetResult())`) deadlocked the test
   host: `Execute()` blocked the calling thread waiting on the gate, and the
