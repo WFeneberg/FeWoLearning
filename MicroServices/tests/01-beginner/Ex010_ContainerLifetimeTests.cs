@@ -25,10 +25,13 @@ public class Ex010_ContainerLifetimeTests
 
         // Measured, and worth knowing before following the Aspire docs: the API
         // reference recommends WithPersistentLifetime()/WithSessionLifetime() "for
-        // new code", but on 13.5.3 both are gated behind the experimental diagnostic
-        // ASPIREPERSISTENCE001 ("for test purposes only"). This track builds with
-        // warnings as errors, so those two spellings do not compile here without a
-        // suppression. WithLifetime is the supported call, and the one this row uses.
+        // new code", but on 13.5.3 both are marked [Experimental] with the diagnostic
+        // ASPIREPERSISTENCE001 ("for test purposes only"). Roslyn reports an
+        // [Experimental] use as an ERROR by default - that is the compiler's own
+        // behaviour, not a setting of this track, which has no TreatWarningsAsErrors
+        // anywhere - so those two spellings simply do not compile without an explicit
+        // #pragma or NoWarn. WithLifetime is the supported call, and the one this row
+        // uses.
     }
 
     [Fact]

@@ -69,7 +69,7 @@ dotnet test                      →  28 failed, 7 passed, 1 skipped (36 total)
 dotnet test -p:UseSolutions=true →   0 failed, 35 passed, 1 skipped (36 total)
 ```
 
-`-p:Containers=true` adds one more passing harness fact and unskips the gate one; no
+`-p:Containers=true` unskips the harness's container-gate fact, which then passes; no
 🐳 exercise row exists yet, so it has not been re-measured since ex005.
 
 **A correct default run is red, and that is not a broken checkout.** Twenty-eight
@@ -325,15 +325,29 @@ Each of these cost real time. None is a guess.
   cannot name it (`CS0122`). The way to tell a literal from a callback is to **run**
   the callbacks: construct an `EnvironmentCallbackContext(new
   DistributedApplicationExecutionContext(op), resource, dict, ct)`, invoke every
-  `EnvironmentCallbackAnnotation.Callback`, and read the dictionary — a literal lands a
-  `System.String`, an endpoint lands an `EndpointReference`. Running the callbacks
-  twice, once per `DistributedApplicationOperation`, is the only assertion a literal
-  provably cannot satisfy, and ex007 is built on it.
+  `EnvironmentCallbackAnnotation.Callback`, and read the dictionary. **Reading the
+  merged dictionary is still not enough**, and this is the sharp edge: writing
+  `context.EnvironmentVariables["REGION"] = "eu-west"` from inside a callback lands the
+  same `System.String` a literal would, so an implementation using no literal overload
+  at all is invisible to any assertion over merged values. Partition first —
+  `annotation.GetType() == typeof(EnvironmentCallbackAnnotation)` is the deferred form,
+  anything derived is the literal form — then run each group separately and assert
+  which variable came from which. Measured composition on 13.5.3:
+  `WithEnvironment(name, "s")` → derived; `WithEnvironment(callback)` → exact;
+  `WithEnvironment(name, EndpointReference)` → **exact**, i.e. deferred, not a literal.
+  Separately, running the callbacks twice under different
+  `DistributedApplicationOperation`s is the one assertion no literal can satisfy in any
+  spelling. ex007 uses both techniques, one per direction of its subject.
 - **`WithPersistentLifetime()` / `WithSessionLifetime()` are experimental.** The Aspire
   API reference says to prefer them over `WithLifetime(ContainerLifetime.…)` "for new
-  code". On 13.5.3 both are gated behind `ASPIREPERSISTENCE001` ("for test purposes
-  only"), which this track's build treats as an **error**. `WithLifetime` is the call
-  to use; ex010 uses it.
+  code". On 13.5.3 both are marked `[Experimental]` with the diagnostic
+  `ASPIREPERSISTENCE001` ("for test purposes only"), and **Roslyn reports an
+  `[Experimental]` use as an error by default** — that is the compiler's behaviour, not
+  a policy of this track. `MicroServices/` sets no `TreatWarningsAsErrors`,
+  `WarningsAsErrors` or `AnalysisLevel` anywhere, and a future author should not infer
+  one from this entry. The two spellings therefore need an explicit `#pragma warning
+  disable` or `NoWarn` to compile at all; `WithLifetime` is the call to use, and ex010
+  uses it.
 - **A container's `ContainerImageAnnotation` is there before the learner touches it,
   and the manifest cannot grade image pinning.** `AddContainer("api", "nginx")` already
   carries `Image="nginx"`, `Tag="latest"`, `Registry=null`, `SHA256=null` — so the

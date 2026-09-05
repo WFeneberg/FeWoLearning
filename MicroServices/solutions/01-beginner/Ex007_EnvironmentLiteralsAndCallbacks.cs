@@ -10,14 +10,19 @@ namespace FeWoLearning.MicroServices.Exercises.Beginner;
 ///         callback receives an EnvironmentCallbackContext, which is what lets it
 ///         read another resource's endpoint and ask which operation the AppHost is
 ///         performing - neither of which a literal can express.
-/// Passes: Running the worker's environment callbacks yields REGION as the fixed
-///         string "eu-west" in every context, API_URL as an EndpointReference to
-///         the "http" endpoint of "api" (not a hard-coded URL), and MODE as "run"
-///         under a run context but "publish" under a publish context.
+/// Passes: REGION comes from the LITERAL overload and only from it, API_URL and
+///         MODE come from the callback and only from it, API_URL is an
+///         EndpointReference to the "http" endpoint of "api" (not a hard-coded
+///         URL), and MODE is "run" under a run context but "publish" under a
+///         publish context.
 /// Note:   Measured - EnvironmentAnnotation, the annotation a LITERAL writes,
-///         derives from EnvironmentCallbackAnnotation. So counting
+///         derives from EnvironmentCallbackAnnotation and is internal. So counting
 ///         EnvironmentCallbackAnnotations cannot tell a literal from a callback,
-///         and this exercise is graded by running the callbacks instead.
+///         and neither can inspecting the merged environment: writing REGION as a
+///         plain string from INSIDE the callback produces the same merged result.
+///         The exercise is graded by running each mechanism's annotations
+///         separately, which is what makes "literal versus callback" gradeable in
+///         both directions.
 /// </summary>
 public static class Ex007_EnvironmentLiteralsAndCallbacks
 {
