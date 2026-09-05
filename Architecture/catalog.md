@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 21 ✅ / 39 ⬜**
+**Status: 26 ✅ / 34 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -49,11 +49,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 019 | MessengerEventAggregator | in-process pub/sub, subscription lifetime, unsubscribe correctness | ✅ |
 | 020 | DialogServiceAbstraction | modal interaction as a port, testable without a window | ✅ |
 | 021 | BackgroundJobScheduler | queued work, cancellation, sequencing guarantees | ✅ |
-| 022 | OfflineFirstSync | local SQLite store, change tracking, conflict resolution policy | ⬜ |
-| 023 | SettingsStatePersistence | versioned settings, migration on load, forward compatibility | ⬜ |
-| 024 | PluginArchitecture | AssemblyLoadContext, contract assembly, isolation and unload | ⬜ |
-| 025 | UndoRedoCommandStack | command pattern, undo/redo invariants, coalescing | ⬜ |
-| 026 | ScopedPerViewDi | child scope per view, deterministic disposal, no captive dependency | ⬜ |
+| 022 | OfflineFirstSync | local SQLite store, change tracking, conflict resolution policy | ✅ |
+| 023 | SettingsStatePersistence | versioned settings, migration on load, forward compatibility | ✅ |
+| 024 | PluginArchitecture | AssemblyLoadContext, contract assembly, isolation and unload | ✅ |
+| 025 | UndoRedoCommandStack | command pattern, undo/redo invariants, coalescing | ✅ |
+| 026 | ScopedPerViewDi | child scope per view, deterministic disposal, no captive dependency | ✅ |
 | 027 | ThreadMarshallingAbstraction | dispatcher as a port, testable synchronisation | ⬜ |
 | 028 | TelemetryBoundary | logging/metrics as a port, keeping the domain logger-free | ⬜ |
 
