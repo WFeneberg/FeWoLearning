@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 46 ✅ / 14 ⬜**
+**Status: 52 ✅ / 8 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -78,12 +78,12 @@ implementations in `solutions/<block>/` at the same relative path.
 | 044 | UpdateIntegrityAndRollback | hash manifests, signed manifests, monotonic version enforcement | ✅ |
 | 045 | UnsafeDeserialization | polymorphic type handling, type allowlists, rejecting arbitrary types | ✅ |
 | 046 | XmlExternalEntity | XmlReaderSettings, DtdProcessing, XmlResolver, entity expansion | ✅ |
-| 047 | ZipSlipExtraction | archive entry path containment, absolute and relative escapes | ⬜ |
-| 048 | PathCanonicalization | full-path containment, UNC and device-name traps, alternate streams | ⬜ |
-| 049 | ProcessArgumentInjection | ProcessStartInfo.ArgumentList over a joined Arguments string | ⬜ |
-| 050 | NamedPipeAccessControl | PipeSecurity, ACLs, rejecting unauthorised peers | ⬜ |
-| 051 | SecretRedactionInLogs | structured logging, redaction of sensitive values, log injection | ⬜ |
-| 052 | RestrictiveFileAcl | file ACLs at creation, inherited permissions, least privilege | ⬜ |
+| 047 | ZipSlipExtraction | archive entry path containment, absolute and relative escapes | ✅ |
+| 048 | PathCanonicalization | full-path containment, UNC and device-name traps, alternate streams | ✅ |
+| 049 | ProcessArgumentInjection | ProcessStartInfo.ArgumentList over a joined Arguments string | ✅ |
+| 050 | NamedPipeAccessControl | PipeSecurity, ACLs, rejecting unauthorised peers | ✅ |
+| 051 | SecretRedactionInLogs | structured logging, redaction of sensitive values, log injection | ✅ |
+| 052 | RestrictiveFileAcl | file ACLs at creation, inherited permissions, least privilege | ✅ |
 
 ## desktop-wpf (053–060) — the WPF attack surface
 
