@@ -15,6 +15,11 @@ public static class ExerciseRegistry
         ["ex003"] = Ex003_EndpointsAndBindings.Configure,
         ["ex004"] = Ex004_HealthChecksInTheModel.Configure,
         ["ex005"] = Ex005_ParametersAndSecrets.Configure,
+        ["ex006"] = Ex006_ImageRegistryTagAndDigest.Configure,
+        ["ex007"] = Ex007_EnvironmentLiteralsAndCallbacks.Configure,
+        ["ex008"] = Ex008_ContainerArgsAndEntrypoint.Configure,
+        ["ex009"] = Ex009_VolumesAndBindMounts.Configure,
+        ["ex010"] = Ex010_ContainerLifetime.Configure,
     };
 
     public static Action<IDistributedApplicationBuilder>? Lookup(string id)

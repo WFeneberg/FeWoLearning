@@ -61,18 +61,20 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-05; `catalog.md` at 5 ✅ / 95 ⬜, so the five
-delivered exercises contribute 12 red facts):
+**Current measured state** (2026-09-06; `catalog.md` at 10 ✅ / 90 ⬜, so the ten
+delivered exercises contribute 28 red facts):
 
 ```
-dotnet test                      →  12 failed, 7 passed, 1 skipped (20 total)
-dotnet test -p:UseSolutions=true →   0 failed, 19 passed, 1 skipped (20 total)
-dotnet test -p:Containers=true   →  12 failed, 8 passed, 0 skipped (20 total)
+dotnet test                      →  28 failed, 7 passed, 1 skipped (36 total)
+dotnet test -p:UseSolutions=true →   0 failed, 35 passed, 1 skipped (36 total)
 ```
 
-**A correct default run is red, and that is not a broken checkout.** Twelve failures is
-exactly what an untouched tree gives: one `NotImplementedException` per unimplemented
-`Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
+`-p:Containers=true` adds one more passing harness fact and unskips the gate one; no
+🐳 exercise row exists yet, so it has not been re-measured since ex005.
+
+**A correct default run is red, and that is not a broken checkout.** Twenty-eight
+failures is exactly what an untouched tree gives: one `NotImplementedException` per
+unimplemented `Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
 the harness's own facts, which pass in *both* modes because they grade the harness
 rather than an exercise. Update these numbers whenever a batch lands.
 
@@ -314,6 +316,45 @@ Each of these cost real time. None is a guess.
   health-check exercise written against an *integration* resource therefore grades
   nothing — the annotation is there whether or not the learner did anything. ex004 uses
   bare `AddContainer`s for exactly this reason; a bare `AddContainer` carries none.
+- **`EnvironmentAnnotation` derives from `EnvironmentCallbackAnnotation`, and is
+  `internal`.** Measured while writing ex007: `WithEnvironment("REGION", "eu-west")` —
+  a plain literal — writes an `EnvironmentAnnotation`, which is a *subclass* of
+  `EnvironmentCallbackAnnotation`. So `OfType<EnvironmentCallbackAnnotation>().Count()`
+  returns the same number for an all-literal resource and an all-callback one, and any
+  fact built on that count grades nothing. The type is also `internal`, so a test
+  cannot name it (`CS0122`). The way to tell a literal from a callback is to **run**
+  the callbacks: construct an `EnvironmentCallbackContext(new
+  DistributedApplicationExecutionContext(op), resource, dict, ct)`, invoke every
+  `EnvironmentCallbackAnnotation.Callback`, and read the dictionary — a literal lands a
+  `System.String`, an endpoint lands an `EndpointReference`. Running the callbacks
+  twice, once per `DistributedApplicationOperation`, is the only assertion a literal
+  provably cannot satisfy, and ex007 is built on it.
+- **`WithPersistentLifetime()` / `WithSessionLifetime()` are experimental.** The Aspire
+  API reference says to prefer them over `WithLifetime(ContainerLifetime.…)` "for new
+  code". On 13.5.3 both are gated behind `ASPIREPERSISTENCE001` ("for test purposes
+  only"), which this track's build treats as an **error**. `WithLifetime` is the call
+  to use; ex010 uses it.
+- **A container's `ContainerImageAnnotation` is there before the learner touches it,
+  and the manifest cannot grade image pinning.** `AddContainer("api", "nginx")` already
+  carries `Image="nginx"`, `Tag="latest"`, `Registry=null`, `SHA256=null` — so the
+  annotation's presence proves nothing and only its fields do. Worse for grading:
+  `AddContainer("api", "ghcr.io/acme/api:2.4.1")` parses into `Image="ghcr.io/acme/api"`,
+  `Tag="2.4.1"`, `Registry=null` and publishes an `"image"` string **byte-identical** to
+  the correct three-call answer. ex006 is therefore graded at L1 on the three fields
+  separately, with no manifest fact at all. Measured too: `WithImageSHA256` clears
+  `Tag`, even when `WithImageTag` was called first.
+- **A bind mount's `Source` is resolved to an absolute host path; a volume's is not.**
+  `WithBindMount("./seed", …)` stores the path resolved against
+  `builder.AppHostDirectory`, which under the harnesses is the **test assembly's output
+  directory** — a different absolute path in the red run and the green run. So a mount
+  test must assert `Path.IsPathRooted` plus the last segment, never the whole path. In
+  the manifest the same source comes back *relative to the publish output directory*
+  (a temp folder), i.e. a long `../../..` chain. `WithVolume("pgdata", …)` leaves
+  `Source` as the literal name, which is what makes the rooted-path check a second,
+  independent way of separating the two mount kinds.
+- **Container lifetime does not reach the manifest.** Persistent, session and untouched
+  containers publish identically — it is a local run-mode concept. ex010 is L1-only for
+  that reason.
 - **`NU1603` silently upgrades the test runner.** `xunit.runner.visualstudio` has **no
   3.1.6 and no 3.1.7** — 3.1.5 is the last 3.x and the next version is 4.0.0. Naming a
   3.x that does not exist does not fail the build: NuGet resolves *forward* to 4.0.0 with

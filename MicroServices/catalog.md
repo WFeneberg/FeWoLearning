@@ -57,7 +57,7 @@ as oversights:
   and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
   093/094/099/100 assert on the generated Bicep for real.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 10 ✅ / 90 ⬜**
 
 ## Beginner (001–035) — Aspire model and first persistence
 
@@ -68,11 +68,11 @@ as oversights:
 | 003 | EndpointsAndBindings | `WithHttpEndpoint`/`WithEndpoint`, `EndpointAnnotation.TargetPort` vs `Port` vs `IsExternal`; two endpoints on one resource must stay two annotations | ✅ |
 | 004 | HealthChecksInTheModel | `WithHttpHealthCheck` writes a `HealthCheckAnnotation` whose key varies with the path; grade the annotation, never a 200 response | ✅ |
 | 005 | ParametersAndSecrets | `AddParameter`, `ParameterResource.Secret`, and the `inputs.value.default.generate` policy a generated secret emits into the manifest | ✅ |
-| 006 | ImageRegistryTagAndDigest | `WithImage`/`WithImageTag`/`WithImageRegistry`; assert `ContainerImageAnnotation.Image`, `.Tag` and `.Registry` **separately** — a full reference baked into one string is the wrong answer | ⬜ |
-| 007 | EnvironmentLiteralsAndCallbacks | `WithEnvironment(name, value)` vs the callback overload: a literal is fixed at model time, a callback runs per `EnvironmentCallbackContext` and can read another resource's endpoint | ⬜ |
-| 008 | ContainerArgsAndEntrypoint | `WithArgs`, `WithEntrypoint`, `CommandLineArgsCallbackAnnotation`; argument **order** is part of the assertion, because a set-equality test grades nothing | ⬜ |
-| 009 | VolumesAndBindMounts | `WithVolume` (named) vs `WithBindMount` (host path): `ContainerMountAnnotation.Type`, `Source`, `Target`, `IsReadOnly` — the two differ in type, not just in the source string | ⬜ |
-| 010 | ContainerLifetime | `WithLifetime(ContainerLifetime.Persistent)` and `ContainerLifetimeAnnotation`; why a persistent container survives an AppHost restart and a session one does not | ⬜ |
+| 006 | ImageRegistryTagAndDigest | `WithImage`/`WithImageTag`/`WithImageRegistry`; assert `ContainerImageAnnotation.Image`, `.Tag` and `.Registry` **separately** — a full reference baked into one string is the wrong answer | ✅ |
+| 007 | EnvironmentLiteralsAndCallbacks | `WithEnvironment(name, value)` vs the callback overload: a literal is fixed at model time, a callback runs per `EnvironmentCallbackContext` and can read another resource's endpoint | ✅ |
+| 008 | ContainerArgsAndEntrypoint | `WithArgs`, `WithEntrypoint`, `CommandLineArgsCallbackAnnotation`; argument **order** is part of the assertion, because a set-equality test grades nothing | ✅ |
+| 009 | VolumesAndBindMounts | `WithVolume` (named) vs `WithBindMount` (host path): `ContainerMountAnnotation.Type`, `Source`, `Target`, `IsReadOnly` — the two differ in type, not just in the source string | ✅ |
+| 010 | ContainerLifetime | `WithLifetime(ContainerLifetime.Persistent)` and `ContainerLifetimeAnnotation`; why a persistent container survives an AppHost restart and a session one does not | ✅ |
 | 011 | ProjectResources | `AddProject<Projects.X>`, `ProjectResource`, `IProjectMetadata.ProjectPath`, and the launch profile that supplies its endpoints | ⬜ |
 | 012 | ExecutableResources | `AddExecutable`, `ExecutableResource`, working directory and args; an executable carries **no** `ContainerImageAnnotation`, which is how a test tells the two apart | ⬜ |
 | 013 | ConnectionStringResources | `AddConnectionString` for a store Aspire does not host; `value.v0` in the manifest against a container's `container.v0` | ⬜ |
