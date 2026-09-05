@@ -172,6 +172,45 @@ The two that differ:
   exist. Omitting `where TViewModel : class` is CS0425/CS0452, and returning a
   non-generic `IViewFor` from the generic overloads is CS0738.
 
+### 2.4 Routing and template selection
+
+Measured on 2026-09-05, for ex051–ex055.
+
+- **`RoutingState` works**: `Navigate`, `NavigateBack`, `NavigateAndReset`,
+  `NavigationStack`, plus `IRoutableViewModel` (`UrlPathSegment`, `HostScreen`) and
+  `IScreen`. Measured stack depth 0 → 1 → 2 → 1 across navigate, navigate, back.
+- **`CurrentViewModel` is an `IObservable`, not a property.** Reading
+  `Router.CurrentViewModel?.GetType().Name` yields the *observable's* type
+  (`MapSignal\`2`), which looks like a bug in the exercise rather than a misuse.
+  Subscribe to it, or read `NavigationStack`. Measured emissions across the sequence
+  above: `[null, FooViewModel, BarViewModel, FooViewModel]`.
+- **`DefaultViewLocator` does NOT resolve by naming convention.** Measured: it returned
+  `null` for a `FooViewModel` with a `FooView` sitting in the same assembly, and a
+  `RoutedViewHost` using it rendered nothing. It defers to the resolver, which is empty
+  because registration is builder-time (section 2.3). **ex053's catalog row therefore
+  cannot stand as "the default view-locator naming convention"** — re-scope it to the
+  learner *implementing* a convention-based `IViewLocator`, which is self-contained and
+  a natural step up from ex050's explicit locator.
+- **A hand-written convention locator works.** Mapping the view-model's full type name
+  `…ViewModel` → `…View` and resolving it out of the same assembly rendered correctly.
+- **`RoutedViewHost` exposes settable `Router`, `ViewLocator`, `DefaultContent` and
+  `Content`.** With an explicit locator: navigate → `FooView`, navigate → `BarView`,
+  back → `FooView`. The locator was consulted **3 times** for those three navigations,
+  so a call counter on the locator is a clean mechanism assertion for ex052/ex053.
+- **Avalonia selects data templates by type implicitly** — no WPF-style
+  `DataTemplateSelector` exists or is needed. A `DataTemplates` collection holding
+  `<DataTemplate DataType="p:Dog">` and `<DataTemplate DataType="p:Cat">` rendered a
+  mixed list as `[dog: Rex, cat: Tom, dog: Fido]`.
+- **A `TreeDataTemplate` only renders the level that is expanded.** A one-child tree
+  measured `[root]` on show. To reach the child: find the containers with
+  `tree.GetRealizedTreeContainers().OfType<TreeViewItem>()`, set `IsExpanded = true`,
+  then `Dispatcher.UIThread.RunJobs()` — after which it measured `[root, child]`.
+  Asserting only the collapsed state would test nothing about the hierarchy.
+- **Compiled bindings need `x:DataType` on the root as well as on each template.**
+  Omitting it on the `UserControl` is AVLN2100 ("Cannot parse a compiled binding
+  without an explicit x:DataType directive"), even when every inner `DataTemplate`
+  carries one.
+
 ### 2.1 Seven constraints discovered by the probe
 
 A throwaway probe in the scratchpad — a ReactiveUI view model plus a real
