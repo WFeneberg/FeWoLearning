@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 40 ✅ / 60 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -63,11 +63,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 033 | ConductorSingleActive | `Conductor<T>`, activating and replacing an item - the replaced item is CLOSED (`OnDeactivateAsync(close: true)`), and a refusing `CanCloseAsync` blocks the replacement entirely | ✅ |
 | 034 | ConductorOneActive | `Conductor<T>.Collection.OneActive`, `Items` (a `BindableCollection<T>`), `ActiveItem` - the outgoing item is only deactivated (`close: false`), not closed, and stays in `Items` until explicitly closed | ✅ |
 | 035 | ConductorAllActive | `Conductor<T>.Collection.AllActive` - every item in `Items` active simultaneously; no `ActiveItem` property exists at all (measured by reflection) | ✅ |
-| 036 | ParentChildRelationship | `IChild`, `Parent`, set by the conductor | ⬜ |
-| 037 | EventAggregatorBasics | `Subscribe`, `PublishAsync`, `IHandle<T>` | ⬜ |
-| 038 | EventAggregatorMultipleMessages | one subscriber handling several message types | ⬜ |
-| 039 | EventAggregatorUnsubscribe | unsubscribing on deactivation | ⬜ |
-| 040 | EventAggregatorMarshalling | the publish marshaller delegate | ⬜ |
+| 036 | ParentChildRelationship | `IChild.Parent` (object-typed), set by an active conductor's `ActivateItemAsync`; closing from the child's side via `IConductor.DeactivateItemAsync(this, close: true)` - `IConductor` has no `CloseItemAsync` at all | ✅ |
+| 037 | EventAggregatorBasics | `IEventAggregator`'s raw four-method instance surface - `Subscribe`/`PublishAsync` (not the `SubscribeOnXxx`/`PublishOnXxxAsync` extensions) - and `IHandle<T>.HandleAsync(T, CancellationToken)` | ✅ |
+| 038 | EventAggregatorMultipleMessages | one `Subscribe` call covers every `IHandle<T>` a subscriber implements - no per-message-type registration step | ✅ |
+| 039 | EventAggregatorUnsubscribe | explicit `Unsubscribe` in `OnDeactivateAsync` as the deterministic alternative to `EventAggregator`'s WEAK subscriber references, which silently stop delivering once a forgotten subscriber is garbage-collected | ✅ |
+| 040 | EventAggregatorMarshalling | `PublishAsync`'s marshal delegate wraps the entire delivery and runs exactly once per publish, regardless of subscriber count - the caller controls it, not the aggregator | ✅ |
 | 041 | CoroutineBasics | `IResult`, the `Completed` event | ⬜ |
 | 042 | CoroutineSequence | `yield return` chains and their order | ⬜ |
 | 043 | CoroutineResultValue | `IResult<T>` and `Result.Value` | ⬜ |
