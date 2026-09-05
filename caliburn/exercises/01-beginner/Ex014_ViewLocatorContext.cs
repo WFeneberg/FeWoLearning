@@ -13,9 +13,14 @@
 //
 // TODO: Ex014_ProbeViewModel's context views do not exist yet. Create them HERE, in this
 // exercises/ project (the project tests/ actually builds against on the red run): a class
-// named Edit and a class named Detail, both deriving System.Windows.Controls.UserControl - not
-// any other UIElement, or the "no such view" fallback below returns a different placeholder -
-// in the namespace FeWoLearning.Caliburn.Exercises.Beginner.Ex014_Probe.
+// named Edit and a class named Detail, both deriving System.Windows.Controls.UserControl, in
+// the namespace FeWoLearning.Caliburn.Exercises.Beginner.Ex014_Probe. UserControl is this
+// track's convention and what the tests assert - not a framework requirement: Caliburn's only
+// real check is that the resolved type is some System.Windows.UIElement, so a Grid or any other
+// UIElement subclass would resolve too. Measured: a resolved type that is NOT a UIElement at all
+// does not throw either, but yields a DIFFERENT placeholder than the "missing view" one this
+// exercise otherwise teaches - "Cannot create <type>." rather than "Cannot find view for
+// <model>." - so getting this wrong surfaces as a confusing, differently-worded failure.
 
 using Caliburn.Micro;
 
