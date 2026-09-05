@@ -78,12 +78,13 @@ public class Ex043_CoroutineResultValueTests : CaliburnCoreContext
     public async Task TaskExtensions_ExecuteAsync_Of_T_Hands_The_Value_Back_Directly()
     {
         // TaskExtensions.ExecuteAsync<TResult>(this IResult<TResult>, ...) is the single-step
-        // convenience that DOES return Task<TResult> - unlike Coroutine.ExecuteAsync above, no
-        // bounded helper is needed: the extension owns its own task, and this is red on the stub
-        // (Execute throws before any task is even created).
+        // convenience that returns Task<TResult> directly, unlike Coroutine.ExecuteAsync above.
+        // The await is still bounded like every other coroutine await in this batch: an
+        // implementation that stores the value but never raises Completed would otherwise hang
+        // this test forever instead of failing it.
         var step = new Ex043_ValueResult<int>(() => 55);
 
-        var value = await step.ExecuteAsync();
+        var value = await BoundedAsync(step.ExecuteAsync(), "ExecuteAsync<T> (single step)");
 
         Assert.Equal(55, value);
     }

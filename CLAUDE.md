@@ -95,10 +95,10 @@ the same `global.json` opt-in.
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
   verified as of 2026-09-05: the beginner tier (001-035) is complete and the
-  intermediate tier has begun (ex036-ex040) — `dotnet test` shows 227 failed,
-  7 passed on the untouched tree (227 exercise facts across ex001-ex040, plus
+  intermediate tier is through ex045 — `dotnet test` shows 254 failed,
+  7 passed on the untouched tree (254 exercise facts across ex001-ex045, plus
   the 7 harness smoke tests, which pass in both modes) — and
-  `dotnet test -p:UseSolutions=true` shows 234 passed, 0 failed. **`wpf/`**'s beginner tier
+  `dotnet test -p:UseSolutions=true` shows 261 passed, 0 failed. **`wpf/`**'s beginner tier
   (35/100, `01-beginner` ex001-ex035) is verified end-to-end as of 2026-09-05, on
   **.NET 10.0.400** with **xunit.v3 4.0.0** and **Xunit.StaFact 4.0.23**
   (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5 passed (the
@@ -473,6 +473,25 @@ the same `global.json` opt-in.
   `Caliburn.Micro` namespace, so `using Caliburn.Micro;` makes the extensions
   look like interface members at the call site — and an exercise that claims
   a member "does not exist" is falsified by one IntelliSense keystroke.
+  **A coroutine step that never raises `Completed` hangs the test instead of
+  failing it.** `Coroutine.ExecuteAsync` returns a task that completes only
+  when the chain does, so a wrong implementation stalls the suite rather than
+  going red — the same sharp edge ex010 documents for a blocking guard.
+  `tests/_harness/CaliburnCoreContext.cs` therefore provides `BoundedAsync`,
+  `BoundedAsync<T>` and `BoundedExceptionAsync`, which race the coroutine
+  against a 5-second delay and assert it won *before* observing its result.
+  Every coroutine await in the track uses them. Note the ordering matters:
+  wrapping a bounded await in `Record.ExceptionAsync` swallows the timeout
+  assertion and turns a hang back into a silent pass.
+  **Coroutine surface, measured:** `IResult` is
+  `Execute(CoroutineExecutionContext)` plus a `Completed` event; `IResult<T>`
+  adds **`Result`**, not `Value`; `ResultCompletionEventArgs` carries only
+  `Error` and `WasCancelled`. A step setting `WasCancelled` makes
+  `ExecuteAsync` throw `TaskCanceledException`; a step setting `Error` makes
+  it throw that same exception with its message intact; either way no later
+  step runs. `TaskExtensions.AsResult()` adapts `Task`/`Task<T>`, and a
+  **faulted task surfaces as `AggregateException`** — unlike a hand-written
+  `IResult` setting `Error`, which surfaces the original directly.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -691,7 +710,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 75 / 100 (verified) | 25 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 40 / 100 (verified) | 60 |
+| `caliburn/`| 45 / 100 (verified) | 55 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
