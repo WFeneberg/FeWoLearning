@@ -16,17 +16,17 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 0 ✅ / 60 ⬜**
+**Status: 5 ✅ / 55 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 001 | SecurityHeaders | middleware pipeline, Response.OnStarting, header lifetime | ⬜ |
-| 002 | HttpsRedirectAndHsts | HSTS, transport downgrade, redirect status codes | ⬜ |
-| 003 | ContentSecurityPolicy | CSP directives, per-request nonce, inline-script blocking | ⬜ |
-| 004 | PathTraversalGuard | canonicalisation, root containment, safe static file serving | ⬜ |
-| 005 | ModelBindingOverposting | mass assignment, BindNever, explicit DTO projection | ⬜ |
+| 001 | SecurityHeaders | middleware pipeline, Response.OnStarting, header lifetime | ✅ |
+| 002 | HttpsRedirectAndHsts | HSTS, transport downgrade, redirect status codes | ✅ |
+| 003 | ContentSecurityPolicy | CSP directives, per-request nonce, inline-script blocking | ✅ |
+| 004 | PathTraversalGuard | canonicalisation, root containment, safe static file serving | ✅ |
+| 005 | ModelBindingOverposting | mass assignment, BindNever, explicit DTO projection | ✅ |
 | 006 | SqlInjectionParameterization | parameterised commands, real SQLite, tautology payloads | ⬜ |
 | 007 | ContextualOutputEncoding | HtmlEncoder vs JavaScriptEncoder vs UrlEncoder, sink context | ⬜ |
 | 008 | AntiforgeryCsrf | antiforgery tokens, cross-origin POST, safe vs unsafe methods | ⬜ |
