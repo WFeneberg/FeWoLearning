@@ -106,7 +106,20 @@ it:
   undoing whatever a previous view test installed;
 - clears and re-seeds `AssemblySource.Instance`;
 - initializes the `IoC` delegates (`GetInstance`, `GetAllInstances`,
-  `BuildUp`) from a fresh `SimpleContainer`.
+  `BuildUp`) from a fresh `SimpleContainer`;
+- resets `ViewLocator.NameTransformer` back to Caliburn's 4 built-in rules,
+  undoing whatever a previous test's `AddRule` (ex015 onward) left behind.
+  The snapshot of those 4 rules is captured once, in an **explicit** static
+  constructor — not a plain field initializer. A field initializer alone
+  marks the type `beforefieldinit`, which lets the JIT defer running it
+  lazily to the first read of that field, and that first read is the
+  `foreach` a few lines into the instance constructor, which runs *after*
+  that same constructor's own `NameTransformer.Clear()` a line above it.
+  Measured on this machine: with only a field initializer, the snapshot
+  came back `Count=0` every time, because `Clear()` had already emptied the
+  live collection before the lazily-deferred snapshot was ever taken. An
+  explicit static constructor removes `beforefieldinit`, which forces the
+  CLR to run it before any instance of the class can be constructed at all.
 
 **`CaliburnViewContext : CaliburnCoreContext, IDisposable`** — for exercises
 with a view (ex012 onward). Runs only under `[WpfFact]`/`[WpfTheory]`, because
@@ -131,24 +144,26 @@ Caliburn's configuration — `IoC`, `PlatformProvider`, `AssemblySource`, the
 `ViewLocator` — is process-global, not per-test.
 
 **Forward risk: the harness does not reset every process-global static.**
-`CaliburnCoreContext` resets exactly three globals per test — `PlatformProvider.Current`,
-`AssemblySource.Instance`, and the `IoC` delegates. It does **not** reset
-`ViewLocator.LocateTypeForModelType`/`NameTransformer`, `ViewModelBinder.BindProperties`/
+`CaliburnCoreContext` resets exactly four globals per test now —
+`PlatformProvider.Current`, `AssemblySource.Instance`, the `IoC` delegates, and (since
+ex011–ex015) `ViewLocator.NameTransformer`, the first of these globals an exercise
+actually mutated. It still does **not** reset `ViewModelBinder.BindProperties`/
 `BindActions`, `ConventionManager.ElementConventions`, `MessageBinder.SpecialValues`/
 `CustomConverters`, `ActionMessage.InvokeAction`/`ApplyAvailabilityEffect`,
 `LogManager.GetLog`, or `BindingScope.GetNamedElements` — all equally static and
-equally process-global. Nothing shipped today touches them, but ex015
-(`NameTransformerRule`), ex020 (`CustomElementConvention`), ex063, ex068–ex073, ex087,
-ex095 and ex096 will. Because the assembly runs serially with no restore between
-tests, the first of those to mutate one of these statics — ex015's
-`NameTransformer.AddRule` — will leak into every later test in the run unless whoever
-writes it first extends `CaliburnCoreContext` (or `CaliburnViewContext`) to snapshot
-the value in its constructor and restore it on teardown. Until then, a later
-exercise failing for no visible reason of its own is this, not a bug in that
-exercise.
+equally process-global. Nothing shipped today touches those, but ex020
+(`CustomElementConvention`), ex063, ex068–ex073, ex087, ex095 and ex096 will. Because the
+assembly runs serially with no restore between tests, the first of those to mutate one
+of these statics will leak into every later test in the run unless whoever writes it
+first extends `CaliburnCoreContext` (or `CaliburnViewContext`) the same way ex015's
+`NameTransformer` reset was added: snapshot the pristine value once, in an **explicit**
+static constructor, and re-apply it at the start of every test's instance constructor.
+Until then, a later exercise failing for no visible reason of its own is this, not a bug
+in that exercise.
 
 `tests/_harness/HarnessSmokeTests.cs` proves the harness itself: `HarnessCoreSmokeTests`
-(1 `[Fact]`) exercises the core context with no view at all, and `HarnessSmokeTests`
+(3 `[Fact]`) exercises the core context with no view at all — including that a
+`NameTransformer.AddRule` in one test cannot survive into another — and `HarnessSmokeTests`
 (4 `[WpfFact]`) exercises `Show`, convention binding, guard gating and action
 invocation end to end. Neither is a catalog exercise — they exist so the
 harness is proven green in the real tree from the first commit, rather than

@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -38,11 +38,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 008 | ScreenInitialize | `OnInitializedAsync` runs once, `IsInitialized` | ✅ |
 | 009 | ScreenActivate | `OnActivatedAsync`/`OnDeactivateAsync`, `IsActive`, the `Activated` async event | ✅ |
 | 010 | ScreenGuardClose | `CanCloseAsync` refusing a close | ✅ |
-| 011 | ScreenTryClose | `TryCloseAsync`, deactivation with `close: true` | ⬜ |
-| 012 | ViewAwareCallbacks | `IViewAware`, `OnViewAttached`, `OnViewLoaded` | ⬜ |
-| 013 | ViewLocatorConvention | `FooViewModel` → `FooView`, `AssemblySource` | ⬜ |
-| 014 | ViewLocatorContext | context-specific view variants | ⬜ |
-| 015 | NameTransformerRule | custom `NameTransformer` mapping rule | ⬜ |
+| 011 | ScreenTryClose | `TryCloseAsync` is a silent no-op with no `Parent`; deactivation with `close: true` under an active conductor | ✅ |
+| 012 | ViewAwareCallbacks | `IViewAware`, `OnViewAttached`, `OnViewLoaded` | ✅ |
+| 013 | ViewLocatorConvention | `FooViewModel` → `FooView`, `AssemblySource`, missing view yields a placeholder `TextBlock` | ✅ |
+| 014 | ViewLocatorContext | context convention is namespace-based, not suffix-based | ✅ |
+| 015 | NameTransformerRule | custom `NameTransformer` mapping rule | ✅ |
 | 016 | ViewModelLocator | view-first resolution | ⬜ |
 | 017 | ViewModelBinderNames | element named after a property binds to it | ⬜ |
 | 018 | BindingConventionTwoWay | convention-chosen binding mode and update trigger | ⬜ |

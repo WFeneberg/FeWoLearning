@@ -19,6 +19,34 @@ public class HarnessCoreSmokeTests : CaliburnCoreContext
         Assert.NotNull(IoC.BuildUp);
         Assert.NotNull(IoC.GetInstance);
     }
+
+    // Proves the ViewLocator.NameTransformer reset added for ex015. Two separate facts,
+    // deliberately not one: this is the same "reset at the start of every test" shape as the
+    // other three globals, so the proof has to be that ONE test's mutation cannot survive into
+    // ANOTHER test, not just that a single test can observe 4 in isolation. Without the reset
+    // in CaliburnCoreContext's constructor, Mutating_NameTransformer_In_One_Test... leaves the
+    // static NameTransformer at 5 rules, and whichever of these two runs next would see that
+    // leak instead of the pristine 4 -- these facts run in the same class, sequentially, in the
+    // same test assembly that already disables parallelization for exactly this kind of
+    // process-global state.
+    [Fact]
+    public void Mutating_NameTransformer_In_One_Test_Does_Not_Survive_Past_It()
+    {
+        // If this ever sees 5 here, either the reset broke or a previous test's rule leaked in.
+        Assert.Equal(4, ViewLocator.NameTransformer.Count);
+
+        ViewLocator.NameTransformer.AddRule("HarnessSmokeIgnored$", "Ignored");
+
+        Assert.Equal(5, ViewLocator.NameTransformer.Count);
+    }
+
+    [Fact]
+    public void A_Later_Test_Still_Sees_The_Pristine_Rule_Count()
+    {
+        // Without the harness reset, this fails whenever it happens to run after the test
+        // above -- proving the mutation really would otherwise leak across tests.
+        Assert.Equal(4, ViewLocator.NameTransformer.Count);
+    }
 }
 
 /// <summary>
