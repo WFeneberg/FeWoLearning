@@ -167,11 +167,14 @@ narrow question — does the WPF mechanism work — and deliberately does not at
   (`Application.Current`, `DispatcherUnhandledException`, resource lookup through
   `Application.Resources`, …) cannot be an exercise here; see row 067 for the
   concrete case this ruled out. A direct consequence for implicit (`TargetType`-keyed)
-  styles: real WPF's lookup walks the element tree's `Resources`, then falls back to
-  `Application.Current.Resources`, then the theme dictionaries - the middle stop is
-  simply absent here. An implicit style with nowhere but an element's own `Resources`
-  to live in has nowhere to go; row 023 (`ImplicitStyleByType`) is built around this,
-  and every later style/resource row (026 onward) meets the same absence.
+  styles: real WPF's implicit-style chain is the element tree's `Resources` then
+  `Application.Current.Resources` - and that is all of it, so the missing app-level
+  stop is simply absent here. Measured: the theme dictionaries are *not* part of this
+  chain - they feed a separate, lower rung reached through `DefaultStyleKey`
+  (`BaseValueSource.DefaultStyle`), which is why a plain `Button` here still resolves a
+  real `Template` with no `Style` in sight. An implicit style itself has nowhere but an
+  element's own `Resources` to live here; row 023 (`ImplicitStyleByType`) is built
+  around this, and every later style/resource row (026 onward) meets the same absence.
 - **No time control and no wall-clock assertions.** There is no virtual clock and no
   exercise asserts elapsed time — that is noise on a loaded machine. This is also why
   the performance rows (076–080) assert *that* the mechanism fired (container identity

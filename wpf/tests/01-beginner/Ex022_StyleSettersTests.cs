@@ -24,15 +24,17 @@ public class Ex022_StyleSettersTests : WpfTestContext
     [WpfFact]
     public void Apply_Assigns_The_Style_And_Both_Setters_Take_Effect()
     {
-        var style = Ex022_StyleSetters.BuildStyle(120.0, "wide");
+        // Different width/tag than the structural test above: no single hard-coded
+        // literal in Apply could satisfy both this and BuildStyle_Produces_... at once.
+        var style = Ex022_StyleSetters.BuildStyle(200.0, "tall");
         var button = new Button();
 
         Ex022_StyleSetters.Apply(button, style);
         Layout(button);
 
         Assert.Same(style, button.Style);
-        Assert.Equal(120.0, button.Width);
-        Assert.Equal("wide", button.Tag);
+        Assert.Equal(200.0, button.Width);
+        Assert.Equal("tall", button.Tag);
 
         // Mechanism, not just effective value: both properties must actually have come
         // from the Style, not from a direct SetValue/local assignment that happens to

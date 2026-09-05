@@ -12,6 +12,7 @@ public class Ex024_StyleBasedOnTests : WpfTestContext
     {
         var baseStyle = Ex024_StyleBasedOn.BuildBaseStyle();
 
+        Assert.Equal(typeof(Button), baseStyle.TargetType);
         var setters = baseStyle.Setters.Cast<Setter>().ToList();
         Assert.Equal(2, setters.Count);
         Assert.Contains(setters, s => s.Property == Button.WidthProperty && Equals(s.Value, 100.0));
@@ -24,6 +25,7 @@ public class Ex024_StyleBasedOnTests : WpfTestContext
         var baseStyle = Ex024_StyleBasedOn.BuildBaseStyle();
         var derived = Ex024_StyleBasedOn.BuildDerivedStyle(baseStyle);
 
+        Assert.Equal(typeof(Button), derived.TargetType);
         Assert.Same(baseStyle, derived.BasedOn);
 
         // Setter override order, inspected on the graph itself rather than only through

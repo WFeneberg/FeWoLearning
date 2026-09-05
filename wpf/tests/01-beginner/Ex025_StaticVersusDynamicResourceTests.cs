@@ -11,13 +11,21 @@ public class Ex025_StaticVersusDynamicResourceTests : WpfTestContext
     {
         var root = new StackPanel();
         root.Resources["Greeting"] = "Hello";
+        root.Resources["Farewell"] = "Bye";
         var target = new Button();
+        var otherTarget = new Button();
         root.Children.Add(target);
+        root.Children.Add(otherTarget);
         Layout(root);
 
         Ex025_StaticVersusDynamicResource.ApplyOnce(target, FrameworkElement.TagProperty, "Greeting");
+        // A second call resolving a DIFFERENT key to a DIFFERENT value: no single
+        // hard-coded literal can satisfy both, which is what forces ApplyOnce to
+        // actually call FindResource(key) instead of writing a constant.
+        Ex025_StaticVersusDynamicResource.ApplyOnce(otherTarget, FrameworkElement.TagProperty, "Farewell");
 
         Assert.Equal("Hello", target.Tag);
+        Assert.Equal("Bye", otherTarget.Tag);
         // Mechanism: a plain SetValue result is never an expression - this is what tells
         // ApplyOnce apart from a learner who called SetResourceReference here instead.
         Assert.False(DependencyPropertyHelper.GetValueSource(target, FrameworkElement.TagProperty).IsExpression);
