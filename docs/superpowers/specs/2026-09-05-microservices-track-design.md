@@ -107,12 +107,45 @@ compute environments (`AddDockerComposeEnvironment` *and*
 not assigned to a compute environment, but the model contains multiple compute
 environments"*.
 
-A caveat that shapes the implementation: after writing the artifacts, the
-`aspire publish` **CLI** went on to build images and did not return within
-600 s. Exercise tests must therefore drive artifact generation
-**in-process** rather than shelling out to `aspire publish`. Establishing that
-in-process entry point is Step 1 work (section 9), and it is the single
-highest-risk unknown left in this design.
+A caveat that shapes the implementation: the `aspire publish` **CLI** writes the
+artifacts and then does not exit — in a non-interactive shell it drops into
+"press CTRL+C to stop the AppHost" and was still running at 200 s and at 600 s.
+It is unusable inside a test loop.
+
+**The in-process entry point, measured.** Constructing the builder with publish
+arguments and awaiting `RunAsync` returns cleanly in **≈3.7 s** and writes
+`aspire-manifest.json`:
+
+```csharp
+var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
+{
+    Args = ["--operation", "publish", "--output-path", dir],
+    DisableDashboard = true
+});
+Ex0NN_Whatever.Configure(builder);
+using var app = builder.Build();
+await app.RunAsync(cts.Token);
+// dir/aspire-manifest.json now exists
+```
+
+`PublishingOptions` binds `Publisher` and `OutputPath` from the `Publishing`
+configuration section, which is what those arguments set.
+
+The manifest is a rich, deterministic assertion target — per resource it carries
+`type` (`container.v0`, `value.v0`, `parameter.v0`), `image` with the pinned tag,
+the full `env` map including `ConnectionStrings__*` and the per-flavour
+`*_URI` / `*_JDBCCONNECTIONSTRING` forms, `bindings` with `targetPort`, and for
+generated secrets the `inputs.value.default.generate` policy. **This is what L2
+asserts against.**
+
+What is *not* available in-process is the Docker Compose YAML: every argument
+combination tried (`--publisher default`, `--publisher compose`, no publisher,
+with and without `--operation publish`) produced the manifest, because the
+compose file is emitted by a pipeline the CLI drives. Compose-specific rows
+therefore assert a **committed golden `docker-compose.yaml`**, generated once at
+authoring time with the CLI and checked in — the assertion is that the learner's
+model produces a manifest consistent with that golden file, not that the test
+re-runs the CLI. Section 6.5 rows are scoped accordingly.
 
 ### 2.4 The test runner — and a repo-wide finding
 
@@ -272,7 +305,7 @@ grade is the code the dashboard runs.
 | Level | What it asserts | Cost | How it runs |
 |---|---|---|---|
 | **L1 model** | resource graph, types, `ConnectionStringExpression`, annotations | ~1.4 s | always |
-| **L2 artifact** | generated `docker-compose.yaml` / `.env` / Bicep | seconds, no container | always |
+| **L2 artifact** | `aspire-manifest.json` generated in-process (§2.3) | ~3.7 s, no container | always |
 | **L3 container** | a real database starts and a real query runs | minutes | opt-in only |
 
 L1 and L2 are the daily loop and cover the large majority of rows. L3 hangs on a
@@ -409,10 +442,9 @@ material is frequently wrong about it.
 Step 1 is scaffolding and must land before any exercise:
 
 1. `.slnx`, `Directory.Build.props`, the three projects, the `UseSolutions`
-   switch, `services/`, `playground/`, `[ContainerFact]`, and — the open
-   unknown from section 2.3 — the **in-process** entry point for generating
-   deployment artifacts. Proven by harness smoke tests that pass in both the red
-   and the green run.
+   switch, `services/`, `playground/`, `[ContainerFact]`, and the in-process
+   manifest generator of section 2.3. Proven by harness smoke tests that pass in
+   both the red and the green run.
 2. The DevContainer, verified per section 7.
 3. `catalog.md` seeded with all 100 rows as ⬜, following section 6.
 4. Exercises in **batches of five**, per `CLAUDE.md`: write stub + test +
