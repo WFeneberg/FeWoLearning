@@ -7,7 +7,7 @@ public static class GalleryCatalog
 {
     /// <summary>
     /// One entry per exercise whose result is visual. View-model-only exercises
-    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex070) deliberately
+    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex075) deliberately
     /// have no page -
     /// ex050's ViewModelViewHost and ex052/ex053's RoutedViewHost both only
     /// resolve their content on attach-to-visual-tree (via IViewLocator.ResolveView,
@@ -29,6 +29,14 @@ public static class GalleryCatalog
     /// which decorate controls the exercise does not own. ex068 (async loading),
     /// ex069 (dispatcher priorities) and ex070 (collection diffing) are likewise
     /// pure logic with no view of their own.
+    /// ex071-ex075 have no page for the ex060 reason rather than for want of
+    /// something visual: their stubs throw from Render, MeasureOverride or
+    /// ArrangeOverride, none of which a merely-constructed page reaches. Measured -
+    /// a Render exception surfaces only once the dispatcher is drained, and a
+    /// layout exception only once a layout pass runs - so registering them would
+    /// let the smoke test pass against the untouched stubs and silently break the
+    /// red/green invariant. ex074 and ex075 build geometry and brushes and have no
+    /// control of their own at all.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [

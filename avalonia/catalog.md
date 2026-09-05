@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 70 ✅ / 30 ⬜**
+**Status: 75 ✅ / 25 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -108,11 +108,11 @@ not a valid C# identifier.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 071 | CustomControlRender | `Control.Render(DrawingContext)` | ⬜ |
-| 072 | MeasureArrangeOverride | `MeasureOverride`, `ArrangeOverride` | ⬜ |
-| 073 | CustomLayoutPanel | a `Panel` subclass laying out children | ⬜ |
-| 074 | GeometryAndPen | `StreamGeometry`, `Pen`, fill rules | ⬜ |
-| 075 | CustomBrushGradient | gradient brushes, opacity masks | ⬜ |
+| 071 | CustomControlRender | `Control.Render(DrawingContext)` | ✅ |
+| 072 | MeasureArrangeOverride | `MeasureOverride`, `ArrangeOverride` | ✅ |
+| 073 | CustomLayoutPanel | a `Panel` subclass laying out children | ✅ |
+| 074 | GeometryAndPen | `PathGeometry` figures, `Pen`, fill rules | ✅ |
+| 075 | CustomBrushGradient | gradient brushes, opacity masks | ✅ |
 | 076 | InvalidateVisualLifecycle | when `Render` re-runs, `InvalidateVisual` | ⬜ |
 | 077 | PointerInputHandling | `PointerPressed`/`Moved`/`Released` | ⬜ |
 | 078 | GestureRecognition | gesture recognizers, scroll gestures | ⬜ |

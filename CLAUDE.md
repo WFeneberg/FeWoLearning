@@ -311,6 +311,31 @@ the same `global.json` opt-in.
   left to right. A `Convert` that indexes and casts blindly therefore throws
   before the view has finished loading, and a converter's call count must never
   be asserted.
+
+  **Nothing a `Render` override draws is observable, and one of the ways to try
+  it lies.** `DrawingContext` has a private constructor (no recording double);
+  the recorded render data is entirely internal (`RenderDataDrawingContext`,
+  `CompositionRenderData`, `Visual.CompositionVisual`); and the headless backend
+  discards draw commands while `RenderTargetBitmap.Render` + `CopyPixels`
+  throws nothing and hands back plausible bytes — a solid red 8×8 `Border`
+  measured **22 distinct pixel values**, i.e. noise. Never assert on those
+  pixels. `Window.GetLastRenderedFrame()` states the cure in its own exception:
+  build the app with `.UseSkia()` and `UseHeadlessDrawing` off. This track does
+  not, so ex071 grades the coordinate maths and documents the gap; switching the
+  harness over is a worthwhile separate pass, not a drive-by edit. Reliable
+  instead: `Render` *is* called and its exceptions surface at `RunJobs()` — not
+  at `Show()`, unlike `MeasureOverride`/`ArrangeOverride`, which throw
+  synchronously inside it; layout arithmetic is exact; and
+  `Geometry.GetRenderBounds(pen)` inflates bounds by exactly half the thickness
+  (verified at 1, 4 and 10). Two geometry APIs that must never carry an
+  assertion here: **`FillContains`**, which reported a *solid* arrow's centre
+  row as hollow and ignores the fill rule outright (a self-intersecting star
+  read as filled under `EvenOdd` and `NonZero` alike), and **`StrokeContains`**,
+  which returned false for a point plainly inside a 10 px stroke. Grade a shape
+  as a `PathGeometry` and walk `Figures[i].Segments[j]`; a `StreamGeometry` is
+  write-only by design and cannot be inspected at all — which is why
+  `catalog.md` row 074 now reads `PathGeometry` where it once said
+  `StreamGeometry`.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -660,7 +685,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 70 / 100 (verified) | 30 |
+| `avalonia/`| 75 / 100 (verified) | 25 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 40 / 100 (verified) | 60 |

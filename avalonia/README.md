@@ -250,6 +250,65 @@ Transform *state*, by contrast, needs no clock at all: `Transform.Value` gives
 the `Matrix` directly, and a `ScaleTransform(2, 3)` measures `M11 = 2`,
 `M22 = 3`.
 
+## Rendering: what a headless test can and cannot see
+
+Nothing that a `Render` override *draws* is observable here. Three separate
+measurements, each ruling out one obvious approach:
+
+- **`DrawingContext` has a private constructor**, so a recording double cannot be
+  derived from it.
+- **The render data a real context records is entirely internal** —
+  `RenderDataDrawingContext`, `CompositionRenderData` and `Visual`'s own
+  `CompositionVisual` are all non-public.
+- **The headless backend discards draw commands.** This is the nastiest of the
+  three, because it looks like it worked: `RenderTargetBitmap.Render` followed by
+  `CopyPixels` throws nothing and returns plausible-looking bytes. Rendering a
+  solid red 8×8 `Border` produced **22 distinct pixel values** — uninitialized
+  noise. Never assert on pixels obtained this way.
+
+`Window.GetLastRenderedFrame()` names the cure in its own exception message:
+*"make sure that headless application was initialized with `.UseSkia()` and
+disabled `UseHeadlessDrawing` in the `AvaloniaHeadlessPlatformOptions`."*
+This track does **not** do that today, and `CaptureRenderedFrame()` returns
+`null` under the current options. Turning it on would make real pixel assertions
+possible and would close the gap ex071 documents — it is a harness-wide change
+(`tests/_harness/TestAppHarness.cs`), so it needs its own pass and a full
+re-verification of every existing test, not a drive-by edit inside a batch.
+
+What *is* reliable, all measured:
+
+- **`Render` is called**, and its exceptions propagate — but at
+  `Dispatcher.UIThread.RunJobs()`, **not** at `Show()`. A test that shows a
+  control and never drains the dispatcher silently misses a throwing `Render`.
+  `MeasureOverride`/`ArrangeOverride` are the other way round: they throw
+  synchronously inside `Show()`.
+- **`InvalidateVisual()` plus `RunJobs()` produces another `Render` call** (1 → 2
+  in a spy control). `ForceRenderTimerTick` adds none.
+- **Layout is exact.** `MeasureOverride` sees the real constraint (including
+  `double.PositiveInfinity`), `DesiredSize` clamps as computed, `ArrangeOverride`
+  sees `finalSize`, and children land precisely where they were arranged.
+- **`Geometry.Bounds` and `Geometry.GetRenderBounds(pen)` are exact.** A pen
+  inflates the bounds by exactly half its thickness on every side — verified at
+  thicknesses 1, 4 and 10.
+- **`PathGeometry` is inspectable, `StreamGeometry` is not.** A `StreamGeometry`
+  is write-only by design: segments go into a sink and cannot be read back, so a
+  test can learn nothing about the shape beyond its `Bounds`, which a plain
+  rectangle satisfies just as well. Grade a shape as a `PathGeometry` and walk
+  `Figures[i].Segments[j]` — `LineSegment.Point` is public. Use `StreamGeometry`
+  where you only draw.
+
+Two geometry APIs that **must not** carry an assertion in this harness:
+
+- **`FillContains` is wrong for anything but the simplest convex outline.**
+  Sampled on a grid, a *solid* arrow reported its own centre row as hollow and
+  its left edge as outside. It also ignores the fill rule entirely: a
+  self-intersecting five-point star reported the centre as filled under
+  `EvenOdd` and `NonZero` alike, when distinguishing exactly that is the whole
+  purpose of the rule. So a fill rule can be graded as the property it is
+  (`PathGeometry.FillRule` round-trips), never as a hole in a shape.
+- **`StrokeContains` is simply broken here** — it returned `false` for a point
+  plainly inside a 10 px stroke down the middle of a horizontal line.
+
 ## Non-goals
 
 Not in this catalog, because they cannot be tested honestly under a headless
