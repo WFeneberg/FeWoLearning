@@ -1,0 +1,24 @@
+@page "/expert/095"
+@page "/expert/095/{*Rest}"
+@rendermode InteractiveServer
+
+<h1>Exercise 095 - CustomRouterMatching</h1>
+
+<p>The catch-all @@page above lands every sub-path on this page; the matching below
+   is the exercise's own. Try
+   <a href="/expert/095/users/42">/users/42</a>,
+   <a href="/expert/095/users/ada">/users/ada</a>, or
+   <a href="/expert/095/about">/about</a>.</p>
+
+<Ex095_CustomRouterMatching Routes="_routes" />
+
+@code {
+    [Parameter] public string? Rest { get; set; }
+
+    private readonly List<Ex095_CustomRouterMatching.RouteEntry> _routes =
+    [
+        new("expert/095/about", values => @<p class="page">the about page</p>),
+        new("expert/095/users/{id:int}", values => @<p class="page">user number @values["id"]</p>),
+        new("expert/095/users/{name}", values => @<p class="page">user named @values["name"]</p>),
+    ];
+}

@@ -6,7 +6,7 @@
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
 plain C# language features — those belong to the `dotnet/` track. As of this
-writing, ex001–ex090 are written and verified — the whole of **01-beginner**
+writing, ex001–ex095 are written and verified — the whole of **01-beginner**
 (ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
 `@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
 the whole of **02-intermediate** (ex036–ex070: `EditForm`/validation, DI and
@@ -16,8 +16,10 @@ of **03-advanced** (ex071–ex090: `ShouldRender`, `@key` diffing, `Virtualize`,
 custom `InputBase<T>` inputs, custom and cross-field validators,
 `DynamicComponent`, authentication state, `IHandleEvent`/`IHandleAfterRender`,
 render modes, render-fragment caching, sections and
-`[SupplyParameterFromQuery]`). **04-expert** (ex091–ex100) is catalog rows only
-(⬜) — `catalog.md` is the source of truth.
+`[SupplyParameterFromQuery]`), plus the first five rows of **04-expert**
+(ex091–ex095: hand-written `RenderTreeBuilder`, `IComponent` without
+`ComponentBase`, a hand-rolled route matcher). ex096–ex100 are catalog rows
+only (⬜) — `catalog.md` is the source of truth.
 
 ## 2. Prerequisites
 
@@ -35,7 +37,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 339 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 366 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -223,6 +225,25 @@ material found online. This track uses the current names throughout:
   of `ErrorBoundary` that silently replaces the base implementation and the
   boundary renders nothing at all. ex067's subclass is therefore plain C# with
   `[Inject]` property injection, which works on any component, markup or not.
+- **Authentication and render modes both have first-class bUnit support.**
+  `AddAuthorization()` installs stand-ins for the whole authorization stack —
+  state provider, policy provider, authorization service — and drives
+  `<AuthorizeView>` through `SetAuthorized` / `SetNotAuthorized` /
+  `SetAuthorizing` / `SetRoles` / `SetPolicies` (ex081). For a *custom*
+  `AuthenticationStateProvider` (ex082), skip it: register the real provider in
+  `Services` and let `<CascadingAuthenticationState>` consume it, so the test
+  measures the provider rather than bUnit's double. `SetRendererInfo(new
+  RendererInfo(name, isInteractive))` and the parameter builder's
+  `SetAssignedRenderMode(...)` drive `ComponentBase.RendererInfo` and
+  `AssignedRenderMode` (ex085); a component that reads `RendererInfo` without
+  one being set throws `MissingRendererInfoException` rather than guessing.
+- **`RenderHandle.Render` runs the fragment synchronously inside a dispatcher
+  turn.** So the "one pending render at a time" coalescing that `ComponentBase`
+  does has nothing to coalesce here: three `StateHasChanged` calls inside one
+  `InvokeAsync` produce three renders, not one. ex093 is scoped around that — it
+  grades `Attach`, `SetParametersAsync`, `SetParameterProperties` and the render
+  handle, and its stub says why the coalescing flag is real in production but
+  not gradeable in this harness.
 - **There is no parameterless `Render()` on a rendered component.** To push
   parameters again — which is how ex062 proves its load runs once and ex064
   counts sets — re-supply them: `cut.Render(p => p.Add(c => c.X, value))`.
@@ -422,6 +443,11 @@ concrete failure modes worth carrying into future batches:
   regardless of interactivity, loading first and overwriting with the restored
   value, rebuilding the `RenderFragment` inline, declaring the section content
   in place instead of projecting it, and matching a query key by property name.
+  ex091–ex095 as well: `AddMarkupContent` where `AddContent` belongs, a different
+  sequence number per branch, hand-assigning parameters instead of
+  `SetParameterProperties`, capturing the previous value after the new one
+  landed, and ignoring the `:int` route constraint — each taking down exactly
+  one fact.
 - **A stub whose TODO is only markup needs a throwing lifecycle method too.**
   ex079's first draft left the `<DynamicComponent>` markup as the TODO and threw
   only from a property one fact touched; the other three failed on a missing
@@ -441,6 +467,17 @@ concrete failure modes worth carrying into future batches:
   that reason — ComponentBase renders once before it ever asks. Its assertions
   now ride along inside the fact that pushes a second time. Any fact about a
   gate must arrange for the gate to be consulted.
+- **The sequence number is the identity the diff matches on, and that *is*
+  observable.** Two branches of a hand-written `BuildRenderTree` that open the
+  same component at the same sequence number hand it the same instance across a
+  toggle; at different numbers the diff disposes one and builds another — ex092
+  measures both directions. What is *not* observable is the performance argument
+  the docs make about computed sequence numbers: prepending to a list reused
+  instances identically whether the numbers were literals or `10 + i * 2`, so
+  that claim is left to the docs rather than pretended into a test. Note also
+  **`ASP0006`**, which rejects any sequence-number argument that is not an
+  integer literal — a named constant trips it, which cost this batch a clean
+  `solutions/` build until the constant became a literal.
 - **The compiler caches a lambda that captures nothing.** ex088's first draft
   had a `RenderFragment` that closed over nothing, and the "rebuilt inline"
   mutation changed nothing at all: C# hoists a capture-free lambda into a static

@@ -1,0 +1,16 @@
+@page "/expert/094"
+@rendermode InteractiveServer
+
+<h1>Exercise 094 - CustomComponentBaseRenderHook</h1>
+
+<button id="change" @onclick="() => _text = Guid.NewGuid().ToString()[..6]">new text</button>
+
+<Ex094_CustomComponentBaseRenderHook @ref="_child" Text="@_text" />
+
+<p>parameter sets: @(_child?.ParameterSets) · after-renders: @(_child?.AfterRenders)
+   · previous text: @(_child?.PreviousText ?? "(none)") · setup done: @(_child?.SetupDone)</p>
+
+@code {
+    private Ex094_CustomComponentBaseRenderHook? _child;
+    private string _text = "hello";
+}

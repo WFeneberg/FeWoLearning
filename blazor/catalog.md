@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 90 ✅ / 10 ⬜**
+**Status: 95 ✅ / 5 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -126,11 +126,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 091 | RenderTreeBuilderManual | hand-written `BuildRenderTree` via `RenderTreeBuilder`, `OpenElement`/`CloseElement`/`AddAttribute` | ⬜ |
-| 092 | RenderTreeBuilderConditional | `RenderTreeBuilder` branching, sequence numbers and diff stability | ⬜ |
-| 093 | CustomComponentBaseLifecycle | custom `ComponentBase`-style base class reimplementing `StateHasChanged`/render scheduling | ⬜ |
-| 094 | CustomComponentBaseRenderHook | custom base class hooking `SetParametersAsync`/`OnAfterRender` without `ComponentBase` | ⬜ |
-| 095 | CustomRouterMatching | custom route-matching logic layered over `Router`, route constraints | ⬜ |
+| 091 | RenderTreeBuilderManual | hand-written `BuildRenderTree` via `RenderTreeBuilder`, `OpenElement`/`CloseElement`/`AddAttribute` | ✅ |
+| 092 | RenderTreeBuilderConditional | `RenderTreeBuilder` branching, sequence numbers and diff stability | ✅ |
+| 093 | CustomComponentBaseLifecycle | custom `ComponentBase`-style base class reimplementing `StateHasChanged`/render scheduling | ✅ |
+| 094 | CustomComponentBaseRenderHook | custom base class hooking `SetParametersAsync`/`OnAfterRender` without `ComponentBase` | ✅ |
+| 095 | CustomRouterMatching | custom route-matching logic layered over `Router`, route constraints | ✅ |
 | 096 | CustomRouterFallback | custom not-found/fallback handling in a hand-rolled router component | ⬜ |
 | 097 | RenderFragmentComposedInCode | composing `RenderFragment` values programmatically from delegates | ⬜ |
 | 098 | RenderFragmentComposedTemplates | composing `RenderFragment<T>` templates in code, higher-order fragment functions | ⬜ |

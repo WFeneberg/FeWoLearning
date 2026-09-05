@@ -1,0 +1,51 @@
+@implements IDisposable
+@* Exercise 095 - Custom Router Matching (expert).
+   Goal:   Match a URL against a route table yourself - what <Router> does, minus
+           the assembly scanning.
+   Drills: reading the path out of NavigationManager, segment-by-segment matching,
+           extracting route values, an :int constraint, and re-matching on
+           navigation.
+   Passes: dotnet test --filter FullyQualifiedName~Ex095_ *@
+@if (Matched is not null)
+{
+    @Matched.Content(RouteValues)
+}
+
+@code {
+    /// A pattern plus what to render for it. Segments in braces are route values -
+    /// "{id}" takes anything, "{id:int}" only an integer.
+    public sealed record RouteEntry(
+        string Pattern,
+        RenderFragment<IReadOnlyDictionary<string, string>> Content);
+
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    /// Tried in order; the first match wins.
+    [Parameter] public IReadOnlyList<RouteEntry> Routes { get; set; } = [];
+
+    public RouteEntry? Matched { get; private set; }
+
+    public IReadOnlyDictionary<string, string> RouteValues { get; private set; }
+        = new Dictionary<string, string>();
+
+    // TODO: match the current URL, and keep matching as it changes.
+    //   - Take the path from Navigation. ToBaseRelativePath(Navigation.Uri) gives you
+    //     the part after the base, query string included - cut that off, and cut off
+    //     leading and trailing slashes, before splitting on '/'.
+    //   - A route matches when it has the SAME NUMBER of segments and every one of
+    //     them matches: a literal segment compares case-insensitively; a "{name}"
+    //     segment takes any non-empty value; a "{name:int}" segment takes only what
+    //     parses as an int. Partial matches do not count - "/users/{id}" must not
+    //     match "/users" or "/users/42/edit".
+    //   - The first matching entry wins, so a constrained route placed before a
+    //     looser one gets first refusal. Set Matched and RouteValues; when nothing
+    //     matches, Matched is null and this component renders nothing (ex096 is
+    //     where the fallback goes).
+    //   - Subscribe to Navigation.LocationChanged so a navigation re-matches, and
+    //     unsubscribe in Dispose.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex095 - match the current path");
+
+    public void Dispose()
+        => throw new NotImplementedException("TODO: Ex095 - stop listening for navigations");
+}

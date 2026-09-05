@@ -1,0 +1,18 @@
+@page "/expert/091"
+@rendermode InteractiveServer
+
+<h1>Exercise 091 - RenderTreeBuilderManual</h1>
+
+<button id="toggle" @onclick="() => _disabled = !_disabled">toggle disabled</button>
+<button id="link" @onclick="ToggleHref">toggle href</button>
+
+<Ex091_RenderTreeBuilderManual Label="<b>escaped</b> label" Href="@_href" Disabled="_disabled" />
+
+<p>The label is passed through AddContent, so the tags above are visible text.</p>
+
+@code {
+    private bool _disabled;
+    private string? _href;
+
+    private void ToggleHref() => _href = _href is null ? "/expert/091" : null;
+}

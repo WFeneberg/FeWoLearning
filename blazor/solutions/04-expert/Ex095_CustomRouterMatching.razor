@@ -1,0 +1,137 @@
+@implements IDisposable
+@* Exercise 095 - Custom Router Matching (expert).
+   Goal:   Match a URL against a route table yourself - what <Router> does, minus
+           the assembly scanning.
+   Drills: reading the path out of NavigationManager, segment-by-segment matching,
+           extracting route values, an :int constraint, and re-matching on
+           navigation.
+   Passes: dotnet test --filter FullyQualifiedName~Ex095_ *@
+@if (Matched is not null)
+{
+    @Matched.Content(RouteValues)
+}
+
+@code {
+    /// A pattern plus what to render for it. Segments in braces are route values -
+    /// "{id}" takes anything, "{id:int}" only an integer.
+    public sealed record RouteEntry(
+        string Pattern,
+        RenderFragment<IReadOnlyDictionary<string, string>> Content);
+
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    /// Tried in order; the first match wins.
+    [Parameter] public IReadOnlyList<RouteEntry> Routes { get; set; } = [];
+
+    public RouteEntry? Matched { get; private set; }
+
+    public IReadOnlyDictionary<string, string> RouteValues { get; private set; }
+        = new Dictionary<string, string>();
+
+    private EventHandler<LocationChangedEventArgs>? _onLocationChanged;
+
+    protected override void OnInitialized()
+    {
+        _onLocationChanged = (_, _) =>
+        {
+            MatchCurrentPath();
+            StateHasChanged();
+        };
+        Navigation.LocationChanged += _onLocationChanged;
+
+        MatchCurrentPath();
+    }
+
+    protected override void OnParametersSet() => MatchCurrentPath();
+
+    private void MatchCurrentPath()
+    {
+        var segments = CurrentSegments();
+
+        foreach (var route in Routes)
+        {
+            if (TryMatch(route.Pattern, segments, out var values))
+            {
+                Matched = route;
+                RouteValues = values;
+                return;
+            }
+        }
+
+        Matched = null;
+        RouteValues = new Dictionary<string, string>();
+    }
+
+    private string[] CurrentSegments()
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri);
+
+        var query = path.IndexOf('?');
+        if (query >= 0)
+        {
+            path = path[..query];
+        }
+
+        return path.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    private static bool TryMatch(
+        string pattern, string[] segments, out IReadOnlyDictionary<string, string> values)
+    {
+        values = new Dictionary<string, string>();
+
+        var patternSegments = pattern.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        // Same length or no match: a route matches the whole path, never a prefix.
+        if (patternSegments.Length != segments.Length)
+        {
+            return false;
+        }
+
+        var matched = new Dictionary<string, string>();
+
+        for (var i = 0; i < patternSegments.Length; i++)
+        {
+            var expected = patternSegments[i];
+            var actual = segments[i];
+
+            if (!expected.StartsWith('{') || !expected.EndsWith('}'))
+            {
+                if (!string.Equals(expected, actual, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                continue;
+            }
+
+            var inner = expected[1..^1];
+            var colon = inner.IndexOf(':');
+            var name = colon < 0 ? inner : inner[..colon];
+            var constraint = colon < 0 ? null : inner[(colon + 1)..];
+
+            if (actual.Length == 0)
+            {
+                return false;
+            }
+
+            if (constraint == "int" && !int.TryParse(actual, out _))
+            {
+                return false;
+            }
+
+            matched[name] = actual;
+        }
+
+        values = matched;
+        return true;
+    }
+
+    public void Dispose()
+    {
+        if (_onLocationChanged is not null)
+        {
+            Navigation.LocationChanged -= _onLocationChanged;
+        }
+    }
+}

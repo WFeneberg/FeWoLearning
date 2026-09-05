@@ -1,0 +1,15 @@
+@page "/expert/093"
+@rendermode InteractiveServer
+
+<h1>Exercise 093 - CustomComponentBaseLifecycle</h1>
+
+<button id="change" @onclick="() => _text = Guid.NewGuid().ToString()[..6]">new text</button>
+
+<Ex093_CustomComponentBaseLifecycle @ref="_child" Text="@_text" />
+
+<p>renders: @(_child?.Renders)</p>
+
+@code {
+    private Ex093_CustomComponentBaseLifecycle? _child;
+    private string _text = "hello";
+}

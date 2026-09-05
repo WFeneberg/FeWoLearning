@@ -388,7 +388,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 90 / 100 (verified) | 10 |
+| `blazor/` | 95 / 100 (verified) | 5 |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 20 / 100 (verified) | 80 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
@@ -439,10 +439,11 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 90 written exercises — all of `01-beginner`, `02-intermediate` and
-`03-advanced` — carry 339 individual test facts; `dotnet test` shows 339
-failed/0 passed on the untouched tree and `dotnet test -p:UseSolutions=true`
-shows 339 passed/0 failed (verified 2026-09-05). Every failure but one traces
+`blazor/`'s 95 written exercises — all of `01-beginner`, `02-intermediate` and
+`03-advanced`, plus ex091–ex095 of `04-expert` — carry 366 individual test
+facts; `dotnet test` shows 366 failed/0 passed on the untouched tree and
+`dotnet test -p:UseSolutions=true` shows 366 passed/0 failed (verified
+2026-09-05). Every failure but one traces
 to its own exercise's `NotImplementedException`; the exception is ex069, whose
 subject is a generic *type constraint* that no behaviour can prove (LINQ's
 `Min`/`Max` need none), so it is graded by reading the type parameter's
@@ -476,7 +477,12 @@ catalog row rather than merely a test: .NET 10's `[PersistentState]` attribute
 cannot be round-tripped under bUnit (the double's restore snapshot is taken at
 registration), and static SSR's "event handlers are ignored" is unobservable
 because bUnit's renderer is always interactive — so ex086/ex087 are graded on
-what a component controls instead.
+what a component controls instead. Two more from the expert tier:
+`RenderHandle.Render` runs its fragment synchronously inside a dispatcher turn,
+so `ComponentBase`-style render coalescing has nothing to coalesce under bUnit
+and ex093 is scoped without it; and the `ASP0006` analyzer rejects any
+sequence-number argument that is not an integer literal — even a named
+constant, which is worth knowing before writing a `BuildRenderTree` by hand.
 
 ## The `uno/` track
 

@@ -1,0 +1,16 @@
+@page "/expert/092"
+@rendermode InteractiveServer
+
+<h1>Exercise 092 - RenderTreeBuilderConditional</h1>
+
+<p>Toggling swaps the viewer for the editor. The badge below them is opened at the
+   same sequence number in both branches, so the diff keeps the one instance rather
+   than rebuilding it - which the tests prove by ticking its counter first.</p>
+
+<button id="toggle" @onclick="() => _editing = !_editing">toggle branch</button>
+
+<Ex092_RenderTreeBuilderConditional Editing="_editing" Text="hello" />
+
+@code {
+    private bool _editing;
+}
