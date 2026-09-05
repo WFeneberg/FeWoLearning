@@ -17,17 +17,17 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 0 ✅ / 60 ⬜**
+**Status: 5 ✅ / 55 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 001 | LayeredCompositionRoot | layering, composition root, dependency direction | ⬜ |
-| 002 | ServiceLifetimes | singleton/scoped/transient, captive dependency detection | ⬜ |
-| 003 | OptionsPattern | IOptions vs IOptionsSnapshot vs IOptionsMonitor, named options, validation | ⬜ |
-| 004 | MiddlewarePipeline | chain of responsibility, ordering, short-circuiting | ⬜ |
-| 005 | VerticalSliceEndpoint | feature slices, slice-local request/response, no shared service layer | ⬜ |
+| 001 | LayeredCompositionRoot | layering, composition root, dependency direction | ✅ |
+| 002 | ServiceLifetimes | singleton/scoped/transient, captive dependency detection | ✅ |
+| 003 | OptionsPattern | IOptions vs IOptionsSnapshot vs IOptionsMonitor, named options, validation | ✅ |
+| 004 | MiddlewarePipeline | chain of responsibility, ordering, short-circuiting | ✅ |
+| 005 | VerticalSliceEndpoint | feature slices, slice-local request/response, no shared service layer | ✅ |
 | 006 | CqrsCommandQuery | command/query separation, distinct handler contracts | ⬜ |
 | 007 | MediatorDispatch | mediator, handler resolution by request type, no service locator leak | ⬜ |
 | 008 | PipelineBehaviors | decorator chain around a handler, ordering, composition | ⬜ |
