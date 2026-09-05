@@ -1,6 +1,7 @@
 // Exercise 013 - Two-way binding with an explicit update trigger (beginner).
 // Goal:   Build the "edit freely, only commit on Save" screen - the target must NOT
-//         push every keystroke back to the source the way ex004's binding did.
+//         push every keystroke (or even losing focus) back to the source, until
+//         something explicit - the Save button's handler - commits it.
 // Drills: UpdateSourceTrigger.Explicit, and reaching the live BindingExpression with
 //         BindingOperations.GetBindingExpression to push the pending edit on demand
 //         with BindingExpression.UpdateSource().
@@ -29,6 +30,18 @@ public static class Ex013_TwoWayUpdateSourceTrigger
         // Source -> target still updates immediately through PropertyChanged, exactly
         // like ex004 - Explicit only changes the target -> source direction.
         throw new NotImplementedException("TODO: Ex013 - bind two-way with UpdateSourceTrigger.Explicit");
+    }
+
+    /// <summary>
+    /// Commits whatever edit is currently pending on <paramref name="target"/>'s Text
+    /// binding straight to its source - the Save button's handler in a real screen.
+    /// </summary>
+    public static void Commit(TextBox target)
+    {
+        // TODO: reach the live BindingExpression via
+        // BindingOperations.GetBindingExpression(target, TextBox.TextProperty) and
+        // call UpdateSource() on it.
+        throw new NotImplementedException("TODO: Ex013 - commit the pending edit through the BindingExpression");
     }
 }
 

@@ -64,6 +64,7 @@ public class Ex015_RelativeSourceBindingTests : WpfTestContext
         Assert.Equal(nameof(FrameworkElement.ActualWidth), binding!.Path.Path);
         Assert.NotNull(binding.RelativeSource);
         Assert.Equal(RelativeSourceMode.Self, binding.RelativeSource!.Mode);
+        Assert.Equal("{0:0}", binding.StringFormat);
     }
 
     [WpfFact]

@@ -55,7 +55,7 @@ Two deliberate content gaps:
 | 009 | PropertyValuePrecedence | local value vs style setter vs default, `DependencyPropertyHelper.GetValueSource` | ✅ |
 | 010 | DependentPropertyFanOut | one field change raising several `PropertyChanged` names | ✅ |
 | 011 | NotifyAllProperties | `PropertyChangedEventArgs(string.Empty)` semantics | ✅ |
-| 012 | LegacyEventToInpc | replace a bespoke `XChanged` event with `INotifyPropertyChanged` | ✅ |
+| 012 | LegacyEventToInpc | keep a bespoke `XChanged` event firing while adding `INotifyPropertyChanged`, since only the latter reaches a real `Binding` | ✅ |
 | 013 | TwoWayUpdateSourceTrigger | `UpdateSourceTrigger.Explicit`, `BindingExpression.UpdateSource` | ✅ |
 | 014 | StringFormatAndFallbacks | `StringFormat`, `FallbackValue`, `TargetNullValue` | ✅ |
 | 015 | RelativeSourceBinding | `RelativeSource.Self`, `FindAncestor`, `AncestorLevel` | ✅ |

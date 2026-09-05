@@ -4,8 +4,8 @@
 //         many matching ancestors to skip.
 // Drills: RelativeSource.Self (bind a property to another property on the same
 //         element) and RelativeSource.FindAncestor with AncestorType/AncestorLevel
-//         (walk up the visual tree to the Nth ancestor of a given type - 1 means the
-//         nearest one, not the target itself).
+//         (walk up the FrameworkElement parent chain to the Nth ancestor of a given
+//         type - 1 means the nearest one, not the target itself).
 
 using System.Windows;
 using System.Windows.Controls;

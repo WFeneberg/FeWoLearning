@@ -7,15 +7,17 @@ namespace FeWoLearning.Wpf.Tests.Beginner;
 
 public class Ex014_StringFormatAndFallbacksTests : WpfTestContext
 {
-    // Pins the display culture explicitly so "{0:C}" is deterministic on every machine
-    // this suite runs on: a Binding takes its format culture from
-    // Binding.ConverterCulture, falling back to the target element's Language property
-    // (default en-US) - never from Thread.CurrentCulture/the OS locale. This machine
-    // is de-CH with UI culture de-DE; without this, "{0:C}" would render whatever
-    // currency the OS happens to be set to, which is exactly the kind of test that
-    // passes here and fails elsewhere. Pinning Language, not ConverterCulture, keeps
-    // this row about StringFormat/FallbackValue/TargetNullValue - ConverterCulture
-    // itself is row 069's subject.
+    // Pins the display culture explicitly: a Binding takes its format culture from
+    // Binding.ConverterCulture, falling back to the target element's (inherited)
+    // Language property - never from Thread.CurrentCulture/the OS locale.
+    // TextBlock.Language already defaults to a hard-coded "en-US" regardless of the
+    // machine's OS locale (measured: even forcing Thread.CurrentCulture to de-CH,
+    // "{0:C}" still renders "$1,234.50" here), so this pin changes nothing today - it
+    // states the assumption explicitly and keeps the test correct if a future row ever
+    // sets Language on an ancestor, which would otherwise flow down through
+    // inheritance and silently change the format. Pinning Language, not
+    // ConverterCulture, keeps this row about StringFormat/FallbackValue/TargetNullValue
+    // - ConverterCulture itself is row 069's subject.
     private static TextBlock NewTarget() => new() { Language = XmlLanguage.GetLanguage("en-US") };
 
     [WpfFact]

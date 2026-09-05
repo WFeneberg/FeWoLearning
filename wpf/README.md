@@ -94,30 +94,22 @@ no `Application` either; WPF resolves default control templates through
   an instance property on the class that happens to consume it.
 - **A `Binding`'s format culture never comes from `Thread.CurrentCulture`.** It comes
   from `Binding.ConverterCulture`, falling back to the bound element's `Language`
-  property, which defaults to `en-US` regardless of the machine's OS locale. Measured
-  on this machine (OS culture de-CH, UI culture de-DE): a `TextBlock` bound with
-  `StringFormat="{0:C}"` and no `ConverterCulture` renders `$1,234.50` — US-dollar
-  formatting, not CHF and not a de-CH decimal comma — because `Language` resolves to
-  its hard-coded `en-US` default, not the OS locale. Row 014
-  (`StringFormatAndFallbacks`) pins `target.Language` explicitly before asserting, so
-  the row is deterministic on any machine without ever touching `ConverterCulture`
-  (that stays row 069's subject). Any later row whose test formats a culture-sensitive
-  value must pin culture the same way — never assume the CI/dev machine's locale, and
-  never "fix" it by setting `Thread.CurrentCulture`, which a `Binding` does not consult
-  at all.
-- **A negative assertion about `UpdateSourceTrigger` can't tell `Explicit` apart from
-  an unset default.** `TextBox.Text`'s own default trigger is `LostFocus`, not
-  `PropertyChanged` — and this harness never simulates real keyboard/focus input (see
-  "What the harness cannot do" below), so `LostFocus` never fires here either. A test
-  that only asserts "editing the target and pumping leaves the source unchanged, then
-  `BindingExpression.UpdateSource()` pushes it" passes identically whether the
-  learner set `UpdateSourceTrigger.Explicit` or left it unset entirely — both look
-  inert under this harness, for different reasons. Row 013
-  (`TwoWayUpdateSourceTrigger`) found this by actually building that wrong
-  implementation and running the real test against it: only asserting the binding's
-  declared `UpdateSourceTrigger` via `BindingOperations.GetBinding` catches it. Any row
-  whose subject is a specific `UpdateSourceTrigger` value must assert the declaration,
-  not only the observed push/no-push behavior.
+  property, which defaults to a hard-coded `en-US` regardless of the OS locale —
+  measured on this de-CH/de-DE machine: `StringFormat="{0:C}"` with no
+  `ConverterCulture` renders `$1,234.50`, not CHF, even after forcing
+  `Thread.CurrentCulture` to de-CH (which a plain `string.Format` with that culture
+  would render as `CHF 1'234.50`). Row 014 (`StringFormatAndFallbacks`) pins
+  `target.Language` explicitly anyway, so the row states its assumption instead of
+  relying on an invisible default — `ConverterCulture` itself stays row 069's subject.
+- **A push/no-push test for `UpdateSourceTrigger` needs real (logical) focus, not
+  just a target edit.** `TextBox.Text` defaults to `LostFocus`, not `PropertyChanged`,
+  and editing the target alone never raises it — move focus off the target with
+  `FocusManager.SetFocusedElement` (works on a windowless tree: no `Show(...)`, no
+  input simulation) to actually trigger it. `BindingExpression.IsDirty` can't
+  discriminate either — it reads `True` after an edit under unset, `LostFocus` and
+  `Explicit` alike, only `PropertyChanged` reads `False` — and `UpdateSource()`
+  succeeds under every trigger, so there is no exception-shape check. Row 013 asserts
+  both the focus-based behavior and the binding's declared `UpdateSourceTrigger`.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 

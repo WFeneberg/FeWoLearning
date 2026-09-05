@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using FeWoLearning.Wpf.Exercises.Beginner;
 
 namespace FeWoLearning.Wpf.Tests.Beginner;
@@ -7,7 +8,7 @@ namespace FeWoLearning.Wpf.Tests.Beginner;
 public class Ex013_TwoWayUpdateSourceTriggerTests : WpfTestContext
 {
     [WpfFact]
-    public void Editing_The_Target_Leaves_The_Source_Alone_Until_UpdateSource_Is_Called()
+    public void Editing_The_Target_Leaves_The_Source_Alone_Until_Commit_Is_Called()
     {
         var source = new Ex013_DraftSource { Label = "inlet" };
         var target = new TextBox();
@@ -17,21 +18,51 @@ public class Ex013_TwoWayUpdateSourceTriggerTests : WpfTestContext
         target.Text = "edited";
         Pump();
 
-        // Negative: this is the load-bearing assertion. UpdateSourceTrigger.Explicit
-        // means nothing pushes to the source on its own - a learner who left the
-        // default PropertyChanged trigger (or Mode.OneWay, which never pushes at all)
-        // could each pass a test that stopped here, so it is paired below with a
-        // positive assertion on the very same target/source instances.
+        // Negative: UpdateSourceTrigger.Explicit means nothing pushes to the source
+        // on its own - a learner who left the default PropertyChanged trigger (or
+        // Mode.OneWay, which never pushes at all) could each pass a test that stopped
+        // here, so it is paired below with a positive assertion on the very same
+        // target/source instances. This alone cannot tell Explicit apart from an
+        // unset trigger, though - see the focus-based test below for that.
         Assert.Equal("inlet", source.Label);
 
-        var expression = BindingOperations.GetBindingExpression(target, TextBox.TextProperty);
-        Assert.NotNull(expression);
-        expression!.UpdateSource();
+        Ex013_TwoWayUpdateSourceTrigger.Commit(target);
 
         // Positive, same instances: proves the binding was live and two-way, simply
         // waiting for the explicit push - not disconnected, not OneWay, not silently
         // dropped.
         Assert.Equal("edited", source.Label);
+    }
+
+    [WpfFact]
+    public void Losing_Focus_Does_Not_Push_The_Way_The_Unset_Default_Trigger_Would()
+    {
+        var source = new Ex013_DraftSource { Label = "inlet" };
+        var target = new TextBox();
+        var elsewhere = new TextBox();
+        var scope = new Grid();
+        FocusManager.SetIsFocusScope(scope, true);
+        scope.Children.Add(target);
+        scope.Children.Add(elsewhere);
+
+        Ex013_TwoWayUpdateSourceTrigger.Bind(target, source);
+        Layout(scope);
+
+        FocusManager.SetFocusedElement(scope, target);
+        Pump();
+
+        target.Text = "edited";
+        Pump();
+
+        // Moves logical focus off target, which raises its LostFocus - the trigger a
+        // learner who left UpdateSourceTrigger unset (TextBox.Text's own default)
+        // would be relying on. No Show(...) and no synthetic input needed: logical
+        // focus works on a windowless tree.
+        FocusManager.SetFocusedElement(scope, elsewhere);
+        Pump();
+
+        // Explicit ignores LostFocus entirely - the edit is still only pending.
+        Assert.Equal("inlet", source.Label);
     }
 
     [WpfFact]
