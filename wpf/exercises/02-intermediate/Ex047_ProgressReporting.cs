@@ -8,7 +8,8 @@
 //         later calls Report. One built off the UI thread posts every callback to the thread
 //         pool instead, silently - there is no exception anywhere to notice this by.
 // Drills: IProgress<T>.Report as the only channel progress reaches its subscriber through, and
-//         Progress<T>'s construction-site capture of the ambient SynchronizationContext.
+//         WHERE you construct a Progress<T> - not merely accepting one someone else already
+//         built - deciding which thread it marshals its callback onto.
 // Passes: dotnet test --filter FullyQualifiedName~Ex047_
 
 namespace FeWoLearning.Wpf.Exercises.Intermediate;
@@ -27,4 +28,16 @@ public static class Ex047_ProgressReporting
     /// </summary>
     public static Task RunAsync(int steps, IProgress<int> progress, Func<Task> delay) =>
         throw new NotImplementedException("TODO: Ex047 - for step 1..steps inclusive, await delay(), then call progress.Report(step) through the IProgress<int> interface");
+
+    /// <summary>
+    /// Same step loop, but the caller hands over a plain callback (<paramref name="onProgress"/>)
+    /// instead of an already-built <see cref="IProgress{T}"/> - and the stepping itself happens
+    /// via real background work (<see cref="Task.Run(Func{Task})"/>), not just an awaited delay.
+    /// Where you build the <see cref="Progress{T}"/> (of int) wrapping <paramref name="onProgress"/>
+    /// now actually matters: build it on the thread this method is CALLED from, before starting
+    /// the background work - not inside it - so it captures the caller's ambient
+    /// SynchronizationContext instead of whatever pool thread ends up running the loop.
+    /// </summary>
+    public static Task RunOnBackgroundAsync(int steps, Action<int> onProgress, Func<Task> delay) =>
+        throw new NotImplementedException("TODO: Ex047 - construct a Progress<int> wrapping onProgress on the thread RunOnBackgroundAsync is CALLED from, before starting any background work; then Task.Run a loop that, for step 1..steps inclusive, awaits delay() and reports step through that Progress<int>'s Report(step)");
 }

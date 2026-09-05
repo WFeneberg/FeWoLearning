@@ -121,10 +121,12 @@ measurement walked, not the general mechanism it seems to imply.
   (actual I/O, `Task.Delay`, a background loop) resuming on that captured context while the
   dispatcher thread sits blocked in `.GetResult()` with no `PushFrame` pumping it would
   deadlock the classic way. Rows 046-050 (async commands, progress, dispatcher
-  priorities, cancellation) are exactly where that risk becomes real and must be
-  re-measured there when it does - this bullet is an inference about the mechanism from
-  the narrow case actually measured here, not a claim that a real deadlock was produced
-  and caught.
+  priorities, cancellation) were exactly where that risk would become real - and they
+  avoided it by RULING, not by measuring: no test or reference solution in that batch
+  blocks on a real suspension point with `.GetAwaiter().GetResult()` at all, so the
+  deadlock this bullet warns about was never produced there to catch. This bullet remains
+  an inference about the mechanism from the narrow case actually measured here, not a
+  claim that a real deadlock was produced and caught.
 - **`ValidateOnStart()` does not change WHETHER an options validation rule runs, only
   WHEN.** Any `IValidateOptions<T>`/`.Validate(...)` rule already fires lazily on the
   first `IOptions<T>.Value` access, with or without `ValidateOnStart()` - measured
@@ -136,10 +138,20 @@ measurement walked, not the general mechanism it seems to imply.
   same as always".
 - **`await CancellationTokenSource.CancelAsync()` does NOT reproduce `uno/`'s stack overflow
   on this dispatcher.** Measured directly for row 050, outside the repo: a single cancellation
-  and a chain of 20,000 cancel-then-await rounds on a real yield point both complete cleanly,
-  because `DispatcherSynchronizationContext.Post` always queues through `Dispatcher.BeginInvoke`
-  rather than ever running a continuation inline. Row 050 still ships the synchronous `Cancel()`
-  regardless - this measurement is not a license to use `CancelAsync()` untested elsewhere.
+  and a chain of 20,000 cancel-then-await rounds on a real yield point both complete cleanly -
+  but the causality is the OPPOSITE of an earlier pass through this same file: it is NOT because
+  `DispatcherSynchronizationContext.Post` skips running continuations inline (that part is true,
+  confirmed directly, but beside the point). The synchronous `Cancel()` this row mandates is
+  itself the variant that resumes a continuation INLINE - a `CancellationToken.Register` callback
+  firing synchronously inside `Cancel()` completes the awaited task on the SAME thread, and that
+  continuation runs right there, still nested on the calling stack; confirmed directly by chaining
+  genuine RECURSIVE cancel-then-restart rounds (a loop never nests, which is why the 20,000-round
+  stress test alone proves nothing here) - stack depth grows with the chain and is floored only by
+  the runtime's own continuation-inlining stack guard, not by anything about the dispatcher.
+  `CancelAsync()` stays flat regardless of depth because its OWN callbacks never run on the
+  calling thread at all - that is the actual reason it is safe here. Row 050 still ships the
+  synchronous `Cancel()` regardless - this measurement is not a license to use `CancelAsync()`
+  untested elsewhere.
 - **`Progress<T>` captures the ambient `SynchronizationContext` at construction, not at
   `Report` time.** Measured directly for row 047: one built on the dispatcher thread always
   reports back on it; the identical type built on a ThreadPool thread with no ambient context
@@ -150,7 +162,17 @@ measurement walked, not the general mechanism it seems to imply.
   pass against code that never uses real per-item priority at all.** Measured directly building
   row 048: an implementation that pre-sorts its own items and queues all of them at one uniform
   priority passed that simple test outright; only interleaving a marker queued from OUTSIDE the
-  code under test, at a real priority between two of its items, exposed it.
+  code under test, at a real priority between two of its items, exposed it. That marker alone
+  still pins only the MIDDLE of the order, though: a fixed lookup table recognizing exactly the
+  four priority values the rest of the suite happens to use (an identity mapping for those,
+  silently coercing anything else) reproduced every one of those assertions, marker included,
+  and needed a value outside that four-value set (`ApplicationIdle`) to expose it.
+- **Row 049 proves the OUTCOME (which thread code resumes on), not that the ambient context is
+  what produced it.** A thread id is the only observable its tests have; a `ConfigureAwait(false)`
+  on both awaits combined with reading the id back through a captured `Dispatcher` reference
+  reproduces the same numbers by a different route and was judged too contrived to be a
+  plausible learner mistake to guard against here - the row's honest scope stops at the thread
+  id, not the mechanism that put code there.
 
 #### Layout and sizing
 

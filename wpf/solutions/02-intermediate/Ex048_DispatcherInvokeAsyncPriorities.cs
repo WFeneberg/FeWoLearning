@@ -23,6 +23,10 @@ public static class Ex048_DispatcherPriorityQueue
     /// before the dispatcher gets a chance to run any of them. Only once every item has been
     /// queued this way should the returned task await all of those collected tasks together
     /// (<c>Task.WhenAll</c>) and let the dispatcher actually drain.
+    ///
+    /// <c>Dispatcher.BeginInvoke(item.Priority, item.Callback).Task</c> queues and completes
+    /// identically - <c>InvokeAsync</c> is used here only because its (priority, callback)
+    /// argument order reads better, not because <c>BeginInvoke</c> would behave differently.
     /// </summary>
     public static async Task RunAllAsync(Dispatcher dispatcher, IReadOnlyList<(DispatcherPriority Priority, Action Callback)> items)
     {

@@ -45,22 +45,34 @@ public abstract class WpfTestContext : IDisposable
     /// <summary>
     /// Awaits <paramref name="task"/>, but bounded: if <paramref name="timeout"/> (5 seconds by
     /// default) elapses first, throws a <see cref="TimeoutException"/> instead of waiting
-    /// forever. Rows 046-050 are this track's first genuinely async tests, and xunit waits for
-    /// the async work a test started - a stuck gate (an unsettled <see cref="TaskCompletionSource"/>,
-    /// a production bug that swallows a cancellation and never completes) would otherwise hang
-    /// the whole serial run, not just its own test, and leave a testhost process holding the
-    /// output DLL. Every wait on production-controlled async work in that tier goes through
-    /// this instead of a bare <c>await</c>, so a stuck gate becomes a failing assertion here.
+    /// forever, and <paramref name="task"/> itself is left running, abandoned and unobserved -
+    /// this method never looks at it again. Only when <paramref name="task"/> itself is the one
+    /// that completes within the bound does this re-observe that outcome via a real
+    /// <c>await</c>, turning a fault or cancellation it already carries into a thrown exception
+    /// here instead of silently returning early. Rows 046-050 are this track's first genuinely
+    /// async tests, and xunit waits for the async work a test started - a stuck gate (an
+    /// unsettled <see cref="TaskCompletionSource"/>, a production bug that swallows a
+    /// cancellation and never completes) would otherwise hang the whole serial run, not just
+    /// its own test, and leave a testhost process holding the output DLL. Every wait on
+    /// production-controlled async work in that tier goes through this instead of a bare
+    /// <c>await</c>, so a stuck gate becomes a failing assertion here.
     /// </summary>
     protected static async Task WithTimeout(Task task, TimeSpan? timeout = null)
     {
-        var winner = await Task.WhenAny(task, Task.Delay(timeout ?? TimeSpan.FromSeconds(5)));
+        using var timeoutCts = new CancellationTokenSource();
+        var delay = Task.Delay(timeout ?? TimeSpan.FromSeconds(5), timeoutCts.Token);
+        var winner = await Task.WhenAny(task, delay);
+
         if (!ReferenceEquals(winner, task))
         {
             throw new TimeoutException("Bounded wait exceeded its timeout - a gate was never settled. See wpf/README.md, 'Timing and the dispatcher'.");
         }
 
-        await task; // surfaces a fault/cancellation as a real exception instead of hiding it
+        // task already won the race - stop the now-redundant timer instead of leaving it
+        // running for the rest of its 5 seconds on every successful wait.
+        timeoutCts.Cancel();
+
+        await task;
     }
 
     /// <summary>Same as the non-generic overload, for a task that produces a value.</summary>

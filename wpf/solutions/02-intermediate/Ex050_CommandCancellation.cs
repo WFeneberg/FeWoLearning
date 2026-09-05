@@ -8,7 +8,9 @@
 // Drills: a fresh CancellationTokenSource per run, Cancel() reaching the CURRENTLY running
 //         operation's token (not a stale one from a previous run, not none at all), telling
 //         OperationCanceledException apart from a real failure, and the synchronous
-//         CancellationTokenSource.Cancel() - NEVER `await CancelAsync()` - see wpf/README.md.
+//         CancellationTokenSource.Cancel() - NEVER `await CancelAsync()`: Cancel() below is
+//         void, and there is no caller to hand an awaited call's continuation to without
+//         going `async void` - the exact anti-pattern row 046 exists to move away from.
 
 using System.ComponentModel;
 using System.Windows.Input;
@@ -98,7 +100,9 @@ public abstract class Ex050_CancellableCommandBase : ICommand, INotifyPropertyCh
     /// <summary>
     /// Requests cancellation of whatever run is CURRENTLY in flight - a no-op if nothing is
     /// running. Must call the SYNCHRONOUS CancellationTokenSource.Cancel() - never
-    /// `await ....CancelAsync()` - see wpf/README.md.
+    /// `await ....CancelAsync()`: this method returns void, so there is no caller to hand an
+    /// awaited call's continuation to except by going `async void` - exactly the shape row 046
+    /// exists to move this whole tier away from.
     /// </summary>
     public void Cancel() => _currentRun?.Cancel();
 

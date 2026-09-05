@@ -48,9 +48,12 @@ public class Ex047_ProgressReportingTests : WpfTestContext
     [WpfFact]
     public async Task A_Progress_T_Built_On_The_Dispatcher_Thread_Reports_Back_On_That_Same_Thread()
     {
-        // Measured directly (see wpf/README.md): Progress<T> captures the ambient
-        // SynchronizationContext at CONSTRUCTION time. This Progress<int> is built right here,
-        // on the dispatcher thread that [WpfFact] itself runs on.
+        // A documented BCL fact, not a behaviour this row's own code produces: RunAsync just
+        // forwards to whatever IProgress<int> it is handed, so this and the test below hold
+        // regardless of what the learner writes - see RunOnBackgroundAsync below for the row's
+        // own construction-site mutant. Measured directly (see wpf/README.md): Progress<T>
+        // captures the ambient SynchronizationContext at CONSTRUCTION time. This Progress<int>
+        // is built right here, on the dispatcher thread that [WpfFact] itself runs on.
         var dispatcherThreadId = Environment.CurrentManagedThreadId;
         var reportedThreadIds = new List<int>();
         var lastReportSeen = new TaskCompletionSource();
@@ -96,5 +99,32 @@ public class Ex047_ProgressReportingTests : WpfTestContext
         await WithTimeout(reportSeen.Task);
 
         Assert.NotEqual(dispatcherThreadId, reportedThreadId);
+    }
+
+    [WpfFact]
+    public async Task RunOnBackgroundAsync_Reports_Back_On_The_Calling_Thread_Even_Though_The_Loop_Runs_In_The_Background()
+    {
+        // Unlike the two tests above, THIS one exercises the learner's own code: RunOnBackgroundAsync
+        // is the one that must build the Progress<int>, and where it builds it is exactly what
+        // this test can get wrong. A bypass that constructs it INSIDE the Task.Run body instead
+        // of before starting it would capture a pool thread's context (or none) instead of the
+        // caller's, and every callback below would land on the wrong thread.
+        var dispatcherThreadId = Environment.CurrentManagedThreadId;
+        var reportedThreadIds = new List<int>();
+        var lastReportSeen = new TaskCompletionSource();
+
+        await WithTimeout(Ex047_ProgressReporting.RunOnBackgroundAsync(3, step =>
+        {
+            reportedThreadIds.Add(Environment.CurrentManagedThreadId);
+            if (step == 3)
+            {
+                lastReportSeen.TrySetResult();
+            }
+        }, NoDelay));
+
+        await WithTimeout(lastReportSeen.Task);
+
+        Assert.Equal(3, reportedThreadIds.Count);
+        Assert.All(reportedThreadIds, id => Assert.Equal(dispatcherThreadId, id));
     }
 }

@@ -25,6 +25,41 @@ public class Ex050_CommandCancellationTests : WpfTestContext
             => Task.FromException(new InvalidOperationException("boom"));
     }
 
+    // Deliberately never looks at cancellationToken at all - Cancel() being CALLED must not,
+    // by itself, be what flips WasCancelled; only the run actually ENDING via
+    // OperationCanceledException may.
+    private sealed class IgnoresTokenProbe : Ex050_CancellableCommandBase
+    {
+        public TaskCompletionSource? Gate;
+
+        protected override async Task RunAsync(CancellationToken cancellationToken) => await Gate!.Task;
+    }
+
+    // Captures the token it was actually handed, so a test can check what happens to it (and
+    // to the CancellationTokenSource behind it) after the run has ended.
+    private sealed class TokenCapturingProbe : Ex050_CancellableCommandBase
+    {
+        public TaskCompletionSource? Gate;
+        public CancellationToken CapturedToken;
+
+        protected override async Task RunAsync(CancellationToken cancellationToken)
+        {
+            CapturedToken = cancellationToken;
+            await Gate!.Task;
+        }
+    }
+
+    private sealed class SometimesThrowingProbe : Ex050_CancellableCommandBase
+    {
+        public Func<Exception?> FailureFactory = () => null;
+
+        protected override Task RunAsync(CancellationToken cancellationToken)
+        {
+            var failure = FailureFactory();
+            return failure is null ? Task.CompletedTask : Task.FromException(failure);
+        }
+    }
+
     [WpfFact]
     public void Starts_Out_Executable_And_Idle()
     {
@@ -159,5 +194,58 @@ public class Ex050_CommandCancellationTests : WpfTestContext
         await WithTimeout(run);
 
         Assert.Equal(2, canExecuteChangedCount);
+    }
+
+    [WpfFact]
+    public async Task WasCancelled_Reflects_The_Runs_Actual_Outcome_Not_Merely_That_Cancel_Was_Called()
+    {
+        var command = new IgnoresTokenProbe { Gate = new TaskCompletionSource() };
+        var run = command.ExecuteAsync(null);
+
+        // This probe never looks at its token, so Cancel() has no real effect on the run's
+        // outcome. Against a bypass that sets WasCancelled from inside Cancel() itself (a
+        // guarded flag, not the run's actual exception): this would already be wrong the
+        // instant Cancel() returns, before the run even finishes.
+        command.Cancel();
+        command.Gate!.SetResult(); // the run completes normally anyway
+
+        await WithTimeout(run);
+
+        Assert.False(command.WasCancelled);
+        Assert.Null(command.LastError);
+    }
+
+    [WpfFact]
+    public async Task The_Runs_CancellationTokenSource_Is_Disposed_Once_The_Run_Ends()
+    {
+        var command = new TokenCapturingProbe { Gate = new TaskCompletionSource() };
+        var run = command.ExecuteAsync(null);
+        command.Gate!.SetResult();
+        await WithTimeout(run);
+
+        // CancellationToken.Register on an already-disposed source does NOT throw in this
+        // runtime (measured directly - the naive assumption from older docs is wrong here) -
+        // but CancellationToken.WaitHandle DOES throw ObjectDisposedException, even reached
+        // through a token captured BEFORE the dispose. That is the discriminating check for
+        // "dispose and forget" actually happening, rather than merely dropping the reference.
+        Assert.Throws<ObjectDisposedException>(() => command.CapturedToken.WaitHandle);
+    }
+
+    [WpfFact]
+    public async Task A_Successful_Run_After_A_Failure_Clears_LastError()
+    {
+        var fail = true;
+        var command = new SometimesThrowingProbe
+        {
+            FailureFactory = () => fail ? new InvalidOperationException("first") : null,
+        };
+
+        await WithTimeout(command.ExecuteAsync(null));
+        Assert.NotNull(command.LastError);
+
+        fail = false;
+        await WithTimeout(command.ExecuteAsync(null));
+
+        Assert.Null(command.LastError);
     }
 }

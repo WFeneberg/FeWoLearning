@@ -53,6 +53,13 @@ public class Ex048_DispatcherInvokeAsyncPrioritiesTests : WpfTestContext
         {
             (DispatcherPriority.Background, () => order.Add("background")),
             (DispatcherPriority.Send, () => order.Add("send")),
+            // A priority OUTSIDE the four values every other test in this file happens to use
+            // (Send/Normal/Input/Background). An implementation that only recognizes those four
+            // - a fixed lookup table built for exactly that set, silently coercing anything else
+            // to one of them - reproduces every OTHER assertion in this file exactly, since it
+            // is a correct identity mapping for every value they use; only a real priority this
+            // set omits exposes it.
+            (DispatcherPriority.ApplicationIdle, () => order.Add("applicationidle")),
         };
 
         var all = Ex048_DispatcherPriorityQueue.RunAllAsync(Dispatcher.CurrentDispatcher, items);
@@ -68,7 +75,9 @@ public class Ex048_DispatcherInvokeAsyncPrioritiesTests : WpfTestContext
         await WithTimeout(all);
         await WithTimeout(marker.Task);
 
-        Assert.Equal(new[] { "send", "marker", "background" }, order);
+        // Send(10) > Input(5, the marker) > Background(4) > ApplicationIdle(2) - real ranks,
+        // not a rank position within this specific item list.
+        Assert.Equal(new[] { "send", "marker", "background", "applicationidle" }, order);
     }
 
     [WpfFact]
