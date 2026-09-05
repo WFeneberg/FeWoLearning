@@ -91,10 +91,11 @@ the same `global.json` opt-in.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-05: ex001-ex035 (199 exercise test facts, completing
-  the beginner tier) are red on the untouched tree — `dotnet test` shows 199
-  failed, 7 passed (the 7 harness smoke tests, which pass in both modes) — and
-  `dotnet test -p:UseSolutions=true` shows 206 passed, 0 failed. **`wpf/`**'s beginner tier
+  verified as of 2026-09-05: the beginner tier (001-035) is complete and the
+  intermediate tier has begun (ex036-ex040) — `dotnet test` shows 227 failed,
+  7 passed on the untouched tree (227 exercise facts across ex001-ex040, plus
+  the 7 harness smoke tests, which pass in both modes) — and
+  `dotnet test -p:UseSolutions=true` shows 234 passed, 0 failed. **`wpf/`**'s beginner tier
   (35/100, `01-beginner` ex001-ex035) is verified end-to-end as of 2026-09-05, on
   **.NET 10.0.400** with **xunit.v3 4.0.0** and **Xunit.StaFact 4.0.23**
   (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5 passed (the
@@ -425,6 +426,25 @@ the same `global.json` opt-in.
   `GetTargetWithoutContext` null. That is why the `$view` special value
   resolves to the bound view rather than collapsing onto `$source` — the
   collapse only happens where nothing up the tree ever had a target set.
+  **`EventAggregator` holds its subscribers weakly.** Measured: drop the only
+  strong reference, force a full GC, and `HandlerExistsFor` returns false with
+  nothing delivered. Forgetting to unsubscribe therefore does not leak — but a
+  subscriber nobody else owns *silently stops working*, which is harder to
+  diagnose than a leak. Consequence for tests: any test that subscribes an
+  object must keep it reachable at the assertion, with `GC.KeepAlive` or by
+  reading a member of it. Measured on a local whose last read precedes the
+  assertion: 0/1000 collected under the default runtime config, but
+  **615/1000 under Server GC and 1000/1000 with `TieredCompilation=0`** — so a
+  test can be green here and spuriously green, or spuriously red, elsewhere.
+  **Check whether a Caliburn member is on the interface or an extension
+  method before writing it down.** `IConductor` declares `ActivateItemAsync`,
+  `DeactivateItemAsync` and `ActivationProcessed`; `CloseItemAsync` is a
+  `ScreenExtensions` extension. `IEventAggregator` declares `Subscribe`,
+  `PublishAsync`, `Unsubscribe`, `HandlerExistsFor`; the
+  `…OnUIThread`/`…OnBackgroundThread` variants are extensions. Both are in the
+  `Caliburn.Micro` namespace, so `using Caliburn.Micro;` makes the extensions
+  look like interface members at the call site — and an exercise that claims
+  a member "does not exist" is falsified by one IntelliSense keystroke.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -643,7 +663,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 70 / 100 (verified) | 30 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 35 / 100 (verified) | 65 |
+| `caliburn/`| 40 / 100 (verified) | 60 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |

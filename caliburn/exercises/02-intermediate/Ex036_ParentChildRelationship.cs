@@ -12,12 +12,12 @@
 // sets that item's IChild.Parent to the conductor itself - object-typed, because IChild only
 // ever knows its parent AS an object, not as any particular conductor shape - regardless of
 // whether the conductor itself is active; only the item's own IsActive differs on that account.
-// A never-activated item's Parent stays null. IConductor the INTERFACE declares only
-// ActivateItemAsync and DeactivateItemAsync; CloseItemAsync exists too, but as a
-// ScreenExtensions extension method (same Caliburn.Micro namespace every file here already
-// imports) that forwards to DeactivateItemAsync(item, close: true) - the same interface-vs-
-// extension split ex037 measures for IEventAggregator. Either spelling still asks the item's
-// own CanCloseAsync first - a refusing child stays exactly where it was, precisely as
+// A never-activated item's Parent stays null. IConductor the INTERFACE itself declares
+// ActivateItemAsync, DeactivateItemAsync and the ActivationProcessed event; CloseItemAsync
+// exists too, but as a ScreenExtensions extension method (same Caliburn.Micro namespace every
+// file here already imports) that forwards to DeactivateItemAsync(item, close: true) - the same
+// interface-vs-extension split ex037 measures for IEventAggregator. Either spelling still asks
+// the item's own CanCloseAsync first - a refusing child stays exactly where it was, precisely as
 // ex033/ex034 measured.
 
 using System.Threading;
