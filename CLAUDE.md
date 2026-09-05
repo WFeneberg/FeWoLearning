@@ -61,6 +61,7 @@ tests there — do not add `solutions/` to a project/module.
 | `caliburn/`| — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `wpf/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `MicroServices/`| — (restore on first `dotnet test`)| `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
+| `security/`| — (restore on first `dotnet test`)      | `dotnet test --solution FeWoLearning.Security.slnx` | `dotnet test --project tests/FeWoLearning.Security.Tests.csproj --filter-class "*Ex001*"` |
 
 Run every command **from inside the track folder**, not the repo root.
 
@@ -68,7 +69,15 @@ For `blazor/`, `uno/`, `caliburn/` and `wpf/`, `dotnet test -p:UseSolutions=true
 suite against the reference solutions instead of the stubs. `MicroServices/` supports the same
 `-p:UseSolutions=true` flag, plus `-p:Containers=true` to additionally run the container-backed
 rows (skipped by default). `dotnet run --project playground -- --exercise exNNN` runs a single
-exercise in the Aspire dashboard.
+exercise in the Aspire dashboard. `security/` supports the same `-p:UseSolutions=true` flag for
+its green run: `dotnet test --solution FeWoLearning.Security.slnx -p:UseSolutions=true`.
+
+A footnote in the same spirit as the `wpf/`/`MicroServices/` entries below: `security/global.json`
+carries the same `Microsoft.Testing.Platform` opt-in, and a bare, argument-less `dotnet test` here
+was reported once as exiting 5 with zero tests discovered; repeated retests could not reproduce
+it, so it is not treated as an established defect here — but if you ever do see zero tests, the
+fix is the explicit `--solution`/`--project` form above. This applies to `wpf/` too, which carries
+the same `global.json` opt-in.
 
 ## Toolchain status (verified 2026-09-04)
 
@@ -489,6 +498,53 @@ exercise in the Aspire dashboard.
   the classic docker-outside-of-docker breakage, which `docker ps`
   succeeding proves nothing about. Whoever lands the first 🐳 row (034) runs
   it inside the container and records the result.
+- **Security** — 60 rows across four **attack-surface blocks**
+  (`01-web-aspnet`, `02-web-blazor`, `03-desktop-core`, `04-desktop-wpf`), not
+  100 rows in four difficulty tiers like every other track: "beginner" is not
+  a meaningful axis for security, since a path-traversal guard is not
+  conceptually harder than a CSP header — they are different attack surfaces,
+  and difficulty rises *within* each block instead. The solution is
+  `FeWoLearning.Security.slnx`, three projects (`exercises/`, `solutions/`,
+  `tests/`) sharing the `UseSolutions` mechanism with `wpf/`, `blazor/`,
+  `uno/`, `caliburn/` and `avalonia/`: `exercises/` and `solutions/` compile
+  the same type names into the same namespaces and `tests/` references
+  exactly one of them, so `solutions/` is compile-checked on every green run.
+  Namespaces are pinned per **block**, not per folder, because `01-web-aspnet`
+  is not a valid C# identifier: `FeWoLearning.Security.Exercises.WebAspNet` /
+  `.WebBlazor` / `.DesktopCore` / `.DesktopWpf`.
+
+  **The recurring bug class is the track's whole point: an attack fact with
+  no paired use fact grades nothing**, because a reject-everything
+  implementation passes it for free — `Ex004_PathTraversalGuard`'s validator
+  returning a constant `false` passes every traversal payload ever written,
+  and only a paired use fact ("the legitimate file is still served") catches
+  that degenerate. Every batch in this track was checked by actually building
+  reject-everything variants of its stubs and confirming only the paired use
+  facts, and not the attack facts, failed against them.
+
+  Toolchain traps, all measured: **bUnit 2.9 still ships an obsolete
+  `Bunit.TestContext`**, which collides with xunit.v3's `Xunit.TestContext`
+  (`CS0104`) the moment a test file has `using Bunit;` and also touches
+  `TestContext.Current.CancellationToken` — fixed with
+  `using TestContext = Xunit.TestContext;`; `blazor/` never hits this because
+  it runs xunit 2.x, which has no `TestContext` at all. `Microsoft.Data.Sqlite`
+  10.0.0 drags in `SQLitePCLRaw.lib.e_sqlite3` 2.1.11, which carries
+  **GHSA-2m69-gcr7-jv3q** and emits `NU1903` on every build — pinned instead
+  to **`SQLitePCLRaw.lib.e_sqlite3` 2.1.13**, since
+  `SQLitePCLRaw.bundle_e_sqlite3` can't fix it (bundle and lib versions are
+  decoupled). **Do not reference `Microsoft.Extensions.Hosting` or
+  `System.Security.Cryptography.ProtectedData`** — both are already in the
+  shared framework for `net10.0-windows` here, and referencing either emits
+  `NU1510` (unlike `wpf/`, which *does* reference `Microsoft.Extensions.Hosting`
+  explicitly, because it targets the same TFM but does not carry
+  `Microsoft.AspNetCore.App` — do not copy that line into this track). The
+  test project uses **`Microsoft.NET.Sdk`, not the Razor SDK** — it has no
+  `.razor` files of its own, since the components under test live in the
+  content library.
+
+  Windows-only, and block `04-desktop-wpf` additionally needs an
+  **interactive desktop session**, because WPF is. `Ex055_ClipboardHygiene`
+  briefly disturbs the real system clipboard while the suite runs.
 
 ## Adding or completing exercises
 
@@ -558,6 +614,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `caliburn/`| 35 / 100 (verified) | 65 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
+| `security/`| 60 / 60 (verified) | —         |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above
@@ -652,6 +709,18 @@ so `ComponentBase`-style render coalescing has nothing to coalesce under bUnit
 and ex093 is scoped without it; and the `ASP0006` analyzer rejects any
 sequence-number argument that is not an integer literal — even a named
 constant, which is worth knowing before writing a `BuildRenderTree` by hand.
+
+`security/` is content-complete and verified end-to-end: 60/60 exercises
+across four attack-surface blocks (not tiers — see its own entry in
+"Track-specific gotchas" above), 326 test facts total (127 `01-web-aspnet` +
+55 `02-web-blazor` + 104 `03-desktop-core` + 37 `04-desktop-wpf`, plus 3
+harness canaries). The stub run reports Total: 326, Failed: 322, Passed: 3,
+Skipped: 1 (the 3 passing are the harness canaries; the 1 skipped is
+Ex060's symbolic-link fact, which needs elevation or Windows Developer Mode);
+the solutions run reports Total: 326, Failed: 0, Passed: 325, Skipped: 1.
+Both builds emit 0 warnings. Verified via
+`dotnet test --solution FeWoLearning.Security.slnx` (red) and the same
+command with `-p:UseSolutions=true` (green).
 
 ## The `uno/` track
 
@@ -755,3 +824,9 @@ reason.
 a real project referenced by `tests/`/`host/` under `UseSolutions=true`, so it
 is compile-checked and test-run on every green check and cannot drift
 silently the way described above.
+
+`security/` is the same kind of exception: its `solutions/` is a real project
+referenced by `tests/` under `UseSolutions=true`, the same mechanism
+`blazor/`, `avalonia/`, `uno/`, `caliburn/` and `wpf/` use, so it too is
+compile-checked and test-run on every green check and cannot drift silently
+the way described above.

@@ -18,6 +18,13 @@ The per-language ledger lives in each folder's `catalog.md`, which lists all 100
 entries with a ✅ / ⬜ status. That file is the source of truth for what is done
 and what is next.
 
+**Exception:** `security/` is the only track that departs from this scheme. It
+has **60 rows**, not 100, organised into four **attack-surface blocks**
+(`01-web-aspnet`, `02-web-blazor`, `03-desktop-core`, `04-desktop-wpf`) rather
+than difficulty tiers — the blocks are surfaces, not levels, and difficulty
+rises within each one instead of across the track. See its own entry in
+`CLAUDE.md`'s track-specific gotchas for why.
+
 ## Naming
 
 Identifiers cannot start with a digit in most of these languages, so the number
@@ -38,6 +45,7 @@ is prefixed:
 | `caliburn/`| one file per exercise, tier-wide namespace, test in a separate `tests/` project | `exercises/01-beginner/Ex001_NotifyByHand.cs` |
 | `wpf/`    | one folder per tier, `.cs` (plus `.xaml` + code-behind for markup exercises), test in a separate `tests/` project | `exercises/01-beginner/Ex001_ClrToDependencyProperty.cs` |
 | `MicroServices/`| one file per exercise, tier-wide namespace, test in a separate `tests/` project | `exercises/01-beginner/Ex001_ContainerResourceBasics.cs` |
+| `security/`| one file per exercise per block, block-wide namespace, `.razor` for block 02, test in a separate `tests/` project | `exercises/01-web-aspnet/Ex001_SecurityHeaders.cs` |
 
 Go package clauses drop the `exNNN_` prefix and the underscores
 (`ex001_fizzbuzz` → `package fizzbuzz`). .NET namespaces follow the *tier*
