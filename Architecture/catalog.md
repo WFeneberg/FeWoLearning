@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 16 ✅ / 44 ⬜**
+**Status: 21 ✅ / 39 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -44,11 +44,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 017 | MvvmComposition | view model as a unit, INotifyPropertyChanged, no framework dependency | ⬜ |
-| 018 | NavigationService | view-model-first navigation, back stack, lifecycle callbacks | ⬜ |
-| 019 | MessengerEventAggregator | in-process pub/sub, subscription lifetime, unsubscribe correctness | ⬜ |
-| 020 | DialogServiceAbstraction | modal interaction as a port, testable without a window | ⬜ |
-| 021 | BackgroundJobScheduler | queued work, cancellation, sequencing guarantees | ⬜ |
+| 017 | MvvmComposition | view model as a unit, INotifyPropertyChanged, no framework dependency | ✅ |
+| 018 | NavigationService | view-model-first navigation, back stack, lifecycle callbacks | ✅ |
+| 019 | MessengerEventAggregator | in-process pub/sub, subscription lifetime, unsubscribe correctness | ✅ |
+| 020 | DialogServiceAbstraction | modal interaction as a port, testable without a window | ✅ |
+| 021 | BackgroundJobScheduler | queued work, cancellation, sequencing guarantees | ✅ |
 | 022 | OfflineFirstSync | local SQLite store, change tracking, conflict resolution policy | ⬜ |
 | 023 | SettingsStatePersistence | versioned settings, migration on load, forward compatibility | ⬜ |
 | 024 | PluginArchitecture | AssemblyLoadContext, contract assembly, isolation and unload | ⬜ |
