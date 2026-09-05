@@ -48,11 +48,14 @@ as oversights:
 - **No live Azure.** Rows 091–100 assert emulators, the generated manifest and the
   generated Bicep. Nothing calls a subscription, `az login` or `azd up`, so every
   Azure row is red/green testable on a laptop with no cloud account.
-- **No Docker Compose YAML in-process.** The compose file is emitted by a pipeline the
-  `aspire` CLI drives, and the CLI never exits in a non-interactive shell. Row 089
-  therefore asserts against a **committed golden `docker-compose.yaml`**, generated
-  once at authoring time — the graded claim is that the learner's model is consistent
-  with that file, not that the test re-runs the CLI.
+- **No Docker Compose YAML in-process — and that is the *only* artifact missing.** The
+  compose file is emitted by a pipeline the `aspire` CLI drives, and the CLI never exits
+  in a non-interactive shell. Row 089 therefore asserts against a **committed golden
+  `docker-compose.yaml`**, generated once at authoring time — the graded claim is that
+  the learner's model is consistent with that file, not that the test re-runs the CLI.
+  **Bicep needs no such fallback**: an in-process publish emits the `*.module.bicep`
+  and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
+  093/094/099/100 assert on the generated Bicep for real.
 
 **Status: 0 ✅ / 100 ⬜**
 
@@ -81,7 +84,7 @@ as oversights:
 | 019 | ExcludeFromManifest | a run-mode-only resource: present in the built model, **absent** from `aspire-manifest.json`; the row needs both assertions or it grades nothing | ⬜ |
 | 020 | RunVersusPublishMode | `builder.ExecutionContext.IsRunMode` / `IsPublishMode` branching one file into two graphs; the exercise fails if both modes produce the same model | ⬜ |
 | 021 | ServiceDefaults | `AddServiceDefaults`: health endpoints, service discovery, the standard resilience handler and OTel; assert the registrations in the `IServiceCollection`, not that the app started | ⬜ |
-| 022 | OpenTelemetryWiring | `OTEL_EXPORTER_OTLP_ENDPOINT` / `OTEL_SERVICE_NAME` injected into referenced resources; assert the env keys reaching the consumer, not a captured trace | ⬜ |
+| 022 | OpenTelemetryRegistration | Aspire injects `OTEL_EXPORTER_OTLP_ENDPOINT`/`OTEL_SERVICE_NAME` on its own, so those keys grade nothing. The learner's part is `WithTracing(t => t.AddSource(…))` / `WithMetrics(m => m.AddMeter(…))` for a **custom** `ActivitySource` and `Meter`: capture with an in-memory exporter, and an unregistered source must produce no spans | ⬜ |
 | 023 | LivenessVersusReadiness | `/alive` vs `/health`, `AddHealthChecks().AddCheck(..., tags:)` and tag-filtered endpoints; a readiness probe that reports live during startup is the bug being drilled | ⬜ |
 | 024 | ResourceCommands | `WithCommand`, `ResourceCommandAnnotation`, its `UpdateState` callback; a command whose state never depends on the resource is not doing the exercise | ⬜ |
 | 025 | EventingAndLifecycleHooks | `builder.Eventing.Subscribe<BeforeStartEvent>` / `ResourceReadyEvent`; where a hook fires relative to `WaitFor`, and why "ready" is not "started" | ⬜ |
@@ -92,7 +95,7 @@ as oversights:
 | 030 | DatabaseAdminTools | `WithPgAdmin`, `WithMongoExpress`, `WithRedisInsight`; each adds a *separate* container resource tied to its parent — assert the extra resource and the link, not a port number | ⬜ |
 | 031 | DataVolumesPerFlavour | `WithDataVolume` vs `WithDataBindMount`, and that the container path is flavour-specific (`/var/lib/postgresql/data`, `/data/db`, `/var/opt/mssql`) — one shared constant is wrong | ⬜ |
 | 032 | DatabaseInitScripts | `WithInitBindMount`/`WithInitFiles` targeting `/docker-entrypoint-initdb.d`; the mount annotation plus the `WaitFor` ordering that makes the script run before a consumer connects | ⬜ |
-| 033 | ClientIntegrationRegistration | `AddNpgsqlDataSource("orders")` in a service reading `ConnectionStrings:orders`, supplied by the AppHost's `WithReference`; the name is the contract between the two halves | ⬜ |
+| 033 | ClientIntegrationRegistration | `AddNpgsqlDataSource("orders")` reading `ConnectionStrings:orders`; build the service's configuration with a **sentinel** value and assert the registered data source carries it, then remove the key and assert registration fails — a hardcoded connection string fails both halves | ⬜ |
 | 034 | FirstRealQuery | start Postgres for real, `WaitFor` it, and execute a query through the *injected* connection string — proves the expression resolves, which no model-level test can | 🐳 ⬜ |
 | 035 | BeginnerCapstoneModel | catalog + orders + reviews + cache in one graph: four resource types, four distinct connection expressions, and consumers carrying both `WithReference` and `WaitFor` | ⬜ |
 
@@ -102,7 +105,7 @@ as oversights:
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | EfCoreAgainstSqlServer | `AddSqlServer` + `AddDatabase`, `UseSqlServer` over the injected `ConnectionStrings:catalog`, an `IDENTITY` key round-tripped through a real server | 🐳 ⬜ |
+| 036 | EfCoreAgainstSqlServer | `AddSqlServer` + `AddDatabase` → `SqlServerDatabaseResource` and its `…;Initial Catalog=catalog` expression, wired to `UseSqlServer` over the injected `ConnectionStrings:catalog`; the live SQL Server proof lives in 038 and 040, so this row is the wiring | ⬜ |
 | 037 | EfCoreAgainstPostgres | the same `DbContext` on Npgsql; compare the two providers' **generated migration scripts** offline — `nvarchar`/`datetime2`/`IDENTITY` against `text`/`timestamptz`/`GENERATED … AS IDENTITY` | ⬜ |
 | 038 | MigrationsOnStartup | `Database.MigrateAsync` from a hosted service, gated on `WaitFor`; the second start must apply **zero** migrations, which is the assertion that catches a naive `EnsureCreated` | 🐳 ⬜ |
 | 039 | SeedDataInTheModel | `HasData` in `OnModelCreating` vs an upsert at startup; grade the `INSERT`s in the generated migration and the seed's re-run safety, not the row count after one start | ⬜ |
@@ -113,13 +116,13 @@ as oversights:
 | 044 | MongoIndexesAndExplain | `CreateIndexModel`, a compound index, and `explain()` reporting `IXSCAN` rather than `COLLSCAN` — the query must prove the index was *used*, since a correct result proves nothing | 🐳 ⬜ |
 | 045 | MongoAggregationPipeline | `$match`/`$unwind`/`$group`/`$lookup` executed server-side; assert the emitted pipeline stages **and** the documents, because an in-memory LINQ `GroupBy` returns the same answer | 🐳 ⬜ |
 | 046 | RedisExpiryAndEviction | `SET … EX`, `TTL`, a key that genuinely disappears, and `maxmemory-policy` deciding what is dropped under pressure; the subject is what Redis *forgets* | 🐳 ⬜ |
-| 047 | ValkeyAsAFork | `AddValkey` → `ValkeyResource` on the `valkey/valkey` image; the connection expression alone cannot distinguish it from Redis, so the row is graded on resource type and image annotation | ⬜ |
-| 048 | GarnetRespCompatibility | `AddGarnet` → `GarnetResource`, Microsoft's RESP server; the same client library, driven against a live Garnet, including where its command coverage stops short of Redis | 🐳 ⬜ |
+| 047 | CacheAsideAndStampede | read-through cache-aside with negative caching for misses and a jittered TTL, plus a `SET NX PX` lock so N **concurrent** misses invoke the loader exactly once and the lock is released; assert the loader's invocation count — naive cache-aside calls it N times | 🐳 ⬜ |
+| 048 | ValkeyAndGarnetForks | `AddValkey` → `ValkeyResource` on `valkey/valkey` and `AddGarnet` → `GarnetResource` on Microsoft's image: one `AddRedis` fails the type assertion and the connection expressions cannot tell them apart, so the row also drives both with one client to find where Garnet's command coverage stops short | 🐳 ⬜ |
 | 049 | QdrantVectorSearch | a collection with a named vector and an explicit distance metric, a payload filter combined with top-k; changing Cosine to Dot must change the returned order — an unordered assertion grades nothing | 🐳 ⬜ |
 | 050 | MilvusCollectionsAndIndexes | schema with a primary key plus a `FloatVector` field, an `IVF_FLAT`/`HNSW` index, and `load()` before search — an unloaded collection returns nothing, which is the trap | 🐳 ⬜ |
 | 051 | ElasticsearchAnalyzersAndScoring | a custom analyzer, a `match` query against a `term` query on the same field, and `_score` ordering; full-text search is not `LIKE '%x%'` and the scores must show it | 🐳 ⬜ |
 | 052 | AzuriteQueuesAndTables | `AddAzureStorage().RunAsEmulator()` driven for real: a queue message's visibility timeout and `DequeueCount`, and a Table entity found by `PartitionKey`+`RowKey` against a cross-partition scan | 🐳 ⬜ |
-| 053 | CosmosPartitionKeyDesign | `AddAzureCosmosDB().RunAsEmulator()` with database and container children, an explicit partition key path (and a hierarchical one); grade the container definition, since a bad key is invisible in results | ⬜ |
+| 053 | CosmosContainersAndKeys | `AddAzureCosmosDB().RunAsEmulator()` with database and container children; grade the partition key paths as they reach the **generated Bicep** — a single-path model fails the hierarchical-key case, which is the discriminating half. RU cost is deliberately out of scope: it needs the emulator, which is slow and flaky on Linux | ⬜ |
 | 054 | ResilienceAndPooling | provider retry (`EnableRetryOnFailure`) against a Polly pipeline, and `MaxPoolSize` exhaustion; retrying a *non-transient* failure is the bug — the row must distinguish the two | ⬜ |
 | 055 | PolyglotPersistenceCapstone | one order flow split across relational, document and cache stores, with a stated owner per fact; the graph carries all three resource types and their three distinct expressions | ⬜ |
 
@@ -137,9 +140,9 @@ as oversights:
 | 063 | KafkaTopicsAndPartitions | `AddKafka`, an explicit partition count, and key-based placement: the same key must land on one partition and preserve order, while different keys need not — assert partition ids | 🐳 ⬜ |
 | 064 | KafkaConsumerGroupsAndOffsets | consumer groups, `enable.auto.commit=false`, an explicit commit, and replay from the committed offset after a restart; at-least-once and at-most-once must be told apart | 🐳 ⬜ |
 | 065 | NatsCoreVersusJetStream | `AddNats`: core pub/sub drops messages for an absent subscriber, JetStream replays them; the row is graded by a subscriber that was **offline** during publish | 🐳 ⬜ |
-| 066 | MessageContractsAndVersioning | an explicit envelope (type name, version, content type) and `System.Text.Json` polymorphism; sharing a C# class between producer and consumer is not a contract and must fail the row | ⬜ |
+| 066 | MessageContractsAndVersioning | an explicit envelope (type name, version, content type); the consumer is graded against a **JSON literal the test itself builds**, with no reference to the producer's type, so the envelope's `type`+`version` must select the handler — a shared C# class cannot satisfy that setup | ⬜ |
 | 067 | SeqStructuredLogging | `AddSeq` plus `WithReference`; log properties must arrive as **fields**, so an interpolated message string with the values baked in fails even though the text matches | ⬜ |
-| 068 | TracingAcrossHttp | a custom `ActivitySource`, W3C `traceparent` propagated by the typed client, and parent/child spans sharing one trace id across two services | ⬜ |
+| 068 | BaggageAndSpanEnrichment | `traceparent` propagates on its own once ServiceDefaults is in, so it grades nothing. `Baggage` does **not** propagate usefully by itself: set a tenant id on the caller, read it via `Baggage.GetBaggage` on the callee, and tag a span from the learner's own `ActivitySource` with it — the tag is absent under automatic propagation alone | ⬜ |
 | 069 | CancellationPropagation | the request's `CancellationToken` reaching the downstream HTTP call and the database command; a handler that ignores the token still returns the right answer, so assert the downstream *observed* the cancel | ⬜ |
 | 070 | CommunicationCapstone | HTTP command → broker event → gRPC read in one flow, with the trace crossing all three hops and the broker hop carrying its context explicitly | ⬜ |
 
@@ -170,7 +173,7 @@ as oversights:
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
 | 086 | AddDockerfileResource | `AddDockerfile` with a build context and `WithBuildArg`; the manifest entry is `dockerfile.v0` with `path`/`context`/`buildArgs`, not `container.v0` — that distinction is the grade | ⬜ |
-| 087 | MultiStageBuildAndLayerCache | an SDK build stage and a runtime stage; ordering `COPY *.csproj` + `restore` before the source copy so a code-only change rebuilds **without** re-restoring — proven by two real builds | 🐳 ⬜ |
+| 087 | MultiStageBuildAndHardening | an SDK build stage and a runtime stage; ordering `COPY *.csproj` + `restore` before the source copy so a code-only change rebuilds **without** re-restoring, proven by two real builds. Plus the hardening the runtime stage must carry — a non-root `USER` and base images pinned by **digest**, not tag — asserted from the built image's config, because a container that works fine also works fine as root | 🐳 ⬜ |
 | 088 | ContainerNetworksAndDns | containers resolving each other by service name on the `aspire` network, and `localhost` inside a container not being the host; the row needs a real run because the model cannot show DNS | 🐳 ⬜ |
 | 089 | ComposePublishingGolden | `AddDockerComposeEnvironment`, checked against the committed golden `docker-compose.yaml`: service names, pinned images, `expose` ports, the `aspire` network, `ConnectionStrings__*`, and secrets lifted into `.env` as `${X_PASSWORD}` | ⬜ |
 | 090 | VolumeLifetimeAndPersistence | data surviving `docker rm` behind a **named** volume, a bind mount reflecting host edits live, and an anonymous volume lost with `--rm`; only a real restart distinguishes the three | 🐳 ⬜ |

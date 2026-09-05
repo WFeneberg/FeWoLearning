@@ -75,7 +75,7 @@ must not be able to masquerade as a green run by silently skipping.
 | Level | Asserts | Cost | Runs |
 |---|---|---|---|
 | **L1 model** | the resource graph: types, `ConnectionStringExpression`, annotations | ~1.4 s | always |
-| **L2 artifact** | `aspire-manifest.json`, generated in-process | ~3.7 s, no container | always |
+| **L2 artifact** | `aspire-manifest.json` **and the generated Bicep**, both in-process | ~3.7 s (~7.5 s with Azure resources), no container | always |
 | **L3 container** | a real database starts and a real query, message or expiry happens | minutes | opt-in |
 
 **What L1 can prove.** `DistributedApplication.CreateBuilder(...)` + `Build()` produces
@@ -97,7 +97,22 @@ and for generated secrets the `inputs.value.default.generate` policy. It is
 deterministic, so it is a good assertion target for publish-shaped rows.
 `ManifestHarness` is the entry point.
 
-**What L2 cannot prove.** Docker Compose YAML — see §6.
+**The manifest is not the only in-process artifact — Bicep comes out too.** Measured: an
+in-process publish of a model carrying `AddAzureContainerAppEnvironment` plus
+`AddAzureStorage` writes, in **~7.5 s**, all of
+
+```
+aspire-manifest.json
+aca.module.bicep      aca-acr.module.bicep      storage.module.bicep
+aca/aca.bicep         aca-acr/aca-acr.bicep     storage/storage.bicep
+```
+
+So the Azure rows (093 managed identity and role assignments, 094 Bicep customisation,
+099 secrets across environments, 100 the capstone) assert on **real generated Bicep**,
+in the fast loop, with no subscription and no golden-file fallback.
+
+**What L2 cannot prove.** Docker Compose YAML — and that is the *single* exception, not
+a general limitation of in-process publish. See §6.
 
 **What L3 is for.** Only the things a real run proves: migrations actually applying, a
 Mongo aggregation actually returning documents, an index actually being *used*, an
@@ -162,13 +177,15 @@ Each of these cost real time. None is a guess.
   and awaiting `RunAsync` returns cleanly in **≈3.7 s** and writes
   `aspire-manifest.json`. That is what `ManifestHarness` does and what L2 asserts
   against.
-- **Docker Compose YAML is not obtainable in-process.** Every argument combination tried
-  (`--publisher default`, `--publisher compose`, no publisher, with and without
-  `--operation publish`) produced the manifest and nothing else, because the compose file
-  is emitted by a pipeline the CLI drives. Rows 086–090 therefore assert against a
-  **committed golden `docker-compose.yaml`**, generated once at authoring time with the
-  CLI and checked in. The graded claim is that the learner's model is consistent with
-  that file — not that the test re-runs the CLI.
+- **Docker Compose YAML is not obtainable in-process — and it is the only thing that
+  isn't.** Every argument combination tried (`--publisher default`, `--publisher
+  compose`, no publisher, with and without `--operation publish`) produced the manifest
+  but never the compose file, because that file is emitted by a pipeline the CLI drives.
+  Row 089 therefore asserts against a **committed golden `docker-compose.yaml`**,
+  generated once at authoring time with the CLI and checked in; the graded claim is that
+  the learner's model is consistent with that file, not that the test re-runs the CLI.
+  Do **not** generalise this into "publish artifacts need golden files" — Bicep is
+  emitted in-process just fine (§4), and the Azure rows rely on that.
 - **Two compute environments without assignment is a hard failure.** Declaring both
   `AddDockerComposeEnvironment` and `AddAzureContainerAppEnvironment` without assigning
   resources fails the `validate-compute-environments` pipeline step: *"Compute
@@ -230,14 +247,26 @@ So this track pins **xunit.v3 3.2.2 on the classic VSTest path and ships no
 `mcr.microsoft.com/devcontainers/dotnet:1-10.0`. It works under Rider as well as VS
 Code — JetBrains IDEs read `devcontainer.json`.
 
-**Verified end-to-end** with `@devcontainers/cli` 0.89.0, on a fresh rebuild
-(`devcontainer up --remove-existing-container`), not shipped on faith:
+**What was actually measured**, with `@devcontainers/cli` 0.89.0 on a fresh rebuild
+(`devcontainer up --remove-existing-container`) — this is the whole of the evidence, not
+a summary of it:
 
-- builds to `{"outcome":"success"}` in **~85 seconds**, almost all of it `dotnet restore`;
+- it builds to `{"outcome":"success"}` in **~85 seconds**, almost all of it `dotnet restore`;
 - `docker ps` inside works as the non-root `vscode` user **without `sudo`**, and lists the
-  host's own pre-existing containers — the decisive proof that sibling containers land on
-  the **host** daemon rather than nested;
+  host's own pre-existing containers — so the container's Docker client genuinely reaches
+  the **host** daemon rather than a nested one;
 - `dotnet test` inside gives **4 passed / 1 skipped**, matching the host exactly.
+
+**What remains unproven.** Spec §7 set the bar at *Aspire starting a sibling database
+container from inside the DevContainer*, and that was never exercised: the track had no
+🐳 exercises to run at the time, and `dotnet test` at 4 passed / 1 skipped is precisely
+the run that starts **no** containers. `docker ps` proves the socket and the client;
+it does not prove Aspire's container lifecycle, port handling or health-check waiting
+through that socket. So the honest claim is **"the DevContainer builds, reaches the host
+daemon, and runs the default test suite"** — not "verified end-to-end". Whoever lands
+the first 🐳 exercise (row 034 is the earliest) should run
+`dotnet test -p:Containers=true --filter …Ex034_` inside the container and, if it passes,
+upgrade this section to the §7 bar.
 
 ### It does not use the `docker-outside-of-docker` or `node` features
 
