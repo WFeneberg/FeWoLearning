@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 5 ✅ / 55 ⬜**
+**Status: 10 ✅ / 50 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -28,11 +28,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 003 | OptionsPattern | IOptions vs IOptionsSnapshot vs IOptionsMonitor, named options, validation | ✅ |
 | 004 | MiddlewarePipeline | chain of responsibility, ordering, short-circuiting | ✅ |
 | 005 | VerticalSliceEndpoint | feature slices, slice-local request/response, no shared service layer | ✅ |
-| 006 | CqrsCommandQuery | command/query separation, distinct handler contracts | ⬜ |
-| 007 | MediatorDispatch | mediator, handler resolution by request type, no service locator leak | ⬜ |
-| 008 | PipelineBehaviors | decorator chain around a handler, ordering, composition | ⬜ |
-| 009 | ValidationBehavior | validation as a pipeline stage that runs before the handler | ⬜ |
-| 010 | ResultErrorModel | Result vs exceptions, error-to-status mapping, no control flow by throw | ⬜ |
+| 006 | CqrsCommandQuery | command/query separation, distinct handler contracts | ✅ |
+| 007 | MediatorDispatch | mediator, handler resolution by request type, no service locator leak | ✅ |
+| 008 | PipelineBehaviors | decorator chain around a handler, ordering, composition | ✅ |
+| 009 | ValidationBehavior | validation as a pipeline stage that runs before the handler | ✅ |
+| 010 | ResultErrorModel | Result vs exceptions, error-to-status mapping, no control flow by throw | ✅ |
 | 011 | DtoBoundaryMapping | domain-to-DTO projection, preventing domain leakage across the boundary | ⬜ |
 | 012 | ApiVersioning | versioned contracts, v1/v2 coexistence, additive vs breaking change | ⬜ |
 | 013 | PaginationContract | cursor vs offset, stable ordering, page metadata | ⬜ |

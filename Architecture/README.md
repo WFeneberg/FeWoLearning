@@ -85,7 +85,10 @@ future bump reintroduces `NU1903`, pin it again the way `security/` does.
 `tests/` suppresses **`xUnit1051` only**, via `NoWarn`. Any other warning in that
 project is a finding. `solutions/` must build with **zero warnings** — a warning
 there is a finding too. `exercises/` may emit `CS0169`/`CS0414`/`CS0649` from fields
-a stub declares for the learner to wire up; those stay unsuppressed deliberately.
+a stub declares for the learner to wire up, and `CS9113` from a primary-constructor
+parameter a stub does not read yet (a handler that takes its store and then throws).
+Those stay unsuppressed deliberately: they are an accurate description of an
+unfinished stub, and they disappear as the learner implements it.
 
 ## The three infrastructure tiers
 
