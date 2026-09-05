@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>FeWoLearning.MicroServices.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- xunit.v3 3.2.2 on the classic VSTest path, and NO global.json.
+       xunit.v3 4.0.0 + a Microsoft.Testing.Platform global.json makes
+       `dotnet test` exit 5 with zero tests discovered on the .NET 10.0.400 SDK.
+       runner.visualstudio has no 3.1.6/3.1.7 - 3.1.5 is the last 3.x, and naming
+       a nonexistent one resolves FORWARD to 4.0.0 with only an NU1603 warning. -->
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Testing" Version="13.5.3" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Exactly one content library, never both: that is what keeps the identical
+       namespaces and type names from colliding. `dotnet test` is the red run,
+       `dotnet test -p:UseSolutions=true` the green one. -->
+  <ItemGroup Condition="'$(UseSolutions)' != 'true'">
+    <ProjectReference Include="..\exercises\FeWoLearning.MicroServices.Exercises.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseSolutions)' == 'true'">
+    <ProjectReference Include="..\solutions\FeWoLearning.MicroServices.Solutions.csproj" />
+  </ItemGroup>
+
+</Project>

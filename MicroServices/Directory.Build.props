@@ -1,0 +1,13 @@
+<Project>
+
+  <!-- Redirect the solutions build to its own output tree. Required: exercises/ and
+       solutions/ compile the same type names into the same namespaces, so sharing an
+       obj/ tree makes the build fail with CS0579 on duplicate generated assembly-info
+       attributes. Cannot live in the .csproj body - BaseOutputPath/
+       BaseIntermediateOutputPath set there are read after the SDK props import. -->
+  <PropertyGroup Condition="'$(UseSolutions)' == 'true'">
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts-solutions</ArtifactsPath>
+  </PropertyGroup>
+
+</Project>

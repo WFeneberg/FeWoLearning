@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>FeWoLearning.MicroServices.Exercises</RootNamespace>
+    <AssemblyName>FeWoLearning.MicroServices.Exercises</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Aspire hosting integrations. Keep this list identical in solutions/.
+       All 13.5.3 except Elasticsearch, whose latest stable is 13.3.0 - a known
+       lag, documented in MicroServices/README.md, not silently bumped. -->
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.MongoDB" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.5.3" />
+  </ItemGroup>
+
+</Project>
