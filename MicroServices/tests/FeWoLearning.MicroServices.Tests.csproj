@@ -34,4 +34,12 @@
     <ProjectReference Include="..\solutions\FeWoLearning.MicroServices.Solutions.csproj" />
   </ItemGroup>
 
+  <!-- `-p:Containers=true` reaches the test process through runtimeconfig.json.
+       FEWO_MS_CONTAINERS=1 is the no-rebuild alternative. -->
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="FeWoLearning.MicroServices.Containers"
+                                    Value="$(Containers)"
+                                    Condition="'$(Containers)' != ''" />
+  </ItemGroup>
+
 </Project>
