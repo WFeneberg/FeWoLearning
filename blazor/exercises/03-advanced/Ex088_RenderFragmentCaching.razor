@@ -1,0 +1,31 @@
+@* Exercise 088 - Render Fragment Caching (advanced).
+   Goal:   Stop handing a child a brand-new delegate on every render, which defeats
+           any change detection the child does on its parameters.
+   Drills: caching a RenderFragment that closes over this component, and the
+           referential equality that parameter comparison actually uses.
+   Passes: dotnet test --filter FullyQualifiedName~Ex088_ *@
+<Ex088_RenderFragmentCaching_Panel Label="@Label" Content="@Content" />
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+
+    /// What the fragment renders. An instance member on purpose - see below.
+    public string Body { get; } = "panel body";
+
+    // TODO: hand back the SAME RenderFragment instance every time. It renders
+    //   <span class="body">…</span>
+    // holding Body. Build it once - a null-coalescing assignment into a field is the
+    // usual way, since a field initialiser cannot reach an instance member.
+    //
+    // Why it matters: a RenderFragment is a delegate, and anything comparing this
+    // parameter - the panel's gate here, but equally a memo or a @key - compares it
+    // by reference. Note WHICH fragments are dangerous, though: a lambda that
+    // captures nothing is cached by the compiler into a static field, so an inline
+    // one would be the same instance every time and this exercise would have no
+    // teeth. This fragment reads Body, so it closes over `this` and a fresh delegate
+    // really is allocated on every evaluation - which is the case that bites in real
+    // components, because a fragment worth passing down almost always reads
+    // something.
+    public RenderFragment Content
+        => throw new NotImplementedException("TODO: Ex088 - hand back one cached fragment");
+}

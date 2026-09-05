@@ -1,0 +1,12 @@
+@page "/advanced/089"
+@rendermode InteractiveServer
+
+<h1>Exercise 089 - SectionContentOutlet</h1>
+
+<button id="toggle" @onclick="() => _showTools = !_showTools">toggle tools</button>
+
+<Ex089_SectionContentOutlet Tools="cut copy paste" StatusText="ready" ShowTools="_showTools" />
+
+@code {
+    private bool _showTools = true;
+}

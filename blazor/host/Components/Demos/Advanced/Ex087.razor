@@ -1,0 +1,22 @@
+@page "/advanced/087"
+@rendermode InteractiveServer
+
+<h1>Exercise 087 - ComponentStatePreservationAcrossRenderMode</h1>
+
+<p>The prerender pass computes the report and persists it; the interactive pass
+   adopts it. The load counter below is per circuit, so a correct implementation
+   shows 1 after a reload, not 2.</p>
+
+<Ex087_ComponentStatePreservationAcrossRenderMode Load="LoadReport" />
+
+<p>loads this pass: @_loads</p>
+
+@code {
+    private int _loads;
+
+    private Ex087_ComponentStatePreservationAcrossRenderMode.ReportData LoadReport()
+    {
+        _loads++;
+        return new Ex087_ComponentStatePreservationAcrossRenderMode.ReportData("quarterly", 128);
+    }
+}

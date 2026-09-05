@@ -1,0 +1,34 @@
+@* Exercise 088 - the panel. No TODO here: it is the thing that notices. It renders
+   only when one of its parameters actually changed, comparing them the way any such
+   gate does - by equality, which for a delegate means reference equality. *@
+<span class="label">@Label</span>
+@Content
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public RenderFragment? Content { get; set; }
+
+    public int RenderCount { get; private set; }
+
+    private string? _lastLabel;
+    private RenderFragment? _lastContent;
+    private bool _dirty = true;
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(Content, _lastContent) || Label != _lastLabel)
+        {
+            _dirty = true;
+        }
+    }
+
+    protected override bool ShouldRender() => _dirty;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        RenderCount++;
+        _lastLabel = Label;
+        _lastContent = Content;
+        _dirty = false;
+    }
+}

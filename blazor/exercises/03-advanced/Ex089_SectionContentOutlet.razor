@@ -1,0 +1,29 @@
+@using Microsoft.AspNetCore.Components.Sections
+@* Exercise 089 - Section Content Outlet (advanced).
+   Goal:   Let a component deep in the tree put content somewhere far above it - a
+           page filling in the layout's toolbar without a cascade or a state object.
+   Drills: <SectionOutlet> as the hole, <SectionContent> as the filling, and the
+           name that pairs them.
+   Passes: dotnet test --filter FullyQualifiedName~Ex089_ *@
+
+@* TODO: render, in this order:
+     <div id="toolbar">  holding a <SectionOutlet> for the section named Toolbar.
+     <div id="status">   holding a <SectionOutlet> for the section named Status.
+     <div id="page">     the "deep" part of the tree, holding TWO <SectionContent>
+                         blocks - one per section name:
+                           Toolbar -> <span id="tools">@Tools</span>, but only when
+                                      ShowTools is true;
+                           Status  -> <span id="state">@Status</span>.
+   Where the content is DECLARED is not where it renders: #page must stay empty. *@
+
+@code {
+    public const string Toolbar = "toolbar";
+    public const string Status = "status";
+
+    [Parameter] public string Tools { get; set; } = "";
+    [Parameter] public string StatusText { get; set; } = "";
+    [Parameter] public bool ShowTools { get; set; } = true;
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex089 - project the content into its outlets");
+}

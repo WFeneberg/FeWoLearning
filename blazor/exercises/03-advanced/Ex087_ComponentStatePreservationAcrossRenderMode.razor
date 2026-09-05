@@ -1,0 +1,35 @@
+@* Exercise 087 - Component State Preservation Across Render Mode (advanced).
+   Goal:   Hand the prerender pass's work to the interactive pass instead of doing
+           it twice - the reason component state is persisted across a render-mode
+           boundary at all.
+   Drills: reading PersistentComponentState BEFORE deciding to work, and persisting
+           the result for whoever comes next. ex059/ex060 drilled the mechanism;
+           this row is about the decision it exists to enable.
+   Passes: dotnet test --filter FullyQualifiedName~Ex087_ *@
+<span id="report">@Report.Title</span>
+<span id="rows">@Report.RowCount</span>
+
+@code {
+    public const string StateKey = "ex087-report";
+
+    [Inject] public PersistentComponentState State { get; set; } = default!;
+
+    /// Stands in for the expensive thing - a query, an API call - that the prerender
+    /// pass already paid for. The test counts how often it is called.
+    [Parameter] public Func<ReportData> Load { get; set; } = () => new ReportData("empty", 0);
+
+    public ReportData Report { get; private set; } = new("", 0);
+
+    // TODO: on initialization, in this order:
+    //   1. If State already carries a ReportData under StateKey, adopt it and DO NOT
+    //      call Load - the whole point is that the work is not repeated. Calling
+    //      Load anyway and then overwriting it with the restored value still passes
+    //      a test that only looks at what is rendered, and still doubles the cost.
+    //   2. Otherwise call Load once and keep what it returns.
+    //   3. Either way, register a persisting callback that writes the CURRENT Report
+    //      back under StateKey, so the next pass can skip the work in turn.
+    protected override void OnInitialized()
+        => throw new NotImplementedException("TODO: Ex087 - restore first, work only if you must");
+
+    public sealed record ReportData(string Title, int RowCount);
+}

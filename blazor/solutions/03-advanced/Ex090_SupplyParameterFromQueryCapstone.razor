@@ -1,0 +1,29 @@
+@* Exercise 090 - Supply Parameter From Query Capstone (advanced).
+   Goal:   Take the page's state from the URL, so a link or a back button restores
+           it - and keep up when the URL changes underneath you.
+   Drills: [SupplyParameterFromQuery], its Name for a query key that differs from
+           the property, an array-typed parameter for a repeated key, and the fact
+           that these are re-supplied on navigation like any other parameter.
+   Passes: dotnet test --filter FullyQualifiedName~Ex090_ *@
+<span id="page">@CurrentPage</span>
+<span id="term">@Term</span>
+<span id="tags">@string.Join(",", Tags ?? [])</span>
+<span id="applied">@Applied</span>
+
+@code {
+    // int?, not int: an absent key writes default(T) over the property, so the
+    // fallback has to live somewhere the query cannot reach.
+    [SupplyParameterFromQuery(Name = "page")] public int? Page { get; set; }
+
+    private int CurrentPage => Page ?? 1;
+
+    [SupplyParameterFromQuery(Name = "q")] public string? Term { get; set; }
+
+    // Array-typed: one property, every occurrence of the key.
+    [SupplyParameterFromQuery(Name = "tag")] public string[]? Tags { get; set; }
+
+    /// How many times the query has been applied to this component.
+    public int Applied { get; private set; }
+
+    protected override void OnParametersSet() => Applied++;
+}

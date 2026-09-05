@@ -1,0 +1,43 @@
+@* Exercise 087 - Component State Preservation Across Render Mode (advanced).
+   Goal:   Hand the prerender pass's work to the interactive pass instead of doing
+           it twice - the reason component state is persisted across a render-mode
+           boundary at all.
+   Drills: reading PersistentComponentState BEFORE deciding to work, and persisting
+           the result for whoever comes next. ex059/ex060 drilled the mechanism;
+           this row is about the decision it exists to enable.
+   Passes: dotnet test --filter FullyQualifiedName~Ex087_ *@
+<span id="report">@Report.Title</span>
+<span id="rows">@Report.RowCount</span>
+
+@code {
+    public const string StateKey = "ex087-report";
+
+    [Inject] public PersistentComponentState State { get; set; } = default!;
+
+    /// Stands in for the expensive thing - a query, an API call - that the prerender
+    /// pass already paid for. The test counts how often it is called.
+    [Parameter] public Func<ReportData> Load { get; set; } = () => new ReportData("empty", 0);
+
+    public ReportData Report { get; private set; } = new("", 0);
+
+    protected override void OnInitialized()
+    {
+        // Restore first, and let it decide whether to work at all.
+        if (State.TryTakeFromJson<ReportData>(StateKey, out var restored) && restored is not null)
+        {
+            Report = restored;
+        }
+        else
+        {
+            Report = Load();
+        }
+
+        State.RegisterOnPersisting(() =>
+        {
+            State.PersistAsJson(StateKey, Report);
+            return Task.CompletedTask;
+        });
+    }
+
+    public sealed record ReportData(string Title, int RowCount);
+}

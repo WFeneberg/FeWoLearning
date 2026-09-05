@@ -388,7 +388,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 85 / 100 (verified) | 15 |
+| `blazor/` | 90 / 100 (verified) | 10 |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 15 / 100 (verified) | 85 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
@@ -439,11 +439,10 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 85 written exercises — all of `01-beginner`, all of
-`02-intermediate`, and ex071–ex085 of `03-advanced` — carry 318 individual test
-facts; `dotnet test` shows 318 failed/0 passed on the untouched tree and
-`dotnet test -p:UseSolutions=true` shows 318 passed/0 failed (verified
-2026-09-05). Every failure but one traces
+`blazor/`'s 90 written exercises — all of `01-beginner`, `02-intermediate` and
+`03-advanced` — carry 339 individual test facts; `dotnet test` shows 339
+failed/0 passed on the untouched tree and `dotnet test -p:UseSolutions=true`
+shows 339 passed/0 failed (verified 2026-09-05). Every failure but one traces
 to its own exercise's `NotImplementedException`; the exception is ex069, whose
 subject is a generic *type constraint* that no behaviour can prove (LINQ's
 `Min`/`Max` need none), so it is graded by reading the type parameter's
@@ -472,7 +471,12 @@ change how many rows are realised and a pending items provider renders nothing
 at all. What is observable is the `ItemsProviderRequest`, `OverscanCount`
 widening the window, `Placeholder` filling slots an *under-delivering* provider
 left empty, and `ItemSize` scaling the trailing spacer div — see
-`blazor/README.md` §7.
+`blazor/README.md` §7. The same section records two limits that shaped a
+catalog row rather than merely a test: .NET 10's `[PersistentState]` attribute
+cannot be round-tripped under bUnit (the double's restore snapshot is taken at
+registration), and static SSR's "event handlers are ignored" is unobservable
+because bUnit's renderer is always interactive — so ex086/ex087 are graded on
+what a component controls instead.
 
 ## The `uno/` track
 

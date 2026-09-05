@@ -6,16 +6,18 @@
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
 plain C# language features — those belong to the `dotnet/` track. As of this
-writing, ex001–ex080 are written and verified — the whole of **01-beginner**
+writing, ex001–ex090 are written and verified — the whole of **01-beginner**
 (ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
 `@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
 the whole of **02-intermediate** (ex036–ex070: `EditForm`/validation, DI and
 state containers, JS interop, navigation, persistent component state, `@ref`,
-the async lifecycle, error boundaries and generic components), plus the first
-ten rows of **03-advanced** (ex071–ex080: `ShouldRender`, `@key` diffing,
-`Virtualize`, custom `InputBase<T>` inputs, custom and cross-field validators,
-`DynamicComponent`). ex081–ex100 are catalog rows only (⬜) — `catalog.md` is
-the source of truth.
+the async lifecycle, error boundaries and generic components), and the whole
+of **03-advanced** (ex071–ex090: `ShouldRender`, `@key` diffing, `Virtualize`,
+custom `InputBase<T>` inputs, custom and cross-field validators,
+`DynamicComponent`, authentication state, `IHandleEvent`/`IHandleAfterRender`,
+render modes, render-fragment caching, sections and
+`[SupplyParameterFromQuery]`). **04-expert** (ex091–ex100) is catalog rows only
+(⬜) — `catalog.md` is the source of truth.
 
 ## 2. Prerequisites
 
@@ -33,7 +35,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 295 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 339 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -168,6 +170,23 @@ overscan of 10), the `Placeholder` fragment filling the slots a provider
 *under-delivered* on, and `ItemSize` scaling the trailing spacer `<div>` that
 reserves room for the rows that are not in the DOM. Anything phrased in terms
 of scrolling belongs in a browser, not here.
+
+Two more limits, both found by measuring rather than by assuming, and both
+recorded here because they shaped a catalog row:
+
+- **`[PersistentState]` cannot be round-tripped.** .NET 10's declarative
+  persistence attribute compiles and renders under bUnit, but a value persisted
+  via `TriggerOnPersisting()` is not restored into a component rendered
+  afterwards — the double's restore snapshot is taken when it is registered.
+  ex087 therefore teaches the explicit `PersistentComponentState` API (which
+  *does* round-trip, seed direction included) and is scoped to the decision that
+  API exists for: restore first, and skip the work entirely rather than doing it
+  and overwriting the result.
+- **Static SSR's "event handlers are ignored" is not observable.** bUnit's
+  renderer is always interactive, and it runs `OnAfterRenderAsync` however
+  `SetRendererInfo` describes the renderer. ex086 is graded on what a component
+  can control instead — branching its markup on `RendererInfo.IsInteractive`,
+  and guarding the interop call that a real static render would refuse.
 
 `preventDefault` is a non-goal of this tier specifically:
 `@onclick:preventDefault` has no observable effect on bUnit's DOM (there is no
@@ -399,7 +418,10 @@ concrete failure modes worth carrying into future batches:
   the `ClaimsIdentity` without an authentication type, leaving
   `NotifyAuthenticationStateChanged` out, keeping `StateHasChanged` inside the
   custom `IHandleEvent`, running the once-only after-render work every time,
-  and hardcoding the render-mode name.
+  and hardcoding the render-mode name. And ex086–ex090: calling interop
+  regardless of interactivity, loading first and overwriting with the restored
+  value, rebuilding the `RenderFragment` inline, declaring the section content
+  in place instead of projecting it, and matching a query key by property name.
 - **A stub whose TODO is only markup needs a throwing lifecycle method too.**
   ex079's first draft left the `<DynamicComponent>` markup as the TODO and threw
   only from a property one fact touched; the other three failed on a missing
@@ -419,6 +441,14 @@ concrete failure modes worth carrying into future batches:
   that reason — ComponentBase renders once before it ever asks. Its assertions
   now ride along inside the fact that pushes a second time. Any fact about a
   gate must arrange for the gate to be consulted.
+- **The compiler caches a lambda that captures nothing.** ex088's first draft
+  had a `RenderFragment` that closed over nothing, and the "rebuilt inline"
+  mutation changed nothing at all: C# hoists a capture-free lambda into a static
+  field, so the inline version handed back the *same* delegate every time and
+  every fact still passed. The exercise now has the fragment read an instance
+  member, which is the case that actually bites — and the stub says so, because
+  the distinction is the lesson. Without the mutation run this row would have
+  taught a pitfall that its own test could not detect.
 - **A `ClaimsIdentity` with no authentication type is not authenticated.** ex082
   asserts the name *and* `IsAuthenticated` for exactly this reason: a provider
   that returns `new ClaimsIdentity([nameClaim])` reports the right user and

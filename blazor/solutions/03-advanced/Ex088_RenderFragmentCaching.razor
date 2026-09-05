@@ -1,0 +1,22 @@
+@* Exercise 088 - Render Fragment Caching (advanced).
+   Goal:   Stop handing a child a brand-new delegate on every render, which defeats
+           any change detection the child does on its parameters.
+   Drills: caching a RenderFragment that closes over this component, and the
+           referential equality that parameter comparison actually uses.
+   Passes: dotnet test --filter FullyQualifiedName~Ex088_ *@
+<Ex088_RenderFragmentCaching_Panel Label="@Label" Content="@Content" />
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+
+    /// What the fragment renders. An instance member on purpose - see below.
+    public string Body { get; } = "panel body";
+
+    private RenderFragment? _content;
+
+    // Built on first use and kept. The lambda reads Body, so it closes over `this`
+    // and the compiler cannot cache it for us the way it caches a capture-free one -
+    // without this field, every evaluation would hand the panel a different delegate.
+    public RenderFragment Content
+        => _content ??= builder => builder.AddMarkupContent(0, $"<span class=\"body\">{Body}</span>");
+}

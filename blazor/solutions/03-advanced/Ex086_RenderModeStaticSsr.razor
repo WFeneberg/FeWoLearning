@@ -1,0 +1,36 @@
+@* Exercise 086 - Render Mode Static Ssr (advanced).
+   Goal:   Stay useful when there is no circuit yet - render something that works
+           without JavaScript, and do not reach for JavaScript before it exists.
+   Drills: branching markup on RendererInfo.IsInteractive, and guarding an interop
+           call so a static render cannot make one.
+   Passes: dotnet test --filter FullyQualifiedName~Ex086_ *@
+<span id="mode">@(RendererInfo.IsInteractive ? "interactive" : "static")</span>
+
+@if (RendererInfo.IsInteractive)
+{
+    <button id="save" @onclick="Save">save</button>
+}
+else
+{
+    <form id="fallback" method="post" action="/save">
+        <button type="submit">save</button>
+    </form>
+}
+
+@code {
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+
+    public const string SetupFunction = "ex086.setup";
+
+    public int Saves { get; private set; }
+
+    private void Save() => Saves++;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && RendererInfo.IsInteractive)
+        {
+            await JS.InvokeVoidAsync(SetupFunction);
+        }
+    }
+}

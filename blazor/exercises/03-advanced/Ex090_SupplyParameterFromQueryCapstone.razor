@@ -1,0 +1,43 @@
+@* Exercise 090 - Supply Parameter From Query Capstone (advanced).
+   Goal:   Take the page's state from the URL, so a link or a back button restores
+           it - and keep up when the URL changes underneath you.
+   Drills: [SupplyParameterFromQuery], its Name for a query key that differs from
+           the property, an array-typed parameter for a repeated key, and the fact
+           that these are re-supplied on navigation like any other parameter.
+   Passes: dotnet test --filter FullyQualifiedName~Ex090_ *@
+<span id="page">@CurrentPage</span>
+<span id="term">@Term</span>
+<span id="tags">@string.Join(",", Tags ?? [])</span>
+<span id="applied">@Applied</span>
+
+@code {
+    // TODO: bind these three to the query string. ex056 parsed the URL by hand; this
+    // is the framework doing it, and it is supplied like a parameter rather than read
+    // like a string.
+    //   Page  <- "page". Note the property is int?, not int, and CurrentPage below
+    //            supplies the fallback: an absent key does not leave the property
+    //            alone, it writes default(T) over whatever was there. A property
+    //            initialiser is therefore NOT a usable default here - it survives
+    //            construction and is overwritten the moment the query is applied.
+    //   Term  <- "q", a string.
+    //   Tags  <- "tag", repeated - which needs an ARRAY-typed property; a string
+    //            property would take only one of them.
+    // A key whose name matches the property needs no argument; one that does not
+    // needs Name.
+    public int? Page { get; set; }
+
+    private int CurrentPage => Page ?? 1;
+
+    public string? Term { get; set; }
+
+    public string[]? Tags { get; set; }
+
+    /// How many times the query has been applied to this component. Not rendered by
+    /// the framework for you - count it where parameters arrive.
+    public int Applied { get; private set; }
+
+    // TODO: count each time these parameters are supplied - including the times a
+    // navigation supplies them again, which is what makes the values follow the URL.
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex090 - bind the query and count the applications");
+}

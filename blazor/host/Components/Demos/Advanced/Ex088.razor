@@ -1,0 +1,15 @@
+@page "/advanced/088"
+@rendermode InteractiveServer
+
+<h1>Exercise 088 - RenderFragmentCaching</h1>
+
+<button id="same" @onclick="() => { }">re-render the parent</button>
+<button id="change" @onclick="() => _label = Guid.NewGuid().ToString()[..4]">change the label</button>
+
+<Ex088_RenderFragmentCaching Label="@_label" />
+
+<p>Only the second button should make the panel re-render.</p>
+
+@code {
+    private string _label = "a";
+}

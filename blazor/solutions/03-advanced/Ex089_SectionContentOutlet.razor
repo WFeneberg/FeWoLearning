@@ -1,0 +1,34 @@
+@using Microsoft.AspNetCore.Components.Sections
+@* Exercise 089 - Section Content Outlet (advanced).
+   Goal:   Let a component deep in the tree put content somewhere far above it - a
+           page filling in the layout's toolbar without a cascade or a state object.
+   Drills: <SectionOutlet> as the hole, <SectionContent> as the filling, and the
+           name that pairs them.
+   Passes: dotnet test --filter FullyQualifiedName~Ex089_ *@
+<div id="toolbar">
+    <SectionOutlet SectionName="@Toolbar" />
+</div>
+<div id="status">
+    <SectionOutlet SectionName="@Status" />
+</div>
+
+<div id="page">
+    @if (ShowTools)
+    {
+        <SectionContent SectionName="@Toolbar">
+            <span id="tools">@Tools</span>
+        </SectionContent>
+    }
+    <SectionContent SectionName="@Status">
+        <span id="state">@StatusText</span>
+    </SectionContent>
+</div>
+
+@code {
+    public const string Toolbar = "toolbar";
+    public const string Status = "status";
+
+    [Parameter] public string Tools { get; set; } = "";
+    [Parameter] public string StatusText { get; set; } = "";
+    [Parameter] public bool ShowTools { get; set; } = true;
+}

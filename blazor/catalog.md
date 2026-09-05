@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 85 ✅ / 15 ⬜**
+**Status: 90 ✅ / 10 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -116,11 +116,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 083 | HandleEventCustomSync | `IHandleEvent` override, suppressing the automatic post-event re-render | ✅ |
 | 084 | HandleAfterRenderCustom | `IHandleAfterRender` override, custom post-render behaviour | ✅ |
 | 085 | RenderModeInteractiveServer | `RenderMode.InteractiveServer` semantics for a component | ✅ |
-| 086 | RenderModeStaticSsr | static SSR rendering, no interactivity, event handlers ignored | ⬜ |
-| 087 | ComponentStatePreservationAcrossRenderMode | preserving state across a render-mode boundary | ⬜ |
-| 088 | RenderFragmentCaching | caching a `RenderFragment` to avoid re-allocation, referential-equality pitfalls | ⬜ |
-| 089 | SectionContentOutlet | `SectionContent`/`SectionOutlet`, content projection across layout boundaries | ⬜ |
-| 090 | SupplyParameterFromQueryCapstone | `[SupplyParameterFromQuery]`, capstone combining several advanced-tier techniques | ⬜ |
+| 086 | RenderModeStaticSsr | static SSR rendering, no interactivity, event handlers ignored | ✅ |
+| 087 | ComponentStatePreservationAcrossRenderMode | preserving state across a render-mode boundary | ✅ |
+| 088 | RenderFragmentCaching | caching a `RenderFragment` to avoid re-allocation, referential-equality pitfalls | ✅ |
+| 089 | SectionContentOutlet | `SectionContent`/`SectionOutlet`, content projection across layout boundaries | ✅ |
+| 090 | SupplyParameterFromQueryCapstone | `[SupplyParameterFromQuery]`, capstone combining several advanced-tier techniques | ✅ |
 
 ## Expert (091–100) — render tree internals, custom infrastructure
 

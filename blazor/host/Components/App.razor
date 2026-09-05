@@ -15,6 +15,10 @@
 <body>
     <Routes />
     <ReconnectModal />
+    @* Ex086 calls this from OnAfterRenderAsync once the circuit is interactive. It
+       lives here rather than in app.js because app.js is loaded only as a dynamic
+       module import, by Ex052 - see the comment at the top of that file. *@
+    <script>window.ex086 = { setup: () => console.log("ex086: setup ran") };</script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 
