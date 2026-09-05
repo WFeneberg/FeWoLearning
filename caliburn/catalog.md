@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 40 ✅ / 60 ⬜**
+**Status: 45 ✅ / 55 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -68,11 +68,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 038 | EventAggregatorMultipleMessages | one `Subscribe` call covers every `IHandle<T>` a subscriber implements - no per-message-type registration step | ✅ |
 | 039 | EventAggregatorUnsubscribe | explicit `Unsubscribe` in `OnDeactivateAsync` as the deterministic alternative to `EventAggregator`'s WEAK subscriber references, which silently stop delivering once a forgotten subscriber is garbage-collected | ✅ |
 | 040 | EventAggregatorMarshalling | `PublishAsync`'s marshal delegate wraps the entire delivery and runs exactly once per publish, regardless of subscriber count - the caller controls it, not the aggregator | ✅ |
-| 041 | CoroutineBasics | `IResult`, the `Completed` event | ⬜ |
-| 042 | CoroutineSequence | `yield return` chains and their order | ⬜ |
-| 043 | CoroutineResultValue | `IResult<T>` and `Result.Value` | ⬜ |
-| 044 | CoroutineFromTask | adapting a `Task` into an `IResult` | ⬜ |
-| 045 | CoroutineCancellation | stopping a sequence on failure | ⬜ |
+| 041 | CoroutineBasics | `IResult`'s two members - `Execute` and the `Completed` event; forgetting to raise `Completed` stalls the coroutine forever instead of failing | ✅ |
+| 042 | CoroutineSequence | a `yield return` chain drives one `IResult` at a time via `Coroutine.ExecuteAsync(IEnumerator<IResult>, ...)` - each step starts only after the previous one's `Completed` has fired | ✅ |
+| 043 | CoroutineResultValue | `IResult<T>.Result` (read-only on the interface) - not `Result.Value` - the value only ever lives on the instance itself, since `Coroutine.ExecuteAsync` still returns a plain `Task` | ✅ |
+| 044 | CoroutineFromTask | `TaskExtensions.AsResult()`/`AsResult<T>()` adapting a `Task`/`Task<T>` into the coroutine pipeline - the coroutine genuinely waits for it, and a faulted task surfaces as `AggregateException`, not the original exception | ✅ |
+| 045 | CoroutineCancellation | a sequence stops early two ways - `WasCancelled` throws `TaskCanceledException`, `Error` throws that same original exception - and no later step ever runs either way | ✅ |
 | 046 | CoroutineExecutionContext | `Target` and `View` on the context | ⬜ |
 | 047 | WindowManagerDialog | `ShowDialogAsync` | ⬜ |
 | 048 | DialogResult | `TryCloseAsync(bool?)` flowing back to the caller | ⬜ |
