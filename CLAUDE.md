@@ -78,10 +78,10 @@ suite against the reference solutions instead of the stubs.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-04: ex001-ex020 (111 exercise test facts) are red on
-  the untouched tree — `dotnet test` shows 111 failed, 7 passed (the 7 harness
+  verified as of 2026-09-05: ex001-ex025 (138 exercise test facts) are red on
+  the untouched tree — `dotnet test` shows 138 failed, 7 passed (the 7 harness
   smoke tests, which pass in both modes) — and `dotnet test
-  -p:UseSolutions=true` shows 118 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
+  -p:UseSolutions=true` shows 145 passed, 0 failed. **`wpf/`** is verified end-to-end on its first
   five exercises as of 2026-09-04, on **.NET 10.0.400** with **xunit.v3 4.0.0**
   and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11):
   `dotnet test` shows 4 passed (the harness smoke tests) and 37 exercise facts
@@ -250,7 +250,19 @@ suite against the reference solutions instead of the stubs.
   `ApplyTemplate()` and hand-raised `Loaded` all fail to supply one. Hence
   `CaliburnViewContext.Show(...)`, which opens a real window off-screen at
   zero opacity — **and hence the track needs an interactive desktop session
-  and will not run in a service or session-0 context.** `IoC` must be
+  and will not run in a service or session-0 context.**
+  **Guard evaluation and action invocation have different thresholds.**
+  Measured: with a `CanXxx` guard that is false from the start,
+  `ViewModelBinder.Bind` alone leaves the button **enabled** and un-gated, and
+  so does a `Measure`/`Arrange` pass. The guard is evaluated on the
+  **`Loaded` event** — the harness's `Load(view)`, which raises `Loaded` by
+  hand, is enough. **Invocation** is the stricter one: it needs a real
+  `PresentationSource`, so only `Show(view)` makes a click reach the method.
+  A test that only calls `Layout` proves neither; one that calls `Load`
+  proves the guard but not the action. `ActionMessage` gates only
+  `IsEnabled`, not execution: raising `ButtonBase.ClickEvent` programmatically
+  on a guard-**disabled** button still invokes the method. WPF blocks real
+  input, `RaiseEvent` does not. `IoC` must be
   initialized even with no UI: `Coroutine.BeginExecute` calls `IoC.BuildUp`.
   `XamlPlatformProvider` captures `Dispatcher.CurrentDispatcher` in its
   constructor, so it leaks across tests; `CaliburnCoreContext` resets
@@ -390,7 +402,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 10 / 100 (verified) | 90 |
 | `blazor/` | 95 / 100 (verified) | 5 |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 20 / 100 (verified) | 80 |
+| `caliburn/`| 25 / 100 (verified) | 75 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `blazor/`,
