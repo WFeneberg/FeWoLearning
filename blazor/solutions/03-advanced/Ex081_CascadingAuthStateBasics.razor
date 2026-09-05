@@ -1,0 +1,24 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@* Exercise 081 - Cascading Auth State Basics (advanced).
+   Goal:   Show different markup to a signed-in user, a signed-out one, and one
+           whose state has not arrived yet.
+   Drills: <AuthorizeView> and its three fragments, the ClaimsPrincipal it hands to
+           Authorized as @context, and gating on a role.
+   Passes: dotnet test --filter FullyQualifiedName~Ex081_ *@
+<AuthorizeView>
+    <Authorizing>
+        <span id="pending">checking…</span>
+    </Authorizing>
+    <Authorized>
+        <span id="user">@context.User.Identity!.Name</span>
+    </Authorized>
+    <NotAuthorized>
+        <span id="anon">sign in</span>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <span id="admin">admin tools</span>
+    </Authorized>
+</AuthorizeView>

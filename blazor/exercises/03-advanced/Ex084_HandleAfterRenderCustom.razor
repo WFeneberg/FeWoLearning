@@ -1,0 +1,31 @@
+@implements IHandleAfterRender
+@* Exercise 084 - Handle After Render Custom (advanced).
+   Goal:   Own the post-render hook itself, rather than the OnAfterRender callback
+           ComponentBase builds on top of it.
+   Drills: implementing IHandleAfterRender, and what taking it over costs - the
+           interface IS the dispatch, so ComponentBase's OnAfterRender no longer runs.
+   Passes: dotnet test --filter FullyQualifiedName~Ex084_ *@
+<span id="value">@Value</span>
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+
+    /// Every post-render call this component receives.
+    public int AfterRenders { get; private set; }
+
+    /// Work that must happen once per component, not once per render - the slot a
+    /// real component uses for JS initialisation.
+    public int SetupRuns { get; private set; }
+
+    /// ComponentBase's hook. The tests assert this stays at zero, which is the point
+    /// of the exercise - do not call it yourself to make that number move.
+    public int BaseHookRuns { get; private set; }
+
+    protected override void OnAfterRender(bool firstRender) => BaseHookRuns++;
+
+    // TODO: implement the interface method. Count every call in AfterRenders, and run
+    // the once-only work exactly once, incrementing SetupRuns - you no longer get a
+    // firstRender flag handed to you, so decide from what you have counted.
+    Task IHandleAfterRender.OnAfterRenderAsync()
+        => throw new NotImplementedException("TODO: Ex084 - handle the post-render pass");
+}

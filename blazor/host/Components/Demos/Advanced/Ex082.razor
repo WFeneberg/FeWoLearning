@@ -1,0 +1,14 @@
+@page "/advanced/082"
+@rendermode InteractiveServer
+@inject Ex082_CustomAuthenticationStateProvider Auth
+
+<h1>Exercise 082 - CustomAuthenticationStateProvider</h1>
+
+<button id="in" @onclick="SignIn">sign in</button>
+<button id="out" @onclick="Auth.SignOut">sign out</button>
+
+<Ex082_CustomAuthenticationStateProvider_Host />
+
+@code {
+    private void SignIn() => Auth.SignIn("ada");
+}

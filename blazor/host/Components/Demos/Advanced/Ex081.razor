@@ -1,0 +1,19 @@
+@page "/advanced/081"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@inject Ex082_CustomAuthenticationStateProvider Auth
+
+<h1>Exercise 081 - CascadingAuthStateBasics</h1>
+
+<p>Signed in through ex082's provider. The admin block stays away - that provider
+   issues no roles.</p>
+<button id="in" @onclick="SignIn">sign in</button>
+<button id="out" @onclick="Auth.SignOut">sign out</button>
+
+<CascadingAuthenticationState>
+    <Ex081_CascadingAuthStateBasics />
+</CascadingAuthenticationState>
+
+@code {
+    private void SignIn() => Auth.SignIn("ada");
+}

@@ -1,0 +1,7 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@* Exercise 082 - the host. No TODO here. CascadingAuthenticationState is what turns
+   an AuthenticationStateProvider into a cascading Task<AuthenticationState>, and it
+   is what re-supplies that task when the provider says the state changed. *@
+<CascadingAuthenticationState>
+    <Ex082_CustomAuthenticationStateProvider_Consumer />
+</CascadingAuthenticationState>

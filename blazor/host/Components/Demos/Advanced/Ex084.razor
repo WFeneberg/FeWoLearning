@@ -1,0 +1,16 @@
+@page "/advanced/084"
+@rendermode InteractiveServer
+
+<h1>Exercise 084 - HandleAfterRenderCustom</h1>
+
+<button id="rerender" @onclick="() => _value = Guid.NewGuid().ToString()[..4]">re-render</button>
+
+<Ex084_HandleAfterRenderCustom @ref="_child" Value="@_value" />
+
+<p>after-renders: @(_child?.AfterRenders) · setup runs: @(_child?.SetupRuns)
+   · ComponentBase hook: @(_child?.BaseHookRuns)</p>
+
+@code {
+    private Ex084_HandleAfterRenderCustom? _child;
+    private string _value = "a";
+}

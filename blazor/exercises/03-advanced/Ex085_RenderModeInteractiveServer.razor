@@ -1,0 +1,27 @@
+@* Exercise 085 - Render Mode Interactive Server (advanced).
+   Goal:   Let a component say which render mode it was given, and behave sanely
+           while it is still being prerendered and cannot handle a click yet.
+   Drills: ComponentBase.AssignedRenderMode and RendererInfo, and the prerender
+           pattern of disabling interaction until the component is interactive.
+   Passes: dotnet test --filter FullyQualifiedName~Ex085_ *@
+<span id="mode">@ModeName</span>
+<span id="interactive">@(RendererInfo.IsInteractive ? "interactive" : "static")</span>
+<span id="renderer">@RendererInfo.Name</span>
+<button id="act" @onclick="() => Clicks++" disabled="@(!RendererInfo.IsInteractive)">act</button>
+<span id="clicks">@Clicks</span>
+
+@code {
+    public int Clicks { get; private set; }
+
+    // TODO: name the render mode this component was assigned, by matching on the
+    // type of AssignedRenderMode:
+    //   InteractiveServerRenderMode        -> "InteractiveServer"
+    //   InteractiveWebAssemblyRenderMode   -> "InteractiveWebAssembly"
+    //   InteractiveAutoRenderMode          -> "InteractiveAuto"
+    //   null                               -> "none"  (static SSR: no mode assigned)
+    //   anything else                      -> "other"
+    // AssignedRenderMode is an IComponentRenderMode, so this is a type test, not a
+    // string comparison - the render modes are singleton instances of those types.
+    private string ModeName
+        => throw new NotImplementedException("TODO: Ex085 - name the assigned render mode");
+}

@@ -1,0 +1,25 @@
+@implements IHandleEvent
+@* Exercise 083 - Handle Event Custom Sync (advanced).
+   Goal:   Take back the automatic re-render that ComponentBase performs after every
+           event handler, and decide for yourself when the screen catches up.
+   Drills: implementing IHandleEvent, EventCallbackWorkItem.InvokeAsync, and the
+           StateHasChanged you now owe yourself.
+   Passes: dotnet test --filter FullyQualifiedName~Ex083_ *@
+<span id="count">@Count</span>
+<button id="bump" @onclick="() => Count++">bump</button>
+<button id="show" @onclick="Show">show</button>
+
+@code {
+    public int Count { get; private set; }
+
+    /// How many times this component has rendered. Not rendered itself.
+    public int RenderCount { get; private set; }
+
+    protected override void OnAfterRender(bool firstRender) => RenderCount++;
+
+    // Just the invocation: no StateHasChanged before it, none after.
+    Task IHandleEvent.HandleEventAsync(EventCallbackWorkItem item, object? arg)
+        => item.InvokeAsync(arg);
+
+    private void Show() => StateHasChanged();
+}

@@ -395,7 +395,11 @@ concrete failure modes worth carrying into future batches:
   field change instead of the one field, re-checking only the field that
   changed when the rule spans two, handing back a freshly constructed instance
   rather than `DynamicComponent.Instance`, and accepting any public property as
-  a parameter.
+  a parameter. ex081–ex085 too: dropping the `Authorizing` fragment, building
+  the `ClaimsIdentity` without an authentication type, leaving
+  `NotifyAuthenticationStateChanged` out, keeping `StateHasChanged` inside the
+  custom `IHandleEvent`, running the once-only after-render work every time,
+  and hardcoding the render-mode name.
 - **A stub whose TODO is only markup needs a throwing lifecycle method too.**
   ex079's first draft left the `<DynamicComponent>` markup as the TODO and threw
   only from a property one fact touched; the other three failed on a missing
@@ -415,6 +419,16 @@ concrete failure modes worth carrying into future batches:
   that reason — ComponentBase renders once before it ever asks. Its assertions
   now ride along inside the fact that pushes a second time. Any fact about a
   gate must arrange for the gate to be consulted.
+- **A `ClaimsIdentity` with no authentication type is not authenticated.** ex082
+  asserts the name *and* `IsAuthenticated` for exactly this reason: a provider
+  that returns `new ClaimsIdentity([nameClaim])` reports the right user and
+  leaves every `AuthorizeView` on the page showing its anonymous branch. A test
+  that only checked the name would call that implementation correct.
+- **Implementing `IHandleAfterRender` silences `OnAfterRender` completely.** The
+  interface *is* the dispatch — `ComponentBase` implements it and calls
+  `OnAfterRender` from inside it — so re-implementing it on a derived component
+  replaces that wholesale, and the familiar override never runs again. ex084
+  asserts the base hook stays at zero, measured directly.
 - **`decimal` keeps its scale through arithmetic.** ex076 stores a fraction and
   shows a percentage, and `0.15m * 100m` is `15.00`, not `15` — a bare
   `ToString` puts the trailing zeros in the input box. Found by a green run

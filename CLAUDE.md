@@ -388,7 +388,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 80 / 100 (verified) | 20 |
+| `blazor/` | 85 / 100 (verified) | 15 |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 15 / 100 (verified) | 85 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
@@ -439,10 +439,10 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 80 written exercises — all of `01-beginner`, all of
-`02-intermediate`, and ex071–ex080 of `03-advanced` — carry 295 individual test
-facts; `dotnet test` shows 295 failed/0 passed on the untouched tree and
-`dotnet test -p:UseSolutions=true` shows 295 passed/0 failed (verified
+`blazor/`'s 85 written exercises — all of `01-beginner`, all of
+`02-intermediate`, and ex071–ex085 of `03-advanced` — carry 318 individual test
+facts; `dotnet test` shows 318 failed/0 passed on the untouched tree and
+`dotnet test -p:UseSolutions=true` shows 318 passed/0 failed (verified
 2026-09-05). Every failure but one traces
 to its own exercise's `NotImplementedException`; the exception is ex069, whose
 subject is a generic *type constraint* that no behaviour can prove (LINQ's

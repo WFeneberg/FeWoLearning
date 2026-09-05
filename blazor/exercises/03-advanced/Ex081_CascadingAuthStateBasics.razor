@@ -1,0 +1,26 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@* Exercise 081 - Cascading Auth State Basics (advanced).
+   Goal:   Show different markup to a signed-in user, a signed-out one, and one
+           whose state has not arrived yet.
+   Drills: <AuthorizeView> and its three fragments, the ClaimsPrincipal it hands to
+           Authorized as @context, and gating on a role.
+   Passes: dotnet test --filter FullyQualifiedName~Ex081_ *@
+
+@* TODO: render two <AuthorizeView> blocks.
+   The first has all three fragments:
+     Authorizing   <span id="pending">checking…</span>
+     Authorized    <span id="user">…</span> holding the user's name, from the
+                   ClaimsPrincipal the fragment hands you as @context.User.
+     NotAuthorized <span id="anon">sign in</span>
+   The second gates on a role rather than on being signed in at all, and has only an
+   Authorized fragment:
+     <span id="admin">admin tools</span> for members of the "admin" role.
+   Authorizing is not a decoration: an AuthenticationStateProvider hands back a Task,
+   and until it completes there is genuinely no answer to show. *@
+
+@code {
+    // A markup-only exercise still needs something that fails loudly until the
+    // markup is there, so a red run points at Ex081 rather than at a missing element.
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex081 - render the authorize views");
+}

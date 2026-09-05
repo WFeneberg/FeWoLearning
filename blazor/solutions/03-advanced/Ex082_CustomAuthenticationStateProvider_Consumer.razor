@@ -1,0 +1,22 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@* Exercise 082 - the consumer. No TODO here: it reads the cascaded state the way
+   any component would, so that what the test measures is the provider's behaviour.
+   Note it takes Task<AuthenticationState>, not AuthenticationState - the state is
+   asynchronous by design, and a component that needs it awaits it. *@
+<span id="user">@_name</span>
+<span id="authenticated">@_authenticated</span>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState>? State { get; set; }
+
+    private string _name = "";
+    private bool _authenticated;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = State is null ? null : (await State).User;
+
+        _name = user?.Identity?.Name ?? "anonymous";
+        _authenticated = user?.Identity?.IsAuthenticated ?? false;
+    }
+}
