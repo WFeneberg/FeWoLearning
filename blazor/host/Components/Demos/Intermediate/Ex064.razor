@@ -1,0 +1,14 @@
+@page "/intermediate/064"
+@rendermode InteractiveServer
+
+<h1>Exercise 064 - SetParametersAsyncOverride</h1>
+
+<p>"push same" is a set without a change; "push new" is both.</p>
+<button id="same" @onclick="() => _value = _value">push same</button>
+<button id="new" @onclick="() => _value = Guid.NewGuid().ToString()[..4]">push new</button>
+
+<Ex064_SetParametersAsyncOverride Value="_value" />
+
+@code {
+    private string _value = "a";
+}

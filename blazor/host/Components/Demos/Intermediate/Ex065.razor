@@ -1,0 +1,18 @@
+@page "/intermediate/065"
+@rendermode InteractiveServer
+
+<h1>Exercise 065 - DebouncedAsyncSearch</h1>
+
+<p>Type: the search runs 300ms after the last keystroke, once.</p>
+
+<Ex065_DebouncedAsyncSearch Search="SearchAsync" />
+
+@code {
+    private static readonly string[] Fruit = ["apple", "apricot", "banana", "cherry", "grape"];
+
+    private static async Task<IReadOnlyList<string>> SearchAsync(string term, CancellationToken token)
+    {
+        await Task.Delay(400, token);
+        return [.. Fruit.Where(f => f.StartsWith(term, StringComparison.OrdinalIgnoreCase))];
+    }
+}

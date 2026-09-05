@@ -1,0 +1,45 @@
+@implements IDisposable
+@* Exercise 063 - Cancellation On Dispose (intermediate).
+   Goal:   Stop work a removed component started, instead of letting it run on and
+           write into a component nobody is rendering any more.
+   Drills: a CancellationTokenSource owned by the component, its token passed into
+           the async work, cancelled and disposed in Dispose().
+   Passes: dotnet test --filter FullyQualifiedName~Ex063_ *@
+<span id="result">@Result</span>
+
+@code {
+    [Parameter] public Func<CancellationToken, Task<string>> Load { get; set; }
+        = _ => Task.FromResult("");
+
+    public string Result { get; private set; } = "";
+
+    private CancellationTokenSource? _cts;
+
+    protected override void OnInitialized() => _cts = new CancellationTokenSource();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Non-null from here on: OnInitialized always runs first.
+        var cts = _cts!;
+
+        try
+        {
+            var result = await Load(cts.Token);
+
+            if (!cts.IsCancellationRequested)
+            {
+                Result = result;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // A cancelled load is what disposal looks like from in here.
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

@@ -1,0 +1,45 @@
+@* Exercise 065 - Debounced Async Search (intermediate).
+   Goal:   Search after the typing stops, once, for the term that was typed last.
+   Drills: a Task.Delay debounce window, a CancellationTokenSource replaced per
+           keystroke, and cancelling a request that a newer keystroke superseded.
+   Passes: dotnet test --filter FullyQualifiedName~Ex065_ *@
+<input id="q" @bind="_term" @bind:event="oninput" @bind:after="OnTermChangedAsync" />
+<span id="results">@string.Join(",", Results)</span>
+
+@code {
+    [Parameter] public TimeSpan Debounce { get; set; } = TimeSpan.FromMilliseconds(300);
+
+    [Parameter] public Func<string, CancellationToken, Task<IReadOnlyList<string>>> Search { get; set; }
+        = (_, _) => Task.FromResult<IReadOnlyList<string>>([]);
+
+    public IReadOnlyList<string> Results { get; private set; } = [];
+
+    private string _term = "";
+    private CancellationTokenSource? _pending;
+
+    private async Task OnTermChangedAsync()
+    {
+        // Calls off the previous keystroke - its delay if it is still waiting, its
+        // Search if that already started.
+        _pending?.Cancel();
+        _pending?.Dispose();
+
+        var cts = new CancellationTokenSource();
+        _pending = cts;
+        var token = cts.Token;
+
+        try
+        {
+            await Task.Delay(Debounce, token);
+            var results = await Search(_term, token);
+
+            token.ThrowIfCancellationRequested();
+            Results = results;
+            StateHasChanged();
+        }
+        catch (OperationCanceledException)
+        {
+            // Superseded by a newer keystroke: leave Results as they were.
+        }
+    }
+}

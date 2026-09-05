@@ -6,12 +6,12 @@
 Blazor beginner, not C# beginner**: ex001 is a component with a `[Parameter]`
 and a computed member, not a `FizzBuzz` static method. This track never drills
 plain C# language features — those belong to the `dotnet/` track. As of this
-writing, ex001–ex060 are written and verified: the whole **01-beginner** tier
+writing, ex001–ex065 are written and verified: the whole **01-beginner** tier
 (ex001–ex035, component fundamentals: `[Parameter]`, rendering directives,
 `@bind`, `EventCallback`, `RenderFragment`, lifecycle, `CascadingValue`) and
-the first 25 rows of **02-intermediate** (ex036–ex060: `EditForm`/validation,
-DI and state containers, JS interop, navigation, persistent component state).
-ex061–ex100 are catalog rows only (⬜) — `catalog.md` is the source of truth.
+the first 30 rows of **02-intermediate** (ex036–ex065: `EditForm`/validation,
+DI and state containers, JS interop, navigation, persistent component state,
+`@ref` and the async lifecycle). ex066–ex100 are catalog rows only (⬜) — `catalog.md` is the source of truth.
 
 ## 2. Prerequisites
 
@@ -29,7 +29,7 @@ Run every command **from inside `blazor/`**, not the repo root.
 | Command | Effect |
 |---|---|
 | `dotnet test` | run the stubs — all red |
-| `dotnet test -p:UseSolutions=true` | run the same 206 facts against the reference solutions — all green |
+| `dotnet test -p:UseSolutions=true` | run the same 226 facts against the reference solutions — all green |
 | `dotnet test --filter FullyQualifiedName~Ex001_` | run one exercise |
 | `dotnet run --project host` | exercise host: stub demo pages at `http://localhost:5199`, surfaces each unfinished exercise's `NotImplementedException` |
 | `dotnet run --project host -p:UseSolutions=true` | reference host: the same demo pages backed by the solutions |
@@ -65,10 +65,15 @@ naturally falls:
   `_selected` twice, `_total`), because their finished markup needs something
   to bind to that the stub cannot supply itself. Until the learner writes
   that markup, the field is genuinely unused, which is why the stub build
-  carries warnings (see §9). Later shape-B stubs avoid adding to that list by
-  rendering the echo markup that reads the field and leaving only the
-  *modified* markup as the TODO (ex058), or by leaving the field itself to the
-  learner (ex060's `PersistingComponentStateSubscription`).
+  carries warnings (see §9). Where the field is avoidable a later stub avoids
+  it — by rendering the echo markup that reads it and leaving only the
+  *modified* markup as the TODO (ex058), by leaving the field itself to the
+  learner (ex060's `PersistingComponentStateSubscription`), or by exposing the
+  state as an auto-property, which never warns (ex061's `Panel.IsOpen`).
+  Where it is not avoidable it is left alone: ex061's two `@ref` targets are
+  written as private fields because that is what real Blazor code looks like,
+  and an `@ref` the learner has not added yet is by definition a field nothing
+  assigns.
 
 A reference solution replaces the throwing member/method with the real
 implementation and deletes anything that was there only to throw.
@@ -161,6 +166,11 @@ material found online. This track uses the current names throughout:
   prove component *identity* (e.g. "the same child instance survived a
   reorder"), go through `cut.FindComponents<T>()[i].Instance`, not through an
   element handle.
+- **There is no parameterless `Render()` on a rendered component.** To push
+  parameters again — which is how ex062 proves its load runs once and ex064
+  counts sets — re-supply them: `cut.Render(p => p.Add(c => c.X, value))`.
+  `cut.Render(_ => { })` pushes an empty `ParameterView`, which does *not*
+  reset already-assigned parameters; it is a set carrying nothing.
 - **`BunitNavigationManager.History` is stack-ordered and typed
   `IReadOnlyCollection<NavigationHistory>`.** The *first* element is the most
   recent navigation, not the oldest, and the initial URI is not in it at all.
@@ -190,7 +200,7 @@ material found online. This track uses the current names throughout:
 
 ## 9. The stub build is not warning-free — by design
 
-`dotnet build` on `exercises/` emits **exactly ten warnings**, all
+`dotnet build` on `exercises/` emits **exactly twelve warnings**, all
 `CS0169`/`CS0414`/`CS0649` (unused/never-assigned field), for fields that
 shape-B stubs (§4) declare for the learner to wire up:
 
@@ -204,6 +214,8 @@ shape-B stubs (§4) declare for the learner to wire up:
 - `Ex041_CustomFieldValidation._context`
 - `Ex045_CascadingServiceInjection._fromProperty`
 - `Ex052_JsInteropModule._module`
+- `Ex061_RefCaptureBasics._box`
+- `Ex061_RefCaptureBasics._panel`
 
 These are **expected and must not be suppressed**. Each field is genuinely
 unused until the learner's implementation reads or assigns it; suppressing
@@ -212,7 +224,7 @@ category of warning a real unused-field bug would also produce, defeating the
 purpose of leaving the build unsuppressed. The **solutions** project builds
 with **0 warnings** — building `solutions/FeWoLearning.Blazor.Solutions.csproj`
 directly confirms this; a whole-`.slnx` build in solutions mode still shows
-the same ten exercises warnings because `exercises/` remains part of the
+the same twelve exercises warnings because `exercises/` remains part of the
 `.slnx` regardless of `UseSolutions`.
 
 ## 10. Sharpest edge in this tier: ex035 can hang the test host, not fail it
@@ -284,6 +296,24 @@ concrete failure modes worth carrying into future batches:
   disposed once) still show a "correct" final count. Fixtures must observe
   the actual mechanism (the real event's invocation, the real list's
   contents), not a parallel bookkeeping variable that can drift from it.
+- **To make a negative assertion about async work mean something, drain the
+  dispatcher first.** "The load that finished after disposal did not write
+  `Result`" (ex063) and "the superseded search's answer did not overwrite the
+  newer one" (ex065) both pass vacuously if the continuation simply has not run
+  yet. `await Renderer.Dispatcher.InvokeAsync(() => { })` fixes that without a
+  sleep: the continuation was queued on that dispatcher first, so once a no-op
+  queued after it has completed, it has already had its turn. Pair it with
+  `TaskCreationOptions.RunContinuationsAsynchronously` on the test's
+  `TaskCompletionSource`, or `SetResult` runs the continuation inline on the
+  test thread and the ordering argument no longer holds.
+- **Real time appears exactly once in this track, in ex065.** A `Task.Delay`
+  debounce cannot be tested without it. The window is a parameter so the test
+  can shrink it (200ms) and every wait has a deadline far above it (5s), which
+  is a ~25x margin rather than a few percent; the suite was re-run three times
+  to confirm. Any future timing exercise should follow the same shape rather
+  than sleeping for a fixed guess. `WaitForAssertion` is not a substitute here:
+  it re-checks on renders, so a condition about a fixture's own bookkeeping
+  (how many times the fake search was called) needs a plain polling loop.
 - **Always ask what a naive, wrong implementation would do before trusting a
   green test** — restated here because it is this tier's single most
   effective check, and the one most easily skipped under time pressure.
@@ -295,3 +325,12 @@ concrete failure modes worth carrying into future batches:
   and confirming that exactly the intended facts failed and no others. Two of
   those mutations are the bugs a learner is most likely to write, and both
   produce a component that looks entirely correct while it is on screen.
+  ex061–ex065 were checked the same way — dropping both `@ref` captures,
+  clearing the loading flag before the `await` instead of after, disposing the
+  `CancellationTokenSource` without cancelling it, comparing the incoming
+  parameter *after* `base.SetParametersAsync`, removing the debounce delay, and
+  removing the post-`await` `ThrowIfCancellationRequested` — each taking down
+  exactly the facts it should. The `base.SetParametersAsync` ordering mutation
+  is the one worth remembering: it fails all four of ex064's facts, because
+  once `base` has assigned the property there is no longer a previous value to
+  compare against, and every push looks unchanged.

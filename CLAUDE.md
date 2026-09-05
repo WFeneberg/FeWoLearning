@@ -367,7 +367,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
 | `avalonia/`| 10 / 100 (verified) | 90 |
-| `blazor/` | 60 / 100 (verified) | 40 |
+| `blazor/` | 65 / 100 (verified) | 35 |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 10 / 100 (verified) | 90 |
 | `wpf/`    | 5 / 100 (verified) | 95 |
@@ -418,12 +418,12 @@ batch added to close that track out) were likewise verified per-batch
 100 solutions overlaid together at once as an integration check —
 `cargo test` shows 0 passed/100 stubs red on the untouched tree and
 395 passed/0 failed with every solution overlaid, doc-tests included.
-`blazor/`'s 60 written exercises — all of `01-beginner` plus ex036–ex060 of
-`02-intermediate` — carry 206 individual test facts; `dotnet test` shows 206
+`blazor/`'s 65 written exercises — all of `01-beginner` plus ex036–ex065 of
+`02-intermediate` — carry 226 individual test facts; `dotnet test` shows 226
 failed/0 passed on the untouched tree, each failure traced to its own
 exercise's `NotImplementedException`, and `dotnet test -p:UseSolutions=true`
-shows 206 passed/0 failed (verified 2026-09-05). The `exercises/` build itself
-carries 10 expected `CS0169`/`CS0414`/`CS0649` warnings for fields that
+shows 226 passed/0 failed (verified 2026-09-05). The `exercises/` build itself
+carries 12 expected `CS0169`/`CS0414`/`CS0649` warnings for fields that
 shape-B stubs declare for the learner to wire up — these are intentionally
 left unsuppressed; `solutions/` builds with 0 warnings. See
 `blazor/README.md` for the full list and for a sharp edge in ex035: a naive,
@@ -437,7 +437,10 @@ and returns the double ex059/ex060 drive it with (`Persist` /
 `ComponentStatePersistenceManager` and a fake store also works and is what this
 batch tried first; it is ~40 lines of fixture for nothing, and it drags in the
 rule that touching `BunitContext.Renderer` counts as the first service
-resolution.
+resolution. A third, from ex063/ex065: a negative assertion about async work
+("the cancelled load did not write its result") is vacuous until the renderer's
+queue has drained, and `await Renderer.Dispatcher.InvokeAsync(() => { })` is
+the drain — no sleep needed, because the continuation was queued there first.
 
 ## The `uno/` track
 

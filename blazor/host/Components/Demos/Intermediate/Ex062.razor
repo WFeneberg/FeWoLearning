@@ -1,0 +1,16 @@
+@page "/intermediate/062"
+@rendermode InteractiveServer
+
+<h1>Exercise 062 - AsyncOnInitialized</h1>
+
+<p>The load below takes a second, so the loading state is visible.</p>
+
+<Ex062_AsyncOnInitialized Load="LoadSlowlyAsync" />
+
+@code {
+    private static async Task<IReadOnlyList<string>> LoadSlowlyAsync()
+    {
+        await Task.Delay(1000);
+        return ["alpha", "beta", "gamma"];
+    }
+}

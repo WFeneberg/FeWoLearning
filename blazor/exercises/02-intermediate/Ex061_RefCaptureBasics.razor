@@ -1,0 +1,31 @@
+@* Exercise 061 - Ref Capture Basics (intermediate).
+   Goal:   Reach the DOM element and the child component instance this component
+           rendered, and drive the child by calling a method on it.
+   Drills: @ref on an element (ElementReference) and on a component (the instance
+           itself), and the fact that both are only populated after a render.
+   Passes: dotnet test --filter FullyQualifiedName~Ex061_ *@
+<div id="box">box</div>
+<Ex061_RefCaptureBasics_Panel />
+<button id="open" @onclick="OpenPanel">open</button>
+
+@* TODO: capture both references in the markup above:
+     @ref="_box"   on the <div>, giving the ElementReference the framework assigns
+                   after the render (an opaque handle - it is what you would hand
+                   to JS interop, see ex051).
+     @ref="_panel" on the <Ex061_RefCaptureBasics_Panel>, giving the live child
+                   component instance - not a copy, not a new one. *@
+
+@code {
+    private ElementReference _box;
+    private Ex061_RefCaptureBasics_Panel? _panel;
+
+    public string ElementId => _box.Id;
+    public Ex061_RefCaptureBasics_Panel? Panel => _panel;
+
+    // TODO: open the captured panel by calling its Open() method.
+    private void OpenPanel()
+        => throw new NotImplementedException("TODO: Ex061 - open the captured panel");
+
+    protected override void OnParametersSet()
+        => throw new NotImplementedException("TODO: Ex061 - capture the two references");
+}

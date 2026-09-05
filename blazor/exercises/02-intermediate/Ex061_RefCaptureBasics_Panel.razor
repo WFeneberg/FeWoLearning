@@ -1,0 +1,15 @@
+@* Exercise 061 - Ref Capture Basics (intermediate) - the child half.
+   Goal:   Expose a method the parent can call through its captured @ref.
+   Drills: a public method as a component's imperative surface.
+   Passes: dotnet test --filter FullyQualifiedName~Ex061_ *@
+<span id="panel">@(IsOpen ? "open" : "closed")</span>
+
+@code {
+    public bool IsOpen { get; private set; }
+
+    // TODO: flip IsOpen and ask this component to re-render. The re-render matters
+    // for a method called from outside this component's own render pass - here the
+    // parent's click would refresh the child anyway, but that is incidental.
+    public void Open()
+        => throw new NotImplementedException("TODO: Ex061 - open the panel");
+}

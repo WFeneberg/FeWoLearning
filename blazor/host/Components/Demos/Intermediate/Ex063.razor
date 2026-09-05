@@ -1,0 +1,22 @@
+@page "/intermediate/063"
+@rendermode InteractiveServer
+
+<h1>Exercise 063 - CancellationOnDispose</h1>
+
+<p>Navigate away within two seconds and the load is cancelled instead of running on.</p>
+<button id="toggle" @onclick="() => _shown = !_shown">@(_shown ? "remove" : "add")</button>
+
+@if (_shown)
+{
+    <Ex063_CancellationOnDispose Load="LoadSlowlyAsync" />
+}
+
+@code {
+    private bool _shown = true;
+
+    private static async Task<string> LoadSlowlyAsync(CancellationToken token)
+    {
+        await Task.Delay(2000, token);
+        return "loaded";
+    }
+}

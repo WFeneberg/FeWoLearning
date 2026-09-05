@@ -15,7 +15,7 @@ Stubs live in `exercises/<tier>/ExNNN_<Slug>.razor`, their bUnit tests in
 folder-level `_Imports.razor` (`@namespace FeWoLearning.Blazor.Exercises.Beginner`
 and friends), because `01-beginner` is not a valid C# identifier.
 
-**Status: 60 ✅ / 40 ⬜**
+**Status: 65 ✅ / 35 ⬜**
 
 ## Beginner (001–035) — component fundamentals
 
@@ -86,11 +86,11 @@ and friends), because `01-beginner` is not a valid C# identifier.
 | 058 | BindDirectiveModifiers | `@bind:event` (custom update-trigger event), `@bind:format`, `@bind:after` (post-update hook) | ✅ |
 | 059 | PersistComponentStateBasics | `PersistentComponentState`, `RegisterOnPersisting`, restore on init | ✅ |
 | 060 | PersistComponentStateRoundtrip | persisting typed state as JSON, subscription disposal | ✅ |
-| 061 | RefCaptureBasics | `@ref` capturing an element reference and a component reference, calling a method on a child instance | ⬜ |
-| 062 | AsyncOnInitialized | `async OnInitializedAsync`, loading-state rendering | ⬜ |
-| 063 | CancellationOnDispose | `CancellationTokenSource` created in `OnInitialized`, cancelled in `Dispose` | ⬜ |
-| 064 | SetParametersAsyncOverride | overriding `SetParametersAsync`, calling `base` | ⬜ |
-| 065 | DebouncedAsyncSearch | `Task.Delay`-based debounce, cancelling a superseded request | ⬜ |
+| 061 | RefCaptureBasics | `@ref` capturing an element reference and a component reference, calling a method on a child instance | ✅ |
+| 062 | AsyncOnInitialized | `async OnInitializedAsync`, loading-state rendering | ✅ |
+| 063 | CancellationOnDispose | `CancellationTokenSource` created in `OnInitialized`, cancelled in `Dispose` | ✅ |
+| 064 | SetParametersAsyncOverride | overriding `SetParametersAsync`, calling `base` | ✅ |
+| 065 | DebouncedAsyncSearch | `Task.Delay`-based debounce, cancelling a superseded request | ✅ |
 | 066 | ErrorBoundaryBasics | `ErrorBoundary`, `ErrorContent`, `Recover()` | ⬜ |
 | 067 | ErrorBoundaryLoggingHandler | custom `ErrorBoundary` subclass, `OnErrorAsync` override | ⬜ |
 | 068 | GenericComponentBasics | `@typeparam T`, generic component parameter inference | ⬜ |

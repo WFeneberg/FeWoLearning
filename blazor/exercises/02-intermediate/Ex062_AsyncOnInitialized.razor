@@ -1,0 +1,34 @@
+@* Exercise 062 - Async On Initialized (intermediate).
+   Goal:   Show a loading state while the data a component needs is still in flight.
+   Drills: OnInitializedAsync, the render that happens at the first await, rendering
+           off a "have I loaded yet" flag.
+   Passes: dotnet test --filter FullyQualifiedName~Ex062_ *@
+@if (IsLoading)
+{
+    <span id="loading">loading…</span>
+}
+else
+{
+    <ul id="items">
+        @foreach (var item in Items)
+        {
+            <li>@item</li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter] public Func<Task<IReadOnlyList<string>>> Load { get; set; }
+        = () => Task.FromResult<IReadOnlyList<string>>([]);
+
+    public bool IsLoading { get; private set; } = true;
+    public IReadOnlyList<string> Items { get; private set; } = [];
+
+    // TODO: await Load(), keep what it returns in Items, and clear IsLoading when it
+    // is done. ComponentBase renders once when this method first awaits, which is
+    // what puts the loading markup on screen - so do not block on the task (.Result
+    // or .Wait() deadlocks the renderer rather than failing a test), and do not clear
+    // IsLoading before the await.
+    protected override Task OnInitializedAsync()
+        => throw new NotImplementedException("TODO: Ex062 - load the items asynchronously");
+}

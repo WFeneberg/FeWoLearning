@@ -1,0 +1,25 @@
+@* Exercise 064 - SetParametersAsync Override (intermediate).
+   Goal:   See an incoming parameter before it lands, so you can tell a real change
+           from a re-set of the same value.
+   Drills: overriding SetParametersAsync, reading ParameterView.TryGetValue, and the
+           ordering that makes it work - base.SetParametersAsync is what assigns the
+           properties and drives the rest of the lifecycle, so it comes last.
+   Passes: dotnet test --filter FullyQualifiedName~Ex064_ *@
+<span id="value">@Value</span>
+<span id="sets">@SetCount</span>
+<span id="changes">@ChangeCount</span>
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+
+    public int SetCount { get; private set; }
+    public int ChangeCount { get; private set; }
+
+    // TODO: count every parameter push in SetCount, and count only the pushes that
+    // actually carry a different Value in ChangeCount - comparing the incoming value
+    // from the ParameterView against the current one. Then hand the ParameterView to
+    // base.SetParametersAsync and return what it returns; skipping that call leaves
+    // Value unassigned and the component never renders.
+    public override Task SetParametersAsync(ParameterView parameters)
+        => throw new NotImplementedException("TODO: Ex064 - count sets and changes, then call base");
+}
