@@ -46,19 +46,44 @@ Run every command **from inside `MicroServices/`**, not the repo root.
 | `aspire run --apphost playground -- --exercise ex001` | run that exercise's model in the real Aspire dashboard |
 | `dotnet run --project playground -- --exercise ex001` | same, without the Aspire CLI |
 
-The last two combine with `-p:UseSolutions=true` and `-p:Containers=true` freely.
+`-p:UseSolutions=true` and `-p:Containers=true` apply to the **`dotnet test` rows
+only**. Neither reaches the playground, and neither is accepted by `aspire run`:
+
+- `playground/Playground.AppHost.csproj` references `exercises/` **unconditionally** —
+  its own comment says so. The playground exists so the learner watches *their own*
+  work run, so `UseSolutions` is not wired up there at all. To see a reference solution
+  in the dashboard, read it and type it into the stub (or edit that `ProjectReference`
+  by hand, and put it back).
+- `Containers` reaches only the **test** project, through a
+  `RuntimeHostConfigurationOption` in `tests/…csproj` — i.e. through the test
+  assembly's `runtimeconfig.json`. The playground starts whatever containers its model
+  declares regardless; there is nothing to gate.
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (scaffolding only, no exercises seeded yet):
+**Current measured state** (2026-09-05; `catalog.md` at 5 ✅ / 95 ⬜, so the five
+delivered exercises contribute 12 red facts):
 
 ```
-dotnet test                    →  4 passed, 1 skipped
-dotnet test -p:Containers=true →  5 passed, 0 skipped
+dotnet test                      →  12 failed, 7 passed, 1 skipped (20 total)
+dotnet test -p:UseSolutions=true →   0 failed, 19 passed, 1 skipped (20 total)
+dotnet test -p:Containers=true   →  12 failed, 8 passed, 0 skipped (20 total)
 ```
 
-The skipped one is the harness's own container-gate fact. It is the canary: if it ever
-*passes* under the default run, the gate has stopped gating.
+**A correct default run is red, and that is not a broken checkout.** Twelve failures is
+exactly what an untouched tree gives: one `NotImplementedException` per unimplemented
+`Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
+the harness's own facts, which pass in *both* modes because they grade the harness
+rather than an exercise. Update these numbers whenever a batch lands.
+
+The skipped one is the harness's container-gate fact, and it is only **half** the
+canary. It fails if `ContainerGate.Require()` ever stops skipping with containers off —
+the mutant that would start real containers in the default run. The opposite and more
+dangerous mutant, a `Require()` that *always* skips, would silently disable all 25 🐳
+rows while every run still reported green; that one is caught by
+`ContainerGate_Require_lets_the_test_through_when_containers_are_on`, which forces the
+switch on for its own async flow only and **fails** (never skips) if the gate stays
+closed. Both mutants were built and observed, not reasoned about. Keep both facts.
 
 ### `-p:Containers=true`, and the no-rebuild alternative
 
@@ -96,7 +121,13 @@ graph is still an unresolved expression like `{pg.bindings.tcp.host}`.
 tag, the full `env` map including `ConnectionStrings__*`, `bindings` with `targetPort`,
 and for generated secrets the `inputs.value.default.generate` policy. It is
 deterministic, so it is a good assertion target for publish-shaped rows.
-`ManifestHarness` is the entry point.
+`ManifestHarness` is the entry point, with **two** of them:
+`GenerateAsync(configure)` returns just the parsed manifest and deletes its output
+directory before returning, while `PublishAsync(configure)` returns a disposable
+`PublishOutput` that keeps the whole directory alive — `Files`, `ReadText(relative)`,
+`BicepFiles`, `Has(relative)` and `Manifest`. Always `using` the latter; `Dispose`
+deletes the directory, and every output lives under one temp root that is swept of
+anything older than an hour on first use, so a forgotten `using` still cannot pile up.
 
 **The manifest is not the only in-process artifact — Bicep comes out too.** Measured: an
 in-process publish of a model carrying `AddAzureContainerAppEnvironment` plus
@@ -110,7 +141,12 @@ aca/aca.bicep         aca-acr/aca-acr.bicep     storage/storage.bicep
 
 So the Azure rows (093 managed identity and role assignments, 094 Bicep customisation,
 099 secrets across environments, 100 the capstone) assert on **real generated Bicep**,
-in the fast loop, with no subscription and no golden-file fallback.
+in the fast loop, with no subscription and no golden-file fallback. They reach it
+through `ManifestHarness.PublishAsync(...)`; `GenerateAsync` alone cannot, because it
+deletes the output directory before it returns. `HarnessMechanicsTests
+.ManifestHarness_hands_back_the_generated_Bicep_too` is the proof, and it is why
+`Aspire.Hosting.Azure.AppContainers` and `Aspire.Hosting.Azure.Storage` are already
+referenced by both content libraries.
 
 **What L2 cannot prove.** Docker Compose YAML — and that is the *single* exception, not
 a general limitation of in-process publish. See §6.
@@ -146,6 +182,70 @@ an exercise by name via `ExerciseRegistry`, instead of 100 executable AppHost pr
 their siblings) shared by rows that need a genuine HTTP service to reference. They are
 not exercises, get no catalog rows, and change rarely. `tests/_support/` is the same
 kind of thing on the test side: shared fixtures, never a TODO, never a catalog row.
+
+### Project resources: what rows 011 and 056+ must call — measured
+
+`exercises/` is a plain `Microsoft.NET.Sdk` class library, **not** an
+`Aspire.AppHost.Sdk` project, so the generated `Projects.Catalog` / `Projects.Orders`
+marker classes every Aspire tutorial passes to `AddProject<T>()` **do not exist here**
+and never will. That does *not* block project resources. Measured on 2026-09-05 with a
+throwaway probe compiled into `exercises/` and driven through `ModelHarness`, in both
+the red and the green run:
+
+- **What to call.** The non-generic overload
+  `builder.AddProject(string name, string projectPath)` (`Aspire.Hosting`, in
+  `Aspire.Hosting` package — already referenced). It works unchanged from the exercises
+  library. `AddProject<TProject>()` does not compile here; do not try to make it.
+- **How to express the path.** `projectPath` resolves against
+  `builder.AppHostDirectory` — and under the harnesses that is **the test assembly's
+  own output directory**, not the repo root and not `playground/`. Measured:
+  `…/MicroServices/tests/bin/Debug/net10.0` in the red run,
+  `…/MicroServices/artifacts-solutions/bin/FeWoLearning.MicroServices.Tests/debug`
+  in the green run, and `…\MicroServices\playground` when the same `Configure` runs in
+  the playground. So **never hardcode a relative literal**: `..\..\..\..\services\…`
+  happens to work in both test modes today only because both output directories are
+  coincidentally four levels deep, and it is wrong in the playground. Walk up to the
+  track root instead, from a directory the builder hands you:
+
+  ```csharp
+  static string TrackRoot(IDistributedApplicationBuilder builder)
+  {
+      var d = new DirectoryInfo(builder.AppHostDirectory);
+      while (d is not null && !File.Exists(Path.Combine(d.FullName, "FeWoLearning.MicroServices.slnx")))
+          d = d.Parent;
+      return d?.FullName ?? throw new InvalidOperationException("not inside MicroServices/");
+  }
+
+  builder.AddProject("catalog",
+      Path.Combine(TrackRoot(builder), "services", "Catalog", "Catalog.csproj"));
+  ```
+
+  Forward and backward slashes both work. A path that does not resolve throws
+  `DistributedApplicationException: The project file "<fully resolved path>" was not
+  found` **from `AddProject` itself**, i.e. inside `Configure`, naming the absolute path
+  it tried — a loud failure, not a silent one.
+- **What you get.** `Aspire.Hosting.ApplicationModel.ProjectResource`, which is both
+  `IResourceWithEndpoints` and `IResourceWithServiceDiscovery`. Its annotations at
+  `Build()` time are `ProjectMetadata` (the `IProjectMetadata`, whose `ProjectPath` is
+  the **fully resolved absolute path** — that is the thing row 011 should assert),
+  `ProjectLaunchDefaultsAnnotation`, `SupportsDebuggingAnnotation`,
+  `OtlpExporterAnnotation`, `EnvironmentAnnotation`, four `EnvironmentCallbackAnnotation`s,
+  `ContainerBuildOptionsCallbackAnnotation`, `PipelineStepAnnotation`,
+  `PipelineConfigurationAnnotation`, and the three certificate-trust ones.
+- **The trap for row 011.** There is **no `EndpointAnnotation`** on that resource:
+  `services/Catalog` and `services/Orders` ship no `launchSettings.json`, and the model
+  is built without applying a launch profile, so "the launch profile that supplies its
+  endpoints" is *not* observable as the catalog row currently words it. Either add a
+  `launchSettings.json` to the service in the same commit, or call `WithHttpEndpoint`
+  explicitly and grade that — but do not write a test that expects endpoints to appear
+  on their own.
+- **The alternative, if a future harness wants repo-relative literals.**
+  `DistributedApplicationOptions.ProjectDirectory` exists and, when set, *does* become
+  `builder.AppHostDirectory` (measured: setting it to the track root makes
+  `services/Catalog/Catalog.csproj` resolve). It was deliberately **not** adopted,
+  because it would only fix the two harnesses and leave the playground — where
+  `AppHostDirectory` is `MicroServices/playground` — disagreeing with them. The walk-up
+  above is the one form correct in all three hosts.
 
 ### `solutions/` is in the build here — deliberately
 
@@ -225,11 +325,18 @@ Each of these cost real time. None is a guess.
 | Package | Version | Where |
 |---|---|---|
 | `Aspire.Hosting` + all `Aspire.Hosting.*` integrations | 13.5.3 | `exercises/` + `solutions/` |
-| `Aspire.Hosting.Elasticsearch` | **13.3.0** | `exercises/` + `solutions/` |
+| `Aspire.Hosting.Elasticsearch` | **13.3.0** | `exercises/` + `solutions/`, *when row 051 lands* |
 | `Aspire.Hosting.Testing` | 13.5.3 | `tests/` |
 | `xunit.v3` | 3.2.2 | `tests/` |
 | `xunit.runner.visualstudio` | 3.1.5 | `tests/` |
 | `Microsoft.NET.Test.Sdk` | 17.14.1 | `tests/` |
+
+This table is the **pinning policy**, not an inventory: a package is added to the two
+content libraries when the first row needing it is written. Referenced today:
+`Aspire.Hosting`, `.PostgreSQL`, `.SqlServer`, `.MongoDB`, `.Redis`,
+`.Azure.AppContainers` and `.Azure.Storage` — the last two because the harness's Bicep
+fact needs them and the Azure rows will. Whatever is added next goes into **both**
+`.csproj` files identically, at 13.5.3, or the two libraries stop being interchangeable.
 
 ### The Elasticsearch version lag is deliberate
 
@@ -273,18 +380,37 @@ a summary of it:
 - `docker ps` inside works as the non-root `vscode` user **without `sudo`**, and lists the
   host's own pre-existing containers — so the container's Docker client genuinely reaches
   the **host** daemon rather than a nested one;
-- `dotnet test` inside gives **4 passed / 1 skipped**, matching the host exactly.
+- `dotnet test` inside gives **4 passed / 1 skipped**, matching the host exactly. That
+  measurement predates the first exercises; the host now gives 12 failed / 7 passed /
+  1 skipped (§3), and the DevContainer has not been re-measured since.
 
-**What remains unproven.** Spec §7 set the bar at *Aspire starting a sibling database
-container from inside the DevContainer*, and that was never exercised: the track had no
-🐳 exercises to run at the time, and `dotnet test` at 4 passed / 1 skipped is precisely
-the run that starts **no** containers. `docker ps` proves the socket and the client;
-it does not prove Aspire's container lifecycle, port handling or health-check waiting
-through that socket. So the honest claim is **"the DevContainer builds, reaches the host
-daemon, and runs the default test suite"** — not "verified end-to-end". Whoever lands
-the first 🐳 exercise (row 034 is the earliest) should run
+**What remains unproven, and the specific way it is likely to break.** Spec §7 set the
+bar at *Aspire starting a sibling database container from inside the DevContainer*, and
+that was never exercised: the track had no 🐳 exercises to run at the time, and the
+default `dotnet test` is precisely the run that starts **no** containers.
+
+`docker ps` succeeding proves the socket and the client. It proves **nothing** about the
+part that is actually at risk, which is this: the host's socket is bind-mounted and the
+devcontainer runs on the default bridge network, with **no host networking**. So every
+container Aspire starts is a *sibling* of the devcontainer, created by the **host**
+daemon, and its published ports land on the **host's** `localhost` — not on the
+devcontainer's. The AppHost, running *inside* the devcontainer, then dials
+`localhost:<port>` and finds nothing there. That is the classic
+docker-outside-of-docker breakage, and it hits exactly what Aspire does next: the
+health-check wait, `WaitFor`, and every connection string handed to a service. It
+would also affect any bind-mounted path an exercise passes to a sibling container,
+since those paths are resolved by the host daemon against the **host** filesystem, not
+against the devcontainer's.
+
+None of that is a reason to expect failure — Docker's `host.docker.internal`, joining
+the containers to the devcontainer's own network, or `--network host` are all plausible
+fixes, and Aspire may already do the right thing. It is a reason not to claim success
+before someone runs it. The honest claim today is **"the DevContainer builds, reaches
+the host daemon, and runs the default test suite"** — not "verified end-to-end".
+Whoever lands the first 🐳 exercise (row 034 is the earliest) should run
 `dotnet test -p:Containers=true --filter …Ex034_` inside the container and, if it passes,
-upgrade this section to the §7 bar.
+upgrade this section to the §7 bar — and if it fails on `localhost`, record which of the
+fixes above worked, because every later 🐳 row inherits it.
 
 ### It does not use the `docker-outside-of-docker` or `node` features
 

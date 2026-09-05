@@ -60,7 +60,7 @@ tests there — do not add `solutions/` to a project/module.
 | `uno/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `caliburn/`| — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `wpf/`    | — (restore on first `dotnet test`)      | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
-| `MicroServices/`| — (restore on first `dotnet test`)| `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001` |
+| `MicroServices/`| — (restore on first `dotnet test`)| `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 
 Run every command **from inside the track folder**, not the repo root.
 
@@ -127,9 +127,9 @@ exercise in the Aspire dashboard.
   .NET 10.0.400**, **Docker 29.7.2**, **devcontainer CLI 0.89.0**, and
   **xunit.v3 3.2.2** (`xunit.runner.visualstudio` 3.1.5,
   `Microsoft.NET.Test.Sdk` 17.14.1) pinned on the classic VSTest path:
-  `dotnet test` gives 12 exercise facts red, 4 harness facts passed, 1 skipped
-  (17 total); `dotnet test -p:UseSolutions=true` gives 16 passed, 1 skipped,
-  0 failed. `Aspire.Hosting.Elasticsearch` is deliberately pinned at 13.3.0 —
+  `dotnet test` gives 12 exercise facts red, 7 harness facts passed, 1 skipped
+  (20 total); `dotnet test -p:UseSolutions=true` gives 19 passed, 1 skipped,
+  0 failed; `dotnet test -p:Containers=true` gives 12 red, 8 passed, 0 skipped. `Aspire.Hosting.Elasticsearch` is deliberately pinned at 13.3.0 —
   its own latest stable — while every other Aspire package on the track is
   13.5.3. This also surfaced a problem elsewhere in the repo: `wpf/` sits on
   xunit.v3 4.0.0 plus a `Microsoft.Testing.Platform` `global.json`, and on
@@ -477,9 +477,18 @@ exercise in the Aspire dashboard.
   62D54FD4003F6525` during apt signature verification (corporate TLS
   interception without the root CA inside the build). It bind-mounts the
   host Docker socket and installs version-pinned static `docker` and `node`
-  binaries over plain HTTPS instead. Verified: builds in ~85 s, `docker ps`
+  binaries over plain HTTPS instead. Measured: builds in ~85 s, `docker ps`
   works inside as the non-root `vscode` user, and `dotnet test` inside
-  matches the host.
+  matched the host at the time (4 passed / 1 skipped, before any exercise
+  landed). It is **not verified end-to-end**, and `MicroServices/README.md`
+  §8 is the authority on why: the bar was Aspire starting a sibling database
+  container from inside the devcontainer, and that has never been run. The
+  named risk is that the socket is bind-mounted with **no host networking**,
+  so containers Aspire starts are siblings created by the host daemon and
+  publish their ports on the *host's* `localhost`, not the devcontainer's —
+  the classic docker-outside-of-docker breakage, which `docker ps`
+  succeeding proves nothing about. Whoever lands the first 🐳 row (034) runs
+  it inside the container and records the result.
 
 ## Adding or completing exercises
 

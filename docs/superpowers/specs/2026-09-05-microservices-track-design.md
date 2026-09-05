@@ -114,7 +114,8 @@ It is unusable inside a test loop.
 
 **The in-process entry point, measured.** Constructing the builder with publish
 arguments and awaiting `RunAsync` returns cleanly in **≈3.7 s** and writes
-`aspire-manifest.json`:
+`aspire-manifest.json` — and, for a model carrying Azure resources, the generated
+Bicep alongside it (see the correction below):
 
 ```csharp
 var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
@@ -135,8 +136,25 @@ The manifest is a rich, deterministic assertion target — per resource it carri
 `type` (`container.v0`, `value.v0`, `parameter.v0`), `image` with the pinned tag,
 the full `env` map including `ConnectionStrings__*` and the per-flavour
 `*_URI` / `*_JDBCCONNECTIONSTRING` forms, `bindings` with `targetPort`, and for
-generated secrets the `inputs.value.default.generate` policy. **This is what L2
-asserts against.**
+generated secrets the `inputs.value.default.generate` policy. **This is one of the two
+things L2 asserts against.**
+
+**Correction, measured after this spec was first written: the manifest is NOT the only
+in-process artifact.** An in-process publish of a model carrying
+`AddAzureContainerAppEnvironment` plus `AddAzureStorage` writes, in **≈7.5 s**, real
+Bicep as well:
+
+```
+aspire-manifest.json
+aca.module.bicep      aca-acr.module.bicep      storage.module.bicep
+aca/aca.bicep         aca-acr/aca-acr.bicep     storage/storage.bicep
+```
+
+So the Azure rows (093, 094, 099, 100) assert against **real generated Bicep** in the
+fast loop, with no subscription and no golden-file fallback. Docker Compose YAML,
+below, is the *single* exception — not the general case. `ManifestHarness.PublishAsync`
+is the entry point that exposes these files; `ManifestHarness.GenerateAsync` returns
+only the parsed manifest and deletes the output directory before returning.
 
 What is *not* available in-process is the Docker Compose YAML: every argument
 combination tried (`--publisher default`, `--publisher compose`, no publisher,
@@ -305,7 +323,7 @@ grade is the code the dashboard runs.
 | Level | What it asserts | Cost | How it runs |
 |---|---|---|---|
 | **L1 model** | resource graph, types, `ConnectionStringExpression`, annotations | ~1.4 s | always |
-| **L2 artifact** | `aspire-manifest.json` generated in-process (§2.3) | ~3.7 s, no container | always |
+| **L2 artifact** | `aspire-manifest.json` **and the generated Bicep**, both in-process (§2.3) | ~3.7 s, ~7.5 s with Azure resources; no container | always |
 | **L3 container** | a real database starts and a real query runs | minutes | opt-in only |
 
 L1 and L2 are the daily loop and cover the large majority of rows. L3 hangs on a

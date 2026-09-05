@@ -7,7 +7,9 @@
 # ---- Aspire (MicroServices/playground) ----
 # Machine-local CLI settings `dotnet run`/`aspire run` writes next to the AppHost
 # on first use; not source, and got committed by accident once already.
-aspire.config.json
+# Anchored: unanchored, this pattern would ignore a file of that name anywhere in
+# the repo, which is wider than the comment above claims.
+/MicroServices/playground/aspire.config.json
 
 # ---- Python ----
 __pycache__/
