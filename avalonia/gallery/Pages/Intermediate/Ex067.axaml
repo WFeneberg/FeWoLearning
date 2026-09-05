@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="using:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Gallery.Pages.Intermediate.Ex067">
+  <StackPanel Spacing="12">
+    <TextBlock Text="Exercise 067 — MarkupExtensionBasics" FontSize="18" FontWeight="Bold" />
+    <i:Ex067_MarkupExtensionBasics />
+  </StackPanel>
+</UserControl>

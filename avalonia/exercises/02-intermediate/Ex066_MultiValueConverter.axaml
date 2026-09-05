@@ -1,0 +1,50 @@
+<!-- Exercise 066 - MultiValueConverter (intermediate).
+     Goal:   Compose ONE piece of text out of THREE view-model properties through a
+     single IMultiValueConverter, driven by a MultiBinding. Every earlier converter
+     row in this track took one value; this one takes a list, and the binding has
+     to stay live on all three sources at once.
+     Drills: IMultiValueConverter, MultiBinding, a converter as a XAML resource,
+     positional access to the values list.
+     Passes: dotnet test, filtered to Ex066_ (see
+     Ex066_MultiValueConverter.axaml.cs for the exact command, because an XML
+     comment may not hold two hyphens in a row). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex066_MultiValueConverter"
+             x:DataType="i:Ex066_MultiValueConverterViewModel">
+  <!-- TODO: two halves, and the test grades them separately.
+
+       First implement Convert in Ex066_FullNameConverter (code-behind).
+
+       Then register it and wire the MultiBinding here. Replace the placeholder
+       with:
+
+         <UserControl.Resources>
+           <i:Ex066_FullNameConverter x:Key="FullName" />
+         </UserControl.Resources>
+
+         <StackPanel>
+           <TextBlock Name="FullName">
+             <TextBlock.Text>
+               <MultiBinding Converter="{StaticResource FullName}">
+                 <Binding Path="First" />
+                 <Binding Path="Last" />
+                 <Binding Path="IsFellow" />
+               </MultiBinding>
+             </TextBlock.Text>
+           </TextBlock>
+         </StackPanel>
+
+       Note that Text is set through a property ELEMENT here, not an attribute:
+       a MultiBinding holds child Bindings, so it cannot be written in the
+       curly-brace form the other binding exercises use.
+
+       A hard-coded string reproduces the resting text exactly, so the test
+       changes each of the three properties in turn and asserts the text
+       followed every time - which also catches a MultiBinding that lists only
+       two of the three sources. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

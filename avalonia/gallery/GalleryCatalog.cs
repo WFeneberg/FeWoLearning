@@ -7,7 +7,8 @@ public static class GalleryCatalog
 {
     /// <summary>
     /// One entry per exercise whose result is visual. View-model-only exercises
-    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062) deliberately have no page -
+    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex070) deliberately
+    /// have no page -
     /// ex050's ViewModelViewHost and ex052/ex053's RoutedViewHost both only
     /// resolve their content on attach-to-visual-tree (via IViewLocator.ResolveView,
     /// called lazily), so a page merely constructed (never shown) by the gallery
@@ -25,7 +26,9 @@ public static class GalleryCatalog
     /// pattern above, just for a TemplatedControl instead of a view-model host.
     /// ex062 (AttachedPropertyAuthoring) has no page because it has no view at
     /// all: its graded surface is an attached property plus its change handler,
-    /// which decorate controls the exercise does not own.
+    /// which decorate controls the exercise does not own. ex068 (async loading),
+    /// ex069 (dispatcher priorities) and ex070 (collection diffing) are likewise
+    /// pure logic with no view of their own.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [
@@ -73,5 +76,7 @@ public static class GalleryCatalog
         new("063", "StyleSetterAndTransition", () => new Ex063()),
         new("064", "KeyFrameAnimation", () => new Ex064()),
         new("065", "RenderTransformAnimation", () => new Ex065()),
+        new("066", "MultiValueConverter", () => new Ex066()),
+        new("067", "MarkupExtensionBasics", () => new Ex067()),
     ];
 }

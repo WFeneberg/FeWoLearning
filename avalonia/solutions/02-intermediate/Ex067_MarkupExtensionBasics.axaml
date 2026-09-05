@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex067_MarkupExtensionBasics">
+  <StackPanel>
+    <TextBlock Name="Mvvm" Text="{i:Ex067_Abbreviation Key=mvvm}" />
+    <TextBlock Name="Oaph" Text="{i:Ex067_Abbreviation Key=oaph}" />
+  </StackPanel>
+</UserControl>

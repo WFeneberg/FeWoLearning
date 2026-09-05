@@ -124,6 +124,15 @@ back to match the rest of the repo.
   templates and drives the full pass; a headless window's client area equals
   its requested `Width`/`Height` exactly, so geometry assertions are
   deterministic.
+- **A `MultiBinding` converter is called while its bindings are still
+  settling, and the first call carries nothing.** Measured on ex066's own view,
+  a three-source `MultiBinding` invoked its `IMultiValueConverter` four times as
+  the view loaded: `[UnsetValue, UnsetValue, UnsetValue]`, then the values
+  filling in left to right. So any `Convert` written for this track must tolerate
+  `AvaloniaProperty.UnsetValue` and wrong types instead of indexing and casting
+  blindly — otherwise it throws before the view has finished loading. Do not
+  assert a converter's call *count* either; it is an implementation detail of
+  how the bindings settle.
 - **Drain the dispatcher before asserting on scheduled work.** Anything
   posted through the main-thread scheduler has not run yet when the
   assertion executes — call `Dispatcher.UIThread.RunJobs()` first, or the

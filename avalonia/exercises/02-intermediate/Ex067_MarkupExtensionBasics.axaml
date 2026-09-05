@@ -1,0 +1,38 @@
+<!-- Exercise 067 - MarkupExtensionBasics (intermediate).
+     Goal:   Write your own markup extension and use it twice in one view. An
+     extension runs at PARSE time and returns the value the property gets, which
+     is a different kind of indirection from a binding or a converter.
+     Drills: a custom markup extension, ProvideValue, extension properties as
+     named arguments in curly-brace syntax.
+     Passes: dotnet test, filtered to Ex067_ (see
+     Ex067_MarkupExtensionBasics.axaml.cs for the exact command, because an XML
+     comment may not hold two hyphens in a row).
+
+     A markup extension in Avalonia needs NO base class and NO interface. Any
+     public class with a public ProvideValue method qualifies; XamlX finds it by
+     shape. Measured, so do not go looking for MarkupExtension to inherit from. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex067_MarkupExtensionBasics">
+  <!-- TODO: two halves, graded separately.
+
+       First implement ProvideValue in Ex067_Abbreviation (code-behind): it looks
+       its Key up in the given Ex067_Glossary.
+
+       Then use it twice here. Replace the placeholder with:
+
+         <StackPanel>
+           <TextBlock Name="Mvvm" Text="{i:Ex067_Abbreviation Key=mvvm}" />
+           <TextBlock Name="Oaph" Text="{i:Ex067_Abbreviation Key=oaph}" />
+         </StackPanel>
+
+       Why two usages with different arguments: one alone could be matched by a
+       literal. And because the extension reads the glossary at parse time, the
+       test can rewrite the glossary and build a SECOND view - whose text then
+       differs from the first's. No literal can follow that, which is what makes
+       this exercise gradeable at all. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

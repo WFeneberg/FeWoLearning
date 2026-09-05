@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 65 ✅ / 35 ⬜**
+**Status: 70 ✅ / 30 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -98,11 +98,11 @@ not a valid C# identifier.
 | 063 | StyleSetterAndTransition | `Transitions` on a styled property | ✅ |
 | 064 | KeyFrameAnimation | `Animation` with `KeyFrame`s | ✅ |
 | 065 | RenderTransformAnimation | animating a `RenderTransform` | ✅ |
-| 066 | MultiValueConverter | `IMultiValueConverter` over several bindings | ⬜ |
-| 067 | MarkupExtensionBasics | a custom `MarkupExtension` | ⬜ |
-| 068 | AsyncImageLoading | async load with placeholder and cancellation | ⬜ |
-| 069 | DispatcherPriority | posting work at differing priorities | ⬜ |
-| 070 | ObservableCollectionSync | diffing a source list into a bound collection | ⬜ |
+| 066 | MultiValueConverter | `IMultiValueConverter` over several bindings | ✅ |
+| 067 | MarkupExtensionBasics | a custom `MarkupExtension` | ✅ |
+| 068 | AsyncImageLoading | async load with placeholder and cancellation | ✅ |
+| 069 | DispatcherPriority | posting work at differing priorities | ✅ |
+| 070 | ObservableCollectionSync | diffing a source list into a bound collection | ✅ |
 
 ## Advanced (071–090) — custom controls, rendering, input, collections
 

@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex066_MultiValueConverter"
+             x:DataType="i:Ex066_MultiValueConverterViewModel">
+  <UserControl.Resources>
+    <i:Ex066_FullNameConverter x:Key="FullName" />
+  </UserControl.Resources>
+
+  <StackPanel>
+    <TextBlock Name="FullName">
+      <TextBlock.Text>
+        <MultiBinding Converter="{StaticResource FullName}">
+          <Binding Path="First" />
+          <Binding Path="Last" />
+          <Binding Path="IsFellow" />
+        </MultiBinding>
+      </TextBlock.Text>
+    </TextBlock>
+  </StackPanel>
+</UserControl>

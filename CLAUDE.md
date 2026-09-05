@@ -298,6 +298,18 @@ the same `global.json` opt-in.
   `LocalValue`; and `RenderTransformOrigin="0.5,0.5"` parses as **absolute** half
   a pixel, not the centre — `"50%,50%"` is `RelativePoint.Center`. The full
   register is in `avalonia/README.md`.
+
+  Its `01-beginner` (ex001-ex035) and `02-intermediate` (ex036-ex070) tiers are
+  both complete as of 2026-09-05, verified by a full-suite run in both modes:
+  246 test facts, 239 red / 7 green on the untouched tree (the 7 green are the
+  harness and gallery smoke tests, which pass in both modes) and 246 / 0 under
+  `-p:UseSolutions=true`. One more measured trap from that tier, because it will
+  bite any converter row: a `MultiBinding` calls its `IMultiValueConverter` once
+  per binding *as each one settles*, and the first call carries nothing at all —
+  measured `[UnsetValue, UnsetValue, UnsetValue]`, then the values filling in
+  left to right. A `Convert` that indexes and casts blindly therefore throws
+  before the view has finished loading, and a converter's call count must never
+  be asserted.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -608,7 +620,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 65 / 100 (verified) | 35 |
+| `avalonia/`| 70 / 100 (verified) | 30 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 35 / 100 (verified) | 65 |
