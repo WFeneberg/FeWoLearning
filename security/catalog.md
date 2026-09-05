@@ -16,7 +16,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs` (or `.razor` for block 02),
 their xUnit tests in `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference
 implementations in `solutions/<block>/` at the same relative path.
 
-**Status: 15 ✅ / 45 ⬜**
+**Status: 20 ✅ / 40 ⬜**
 
 ## web-aspnet (001–024) — the server-side attack surface
 
@@ -37,11 +37,11 @@ implementations in `solutions/<block>/` at the same relative path.
 | 013 | AuthenticationHandler | AuthenticationHandler, ClaimsPrincipal construction, scheme selection | ✅ |
 | 014 | AuthorizationPolicies | policy-based authorization, requirements, handler registration | ✅ |
 | 015 | ResourceBasedAuthorization | IAuthorizationService on a resource instance, ownership checks | ✅ |
-| 016 | InsecureDirectObjectReference | ownership enforcement, opaque identifiers, enumeration | ⬜ |
-| 017 | JwtValidation | issuer, audience, lifetime and signature validation, alg confusion | ⬜ |
-| 018 | RefreshTokenRotation | single-use refresh tokens, reuse detection, family revocation | ⬜ |
-| 019 | RateLimiting | rate limiter partitions, 429 responses, per-principal keys | ⬜ |
-| 020 | JsonDepthAndUnknownMembers | MaxDepth, unmapped member handling, deserialisation resource limits | ⬜ |
+| 016 | InsecureDirectObjectReference | ownership enforcement, opaque identifiers, enumeration | ✅ |
+| 017 | JwtValidation | issuer, audience, lifetime and signature validation, alg confusion | ✅ |
+| 018 | RefreshTokenRotation | single-use refresh tokens, reuse detection, family revocation | ✅ |
+| 019 | RateLimiting | rate limiter partitions, 429 responses, per-principal keys | ✅ |
+| 020 | JsonDepthAndUnknownMembers | MaxDepth, unmapped member handling, deserialisation resource limits | ✅ |
 | 021 | SsrfOutboundGuard | outbound URL validation, scheme allowlists, private address ranges | ⬜ |
 | 022 | OpenRedirectGuard | local-redirect checks, absolute URL rejection, return-URL allowlists | ⬜ |
 | 023 | FileUploadValidation | content sniffing, extension allowlists, size limits, safe storage names | ⬜ |

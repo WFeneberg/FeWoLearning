@@ -44,7 +44,8 @@ Everything below was measured by running it, not read from documentation.
   machine already holds `postgres:18.3/17/16`, `redis:8.6/7`,
   `testcontainers/ryuk` and `dcptun_developer_ms` — Aspire and Testcontainers
   have both run here before.
-- Azure CLI: **not installed**. The `devcontainer` CLI: **not installed**.
+- Azure CLI: **not installed** — and deliberately not required, see section 6.6.
+  The `devcontainer` CLI: **0.89.0**, installed for this track (npm 11.19.0).
   VS Code is installed.
 - All required hosting integrations exist at 13.5.3: `SqlServer`,
   `PostgreSQL`, `MongoDB`, `Redis`, `Valkey`, `Garnet`, `Qdrant`, `Milvus`,
@@ -355,11 +356,13 @@ devcontainer image, adding:
 It works under Rider as well as VS Code — JetBrains IDEs read
 `devcontainer.json`.
 
-**Verification gap, stated plainly:** the `devcontainer` CLI is not installed on
-this machine. The file can be written and its schema validated, but "it really
-builds and Aspire really starts a container inside it" cannot be proven without
-`npm i -g @devcontainers/cli`. The agreed resolution is to **install that CLI
-and verify for real**. If that install fails, the DevContainer ships marked
+**Verification:** the `devcontainer` CLI was missing when this design was
+drafted; it has since been installed — **0.89.0**, via
+`npm i -g @devcontainers/cli`, on npm 11.19.0 — and is on `PATH`. The
+DevContainer is therefore **verified for real**, not shipped on faith:
+`devcontainer up` must build the container, and Aspire must start a sibling
+database container from inside it, before the track claims DevContainer
+support. If that ever stops being provable, the DevContainer ships marked
 *unverified* in both `README.md` and `CLAUDE.md`, the way `java/` and `kotlin/`
 are — never silently presented as working.
 
