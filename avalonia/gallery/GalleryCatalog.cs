@@ -15,6 +15,14 @@ public static class GalleryCatalog
     /// ex052 and ex053 are additionally not views at all - their graded surface is
     /// a locator/host-wiring factory, not a UserControl - so there is no
     /// Control-typed page to register in the first place.
+    /// ex060 (TemplatePartLookup) also has no page: its stub's constructor does
+    /// NOT throw (the given ControlTheme is assigned there unconditionally), and
+    /// OnApplyTemplate - where the TODO actually lives - only runs during a layout
+    /// pass triggered by Show/attach, not by plain construction. The gallery smoke
+    /// test only constructs each registered page, so a merely-constructed ex060
+    /// page would build successfully even against the untouched stub, silently
+    /// breaking the red/green invariant for it - exactly the ex050/ex052/ex053
+    /// pattern above, just for a TemplatedControl instead of a view-model host.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [
@@ -54,5 +62,9 @@ public static class GalleryCatalog
         new("049", "ViewForBinding", () => new Ex049()),
         new("054", "DataTemplateSelector", () => new Ex054()),
         new("055", "HierarchicalTemplate", () => new Ex055()),
+        new("056", "DataGridColumns", () => new Ex056()),
+        new("057", "ItemsRepeaterLayout", () => new Ex057()),
+        new("058", "SelectionModel", () => new Ex058()),
+        new("059", "TemplatedControlBasics", () => new Ex059()),
     ];
 }

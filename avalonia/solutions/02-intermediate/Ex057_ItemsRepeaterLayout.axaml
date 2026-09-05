@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex057_ItemsRepeaterLayout"
+             x:DataType="i:Ex057_ItemsRepeaterLayoutViewModel">
+  <ItemsRepeater Name="Repeater" ItemsSource="{Binding Items}">
+    <ItemsRepeater.Layout>
+      <UniformGridLayout MinItemWidth="80" MinItemHeight="20" />
+    </ItemsRepeater.Layout>
+    <ItemsRepeater.ItemTemplate>
+      <DataTemplate DataType="sys:String">
+        <Border Width="80" Height="20">
+          <TextBlock Text="{Binding}" />
+        </Border>
+      </DataTemplate>
+    </ItemsRepeater.ItemTemplate>
+  </ItemsRepeater>
+</UserControl>

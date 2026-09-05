@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="using:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Gallery.Pages.Intermediate.Ex057">
+  <StackPanel Spacing="12">
+    <TextBlock Text="Exercise 057 — ItemsRepeaterLayout" FontSize="18" FontWeight="Bold" />
+    <i:Ex057_ItemsRepeaterLayout Name="Subject" />
+  </StackPanel>
+</UserControl>

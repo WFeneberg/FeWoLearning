@@ -1,0 +1,39 @@
+<!-- Exercise 057 - ItemsRepeaterLayout (intermediate).
+     Goal:   Lay out a flat collection of strings through an ItemsRepeater whose
+     Layout is a UniformGridLayout, so items wrap into a real two-column grid
+     rather than a single flow.
+     Drills: ItemsRepeater, ItemsRepeater.Layout, UniformGridLayout,
+     FuncDataTemplate.
+     Passes: dotnet test, filtered to Ex057_ (see
+     Ex057_ItemsRepeaterLayout.axaml.cs for the exact command - an XML comment
+     cannot hold two hyphens in a row). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex057_ItemsRepeaterLayout"
+             x:DataType="i:Ex057_ItemsRepeaterLayoutViewModel">
+  <!-- TODO: ItemsRepeater is not in core Avalonia - it lives in the
+       Avalonia.Controls.ItemsRepeater package, already referenced for you.
+       Replace the placeholder with:
+         <ItemsRepeater Name="Repeater" ItemsSource="{Binding Items}">
+           <ItemsRepeater.Layout>
+             <UniformGridLayout MinItemWidth="80" MinItemHeight="20" />
+           </ItemsRepeater.Layout>
+           <ItemsRepeater.ItemTemplate>
+             <DataTemplate DataType="sys:String">
+               <Border Width="80" Height="20">
+                 <TextBlock Text="{Binding}" />
+               </Border>
+             </DataTemplate>
+           </ItemsRepeater.ItemTemplate>
+         </ItemsRepeater>
+       A WrapPanel of the same 80x20 items can reproduce identical rectangles -
+       the test looks Repeater up as a typed ItemsRepeater by name (which
+       throws outright against a differently-typed control of the same name)
+       and separately asserts Layout is a UniformGridLayout, neither of which
+       a WrapPanel can ever satisfy. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 55 ✅ / 45 ⬜**
+**Status: 60 ✅ / 40 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -86,13 +86,13 @@ not a valid C# identifier.
 | 051 | RoutingStateNavigation | `RoutingState` navigate and navigate-back | ✅ |
 | 052 | RoutedViewHostShell | a shell hosting a router | ✅ |
 | 053 | ViewLocatorConvention | learner-implemented convention-based `IViewLocator` (`...ViewModel` → `...View`) | ✅ |
-| 054 | DataTemplateSelector | choosing a template by item type | ✅ |
+| 054 | DataTemplateSelector | implicit type-keyed `DataTemplate`s (Avalonia has no `DataTemplateSelector` type) | ✅ |
 | 055 | HierarchicalTemplate | `TreeView` with `TreeDataTemplate` | ✅ |
-| 056 | DataGridColumns | `DataGrid` columns and sorting | ⬜ |
-| 057 | ItemsRepeaterLayout | `ItemsRepeater` with `UniformGridLayout` | ⬜ |
-| 058 | SelectionModel | `SelectionModel` multi-selection | ⬜ |
-| 059 | TemplatedControlBasics | `TemplatedControl` with a `ControlTheme` | ⬜ |
-| 060 | TemplatePartLookup | `OnApplyTemplate`, finding a named part | ⬜ |
+| 056 | DataGridColumns | `DataGrid` columns and sorting | ✅ |
+| 057 | ItemsRepeaterLayout | `ItemsRepeater` with `UniformGridLayout` | ✅ |
+| 058 | SelectionModel | `SelectionModel` multi-selection | ✅ |
+| 059 | TemplatedControlBasics | `TemplatedControl` with a `ControlTheme` | ✅ |
+| 060 | TemplatePartLookup | `OnApplyTemplate`, finding a named part | ✅ |
 | 061 | ControlTemplateBinding | `TemplateBinding` inside a control template | ⬜ |
 | 062 | AttachedPropertyAuthoring | registering your own attached property | ⬜ |
 | 063 | StyleSetterAndTransition | `Transitions` on a styled property | ⬜ |

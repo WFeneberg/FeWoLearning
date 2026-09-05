@@ -15,6 +15,11 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1" />
     <PackageReference Include="ReactiveUI.Avalonia" Version="12.1.1" />
+    <!-- Two documented exceptions to the 12.1.1 pin (design section 2.5): each
+         control's own release line lags Avalonia's. Both measured to compile and
+         render against 12.1.1 with no version-conflict warnings. -->
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="12.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseSolutions)' != 'true'">

@@ -1,0 +1,29 @@
+<!-- Exercise 058 - SelectionModel (intermediate).
+     Goal:   Drive a ListBox's multi-selection through an explicit
+     SelectionModel owned by the view model, rather than through the
+     ListBox's own SelectedItems collection.
+     Drills: SelectionModel<T>, ListBox.Selection, SingleSelect.
+     Passes: dotnet test, filtered to Ex058_ (see
+     Ex058_SelectionModel.axaml.cs for the exact command - an XML comment
+     cannot hold two hyphens in a row). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex058_SelectionModel"
+             x:DataType="i:Ex058_SelectionModelViewModel">
+  <!-- TODO: replace the placeholder with:
+         <ListBox Name="List" ItemsSource="{Binding Items}" Selection="{Binding Selection}" />
+       ListBox.Selection is a settable ISelectionModel property - binding it to
+       the view model's own SelectionModel<string> (already SingleSelect=false,
+       given below) makes the two the SAME object, so selecting through either
+       side is visible on both. Setting SelectionMode="Multiple" and reading
+       back through ListBox.SelectedItems, with no Selection binding at all,
+       can reproduce multi-selection in the UI - the test never looks at
+       SelectedItems. It drives selection through List.Selection and asserts
+       the RESULT through the view model's OWN Selection object; if the two
+       are never the same instance, the view model's model stays empty no
+       matter what the ListBox shows. -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

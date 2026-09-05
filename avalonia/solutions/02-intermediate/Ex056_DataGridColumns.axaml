@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="clr-namespace:FeWoLearning.Avalonia.Exercises.Intermediate"
+             x:Class="FeWoLearning.Avalonia.Exercises.Intermediate.Ex056_DataGridColumns"
+             x:DataType="i:Ex056_DataGridColumnsViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+  </UserControl.Styles>
+  <DataGrid Name="Grid" ItemsSource="{Binding Rows}" AutoGenerateColumns="False">
+    <DataGrid.Columns>
+      <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+      <DataGridTextColumn Header="Age" Binding="{Binding Age}" />
+    </DataGrid.Columns>
+  </DataGrid>
+</UserControl>
