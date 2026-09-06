@@ -57,7 +57,7 @@ as oversights:
   and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
   093/094/099/100 assert on the generated Bicep for real.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 ## Beginner (001–035) — Aspire model and first persistence
 
@@ -73,11 +73,11 @@ as oversights:
 | 008 | ContainerArgsAndEntrypoint | `WithArgs`, `WithEntrypoint`, `CommandLineArgsCallbackAnnotation`; argument **order** is part of the assertion, because a set-equality test grades nothing | ✅ |
 | 009 | VolumesAndBindMounts | `WithVolume` (named) vs `WithBindMount` (host path): `ContainerMountAnnotation.Type`, `Source`, `Target`, `IsReadOnly` — the two differ in type, not just in the source string | ✅ |
 | 010 | ContainerLifetime | `WithLifetime(ContainerLifetime.Persistent)` and `ContainerLifetimeAnnotation`; why a persistent container survives an AppHost restart and a session one does not | ✅ |
-| 011 | ProjectResources | `AddProject<Projects.X>`, `ProjectResource`, `IProjectMetadata.ProjectPath`, and the launch profile that supplies its endpoints | ⬜ |
-| 012 | ExecutableResources | `AddExecutable`, `ExecutableResource`, working directory and args; an executable carries **no** `ContainerImageAnnotation`, which is how a test tells the two apart | ⬜ |
-| 013 | ConnectionStringResources | `AddConnectionString` for a store Aspire does not host; `value.v0` in the manifest against a container's `container.v0` | ⬜ |
-| 014 | ParentAndChildResources | `IResourceWithParent`, a database resource's `Parent`, and why the child's expression interpolates `{parent.connectionString}` rather than repeating the host and port | ⬜ |
-| 015 | WaitForCompletion | `WaitForCompletion` on a one-shot migration/seed step vs `WaitFor` on a long-running server; assert `WaitAnnotation.WaitType`, since both produce a `WaitAnnotation` | ⬜ |
+| 011 | ProjectResources | `AddProject<Projects.X>`, `ProjectResource`, `IProjectMetadata.ProjectPath`, and the launch profile that supplies its endpoints | ✅ |
+| 012 | ExecutableResources | `AddExecutable`, `ExecutableResource`, working directory and args; an executable carries **no** `ContainerImageAnnotation`, which is how a test tells the two apart | ✅ |
+| 013 | ConnectionStringResources | `AddConnectionString` for a store Aspire does not host; `value.v0` in the manifest against a container's `container.v0` | ✅ |
+| 014 | ParentAndChildResources | `IResourceWithParent`, a database resource's `Parent`, and why the child's expression interpolates `{parent.connectionString}` rather than repeating the host and port | ✅ |
+| 015 | WaitForCompletion | `WaitForCompletion` on a one-shot migration/seed step vs `WaitFor` on a long-running server; assert `WaitAnnotation.WaitType`, since both produce a `WaitAnnotation` | ✅ |
 | 016 | CustomAnnotationsAndExtensions | write an `IResourceAnnotation` plus an `IResourceBuilder<T>` extension; `WithAnnotation`, `TryGetLastAnnotation`, and why annotations are a list not a dictionary | ⬜ |
 | 017 | DashboardUrls | `WithUrl`/`WithUrlForEndpoint`, `ResourceUrlAnnotation`; the display text and the endpoint it decorates are two different fields | ⬜ |
 | 018 | ReplicasAndEndpointAllocation | `WithReplicas`, `ReplicaAnnotation`, and what replicating does to endpoint allocation — a single fixed host port and replicas are contradictory | ⬜ |

@@ -61,18 +61,18 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-06; `catalog.md` at 10 ✅ / 90 ⬜, so the ten
-delivered exercises contribute 28 red facts):
+**Current measured state** (2026-09-06; `catalog.md` at 15 ✅ / 85 ⬜, so the fifteen
+delivered exercises contribute 44 red facts):
 
 ```
-dotnet test                      →  28 failed, 7 passed, 1 skipped (36 total)
-dotnet test -p:UseSolutions=true →   0 failed, 35 passed, 1 skipped (36 total)
+dotnet test                      →  44 failed, 7 passed, 1 skipped (52 total)
+dotnet test -p:UseSolutions=true →   0 failed, 51 passed, 1 skipped (52 total)
 ```
 
 `-p:Containers=true` unskips the harness's container-gate fact, which then passes; no
 🐳 exercise row exists yet, so it has not been re-measured since ex005.
 
-**A correct default run is red, and that is not a broken checkout.** Twenty-eight
+**A correct default run is red, and that is not a broken checkout.** Forty-four
 failures is exactly what an untouched tree gives: one `NotImplementedException` per
 unimplemented `Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
 the harness's own facts, which pass in *both* modes because they grade the harness
@@ -234,13 +234,33 @@ the red and the green run:
   `OtlpExporterAnnotation`, `EnvironmentAnnotation`, four `EnvironmentCallbackAnnotation`s,
   `ContainerBuildOptionsCallbackAnnotation`, `PipelineStepAnnotation`,
   `PipelineConfigurationAnnotation`, and the three certificate-trust ones.
-- **The trap for row 011.** There is **no `EndpointAnnotation`** on that resource:
-  `services/Catalog` and `services/Orders` ship no `launchSettings.json`, and the model
-  is built without applying a launch profile, so "the launch profile that supplies its
-  endpoints" is *not* observable as the catalog row currently words it. Either add a
-  `launchSettings.json` to the service in the same commit, or call `WithHttpEndpoint`
-  explicitly and grade that — but do not write a test that expects endpoints to appear
-  on their own.
+- **Endpoints, and how row 011 closed the gap it used to leave.** Until ex011 landed,
+  that list carried **no `EndpointAnnotation`** at all: `services/Catalog` and
+  `services/Orders` shipped no `launchSettings.json`, so "the launch profile that
+  supplies its endpoints" was not observable. Both services now have
+  `Properties/launchSettings.json` with the two profiles a `dotnet new webapi` project
+  gets, and the resulting endpoints were measured on 2026-09-06:
+
+  | call | annotations added |
+  |---|---|
+  | `AddProject("catalog", path)` | one `EndpointAnnotation`: `http`, scheme `http`, `Port` 5080, `TargetPort` null, `IsProxied` true |
+  | `AddProject("orders", path, launchProfileName: "https")` | a `LaunchProfileAnnotation` (`"https"`) **plus two** endpoints: `https`/7081 and `http`/5081 |
+  | `AddProject(…, launchProfileName: null)` | an `ExcludeLaunchProfileAnnotation` and **zero** endpoints |
+
+  Catalog is on 5080/7080 and Orders on 5081/7081. Only the **default** profile — the
+  first in the file, `http` — is applied when no name is passed; the `https` profile's
+  `applicationUrl` lists two URLs in one string and each becomes its own endpoint.
+  The measured trap for anyone grading this: `launchProfileName: null` plus a
+  hand-written `WithHttpEndpoint(port: 5080, name: "http")` produces an
+  `EndpointAnnotation` **identical in every observable field** to the profile's, so the
+  only trace of the difference is that `ExcludeLaunchProfileAnnotation`. ex011 asserts
+  its absence for exactly that reason.
+- **`AddProject` adds a second, hidden resource.** Measured: each project also brings a
+  `<name>-rebuilder` `ProjectRebuilderResource` (a subclass of `ExecutableResource`,
+  carrying `HiddenAnnotation`), so a model that declared two projects holds four
+  resources. Nobody asked for it, so it grades nothing — but `Assert.Single` over
+  `model.Resources.OfType<ExecutableResource>()` in a model that also has projects will
+  find it.
 - **The alternative, if a future harness wants repo-relative literals.**
   `DistributedApplicationOptions.ProjectDirectory` exists and, when set, *does* become
   `builder.AppHostDirectory` (measured: setting it to the track root makes
@@ -369,6 +389,44 @@ Each of these cost real time. None is a guess.
 - **Container lifetime does not reach the manifest.** Persistent, session and untouched
   containers publish identically — it is a local run-mode concept. ex010 is L1-only for
   that reason.
+- **Only one `AddConnectionString` overload publishes `value.v0`.** Measured while
+  writing ex013. `AddConnectionString(name, ReferenceExpression)` and
+  `AddConnectionString(name, builder => builder.Append($"…"))` return a public
+  `ConnectionStringResource` and publish as **`value.v0`** with the expression inline.
+  `AddConnectionString(name)` and `AddConnectionString(name, environmentVariableName)`
+  return an **internal** `ConnectionStringParameterResource` and publish as
+  **`parameter.v0`** — a different artifact shape for what reads like the same call.
+  The internal type is also unnameable from a test (`CS0122`), the same wall ex007 hit
+  with `EnvironmentAnnotation`, so `Assert.IsType<ConnectionStringResource>` is how the
+  wrong overload gets rejected.
+- **A database child does not always interpolate its parent's connection string.**
+  Measured across three flavours: `{pg.connectionString};Database=billing` and
+  `{sql.connectionString};Initial Catalog=inventory` both defer to the parent, because
+  the child's clause goes at the *end*. Mongo's does not — a database name is a path
+  segment in the middle of a URI, so `MongoDBDatabaseResource` re-renders
+  `mongodb://admin:{mongo-password.value}@{mongo.bindings.tcp.host}:{…port}/reviews?…`
+  in full. Parenting (`IResourceWithParent`) and connection-string composition are two
+  separate facts about a child, and ex014 grades both. The practical consequence for a
+  test: a mutant that replaces `AddDatabase` with
+  `AddConnectionString("billing", ReferenceExpression.Create($"{pg};Database=billing"))`
+  renders the **byte-identical** expression and is caught only by the `Parent`
+  assertion.
+- **`WaitAnnotation` carries `WaitType` *and* `ExitCode`, and `WaitFor` on a child emits
+  two of them.** Measured: `WaitFor(orders)` where `orders` is a database on `pg` leaves
+  a `WaitAnnotation` for **`pg`** as well as one for `orders`, both
+  `WaitUntilHealthy` — so any wait assertion has to filter by resource name or it
+  either fails against the right answer or is satisfied by the weaker `WaitFor(pg)`.
+  `WaitForCompletion(x)` leaves one annotation with `WaitType.WaitForCompletion` and
+  `ExitCode` 0 by default (`exitCode:` overrides it). ex002 and ex015 both turn on this.
+- **An executable's `WorkingDirectory` is absolutised, and the manifest's copy is not
+  usable.** Same shape as a bind mount's `Source` (above): a relative
+  `workingDirectory` passed to `AddExecutable` is resolved against
+  `builder.AppHostDirectory`, i.e. the test assembly's output folder under the
+  harnesses. In `aspire-manifest.json` the same path comes back *relative to the publish
+  output directory* — a fresh temp folder — so it is a `../../..` chain that differs
+  every run. Grade it at L1 with `Path.IsPathRooted` plus the last segment; do not
+  assert `executable.v0`'s `workingDirectory` at all. `command` and `args` publish
+  cleanly and are fine to assert.
 - **`NU1603` silently upgrades the test runner.** `xunit.runner.visualstudio` has **no
   3.1.6 and no 3.1.7** — 3.1.5 is the last 3.x and the next version is 4.0.0. Naming a
   3.x that does not exist does not fail the build: NuGet resolves *forward* to 4.0.0 with
