@@ -96,11 +96,11 @@ the same `global.json` opt-in.
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
   verified as of 2026-09-05: the beginner tier (001-035) is complete and the
-  intermediate tier is through ex055, where
-  `dotnet test` shows 313 failed, 8 passed on the untouched tree (313
-  exercise facts across ex001-ex055, plus 8 harness smoke tests which pass
+  intermediate tier is through ex060, where
+  `dotnet test` shows 349 failed, 8 passed on the untouched tree (349
+  exercise facts across ex001-ex060, plus 8 harness smoke tests which pass
   in both modes) —
-  and `dotnet test -p:UseSolutions=true` shows 321 passed, 0 failed. **`wpf/`**'s beginner tier
+  and `dotnet test -p:UseSolutions=true` shows 357 passed, 0 failed. **`wpf/`**'s beginner tier
   (35/100, `01-beginner` ex001-ex035) is verified end-to-end as of 2026-09-05, on
   **.NET 10.0.400** with **xunit.v3 4.0.0** and **Xunit.StaFact 4.0.23**
   (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5 passed (the
@@ -672,6 +672,30 @@ the same `global.json` opt-in.
   `ValidatesOnNotifyDataErrors == true`, because the latter is WPF's own
   default and the newer interface needs no help. A test asserting on
   `ValidatesOnNotifyDataErrors` therefore discriminates nothing.
+  **`ConventionManager.DefaultItemTemplate` is one process-wide static
+  `DataTemplate`, and WPF pins a `DependencyObject`'s `Dispatcher` to the
+  first thread that realizes it.** Since every `[WpfFact]` runs on its own
+  STA thread, any test that calls `LoadContent()` or reads
+  `Triggers`/`VisualTree` on that shared template passes in isolation and
+  then throws `InvalidOperationException` in a later test in the same run.
+  Reference comparisons (`Assert.Same(ConventionManager.DefaultItemTemplate,
+  control.ItemTemplate)`) are safe because they read no dependency property.
+  `caliburn/README.md` carries the full register entry.
+  **`ViewModelBinder` never consults an element's convention for a name it
+  cannot match.** An element whose `x:Name` matches no view-model property
+  gets **no binding on any dependency property** — on every element type,
+  not just ones whose own convention is unusual. The `FrameworkElement`
+  fallback that binds `Visibility` is reached only when the name *does*
+  match and the element type has no more specific convention. Measured and
+  tested in ex017; ex058 initially got this backwards and was corrected.
+  **`ConventionManager.ApplyItemTemplate` keys on the items' runtime type,
+  not the property's static type.** Measured: `DefaultItemTemplate` is
+  assigned for any reference type except `string` — including a plain
+  `object` with no Caliburn relationship — and a property declared as
+  non-generic `IEnumerable` gets it just the same, refuting the intuition
+  that the collection property must be generic. It does short-circuit,
+  leaving the control alone, if `DisplayMemberPath` is already non-empty or
+  `ItemTemplate`/`ItemTemplateSelector` is already set.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -973,7 +997,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 100 / 100 (verified) | — |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 55 / 100 (verified) | 45 |
+| `caliburn/`| 60 / 100 (verified) | 40 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
