@@ -62,17 +62,17 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 There is no separate install step — `dotnet test` restores on first run.
 
 **Current measured state** (2026-09-06; `catalog.md` at 25 ✅ / 75 ⬜, so the
-twenty-five delivered exercises contribute 79 red facts):
+twenty-five delivered exercises contribute 80 red facts):
 
 ```
-dotnet test                      →  79 failed, 7 passed, 1 skipped (87 total)
-dotnet test -p:UseSolutions=true →   0 failed, 86 passed, 1 skipped (87 total)
+dotnet test                      →  80 failed, 7 passed, 1 skipped (88 total)
+dotnet test -p:UseSolutions=true →   0 failed, 87 passed, 1 skipped (88 total)
 ```
 
 `-p:Containers=true` unskips the harness's container-gate fact, which then passes; no
 🐳 exercise row exists yet, so it has not been re-measured since ex005.
 
-**A correct default run is red, and that is not a broken checkout.** Seventy-nine
+**A correct default run is red, and that is not a broken checkout.** Eighty
 failures is exactly what an untouched tree gives: one `NotImplementedException` per
 unimplemented `Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
 the harness's own facts, which pass in *both* modes because they grade the harness
@@ -615,6 +615,71 @@ Each of these cost real time. None is a guess.
   `ResourceReadyEvent`, while `Subscribe<T>(resource, handler)` fires only for that one.
   Both compile, both pass every positive assertion, and only publishing the event for a
   resource nobody subscribed to tells them apart.
+
+- **The test assembly runs SERIALLY, and that is load-bearing.**
+  `tests/_support/TestParallelism.cs` carries
+  `[assembly: CollectionBehavior(DisableTestParallelization = true)]`. Not caution and not
+  a performance knob: three exercises grade **process-global** state that cannot be
+  isolated by construction — ex022's static `ActivitySource`/`Meter` plus an OpenTelemetry
+  `ActivityListener` that is installed process-wide, ex023's two scenario flags, ex025's
+  ordered hook log. ex022's negative fact in particular asserts that an *unregistered*
+  source yields a **null** `Activity`, which stops being true the instant any other class
+  anywhere in the assembly has a `TracerProvider` listening to `"*"`. Under the default
+  class-level parallelism those three are correct only while nothing else happens to touch
+  the same statics — an assembly-wide invariant that nothing stated and nothing enforced,
+  with 75 rows still to be written against it. **The spelling is version-specific.** On
+  xunit.v3 3.2.2 `CollectionBehaviorAttribute` is the supported form and is not obsolete
+  (verified by reflecting over `xunit.v3.core` 3.2.2:
+  `AttributeTargets.Assembly`, settable `DisableTestParallelization`). Do **not** copy
+  `wpf/`'s `[assembly: Parallelization(Mode = ParallelMode.None)]` — that is the xunit.v3
+  **4.0.0** spelling, and in 4.0.0 this attribute is `Obsolete(error: true)`; the two
+  tracks are on different generations on purpose (§7). **Measured cost**, back to back on the
+  same tree with only this attribute commented out and back in: the green run goes from
+  **26 s to 1 m 8 s** (~2.6x - it is the run where all 87 reference solutions actually
+  execute), while the red run is unchanged within noise (19 s against 17 s, because a
+  stub throws before it does any work). Worth re-measuring as the catalog fills: if the
+  green run ever becomes the bottleneck, the answer is a `[Collection]` per group of
+  globally-stateful rows rather than turning this off.
+- **A count of `HttpMessageHandlerBuilderActions` says how many handlers, never which.**
+  Measured while closing a review finding on ex021:
+  `ConfigureHttpClientDefaults(h => { h.AddStandardResilienceHandler();
+  h.AddHttpMessageHandler(...); })` beside a bare `services.AddServiceDiscovery()` leaves
+  **two** actions for every client name and no service-discovery handler within reach of
+  any `HttpClient` — so `https+http://catalog` never resolves, while every
+  descriptor-level assertion passes. The honest grade is the built chain:
+  `IHttpMessageHandlerFactory.CreateHandler(name)` and then walking
+  `DelegatingHandler.InnerHandler`. Measured chain for a correct ServiceDefaults, on a
+  client name nobody registered:
+  `LifetimeTrackingHttpMessageHandler → LoggingScopeHttpMessageHandler →
+  Resilience.ResilienceHandler → ServiceDiscovery.Http.ResolvingHttpDelegatingHandler →
+  LoggingHttpMessageHandler → SocketsHttpHandler`. Both interesting handler types are
+  `internal` and cannot be named from a test, so assert the **assembly** each handler came
+  from (`Microsoft.Extensions.Http.Resilience`, `Microsoft.Extensions.ServiceDiscovery`) —
+  stable across a rename, and precise. Note what the chain does *not* separate: a
+  hand-rolled `AddResilienceHandler(...)` produces the same `ResilienceHandler` type, so
+  standard-versus-custom still needs the `IValidateOptions<HttpStandardResilienceOptions>`
+  descriptor.
+- **A tag-filtered health endpoint cannot be graded by status codes alone.** Measured on
+  ex023, and it is the sharpest thing in this batch: an `/alive` mapped with
+  `Predicate = r => r.Name is "self" or "event-loop"` — names, not tags, with all the
+  registrations' tags spelt correctly — passes *every* scenario the row asserts and *every*
+  assertion about the registrations. The whole point of a tag is the check that does not
+  exist yet, so the only way to grade it is to create one: after the learner's
+  configuration has run, the **test** registers one more `"live"`-tagged check, unhealthy
+  and named nothing the exercise mentions, and requires `/alive` to report 503. A
+  name-based predicate cannot see it; a tag-based one has no choice. Any future row about
+  filtering by metadata needs the same shape — add an item the implementation could not
+  have enumerated.
+- **An event's `Services` and the builder's own `ExecutionContext` agree in every normal
+  run, so "read it off the event" needs an abnormal one.** Measured on ex025: a hook
+  written `Record(builder.ExecutionContext.IsPublishMode ? … : …)` — closing over the
+  builder instead of resolving `DistributedApplicationExecutionContext` from
+  `@event.Services` — answers correctly under both a run-mode and a publish-mode
+  application, so building the model twice does not separate the two. Handing a **run-mode**
+  application a `BeforeStartEvent` whose service provider reports publish mode does: the
+  event is the authority. A one-type-delegating `IServiceProvider` is enough, and Aspire's
+  own built-in `BeforeStartEvent` subscriber is unaffected because everything else still
+  resolves from the real provider.
 
 ## 7. Pinned versions
 

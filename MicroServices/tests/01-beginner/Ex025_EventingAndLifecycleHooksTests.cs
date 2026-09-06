@@ -1,3 +1,4 @@
+using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using FeWoLearning.MicroServices.Exercises.Beginner;
 
@@ -9,6 +10,27 @@ public class Ex025_EventingAndLifecycleHooksTests
     {
         Ex025_EventingAndLifecycleHooks.Reset();
         return EventingHarness.Build(Ex025_EventingAndLifecycleHooks.Configure, publishMode);
+    }
+
+    /// <summary>
+    /// The session's own services with ONE type swapped: the execution context. Everything
+    /// else - including the DCP options Aspire's built-in BeforeStartEvent subscriber
+    /// reads - resolves normally.
+    ///
+    /// This is what makes "read it off the event" a graded claim rather than a stylistic
+    /// preference. A handler that closes over `builder.ExecutionContext` instead answers
+    /// from the builder, which is still in run mode, and disagrees with the event it was
+    /// handed.
+    /// </summary>
+    private sealed class ClaimsToBe(IServiceProvider inner, DistributedApplicationOperation operation)
+        : IServiceProvider
+    {
+        private readonly DistributedApplicationExecutionContext _context = new(operation);
+
+        public object? GetService(Type serviceType)
+            => serviceType == typeof(DistributedApplicationExecutionContext)
+                ? _context
+                : inner.GetService(serviceType);
     }
 
     [Fact]
@@ -51,6 +73,23 @@ public class Ex025_EventingAndLifecycleHooksTests
         {
             await publish.PublishAsync(new BeforeStartEvent(publish.Services, publish.Model),
                                        TestContext.Current.CancellationToken);
+            Assert.Equal(["before-start:publish"], Ex025_EventingAndLifecycleHooks.Hooks);
+        }
+
+        // And the half that makes "off the event's own Services" the graded claim, which
+        // the two cases above do not: a RUN-mode application, handed a BeforeStartEvent
+        // whose service provider says publish. The event is the authority - Aspire
+        // constructs it and hands it to the handler - so the correct answer follows the
+        // event. A handler written as
+        //     Record(builder.ExecutionContext.IsPublishMode ? ... : ...)
+        // closes over the builder, passes both cases above, and answers "run" here.
+        using (var run = Start())
+        {
+            await run.PublishAsync(
+                new BeforeStartEvent(new ClaimsToBe(run.Services, DistributedApplicationOperation.Publish),
+                                     run.Model),
+                TestContext.Current.CancellationToken);
+
             Assert.Equal(["before-start:publish"], Ex025_EventingAndLifecycleHooks.Hooks);
         }
     }

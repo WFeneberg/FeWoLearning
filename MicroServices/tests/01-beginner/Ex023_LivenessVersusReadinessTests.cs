@@ -19,7 +19,8 @@ public class Ex023_LivenessVersusReadinessTests
     /// something about me.
     /// </summary>
     private static async Task<(HttpStatusCode Alive, HttpStatusCode Health)> ProbeAsync(
-        bool warmupComplete, bool eventLoopStalled, CancellationToken cancellationToken)
+        bool warmupComplete, bool eventLoopStalled, CancellationToken cancellationToken,
+        Action<WebApplicationBuilder>? alsoRegister = null)
     {
         Ex023_LivenessVersusReadiness.WarmupComplete = warmupComplete;
         Ex023_LivenessVersusReadiness.EventLoopStalled = eventLoopStalled;
@@ -29,6 +30,7 @@ public class Ex023_LivenessVersusReadinessTests
         builder.WebHost.UseTestServer();
 
         Ex023_LivenessVersusReadiness.ConfigureProbes(builder);
+        alsoRegister?.Invoke(builder);
 
         await using var app = builder.Build();
         Ex023_LivenessVersusReadiness.MapProbes(app);
@@ -85,6 +87,30 @@ public class Ex023_LivenessVersusReadinessTests
         //   - "/alive" as a MapGet(...) returning a constant 200: same symptom;
         //   - "/health" narrowed to the "ready" tag: a dead process reports ready.
         Assert.Equal(HttpStatusCode.ServiceUnavailable, alive);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, health);
+    }
+
+    [Fact]
+    public async Task The_liveness_filter_is_the_TAG_so_a_check_the_exercise_never_named_is_included()
+    {
+        // A fourth liveness check, registered by the TEST after ConfigureProbes has run
+        // and named nothing the exercise or its solution has ever heard of. It stands in
+        // for the next liveness check somebody adds six months from now.
+        var (alive, health) = await ProbeAsync(
+            warmupComplete: true, eventLoopStalled: false, TestContext.Current.CancellationToken,
+            alsoRegister: builder => builder.Services.AddHealthChecks()
+                .AddCheck("sidecar-nobody-in-this-exercise-named",
+                          () => HealthCheckResult.Unhealthy("sidecar down"), tags: ["live"]));
+
+        // The row's actual subject, and the ONLY fact that grades it. Everything the
+        // learner registered is healthy in this scenario, so the 503 can come from
+        // nothing but the check above - and a predicate written as
+        // `r.Name is "self" or "event-loop"` cannot see it. Measured: that name-based
+        // implementation, with all three tags spelt correctly so the registration fact
+        // below still passes, satisfies every other fact in this file.
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, alive);
+
+        // And /health runs everything, so it must have seen it too.
         Assert.Equal(HttpStatusCode.ServiceUnavailable, health);
     }
 

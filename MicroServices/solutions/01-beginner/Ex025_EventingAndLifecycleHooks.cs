@@ -33,6 +33,13 @@ namespace FeWoLearning.MicroServices.Exercises.Beginner;
 ///         with no resource. Measured on 13.5.3, it fires for EVERY resource - so it
 ///         passes every positive fact here and is caught only by publishing the same
 ///         events for a resource nobody subscribed to.
+///
+///         "From the event's own Services" is a graded claim, not a style note. A handler
+///         that closes over `builder.ExecutionContext` instead answers correctly in both
+///         a run-mode and a publish-mode application, so those two cases alone cannot
+///         separate the two. The test therefore also hands a RUN-mode application a
+///         BeforeStartEvent whose service provider reports publish mode: the event is the
+///         authority, and the closure disagrees with it.
 /// </summary>
 public static class Ex025_EventingAndLifecycleHooks
 {

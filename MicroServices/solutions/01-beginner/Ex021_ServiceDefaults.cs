@@ -21,9 +21,11 @@ namespace FeWoLearning.MicroServices.Exercises.Beginner;
 /// Passes: A builder that has been through AddServiceDefaults resolves TracerProvider,
 ///         MeterProvider, HealthCheckService and ServiceEndpointResolver; carries an
 ///         IValidateOptions&lt;HttpStandardResilienceOptions&gt;, which only
-///         AddStandardResilienceHandler registers; has TWO HttpMessageHandlerBuilder
-///         actions waiting for a client name nobody has ever mentioned; and registers
-///         exactly one health check, "self", tagged "live".
+///         AddStandardResilienceHandler registers; builds a client of a name NOBODY has
+///         ever mentioned with a handler chain that contains one handler from
+///         Microsoft.Extensions.Http.Resilience and one from
+///         Microsoft.Extensions.ServiceDiscovery; and registers exactly one health check,
+///         "self", tagged "live".
 /// Note:   Do not grade "the app started" - that needs a socket and proves nothing about
 ///         which of the four pillars is missing. Grade the registrations. But a
 ///         registration assertion is easy to make vacuous, so this row measures a BARE
@@ -38,10 +40,17 @@ namespace FeWoLearning.MicroServices.Exercises.Beginner;
 ///         hand-rolled AddResilienceHandler("...", pipeline =&gt; ...) registers no
 ///         HttpStandardResilienceOptions at all, which is how the test tells the standard
 ///         handler from a home-made one. Scope: AddHttpClient("catalog")
-///         .AddStandardResilienceHandler() leaves the DEFAULT client options empty -
-///         measured, 0 handler-builder actions for any other name - while
-///         ConfigureHttpClientDefaults leaves 2 for every name, including names that do
-///         not exist yet.
+///         .AddStandardResilienceHandler().AddServiceDiscovery() registers every service
+///         type the other three facts look for, and leaves the handler chain of every
+///         OTHER client bare - measured, a never-named client is built with nothing but
+///         the two logging handlers and the socket.
+///
+///         Grade that as the CHAIN, not as a count of HttpMessageHandlerBuilder actions.
+///         Measured: ConfigureHttpClientDefaults(h =&gt; { h.AddStandardResilienceHandler();
+///         h.AddHttpMessageHandler(...); }) beside a bare services.AddServiceDiscovery()
+///         also leaves two actions - and no service-discovery handler within reach of any
+///         HttpClient, so "https+http://catalog" never resolves. A count says how many; only
+///         walking DelegatingHandler.InnerHandler says which.
 /// </summary>
 public static class Ex021_ServiceDefaults
 {

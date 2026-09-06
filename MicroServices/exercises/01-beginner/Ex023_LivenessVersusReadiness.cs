@@ -17,6 +17,9 @@ namespace FeWoLearning.MicroServices.Exercises.Beginner;
 ///         during startup      /alive 200, /health 503
 ///         once warm           /alive 200, /health 200
 ///         warm but stalled    /alive 503, /health 503
+///         ...plus a fourth case the test sets up itself: with everything warm, the TEST
+///         registers one more "live"-tagged check, unhealthy and named nothing this file
+///         mentions, and /alive must go 503.
 /// Note:   Scenario one is the bug the row exists to drill - a readiness check that also
 ///         answers the liveness probe. Map `/alive` with no predicate and it goes 503
 ///         while the database connection is still warming up, and the orchestrator kills
@@ -24,11 +27,20 @@ namespace FeWoLearning.MicroServices.Exercises.Beginner;
 ///
 ///         Scenario three is what stops the filter being faked. Measured, all three of
 ///         these mutants pass scenarios one and two and fail only this one: an `/alive`
-///         filtered by NAME (Predicate = r =&gt; r.Name == "self") rather than by tag,
-///         which silently drops "event-loop"; an `/alive` that is really a
-///         MapGet("/alive", () =&gt; Results.Ok()); and a `/health` narrowed to the "ready"
-///         tag, which stops reporting a genuinely dead process. Two endpoints existing
-///         is not the exercise - which checks each one runs is.
+///         that is really a MapGet("/alive", () =&gt; Results.Ok()); a `/health` narrowed to
+///         the "ready" tag, which stops reporting a genuinely dead process; and an
+///         `/alive` filtered by NAME on ONE check (Predicate = r =&gt; r.Name == "self"),
+///         which silently drops "event-loop". Two endpoints existing is not the exercise -
+///         which checks each one runs is.
+///
+///         And scenario FOUR is what stops the tag itself being faked, which is the row's
+///         actual subject. Predicate = r =&gt; r.Name is "self" or "event-loop", with all
+///         three tags spelt correctly, passes every scenario above AND the registration
+///         assertion - measured. The only thing it cannot survive is a liveness check it
+///         has never heard of, which is the one the test adds after ConfigureProbes has
+///         run. That is the difference between "works today" and "still works when
+///         somebody adds the next check", and it is why the answer is a tag and not a
+///         list of names.
 /// </summary>
 public static class Ex023_LivenessVersusReadiness
 {
