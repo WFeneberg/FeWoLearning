@@ -25,6 +25,11 @@ public static class ExerciseRegistry
         ["ex013"] = Ex013_ConnectionStringResources.Configure,
         ["ex014"] = Ex014_ParentAndChildResources.Configure,
         ["ex015"] = Ex015_WaitForCompletion.Configure,
+        ["ex016"] = Ex016_CustomAnnotationsAndExtensions.Configure,
+        ["ex017"] = Ex017_DashboardUrls.Configure,
+        ["ex018"] = Ex018_ReplicasAndEndpointAllocation.Configure,
+        ["ex019"] = Ex019_ExcludeFromManifest.Configure,
+        ["ex020"] = Ex020_RunVersusPublishMode.Configure,
     };
 
     public static Action<IDistributedApplicationBuilder>? Lookup(string id)

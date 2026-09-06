@@ -61,18 +61,18 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-06; `catalog.md` at 15 ✅ / 85 ⬜, so the fifteen
-delivered exercises contribute 44 red facts):
+**Current measured state** (2026-09-06; `catalog.md` at 20 ✅ / 80 ⬜, so the twenty
+delivered exercises contribute 60 red facts):
 
 ```
-dotnet test                      →  44 failed, 7 passed, 1 skipped (52 total)
-dotnet test -p:UseSolutions=true →   0 failed, 51 passed, 1 skipped (52 total)
+dotnet test                      →  60 failed, 7 passed, 1 skipped (68 total)
+dotnet test -p:UseSolutions=true →   0 failed, 67 passed, 1 skipped (68 total)
 ```
 
 `-p:Containers=true` unskips the harness's container-gate fact, which then passes; no
 🐳 exercise row exists yet, so it has not been re-measured since ex005.
 
-**A correct default run is red, and that is not a broken checkout.** Forty-four
+**A correct default run is red, and that is not a broken checkout.** Sixty
 failures is exactly what an untouched tree gives: one `NotImplementedException` per
 unimplemented `Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
 the harness's own facts, which pass in *both* modes because they grade the harness
@@ -113,7 +113,15 @@ enough to grade against: resource types, per-resource annotations (`WaitAnnotati
 `EnvironmentCallbackAnnotation`, `ContainerMountAnnotation`), and
 `ConnectionStringExpression.ValueExpression`, which differs per database flavour. That
 last one is what lets a test prove the learner wired up *PostgreSQL* rather than *some
-container*. `ModelHarness` in `tests/_support/` is the entry point.
+container*. `ModelHarness` in `tests/_support/` is the entry point, with **two** build
+methods: `Build(configure)` assembles the graph in **run** mode, and
+`BuildForPublish(configure)` assembles it in **publish** mode — the same
+`--operation publish` arguments `ManifestHarness` passes, but stopping at `Build()`, so
+`builder.ExecutionContext.IsPublishMode` is true while the graph is assembled and
+nothing is written to disk (measured: the output path is never even created). Rows about
+mode-dependent modelling — ex020 is the first — need that third view, because `Build` is
+run mode and `ManifestHarness` returns the published artifact rather than the graph
+behind it.
 
 **What L1 cannot prove.** That anything resolves, connects, or runs. Every value in the
 graph is still an unresolved expression like `{pg.bindings.tcp.host}`.
@@ -450,6 +458,49 @@ Each of these cost real time. None is a guess.
   every run. Grade it at L1 with `Path.IsPathRooted` plus the last segment; do not
   assert `executable.v0`'s `workingDirectory` at all. `command` and `args` publish
   cleanly and are fine to assert.
+- **`WithReplicas` exists only on `IResourceBuilder<ProjectResource>`, and Aspire does
+  not police what it is combined with.** Measured on 13.5.3 by reflecting over every
+  public static `WithReplicas` in `Aspire.Hosting`: there is exactly one, and it takes a
+  project. There is no container spelling, so a replica row has to use `AddProject` and
+  the walk-up in §5. More importantly for grading, `WithReplicas(3)` next to a **fixed
+  host port** neither throws nor warns — a proxied endpoint has one listener (the proxy)
+  in front of N instances, so it genuinely works, and `catalog.md` row 018's "a single
+  fixed host port and replicas are contradictory" overstates it. The genuine
+  contradiction is a fixed port on a **proxyless** endpoint, and Aspire does not detect
+  that either: the only replica combination it rejects in managed code is a persistent
+  container lifetime (*"uses multiple replicas and a persistent lifetime. These features
+  do not work together"* — the only replica-related diagnostic string in the assembly).
+  ex018 therefore grades the **shape** of the model — `ReplicaAnnotation` on the scaled
+  resource only, `Port` null and `IsProxied` true there, a pinned proxyless port on the
+  single-instance one — and not a runtime check that does not exist. A second measured
+  trap in the same row: omit `launchProfileName: null` and the launch profile supplies
+  the endpoint, so `AddProject("catalog", …).WithReplicas(3)` arrives with a **fixed**
+  `Port` 5080 and a null `TargetPort` from a file nobody looked at.
+- **`WithUrl` writes its annotation now; `WithUrlForEndpoint` writes none at all.**
+  Measured on 13.5.3: `WithUrl(url, displayText)` puts a `ResourceUrlAnnotation` on the
+  resource immediately, with `Endpoint` null. Both `WithUrlForEndpoint` overloads put a
+  **`ResourceUrlsCallbackAnnotation`** there instead and nothing else — the endpoint's
+  address does not exist until it is allocated, so there is nothing to decorate at model
+  time. A test that only reads `ResourceUrlAnnotation`s therefore sees *nothing* from the
+  endpoint half of a correct answer and is satisfied by a second `WithUrl` carrying a
+  guessed address. ex017 runs the callbacks by hand — construct a
+  `ResourceUrlsCallbackContext(executionContext, resource, urls)` seeded with the
+  endpoint's url (`new EndpointReference((IResourceWithEndpoints)resource, name)` is the
+  only field the callbacks match on) and invoke every callback. Measured behaviours worth
+  knowing: the `Action<ResourceUrlAnnotation>` overload **edits** the matching url in
+  place, the `Func<EndpointReference, ResourceUrlAnnotation>` overload **adds** a new one
+  and Aspire fills in its `Endpoint` even when the callback left it null, and a name that
+  matches no endpoint is a silent no-op (a logged warning, not a throw).
+- **`ExcludeFromManifest` and an `if (IsRunMode)` branch are indistinguishable from the
+  model and from the manifest.** Measured on 13.5.3 while writing ex019: wrapping the
+  `AddContainer` in `if (builder.ExecutionContext.IsRunMode)` produces a run-mode model
+  that contains the resource and a manifest that does not — byte-identical, for grading
+  purposes, to the correct `ExcludeFromManifest()` answer, because `ModelHarness` builds
+  in run mode. The **only** trace of which mechanism was used is that
+  `ExcludeFromManifest` leaves a `ManifestPublishingCallbackAnnotation` on the resource
+  and the branch leaves nothing (a plain `AddContainer` carries none, so the annotation
+  is a real difference and not something everything has). Any future row about
+  run-mode-only resources needs that third assertion or it grades the wrong exercise.
 - **`NU1603` silently upgrades the test runner.** `xunit.runner.visualstudio` has **no
   3.1.6 and no 3.1.7** — 3.1.5 is the last 3.x and the next version is 4.0.0. Naming a
   3.x that does not exist does not fail the build: NuGet resolves *forward* to 4.0.0 with

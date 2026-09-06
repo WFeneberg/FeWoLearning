@@ -41,6 +41,30 @@ public static class ModelHarness
     }
 
     /// <summary>
+    /// The same model, built with the PUBLISH execution context instead of the run
+    /// one, so that <c>builder.ExecutionContext.IsPublishMode</c> is true while a
+    /// resource graph is being assembled. It passes the same "--operation publish"
+    /// arguments <see cref="ManifestHarness"/> uses and then STOPS at Build(): there
+    /// is no RunAsync, so no publisher executes and - measured on 13.5.3 - the
+    /// output path is never even created.
+    ///
+    /// This is what a row about mode-dependent modelling needs and neither other
+    /// harness provides: <see cref="Build"/> is run mode, and ManifestHarness gives
+    /// back the published artifact rather than the graph behind it.
+    /// </summary>
+    public static Result BuildForPublish(Action<IDistributedApplicationBuilder> configure)
+    {
+        var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
+        {
+            Args = ["--operation", "publish", "--output-path", Path.Combine(Path.GetTempPath(), "fewo-ms-model-only")],
+            DisableDashboard = true
+        });
+        configure(builder);
+        using var app = builder.Build();
+        return new Result(builder.Resources.ToList());
+    }
+
+    /// <summary>
     /// The connection-string EXPRESSION, not a resolved value. It differs per
     /// database flavour, which is what lets a test prove the learner wired up
     /// PostgreSQL rather than merely some container (spec section 8.2).

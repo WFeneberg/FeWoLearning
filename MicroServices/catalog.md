@@ -57,7 +57,7 @@ as oversights:
   and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
   093/094/099/100 assert on the generated Bicep for real.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 ## Beginner (001–035) — Aspire model and first persistence
 
@@ -78,11 +78,11 @@ as oversights:
 | 013 | ConnectionStringResources | `AddConnectionString` for a store Aspire does not host; `value.v0` in the manifest against a container's `container.v0` | ✅ |
 | 014 | ParentAndChildResources | `IResourceWithParent`, a database resource's `Parent`, and why the child's expression interpolates `{parent.connectionString}` rather than repeating the host and port | ✅ |
 | 015 | WaitForCompletion | `WaitForCompletion` on a one-shot migration/seed step vs `WaitFor` on a long-running server; assert `WaitAnnotation.WaitType`, since both produce a `WaitAnnotation` | ✅ |
-| 016 | CustomAnnotationsAndExtensions | write an `IResourceAnnotation` plus an `IResourceBuilder<T>` extension; `WithAnnotation`, `TryGetLastAnnotation`, and why annotations are a list not a dictionary | ⬜ |
-| 017 | DashboardUrls | `WithUrl`/`WithUrlForEndpoint`, `ResourceUrlAnnotation`; the display text and the endpoint it decorates are two different fields | ⬜ |
-| 018 | ReplicasAndEndpointAllocation | `WithReplicas`, `ReplicaAnnotation`, and what replicating does to endpoint allocation — a single fixed host port and replicas are contradictory | ⬜ |
-| 019 | ExcludeFromManifest | a run-mode-only resource: present in the built model, **absent** from `aspire-manifest.json`; the row needs both assertions or it grades nothing | ⬜ |
-| 020 | RunVersusPublishMode | `builder.ExecutionContext.IsRunMode` / `IsPublishMode` branching one file into two graphs; the exercise fails if both modes produce the same model | ⬜ |
+| 016 | CustomAnnotationsAndExtensions | write an `IResourceAnnotation` plus an `IResourceBuilder<T>` extension; `WithAnnotation`, `TryGetLastAnnotation`, and why annotations are a list not a dictionary | ✅ |
+| 017 | DashboardUrls | `WithUrl`/`WithUrlForEndpoint`, `ResourceUrlAnnotation`; the display text and the endpoint it decorates are two different fields | ✅ |
+| 018 | ReplicasAndEndpointAllocation | `WithReplicas`, `ReplicaAnnotation`, and what replicating does to endpoint allocation — a single fixed host port and replicas are contradictory | ✅ |
+| 019 | ExcludeFromManifest | a run-mode-only resource: present in the built model, **absent** from `aspire-manifest.json`; the row needs both assertions or it grades nothing | ✅ |
+| 020 | RunVersusPublishMode | `builder.ExecutionContext.IsRunMode` / `IsPublishMode` branching one file into two graphs; the exercise fails if both modes produce the same model | ✅ |
 | 021 | ServiceDefaults | `AddServiceDefaults`: health endpoints, service discovery, the standard resilience handler and OTel; assert the registrations in the `IServiceCollection`, not that the app started | ⬜ |
 | 022 | OpenTelemetryRegistration | Aspire injects `OTEL_EXPORTER_OTLP_ENDPOINT`/`OTEL_SERVICE_NAME` on its own, so those keys grade nothing. The learner's part is `WithTracing(t => t.AddSource(…))` / `WithMetrics(m => m.AddMeter(…))` for a **custom** `ActivitySource` and `Meter`: capture with an in-memory exporter, and an unregistered source must produce no spans | ⬜ |
 | 023 | LivenessVersusReadiness | `/alive` vs `/health`, `AddHealthChecks().AddCheck(..., tags:)` and tag-filtered endpoints; a readiness probe that reports live during startup is the bug being drilled | ⬜ |
