@@ -809,7 +809,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
-| `Architecture/`| 60 / 60 (verified) | —         |
+| `Architecture/`| 80 / 80 (verified) | —         |
 | `telemetry/`| 10 / 70 (verified) | 60 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
@@ -1009,11 +1009,15 @@ into both content libraries), and wall-clock performance assertions (rows
 
 ## The `Architecture/` track
 
-Application and system architecture on .NET 10 — **60 rows in four subject-area
+Application and system architecture on .NET 10 — **80 rows in six subject-area
 blocks**, not 100 rows in four difficulty tiers, for the same reason `security/`
 departs: "beginner architecture" is not a meaningful axis, and difficulty rises
 *within* each block instead. `01-web` 001–016, `02-desktop` 017–028,
-`03-services-data` 029–052, `04-cross-cutting` 053–060. The folder is capitalised
+`03-services-data` 029–052, `04-cross-cutting` 053–060, `05-scale` 061–073,
+`06-evolution` 074–080. The first four build one process that is correct; `05`
+asks what happens when there are fifty of it sharing a finite resource, and `06`
+what happens when two versions of everything are live while the schema changes
+underneath. The folder is capitalised
 like `MicroServices/`; deliberate, do not "fix" it.
 
 It is **not** a second `MicroServices/`: that track teaches Aspire and the
@@ -1029,18 +1033,25 @@ headless and needs no Windows desktop session**. Everything targets plain
 Three projects on the `UseSolutions` mechanism shared with `blazor/`, `uno/`,
 `wpf/`, `caliburn/`, `avalonia/` and `security/`. `dotnet test` is red,
 `-p:UseSolutions=true` green, `-p:Containers=true` additionally runs the eight
-container-backed rows (032, 036, 037, 038, 039, 046, 047, 050), which are
-otherwise skipped — every one of those exercises is still fully graded without
+container-backed rows (032, 036, 037, 038, 039, 046, 047, 050,
+065, 066, 074), which are otherwise skipped — every one of those exercises is still fully graded without
 Docker by its in-process facts.
 
-**Verified end-to-end on 2026-09-06**: 371 test facts. `dotnet test` gives 359
-failed / 4 passed (the harness smoke facts) / 8 skipped (the container rows);
-`-p:UseSolutions=true` gives 0 failed / 363 passed / 8 skipped; and
-`-p:UseSolutions=true -p:Containers=true` gives 371 passed, 0 skipped, in 17 s
+**Verified end-to-end on 2026-09-06**: 517 test facts. `dotnet test` gives 502
+failed / 4 passed (the harness smoke facts) / 11 skipped (the container rows);
+`-p:UseSolutions=true` gives 0 failed / 506 passed / 11 skipped; and
+`-p:UseSolutions=true -p:Containers=true` gives 517 passed, 0 skipped, in 21 s
 against Docker 29.7.2 with `postgres:17-alpine`, `redis:7-alpine`,
-`rabbitmq:4-alpine` and `eclipse-mosquitto:2`. Both builds are clean - the 38
-build warnings are all `CS9113`/`CS0649` from `exercises/` stubs; `solutions/`
-and `tests/` emit none.
+`rabbitmq:4-alpine` and `eclipse-mosquitto:2`. Both builds are clean - every
+build warning is `CS9113`/`CS0649` from `exercises/` stubs; `solutions/` and
+`tests/` emit none.
+
+**A fact that HANGS is worse than one that fails**, and blocks 05/06 produced two
+of them before the probe caught it: an admission controller or bulkhead that
+QUEUES instead of refusing does not throw, it blocks behind a holder the test only
+releases further down - which never runs, because the assertion above it has not
+returned. The suite stalls and reports nothing. Every "this must be rejected" fact
+wraps its call in `WaitAsync`.
 
 **Broker and driver traps, all measured here.** RabbitMQ 4 refuses a transient
 non-exclusive queue - `INTERNAL_ERROR - Feature 'transient_nonexcl_queues' is

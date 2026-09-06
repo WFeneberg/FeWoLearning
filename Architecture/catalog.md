@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 75 ✅ / 5 ⬜**
+**Status: 80 ✅ / 0 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -127,8 +127,8 @@ fits on one machine.
 |---|------|----------|--------|
 | 074 | ExpandContractMigration 🐳 | the three-phase schema change, why the middle phase exists | ✅ |
 | 075 | IdempotentBackfill | resumable batch repair, checkpoints, re-running safely | ✅ |
-| 076 | ConsumerDrivenContract | a contract test that fails when the provider breaks a consumer | ⬜ |
-| 077 | ApiDeprecationLifecycle | sunset dates, deprecation headers, usage before removal | ⬜ |
-| 078 | FeatureFlagTargeting | targeting rules, stable percentage bucketing, flag removal | ⬜ |
-| 079 | CanaryRelease | routing a fraction, comparing outcomes, automatic rollback | ⬜ |
-| 080 | ObservabilitySpans | parent/child spans, trace context across a boundary, sampling | ⬜ |
+| 076 | ConsumerDrivenContract | a contract test that fails when the provider breaks a consumer | ✅ |
+| 077 | ApiDeprecationLifecycle | sunset dates, deprecation headers, usage before removal | ✅ |
+| 078 | FeatureFlagTargeting | targeting rules, stable percentage bucketing, flag removal | ✅ |
+| 079 | CanaryRelease | routing a fraction, comparing outcomes, automatic rollback | ✅ |
+| 080 | ObservabilitySpans | parent/child spans, trace context across a boundary, sampling | ✅ |

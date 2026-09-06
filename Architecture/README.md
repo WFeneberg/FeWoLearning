@@ -37,15 +37,15 @@ Nothing to install for the default run. Run every command **from inside
 
 | Run | Command | Measured on 2026-09-06 |
 |---|---|---|
-| Stubs (red) | `dotnet test` | 371 total — **359 failed**, 4 passed, 8 skipped |
-| Solutions (green) | `dotnet test -p:UseSolutions=true` | 371 total — **0 failed**, 363 passed, 8 skipped |
-| Including the container rows | `dotnet test -p:UseSolutions=true -p:Containers=true` | 371 total — **0 failed, 0 skipped**, 17 s |
+| Stubs (red) | `dotnet test` | 517 total — **502 failed**, 4 passed, 11 skipped |
+| Solutions (green) | `dotnet test -p:UseSolutions=true` | 517 total — **0 failed**, 506 passed, 11 skipped |
+| Including the container rows | `dotnet test -p:UseSolutions=true -p:Containers=true` | 517 total — **0 failed, 0 skipped**, 21 s |
 | One exercise | `dotnet test --filter FullyQualifiedName~Ex001_` | |
 
-The 4 that pass on the red run are the harness smoke facts; the 8 skipped are the
-container-backed facts on rows 032, 036, 037, 038, 039, 046, 047 and 050. Both
-builds are clean: the 38 build warnings all come from `exercises/` and are
-exclusively `CS9113` and `CS0649` — the documented stub warnings. `solutions/`
+The 4 that pass on the red run are the harness smoke facts; the 11 skipped are the
+container-backed facts on rows 032, 036, 037, 038, 039, 046, 047, 050, 065, 066
+and 074. Both builds are clean: every build warning comes from `exercises/` and is
+exclusively `CS9113` or `CS0649` — the documented stub warnings. `solutions/`
 and `tests/` emit none.
 
 The container run needs Docker; it was verified here against **Docker 29.7.2**
@@ -123,8 +123,8 @@ loopback port: real protocol frames, real QoS 1 redelivery, real retained-messag
 delivery to a late subscriber, a real last will on an ungraceful disconnect. MQTT
 is therefore fully graded in the default run rather than gated behind Docker.
 
-**Tier 3 — containers (`-p:Containers=true`).** Eight rows (032, 036, 037, 038,
-039, 046, 047, 050) carry *additional* Testcontainers-backed facts against real
+**Tier 3 — containers (`-p:Containers=true`).** Eleven rows (032, 036, 037, 038,
+039, 046, 047, 050, 065, 066, 074) carry *additional* Testcontainers-backed facts against real
 Postgres, Redis, RabbitMQ and Mosquitto. They are skipped by default via
 `ContainerGate.SkipUnlessEnabled()`. **Every one of those exercises is still fully
 graded without Docker** by its in-process facts — the container facts add realism,
