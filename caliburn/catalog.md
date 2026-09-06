@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 50 ✅ / 50 ⬜**
+**Status: 55 ✅ / 45 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -78,11 +78,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 048 | DialogResult | `TryCloseAsync(bool?)` flowing back to the caller - measured: `true`\|`false`\|`null` in, but only `true`/`false` out, `TryCloseAsync(null)` resolving `ShowDialogAsync` to `false`, not `null` | ✅ |
 | 049 | WindowManagerSettings | the settings dictionary applied to the window by reflection - `Title`/`ShowInTaskbar` stick, but `Width`/`Left` do not: `EnsureWindow` sets `SizeToContent`/a centred `WindowStartupLocation` *before* the dictionary is applied, and never touches `Width`/`Left` itself - it is WPF's own layout at `Show()` that discards them to honour those two | ✅ |
 | 050 | ViewLocatorForDialogs | `ViewLocator.LocateForModelType` (the type-based lookup `WindowManager` itself uses) - a `Window`-derived located view is used AS-IS as the dialog's own window, anything else gets WRAPPED in a bare `Window`; either way `GetView()` is `null` once closed | ✅ |
-| 051 | ConductorActivationChain | activating a conductor activates its active child | ⬜ |
-| 052 | ConductorCloseGuard | `CanCloseAsync` cascading through children | ⬜ |
-| 053 | DefaultCloseStrategy | how the built-in strategy decides | ⬜ |
-| 054 | CustomCloseStrategy | writing an `ICloseStrategy` | ⬜ |
-| 055 | DataErrorInfoValidation | `IDataErrorInfo` on a screen | ⬜ |
+| 051 | ConductorActivationChain | `ActivateItemAsync` sets `ActiveItem` (and `Parent`) immediately even on an inactive conductor, but the child's `OnActivatedAsync` only runs once the conductor itself is activated through `IActivate`/`IDeactivate` (explicit interface members, unreachable without a cast); `DeactivateAsync(close: false)` cascades that same flag to the child without clearing `ActiveItem`, so reactivating reuses it | ✅ |
+| 052 | ConductorCloseGuard | `Conductor<T>.Collection.AllActive.CanCloseAsync()` asks EVERY child's own `CanCloseAsync` (each exactly once, never short-circuited by an earlier refusal) and answers true only when all agree - a pure query that neither closes nor deactivates anyone by itself | ✅ |
+| 053 | DefaultCloseStrategy | `DefaultCloseStrategy<T>`'s constructor flag never changes `CloseCanOccur` - one refusal always makes the whole group refuse either way; it only changes whether `Children` comes back empty (default) or holding the willing subset (`true`), and even with the flag `true`, `Children` is empty when nobody is willing | ✅ |
+| 054 | CustomCloseStrategy | `ICloseStrategy<T>` has exactly one member, `ExecuteAsync(IEnumerable<T>, CancellationToken) -> Task<ICloseResult<T>>` (`CloseCanOccur` + `Children`); `ConductorBase<T>.CloseStrategy` is a plain settable property, so a hand-written majority-vote policy plugs in and is honoured in place of Caliburn's own all-or-nothing default | ✅ |
+| 055 | DataErrorInfoValidation | implementing `IDataErrorInfo` on a screen flips a real `Binding`'s `ValidatesOnDataErrors` to `true` by Caliburn's own naming convention (a plain `PropertyChangedBase`/`Screen` gets `false`) - `ValidatesOnNotifyDataErrors` is `true` for both and proves nothing about the convention by itself | ✅ |
 | 056 | NotifyDataErrorInfoValidation | `INotifyDataErrorInfo`, asynchronous errors | ⬜ |
 | 057 | ValidatingScreen | validation gating `CanClose` | ⬜ |
 | 058 | ItemsConventionBinding | `ItemsControl` named after a collection | ⬜ |
