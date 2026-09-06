@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 60 ✅ / 40 ⬜**
+**Status: 65 ✅ / 35 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -109,11 +109,11 @@ Two deliberate content gaps:
 | 058 | ControlTemplateAndTemplateBinding | retemplate a control in code, naming a template part so `GetTemplateChild` resolves it, the code equivalent of `TemplateBinding` (`RelativeSource.TemplatedParent`) | ✅ |
 | 059 | VisualStateManager | `VisualStateGroup`, `VisualStateManager.GoToState` | ✅ |
 | 060 | AttachedBehavior | replace code-behind with an attached-property behavior | ✅ |
-| 061 | FreezableBrush | `Freeze`, `IsFrozen`, `CanFreeze`, sharing across threads | ⬜ |
-| 062 | CustomPanel | a real `Panel` with `MeasureOverride`/`ArrangeOverride` | ⬜ |
-| 063 | VirtualizationSwitches | `VirtualizingStackPanel.IsVirtualizing`, `VirtualizationMode`, `ScrollUnit` | ⬜ |
-| 064 | CustomMarkupExtension | `MarkupExtension.ProvideValue`, `IProvideValueTarget` | ⬜ |
-| 065 | TemplatesAsResources | `DataTemplate` keyed by `DataType`, implicit lookup | ⬜ |
+| 061 | FreezableBrush | `Freeze`, `IsFrozen`, `CanFreeze`, sharing across threads | ✅ |
+| 062 | CustomPanel | a real `Panel` with `MeasureOverride`/`ArrangeOverride` | ✅ |
+| 063 | VirtualizationSwitches | `VirtualizingStackPanel.IsVirtualizing`, `VirtualizationMode`, `ScrollUnit` | ✅ |
+| 064 | CustomMarkupExtension | `MarkupExtension.ProvideValue`, `IProvideValueTarget` | ✅ |
+| 065 | TemplatesAsResources | `DataTemplate` keyed by `DataType`, implicit lookup | ✅ |
 | 066 | Localization | satellite resources, `ResourceManager`, switching culture at runtime | ⬜ |
 | 067 | GlobalExceptionHooks | `Dispatcher.UnhandledException`, `DispatcherUnhandledExceptionFilter` | ⬜ |
 | 068 | SettingsMigration | a versioned settings store upgrading an old shape | ⬜ |

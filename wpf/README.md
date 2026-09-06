@@ -300,6 +300,15 @@ measurement walked, not the general mechanism it seems to imply.
   stays inside the non-clamped range on purpose to keep the base contract legible; row 062
   (`CustomPanel`) and row 080 (layout invalidation cost) are where the clamping edge and the
   Measure/Arrange asymmetry actually start to matter.
+- **A real `Panel` subclass confirms the forecast row 028 made for it.** Measured directly
+  building row 062 (`Panel.InternalChildren`, a vertical stack arranged by a running offset):
+  `ArrangeOverride`'s return is genuinely NOT clamped to `finalSize` - a panel that computes its
+  own natural stacked size and returns that instead becomes `RenderSize` verbatim, even when
+  `Layout(...)`'s `finalSize` (800x600 by default) is far larger. `MeasureOverride`, by contrast,
+  needs no such demonstration to make `DesiredSize` behave: measuring each child with the parent's
+  width and an unconstrained height, then summing the children's own `DesiredSize.Height`, already
+  produces a `DesiredSize` smaller than the constraint with no clamping question to probe - the
+  clamping asymmetry row 028 documented only ever bites on the `ArrangeOverride` side.
 - **A definition inside a shared size group is measured as `Auto`, regardless of its own
   `GridUnitType` - `SharedSizeGroup` on a `Star`-sized definition is not "broken", it is
   simply never measured as `Star` at all.** Measured directly (building row 031): two
@@ -396,8 +405,37 @@ measurement walked, not the general mechanism it seems to imply.
   `GetTemplateChild`/`FindName` - regardless of `IsInitialized` and with no
   `CompleteInitialization` call anywhere; see the `IsInitialized` finding under "Initialization"
   below for why that is NOT the same path rows 031-034 measured.
+- **Implicit `DataTemplate` lookup walks MULTIPLE levels of ancestry, not just the immediate
+  parent's `Resources`, and a template reached only through an ancestor's `MergedDictionaries` is
+  found exactly as if it were a direct entry there.** Both measured directly building row 065
+  (`TemplatesAsResources`): a template placed two levels up (a grandparent's `Resources`, with the
+  intervening parent's own `Resources` empty) still resolves a `ContentControl` two levels below
+  it, and the same is true when that grandparent-level entry lives inside a freshly built
+  `ResourceDictionary` merged into the grandparent's `Resources.MergedDictionaries` rather than
+  written there directly - unsurprising given row 026 already proved the same reachability for
+  `Style`, but not previously confirmed for `DataTemplate`.
+- **On a genuine collision - the SAME type templated at two different ancestor levels - the
+  NEARER ancestor wins.** Measured directly for row 065: a `ContentControl` two levels below both
+  a grandparent's template and a (nearer) parent's competing template for the same type resolves
+  the PARENT's. This is a different axis entirely from row 026's "last dictionary added to
+  `MergedDictionaries` wins" rule, which only ever concerned several dictionaries merged at the
+  SAME tree level - locality up the tree and merge order within one dictionary do not interact,
+  and neither rule predicts the other's outcome.
 
-#### Validation
+#### Markup extensions
+
+- **`XamlReader.Parse` CAN resolve a custom `MarkupExtension` from a runtime `clr-namespace`
+  reference, but only by its LITERAL type name, `Extension` suffix included - the
+  suffix-stripping convention markup-compiled XAML normally allows is a XAML-COMPILER feature,
+  not something `XamlReader.Parse`'s own runtime type resolution honors.** Measured directly while
+  scoping row 064: `{local:FooExtension ...}` against a public, top-level `FooExtension :
+  MarkupExtension` succeeds; `{local:Foo ...}` against the identical type throws
+  `XamlParseException` ("unknown type ... cannot be created"). Row 064 ships no XAML and no
+  `XamlReader.Parse` test anyway - `MarkupExtension.ProvideValue`/`IProvideValueTarget` are both
+  already fully exercised by calling `ProvideValue` directly with a hand-built
+  `IServiceProvider`/`IProvideValueTarget`, the same substitution rows 025 and 058 already made in
+  this XAML-free tier - but this measurement is recorded here rather than left for a later row to
+  rediscover the hard way.
 
 - **`Binding.ValidatesOnNotifyDataErrors` and `Binding.ValidatesOnDataErrors` have opposite
   defaults - measured directly, not assumed from the two interfaces looking alike.** The
@@ -494,6 +532,24 @@ measurement walked, not the general mechanism it seems to imply.
   the dispatcher", for why that turned out to be the right call for reasons unrelated to
   initialization.
 
+  Row 063 (`VirtualizationSwitches`) measured what that two-item forecast could not show, since
+  two containers is never enough to prove virtualization did anything: with 200 items in a
+  `ListBox` bounded to a 300x200 viewport, `VirtualizingPanel.IsVirtualizing` left at its own
+  (already-`true`) default realizes only a low double-digit handful of containers, and setting it
+  `false` explicitly realizes every single one of the 200 - virtualization is genuinely observable
+  here with no window and no real scrolling. `VirtualizationMode` and `ScrollUnit`, in contrast,
+  make no difference to that realized COUNT either way (076 owns what they actually change:
+  container identity across a scroll) - row 063 asserts only that the three switches read back
+  correctly off the `ListBox` they were set on. Also measured directly: `VirtualizingPanel
+  .IsVirtualizingProperty`'s own metadata does NOT set `FrameworkPropertyMetadataOptions.Inherits`
+  (confirmed via `DependencyProperty.GetMetadata(typeof(VirtualizingPanel)).Inherits == false`), so
+  the switches only take effect set directly on the `ItemsControl` whose default items panel is
+  actually a `VirtualizingStackPanel` - a bare `ItemsControl` (default panel: plain,
+  non-virtualizing `StackPanel`) silently ignores every one of them regardless of what they are
+  set to, with no exception anywhere to notice the miss by - the same "wrong element, no error"
+  shape as the `DataTemplateKey`/`FrameworkElementFactory.Name` traps recorded elsewhere in this
+  file, on a third lookup mechanism.
+
   Row 058 measured the other side of this same gate directly, not by inference from it: an
   EXPLICITLY assigned `Control.Template` applies - visual tree built, `GetTemplateChild`/
   `FindName` both resolve a named part - with `IsInitialized` still `false` and with no
@@ -560,6 +616,29 @@ measurement walked, not the general mechanism it seems to imply.
   delegate-typed field at all: `Dispose()` alone does not prove storage, because
   `CommandManager` compares delegates structurally, so a freshly created method-group
   delegate still unsubscribes correctly even with nothing stored anywhere.
+
+#### Freezable and thread affinity
+
+- **An unfrozen `Freezable` throws `InvalidOperationException` the moment a DIFFERENT thread so
+  much as READS one of its properties - not only on a write - and freezing removes that affinity
+  entirely.** Measured directly for row 061: a plain `SolidColorBrush`, never frozen, reads and
+  writes both throw "the calling thread cannot access this object because a different thread owns
+  it" from a spawned background thread even though the OWNING thread reads it freely; the identical
+  read from a FROZEN instance succeeds on any thread with no exception at all. This is the whole
+  reason a `Freezable` needs freezing before it can be handed across threads - row 061's own scope
+  stops there; reusing one frozen instance across many elements in a tree to cut allocations is a
+  different story, told by row 077.
+- **`Freezable.CanFreeze` is false the moment an animation is attached via `BeginAnimation`, even
+  before any clock ever ticks - and `Freeze()` THROWS on such an instance rather than silently
+  no-op'ing.** Measured directly: a `SolidColorBrush` with a `ColorAnimation` attached (never
+  started by any timing/rendering system - see "What the harness cannot do") already reports
+  `CanFreeze == false`, and calling `Freeze()` on it anyway throws immediately. A correct
+  `FreezeIfPossible`-style helper must check `CanFreeze` first; row 061's tests reject both a
+  mutant that skips the check (crashes on an animated brush) and one that checks `CanFreeze` but
+  never actually calls `Freeze()` on a freezable instance.
+- **Calling `Freeze()` on an already-frozen instance is a harmless no-op, not an error** -
+  measured directly; a defensive mutant that throws when `IsFrozen` is already `true` (assuming
+  it is a bug to be asked twice) fails row 061's idempotency test for exactly this reason.
 
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 
@@ -689,6 +768,19 @@ Five failure modes, each of which has already shipped in some track of this repo
   of the instruction still passed every test. Before shipping an exercise, map each
   instruction in its TODO to the specific test that would fail if it were ignored; an
   instruction with no such test gets an assertion added, or gets dropped.
+- **A wrong implementation must fail an assertion - it must never hang, never crash the test
+  host, and never fail to compile.** The compile-time case was already forbidden above; this is
+  the other half, added after a real incident: a previous batch, in good faith, made a row's
+  transform deliberately non-idempotent (writing a property back changed it again) specifically so
+  a reentrancy guard would have something real to guard against. The unguarded mutant recursed
+  inside its own change handler with no base case, overflowed the stack, completed **zero** tests
+  in the run, and could leave a `testhost` process holding the output DLL open - not a red test,
+  an aborted run. It was rolled back before shipping. Before an exercise ships, run every plausible
+  wrong implementation the way this track's batches are required to (overlay the mutant onto the
+  stub in a scratch copy, run the filtered test file, read the actual result) and confirm each one
+  produces ordinary failing assertions - a design where the only way to make an implementation
+  "wrong" is to break termination rather than break an assertion needs a different angle instead,
+  not a mutant left unbuilt.
 
 ## Deliberate gaps
 
