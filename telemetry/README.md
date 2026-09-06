@@ -702,3 +702,50 @@ surprise the next batch pays for again.
   which 6 are container-gated. Red run 318 failed / 8 passed / 5 skipped; green run 326
   passed / 5 skipped; green with `-p:Containers=true` **331 passed / 0 skipped**.
   0 warnings in both modes.
+
+**2026-09-06, rows 066–070 — the track closes:**
+
+- **The standard container-id recipe does not work on this machine, and row 069 is built
+  on the measurement rather than on the recipe.** Under cgroup v2 — which is what current
+  Docker uses, Docker Desktop here included — `/proc/self/cgroup` reads exactly `0::/`.
+  No id, no path, nothing. The id is in `/proc/self/mountinfo` instead, on a line naming
+  `/docker/containers/<64 hex>/resolv.conf`. A detector that only knows the classic
+  "parse /proc/self/cgroup" advice silently reports no container on every modern host,
+  and every span it produces is missing the attribute that says which replica emitted it.
+  The 🐳 fact asks a real container to `cat` both files and checks the answer against the
+  id Docker handed out.
+- **`Utf8JsonWriter.Dispose` flushes the writer without closing the stream underneath
+  it**, and a `ZipArchive` in `Create` mode permits exactly one open entry at a time. Row
+  068's reference solution failed its own green run on
+  `IOException: Entries cannot be created while previously created entries are still
+  open` until the entry stream got a `using` of its own.
+- **Ex070's ordering fact passed against the wrong implementation, and the fix is worth
+  copying.** The first version registered a marker on `ApplicationStopped` and asserted
+  the flush came first. But cancellation-token callbacks run **last-registered-first**,
+  so an implementation that registered on `ApplicationStopped` *after* the test did still
+  appeared to run "first" and the fact was green. Grading a *phase* needs a phase-based
+  marker: an `IHostedService` whose `StopAsync` writes one, since host shutdown runs
+  `ApplicationStopping` → hosted services stop → `ApplicationStopped`. Same lesson as
+  ex019's — a probe that catches nothing means the fact is not measuring the mechanism.
+- **`TracerProvider.ForceFlush()` and `ForceFlush(int)` are a correctness difference, not
+  a convenience one.** The argument-less overload waits indefinitely against a collector
+  that is down, so the process ignores its SIGTERM, is SIGKILLed at the end of the grace
+  period anyway, loses the telemetry it was holding the shutdown open for, and spends the
+  whole grace period per replica doing it. The overload with a deadline returns `false`
+  instead, and the only correct response is to record that and let shutdown continue.
+  Measured: with a blocking exporter, the deadline-less variant held the stop for the full
+  30 s the test exporter blocked for.
+- **A real container's SIGTERM handler runs, and comfortably inside the grace period.**
+  Row 070's second 🐳 fact `docker stop`s a container running
+  `trap 'echo …; exit 0' TERM` and asserts the marker reaches its logs — which is the
+  assumption every `ApplicationStopping` flush rests on, asked rather than assumed.
+- **Consent gates emission, never content — and row 066 grades both halves.** With
+  consent withheld nothing is emitted at all; with it given the record is emitted **and
+  still scrubbed**. The wrong-implementation probe was the backwards reading (scrub only
+  when consent is withheld), and it failed both adversarial facts, which is the right
+  answer: if turning consent on changed what a record *contained*, then one of the two
+  versions is collecting more than the dialog described.
+- Final baseline, rows 001–070: **360 facts total** (351 exercise + 9 harness), of which
+  **8 are container-gated**. Red run 345 failed / 8 passed / 7 skipped; green run 353
+  passed / 7 skipped; green with `-p:Containers=true` **360 passed / 0 skipped**.
+  0 warnings in both modes.

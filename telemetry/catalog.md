@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 65 ✅ / 5 ⬜**
+**Status: 70 ✅ / 0 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -110,8 +110,8 @@ Rows 059–062 are `[WpfFact]` (STA thread). None opens a window.
 | 063 | StartupPerformanceTracing | cold-start phases as nested activities | ✅ |
 | 064 | OfflineBufferAndReplay | a bounded buffer while the exporter is unreachable, replay on reconnect, explicit drop policy | ✅ |
 | 065 | FlushOnShutdown | flushing on exit; the size of the window that is lost when you do not | ✅ |
-| 066 | PiiScrubbingAndConsent | user names, paths and machine identifiers; an opt-in consent flag that actually gates emission | ⬜ |
-| 067 | SessionCorrelation | a stable anonymous install/session id tying one run's logs, traces and metrics together | ⬜ |
-| 068 | LocalRollingFileAndSupportBundle | a size-capped rolling local log and a support bundle a user can send | ⬜ |
-| 069 | ContainerResourceDetection | `OTEL_*` env configuration, container resource attributes, stdout JSON for the log driver | 🐳 ⬜ |
-| 070 | GracefulShutdownFlushInContainer | SIGTERM, `IHostApplicationLifetime`, draining the batch processor before the process dies | 🐳 ⬜ |
+| 066 | PiiScrubbingAndConsent | user names, paths and machine identifiers; an opt-in consent flag that actually gates emission | ✅ |
+| 067 | SessionCorrelation | a stable anonymous install/session id tying one run's logs, traces and metrics together | ✅ |
+| 068 | LocalRollingFileAndSupportBundle | a size-capped rolling local log and a support bundle a user can send | ✅ |
+| 069 | ContainerResourceDetection | `OTEL_*` env configuration, container resource attributes, stdout JSON for the log driver | 🐳 ✅ |
+| 070 | GracefulShutdownFlushInContainer | SIGTERM, `IHostApplicationLifetime`, draining the batch processor before the process dies | 🐳 ✅ |

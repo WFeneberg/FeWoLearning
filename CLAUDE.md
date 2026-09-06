@@ -958,6 +958,23 @@ the same `global.json` opt-in.
   `using Microsoft.Extensions.Logging;` makes the bare `ILogger` ambiguous
   (`CS0104`), since both namespaces declare one.
 
+  Three more from the closing batch, all measured here. **Under cgroup v2 —
+  what current Docker uses, Docker Desktop included — `/proc/self/cgroup`
+  reads exactly `0::/`** and carries no container id at all; the id is in
+  `/proc/self/mountinfo`, on a line naming
+  `/docker/containers/<64 hex>/resolv.conf`. Every "parse /proc/self/cgroup"
+  recipe on the internet therefore reports no container on a modern host, and
+  row 069 is built on the measurement instead. **Cancellation-token callbacks
+  run last-registered-first**, so a test that grades "this ran during
+  `ApplicationStopping`" by registering its own marker on
+  `ApplicationStopped` passes against an implementation that registered on
+  `ApplicationStopped` too — grading a host *phase* needs a phase-based
+  marker, and an `IHostedService` whose `StopAsync` writes one sits exactly
+  between the two events. And **`Utf8JsonWriter.Dispose` flushes without
+  closing the stream underneath it**, which a `ZipArchive` in `Create` mode
+  rejects on the next entry with `IOException: Entries cannot be created
+  while previously created entries are still open`.
+
   One more, general enough to be worth stating outside this track: **a
   reflection fact asserting that a type *declares* an interface grades
   nothing when the stub already declares it.** Ex008's provider has to declare
@@ -1036,7 +1053,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `MicroServices/`| 30 / 100 (verified) | 70 |
 | `security/`| 60 / 60 (verified) | —         |
 | `Architecture/`| 100 / 100 (verified) | —         |
-| `telemetry/`| 65 / 70 (verified) | 5 |
+| `telemetry/`| 70 / 70 (verified) | —         |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above
@@ -1143,6 +1160,18 @@ the solutions run reports Total: 333, Failed: 0, Passed: 332, Skipped: 1.
 Both builds emit 0 warnings. Verified via
 `dotnet test --solution FeWoLearning.Security.slnx` (red) and the same
 command with `-p:UseSolutions=true` (green).
+
+`telemetry/` is content-complete and verified end-to-end: 70/70 exercises
+across five subject-area blocks (not tiers — see its own entry in
+"Track-specific gotchas" above), **360 test facts** total (351 exercise + 9
+harness), of which **8 are container-gated**. Measured 2026-09-06: the stub run
+reports Total: 360, Failed: 345, Passed: 8, Skipped: 7 (the 8 passing are the
+harness canaries; the 7 skipped are the container-gated facts); the solutions
+run reports Total: 360, Failed: 0, Passed: 353, Skipped: 7; and
+`-p:UseSolutions=true -p:Containers=true` reports **360 passed / 0 skipped**.
+Both builds emit 0 warnings. Verified via `dotnet test` (red),
+`dotnet test -p:UseSolutions=true` (green) and the same command with
+`-p:Containers=true` (green, Docker required). Windows-only.
 
 ## The `uno/` track
 
