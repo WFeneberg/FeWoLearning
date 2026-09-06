@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 75 ✅ / 25 ⬜**
+**Status: 80 ✅ / 20 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -113,11 +113,11 @@ not a valid C# identifier.
 | 073 | CustomLayoutPanel | a `Panel` subclass laying out children | ✅ |
 | 074 | GeometryAndPen | `PathGeometry` figures, `Pen`, fill rules | ✅ |
 | 075 | CustomBrushGradient | gradient brushes, opacity masks | ✅ |
-| 076 | InvalidateVisualLifecycle | when `Render` re-runs, `InvalidateVisual` | ⬜ |
-| 077 | PointerInputHandling | `PointerPressed`/`Moved`/`Released` | ⬜ |
-| 078 | GestureRecognition | gesture recognizers, scroll gestures | ⬜ |
-| 079 | KeyBindingsAndAccelerators | `KeyBinding`, `KeyGesture` | ⬜ |
-| 080 | FocusManagement | focus traversal, `TabIndex`, `IsTabStop` | ⬜ |
+| 076 | InvalidateVisualLifecycle | when `Render` re-runs, `InvalidateVisual` | ✅ |
+| 077 | PointerInputHandling | `PointerPressed`/`Moved`/`Released` | ✅ |
+| 078 | GestureRecognition | `Tapped`/`DoubleTapped`, wheel deltas, gesture recognizers | ✅ |
+| 079 | KeyBindingsAndAccelerators | `KeyBinding`, `KeyGesture` | ✅ |
+| 080 | FocusManagement | focus traversal, `TabIndex`, `IsTabStop` | ✅ |
 | 081 | DragAndDropPayload | `DataObject`, `DragDrop` handlers | ⬜ |
 | 082 | ClipboardRoundTrip | clipboard read and write | ⬜ |
 | 083 | ChangeSetFilterPipeline | ReactiveUI change sets, reactive filtering | ⬜ |

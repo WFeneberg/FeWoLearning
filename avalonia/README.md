@@ -282,8 +282,19 @@ What *is* reliable, all measured:
   control and never drains the dispatcher silently misses a throwing `Render`.
   `MeasureOverride`/`ArrangeOverride` are the other way round: they throw
   synchronously inside `Show()`.
-- **`InvalidateVisual()` plus `RunJobs()` produces another `Render` call** (1 → 2
-  in a spy control). `ForceRenderTimerTick` adds none.
+- **Repaints are driven by the render timer, so use `ViewHarness.PumpRender()`**
+  — `ForceRenderTimerTick(1)` followed by `RunJobs()`. An earlier version of this
+  section claimed that `InvalidateVisual()` plus a bare `RunJobs()` was enough and
+  that `ForceRenderTimerTick` added nothing; **that was wrong**, and wrong in a way
+  that reads as true if you measure it once. A bare `RunJobs()` flushes a frame
+  only for the *first* window shown in a test, and only once, so a second
+  measurement in the same test silently reports zero repaints. With the pump, and
+  one window per test, the behaviour is exact and reproducible:
+  pumping while nothing is dirty repaints **nothing**; each `InvalidateVisual`
+  costs exactly one repaint; five invalidations before one pump **coalesce into
+  one**; a property registered with `AffectsRender` repaints on a real value change
+  and stays quiet when the same value is assigned again; a property not registered
+  never repaints.
 - **Layout is exact.** `MeasureOverride` sees the real constraint (including
   `double.PositiveInfinity`), `DesiredSize` clamps as computed, `ArrangeOverride`
   sees `finalSize`, and children land precisely where they were arranged.
@@ -308,6 +319,60 @@ Two geometry APIs that **must not** carry an assertion in this harness:
   (`PathGeometry.FillRule` round-trips), never as a hole in a shape.
 - **`StrokeContains` is simply broken here** — it returned `false` for a point
   plainly inside a 10 px stroke down the middle of a horizontal line.
+
+## Input: what the headless platform really delivers
+
+Input works, and works well — the whole surface on `InputElement` is public, so
+pointer events, `Tapped`/`DoubleTapped`, `KeyBindings`, `GestureRecognizers`,
+focus events and `FocusManager` are all reachable. Drive it through
+`ViewHarness.ShowWindow(...)`, which hands back the `Window` the headless
+extensions extend.
+
+**The one that will cost you an afternoon: a control with no `Background` is
+invisible to the pointer.** Measured — the same control, with the same overrides,
+received *nothing at all*, not one press, at any position, until it had a
+`Background`. `Brushes.Transparent` is enough, and behaves identically to an
+opaque brush. Hit testing asks what was *painted*, not what was arranged. This is
+also why a negative input assertion is dangerous on its own: "nothing happened"
+is equally true when nothing arrived, so anchor every negative claim to a
+positive one in the same test.
+
+Measured details worth knowing before you write an input test:
+
+- **Positions are control-relative** through `e.GetPosition(control)`: a control
+  arranged at 80,90 turns a window press at 100,100 into 20,10.
+- **Buttons are distinguishable.** A right press really does reach
+  `OnPointerPressed`, with `IsRightButtonPressed` set and `IsLeftButtonPressed`
+  clear, and it raises `RightTapped`.
+- **`DoubleTapped` needs no timing tricks** — a second programmatic click raises
+  it, *in addition to* that click's own `Tapped`, not instead of it.
+- **`KeyPress` requires a `PhysicalKey`** in 12.1.1; the three-argument overload
+  older samples use is gone. `KeyPressQwerty(PhysicalKey, modifiers)` is the
+  shorter route where the layout does not matter.
+- **Accelerators bubble.** With the focus on a `TextBox`, `KeyBindings` declared
+  on an ancestor panel still fired — which is why accelerators belong high in the
+  tree rather than on every leaf.
+- **`IsTabStop` gates traversal, not focusability.** A control with
+  `IsTabStop = false` is skipped by Tab, yet `Focus()` on it returns true and it
+  really becomes the focused element. `Focusable` is what gates focus itself.
+  Traversal also wraps: Tab past the last stop returns to the first.
+- **`TabIndex` beats tree order**, so a tab order can be, and in ex080 is,
+  deliberately different from the visual one.
+
+Three things input cannot show here:
+
+- **Pointer capture makes no observable difference.** With `e.Pointer.Capture(this)`
+  and without it, a move that left the control still arrived. So a test cannot
+  tell a solution that captures from one that forgets — capture is still right in
+  real code, it simply cannot be graded.
+- **`ScrollGesture` never fires from mouse input**, and
+  `ScrollGestureRecognizer` is not a public type in 12.1.1. Touch would raise it;
+  there is no touch here. Only `PinchGestureRecognizer` and
+  `PullGestureRecognizer` are public, and nothing in this harness can produce
+  either gesture, so registering one is assertable but its firing is not.
+- **`Avalonia.Input.Gestures` is not public** in 12.1.1, so the
+  `Gestures.AddTappedHandler` route most samples use does not compile. Subscribe
+  to the events on `InputElement` instead.
 
 ## Non-goals
 

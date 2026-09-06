@@ -340,6 +340,29 @@ the same `global.json` opt-in.
   write-only by design and cannot be inspected at all — which is why
   `catalog.md` row 074 now reads `PathGeometry` where it once said
   `StreamGeometry`.
+
+  **Input, by contrast, works properly — with one trap that costs an afternoon: a
+  control with no `Background` is invisible to the pointer.** Measured, the same
+  control with the same overrides received *nothing at all*, at any position,
+  until it had one; `Brushes.Transparent` suffices and behaves like an opaque
+  brush, because hit testing asks what was painted, not what was arranged. The
+  corollary shapes tests: a negative input assertion ("nothing happened") is
+  equally satisfied by nothing having *arrived*, so anchor every negative to a
+  positive one in the same test. Also measured: `KeyPress` now requires a
+  `PhysicalKey` (the old three-argument overload is gone; `KeyPressQwerty` is the
+  short route), `KeyBindings` on an ancestor fire while a descendant holds focus,
+  `IsTabStop` gates traversal but not `Focus()`, and traversal wraps. Three things
+  input cannot show: pointer **capture** makes no observable difference (moves
+  outside arrive either way), `ScrollGesture` never fires from mouse input and
+  `ScrollGestureRecognizer` is not public, and `Avalonia.Input.Gestures` is not
+  public either, so the `Gestures.AddTappedHandler` route in most samples does not
+  compile — hence `catalog.md` row 078 now names tapped/wheel rather than scroll
+  gestures. **Repaints need `ViewHarness.PumpRender()`** —
+  `ForceRenderTimerTick(1)` then `RunJobs()` — and one window per test: a bare
+  `RunJobs()` flushes a frame only for the first window and only once, which
+  silently reports zero repaints on any later measurement. With the pump the
+  behaviour is exact: idle pumps repaint nothing, each `InvalidateVisual` costs
+  one repaint, and five before a single pump coalesce into one.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -767,7 +790,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 75 / 100 (verified) | 25 |
+| `avalonia/`| 80 / 100 (verified) | 20 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 45 / 100 (verified) | 55 |

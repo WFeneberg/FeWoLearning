@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 60 ✅ / 20 ⬜**
+**Status: 65 ✅ / 15 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -107,11 +107,11 @@ fits on one machine.
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 061 | BulkheadIsolation | resource partitioning, one slow dependency not exhausting the pool | ⬜ |
-| 062 | ConcurrencyLimiter | admission control, load shedding, queue vs reject | ⬜ |
-| 063 | BackpressureBoundedQueue | bounded buffers, block vs drop vs shed, the unbounded-queue failure | ⬜ |
-| 064 | CostAwareBatching | batch size vs latency, flush triggers, partial-batch failure | ⬜ |
-| 065 | IdempotencyKeys 🐳 | HTTP idempotency keys, stored responses, replay vs re-execute | ⬜ |
+| 061 | BulkheadIsolation | resource partitioning, one slow dependency not exhausting the pool | ✅ |
+| 062 | ConcurrencyLimiter | admission control, load shedding, queue vs reject | ✅ |
+| 063 | BackpressureBoundedQueue | bounded buffers, block vs drop vs shed, the unbounded-queue failure | ✅ |
+| 064 | CostAwareBatching | batch size vs latency, flush triggers, partial-batch failure | ✅ |
+| 065 | IdempotencyKeys 🐳 | HTTP idempotency keys, stored responses, replay vs re-execute | ✅ |
 | 066 | LeaderElection 🐳 | lease-based single writer, renewal, loss of leadership mid-work | ⬜ |
 | 067 | DistributedScheduling | a job that runs once across N instances, missed and overlapping ticks | ⬜ |
 | 068 | GracefulShutdown | stop accepting, drain in flight, deadline, what to do with the rest | ⬜ |
