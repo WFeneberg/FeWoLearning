@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 40 ✅ / 30 ⬜**
+**Status: 45 ✅ / 25 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -73,16 +73,16 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 038 | ContextPropagators | `TextMapPropagator` inject/extract, the composite default | ✅ |
 | 039 | BaggagePropagation | baggage across a boundary, why it is not a span tag until you make it one | ✅ |
 | 040 | SemanticConventions | stable attribute names; why hand-rolled names silently break every dashboard | ✅ |
-| 041 | InstrumentationLibraries | `AddHttpClientInstrumentation`/`AddAspNetCoreInstrumentation`: what is automatic vs yours | ⬜ |
-| 042 | OtlpExporterConfiguration | endpoint, protocol, headers, env-var precedence; a real collector receives the span | 🐳 ⬜ |
-| 043 | PrometheusScrapeEndpoint | the text exposition format, name mangling and the `_total` suffix | 🐳 ⬜ |
-| 044 | ShutdownAndFlush | `ForceFlush`/`Shutdown`, the loss window, disposal order | ⬜ |
+| 041 | InstrumentationLibraries | `AddHttpClientInstrumentation`/`AddAspNetCoreInstrumentation`: what is automatic vs yours | ✅ |
+| 042 | OtlpExporterConfiguration | endpoint, protocol, headers, env-var precedence; a real collector receives the span | 🐳 ✅ |
+| 043 | PrometheusScrapeEndpoint | the text exposition format, name mangling and the `_total` suffix | 🐳 ✅ |
+| 044 | ShutdownAndFlush | `ForceFlush`/`Shutdown`, the loss window, disposal order | ✅ |
 
 ## web-services (045–058) — ASP.NET Core, HTTP clients, queues, databases
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 045 | AspNetCoreServerSpan | a server span per request via `TestHost`; the **route template**, not the raw path, as the span name | ⬜ |
+| 045 | AspNetCoreServerSpan | a server span per request via `TestHost`; the **route template**, not the raw path, as the span name | ✅ |
 | 046 | SpanEnrichmentAndFiltering | enriching the server span; suppressing `/health` noise at the source | ⬜ |
 | 047 | HttpClientPropagation | the outgoing `traceparent`, parent/child across the process boundary, a `DelegatingHandler` | ⬜ |
 | 048 | QueuePropagationProducerConsumer | inject into message headers, extract on the consumer, Producer/Consumer kinds and a link | ⬜ |

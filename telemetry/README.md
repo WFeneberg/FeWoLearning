@@ -525,3 +525,41 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–040: **200 facts total** (194 exercise + 6 harness).
   Red run 194 failed / 5 passed / 1 skipped; green run 199 passed / 1 skipped; green
   with `-p:Containers=true` 200 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, rows 041–045 — the first real containers, and `04-web-services` begins:**
+
+- **The container fact earned its place on its first outing, and this is the example to
+  point at.** Ex043's four in-process assertions all passed against a Prometheus
+  document that a real `promtool check metrics` **rejects**: `orders_processed_total no
+  help text`. The exporter emits a `# HELP` line only when the instrument was created
+  with a *description*, and nothing in the SDK, the middleware or any reasonable
+  assertion says so. The row now requires a description, and carries a fifth in-process
+  fact for the `# HELP` line so it is graded without Docker too — but nobody would have
+  known to write that fact without the strict reader.
+- **`AddHttpClientInstrumentation` cannot be exercised in-memory at all.** Measured: the
+  diagnostics handler it listens to is inserted by the real socket handler chain, so a
+  client built over any custom handler — which is what `TestServer` hands you — produces
+  **zero** spans. That is a property of the transport, not of the instrumentation, and it
+  is why row 041 is built on the server side and on `AddRuntimeInstrumentation` instead.
+- **`AddAspNetCoreInstrumentation` works fully under `TestServer`**, and the span it
+  produces is *already* named after the route template (`GET /orders/{id}`). No
+  configuration makes that happen — it is what the instrumentation does.
+- **`AddInMemoryExporter` has no options overload for traces**, so a row about batching
+  has to construct `new BatchActivityExportProcessor(new InMemoryExporter<Activity>(…),
+  scheduledDelayMilliseconds: …)` by hand. No bad thing when the processor is the
+  subject.
+- **Two Testcontainers details, both measured:** `ContainerBuilder()`'s parameterless
+  constructor is `[Obsolete]` in 4.14 (`CS0618`, and this track forbids warnings) — use
+  `new ContainerBuilder(image)`. And a container whose command exits immediately never
+  satisfies the default "until running" wait strategy, so `StartAsync` fails before
+  anything can be read: keep the container idling and use `ExecAsync`, whose
+  `ExitCode` is `long?`.
+- The two container harnesses are deliberately different shapes, and both are worth
+  copying. `CollectorContainer` runs a real OTel Collector with a `debug` exporter and
+  asserts against its **logs** — no second protocol, no query API, and nothing
+  connecting back into the test host. `PromtoolContainer` needs no ports at all: the
+  document goes in as a mapped file and the exit code is the answer.
+- Batch baseline after rows 001–045: **227 facts total** (221 exercise + 6 harness), of
+  which **3 are container-gated**. Red run 219 failed / 5 passed / 3 skipped; green run
+  224 passed / 3 skipped; green with `-p:Containers=true` **227 passed / 0 skipped**.
+  0 warnings in both modes.
