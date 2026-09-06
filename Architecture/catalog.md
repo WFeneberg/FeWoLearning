@@ -18,7 +18,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 85 ✅ / 15 ⬜**
+**Status: 90 ✅ / 10 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -146,11 +146,11 @@ the types the business talks in, and the processes that outlive a single request
 | 083 | AggregateTransactionBoundary | one aggregate per transaction, referencing others by id | ✅ |
 | 084 | DomainServicePlacement | logic that belongs to no single entity, and what that costs | ✅ |
 | 085 | WorkflowStateMachine | explicit states, illegal transitions refused, not a bool soup | ✅ |
-| 086 | WorkflowTimeouts | a step waiting on the world, with a deadline and an escape | ⬜ |
-| 087 | HumanInTheLoop | pausing for a decision and resuming days later | ⬜ |
-| 088 | LongRunningOperation | 202 Accepted, a status resource, and where the result lives | ⬜ |
-| 089 | WebhookDelivery | signing, retries, replay protection, delivery order | ⬜ |
-| 090 | ChangeDataCapture | turning row changes into an event stream nobody has to write | ⬜ |
+| 086 | WorkflowTimeouts | a step waiting on the world, with a deadline and an escape | ✅ |
+| 087 | HumanInTheLoop | pausing for a decision and resuming days later | ✅ |
+| 088 | LongRunningOperation | 202 Accepted, a status resource, and where the result lives | ✅ |
+| 089 | WebhookDelivery | signing, retries, replay protection, delivery order | ✅ |
+| 090 | ChangeDataCapture | turning row changes into an event stream nobody has to write | ✅ |
 
 ## runtime (091–100) — resources, degradation, and staying up
 
