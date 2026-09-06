@@ -14,14 +14,24 @@ public sealed class LogProbe : IDisposable
     private readonly FakeLogCollector _collector = new();
     private readonly ILoggerFactory _factory;
 
-    public LogProbe()
+    /// <param name="configure">
+    /// Applied AFTER the defaults, so an exercise's own filter rules win over the
+    /// probe's permissive baseline. Leave it null and everything from Trace upwards
+    /// is captured - which is what a fact about content, rather than about filtering,
+    /// wants.
+    /// </param>
+    public LogProbe(Action<ILoggingBuilder>? configure = null)
     {
         _factory = LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(LogLevel.Trace);
             builder.AddProvider(new FakeLoggerProvider(_collector));
+            configure?.Invoke(builder);
         });
     }
+
+    /// <summary>The factory itself, for exercises whose subject is category naming.</summary>
+    public ILoggerFactory Factory => _factory;
 
     public ILogger<T> For<T>() => _factory.CreateLogger<T>();
 
@@ -55,6 +65,24 @@ public sealed class LogProbe : IDisposable
     /// fails against a correct implementation.
     /// </summary>
     public static IReadOnlyList<object?> Scopes(FakeLogRecord record) => record.Scopes;
+
+    /// <summary>
+    /// One named value out of the scope at <paramref name="index"/> (0 is the
+    /// outermost), or <c>null</c> when that scope has no such key.
+    ///
+    /// Handles both idiomatic shapes: a <c>Dictionary&lt;string, object&gt;</c> scope
+    /// and a <c>BeginScope("Tenant {TenantId}", id)</c> scope, which the logging
+    /// abstraction turns into a key/value sequence carrying the same names. Both
+    /// erase to IEnumerable&lt;KeyValuePair&lt;string, object&gt;&gt; at runtime.
+    /// </summary>
+    public static string? ScopeValue(FakeLogRecord record, int index, string key)
+    {
+        if (index < 0 || index >= record.Scopes.Count) return null;
+
+        return record.Scopes[index] is IEnumerable<KeyValuePair<string, object?>> pairs
+            ? pairs.FirstOrDefault(kv => kv.Key == key).Value?.ToString()
+            : null;
+    }
 
     public void Dispose() => _factory.Dispose();
 }
