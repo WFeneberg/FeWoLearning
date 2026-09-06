@@ -463,16 +463,18 @@ Each of these cost real time. None is a guess.
   public static `WithReplicas` in `Aspire.Hosting`: there is exactly one, and it takes a
   project. There is no container spelling, so a replica row has to use `AddProject` and
   the walk-up in §5. More importantly for grading, `WithReplicas(3)` next to a **fixed
-  host port** neither throws nor warns — a proxied endpoint has one listener (the proxy)
-  in front of N instances, so it genuinely works, and `catalog.md` row 018's "a single
-  fixed host port and replicas are contradictory" overstates it. The genuine
-  contradiction is a fixed port on a **proxyless** endpoint, and Aspire does not detect
-  that either: the only replica combination it rejects in managed code is a persistent
-  container lifetime (*"uses multiple replicas and a persistent lifetime. These features
+  host port** neither throws nor warns — and that is correct, not a gap: a proxied
+  endpoint has one listener (the proxy) in front of N instances, so one host port there
+  is exactly what the proxy is for. What actually breaks is a fixed port on a
+  **proxyless** endpoint, and Aspire does not detect that either: the only replica
+  combination it rejects in managed code is a persistent container lifetime (*"uses multiple replicas and a persistent lifetime. These features
   do not work together"* — the only replica-related diagnostic string in the assembly).
   ex018 therefore grades the **shape** of the model — `ReplicaAnnotation` on the scaled
   resource only, `Port` null and `IsProxied` true there, a pinned proxyless port on the
-  single-instance one — and not a runtime check that does not exist. A second measured
+  single-instance one — and not a runtime check that does not exist. `catalog.md` row
+  018 says all of this; an earlier wording of it ("a single fixed host port and replicas
+  are contradictory") was corrected once this was measured, so the row and this entry
+  agree and neither is a correction of the other. A second measured
   trap in the same row: omit `launchProfileName: null` and the launch profile supplies
   the endpoint, so `AddProject("catalog", …).WithReplicas(3)` arrives with a **fixed**
   `Port` 5080 and a null `TargetPort` from a file nobody looked at.

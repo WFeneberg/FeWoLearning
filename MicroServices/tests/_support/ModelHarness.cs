@@ -51,12 +51,20 @@ public static class ModelHarness
     /// This is what a row about mode-dependent modelling needs and neither other
     /// harness provides: <see cref="Build"/> is run mode, and ManifestHarness gives
     /// back the published artifact rather than the graph behind it.
+    ///
+    /// The output path is a per-call GUID under <see cref="ManifestHarness.Root"/>
+    /// even though nothing writes to it. That is deliberate: "Aspire does not create
+    /// this directory" is a measured fact about 13.5.3, not a promise, and a future
+    /// version that created it eagerly would leak a directory per call. Under that
+    /// root it is swept with everything else; under a fixed path of its own it would
+    /// not be.
     /// </summary>
     public static Result BuildForPublish(Action<IDistributedApplicationBuilder> configure)
     {
+        var outputPath = Path.Combine(ManifestHarness.Root, Guid.NewGuid().ToString("N")[..12]);
         var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
         {
-            Args = ["--operation", "publish", "--output-path", Path.Combine(Path.GetTempPath(), "fewo-ms-model-only")],
+            Args = ["--operation", "publish", "--output-path", outputPath],
             DisableDashboard = true
         });
         configure(builder);

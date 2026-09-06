@@ -47,6 +47,18 @@ public class Ex017_DashboardUrlsTests
         var model = ModelHarness.Build(Ex017_DashboardUrls.Configure);
         var storefront = model.Resource("storefront");
 
+        // The endpoint itself, first, because the other two facts CANNOT see it.
+        // RunUrlCallbacks below has to fabricate the endpoint's url - L1 allocates
+        // no addresses - and `new EndpointReference((IResourceWithEndpoints)resource,
+        // "http")` succeeds against any container whether or not it declared an
+        // endpoint named "http". Measured: without this assertion, an implementation
+        // that simply forgets WithHttpEndpoint passes all three facts, because the
+        // callback happily decorates the url the test invented. This is what makes
+        // the seeded url stand for something real.
+        var endpoint = Assert.Single(storefront.Annotations.OfType<EndpointAnnotation>());
+        Assert.Equal("http", endpoint.Name);
+        Assert.Equal(8080, endpoint.TargetPort);
+
         // EXACTLY one, and that is the discriminating count. Measured on 13.5.3:
         // WithUrl writes its annotation immediately, WithUrlForEndpoint writes none.
         // So the plausible wrong answer - a second WithUrl("http://localhost:8080",

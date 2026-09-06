@@ -18,16 +18,19 @@ namespace FeWoLearning.MicroServices.Exercises.Beginner;
 ///         false. Both pass launchProfileName: null, so the endpoints above are the
 ///         ones this file declared and not whatever launchSettings.json happens to
 ///         say.
-/// Note:   The catalog row calls a fixed host port and replicas "contradictory".
-///         Measured on 13.5.3, Aspire itself does NOT agree: WithReplicas(3) together
-///         with a fixed Port neither throws nor warns, because a proxied endpoint has
-///         exactly one listener - the proxy - in front of N instances. The genuine
-///         contradiction is a fixed port on a PROXYLESS endpoint, where each instance
-///         would have to bind the port itself; Aspire does not detect that either.
-///         The one replica combination it does reject is a persistent container
-///         lifetime ("uses multiple replicas and a persistent lifetime. These
-///         features do not work together"). So this row grades the SHAPE of the
-///         model, which is the thing that is actually checkable at L1.
+/// Note:   Measured on 13.5.3, and the reason the row is graded on the model's
+///         SHAPE rather than on a runtime check: WithReplicas(3) together with a
+///         fixed Port neither throws nor warns. That is correct rather than a gap -
+///         a PROXIED endpoint has exactly one listener, the proxy, in front of N
+///         instances, so one host port there is what the proxy is for. What actually
+///         breaks is a fixed port on a PROXYLESS endpoint, where each instance would
+///         have to bind the port itself, and Aspire does not detect that either. The
+///         one replica combination it does reject is a persistent container lifetime
+///         ("uses multiple replicas and a persistent lifetime. These features do not
+///         work together") - the only replica diagnostic in the assembly. So nothing
+///         here is enforced for you; the shape is the whole of the grade. Measured
+///         too: WithReplicas exists only on IResourceBuilder<ProjectResource>, so
+///         there is no container spelling of this exercise.
 /// Trap:   Leave launchProfileName off and the launch profile supplies the endpoint
 ///         instead - measured, "catalog" then arrives with a FIXED Port 5080 and a
 ///         null TargetPort, and WithReplicas(3) scales a service whose host port was

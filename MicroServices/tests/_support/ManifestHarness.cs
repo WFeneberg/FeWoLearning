@@ -29,7 +29,15 @@ namespace FeWoLearning.MicroServices.Tests;
 /// </summary>
 public static class ManifestHarness
 {
-    private static readonly string Root = Path.Combine(Path.GetTempPath(), "fewo-ms-publish");
+    /// <summary>
+    /// The single root every publish-shaped output lives under, so the stale-output
+    /// sweep in the static constructor can reach all of it. <c>internal</c> rather than
+    /// private because <see cref="ModelHarness.BuildForPublish"/> also constructs a
+    /// publish-mode builder and must not point its output path somewhere unswept.
+    /// Reading it runs this type's static constructor, and hence the sweep - guaranteed,
+    /// because an explicit static constructor makes the type not <c>beforefieldinit</c>.
+    /// </summary>
+    internal static readonly string Root = Path.Combine(Path.GetTempPath(), "fewo-ms-publish");
 
     static ManifestHarness() => SweepStaleOutputs();
 
