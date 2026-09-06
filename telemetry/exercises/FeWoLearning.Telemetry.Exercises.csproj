@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>FeWoLearning.Telemetry.Exercises</RootNamespace>
+    <AssemblyName>FeWoLearning.Telemetry.Exercises</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Brings Microsoft.Extensions.Logging / DependencyInjection / Configuration /
+       Options / Hosting and the ASP.NET Core request pipeline. Do NOT also
+       PackageReference any of those - they are already in this shared framework
+       and NU1510 follows. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!-- Versions measured by a real restore on 2026-09-06. The Prometheus exporter
+       has NO stable release - 1.18.0-beta.1 is the newest thing that exists, and
+       `dotnet package search` returns nothing for it unless asked for prereleases.
+       (Note the wording: a literal double hyphen is illegal inside an XML comment,
+       so the flag name cannot be written out here - MSB4025.) -->
+  <ItemGroup>
+    <PackageReference Include="OpenTelemetry" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.18.0-beta.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Polly.Core" Version="8.7.0" />
+  </ItemGroup>
+
+</Project>
