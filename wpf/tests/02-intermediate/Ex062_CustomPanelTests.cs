@@ -7,6 +7,24 @@ namespace FeWoLearning.Wpf.Tests.Intermediate;
 
 public class Ex062_CustomPanelTests : WpfTestContext
 {
+    // Records the exact constraint MeasureOverride actually passed down to it - the same
+    // recording shape row 028's own element uses. Every OTHER test in this file uses a Border
+    // with an explicit Width/Height, so a MeasureOverride that constrains height to availableSize
+    // instead of leaving it unconstrained is invisible to them (an explicitly-sized child reports
+    // the same DesiredSize either way); only reading the constraint directly, on an element with
+    // no explicit size of its own, makes the instruction itself observable.
+    private sealed class ConstraintProbeElement : FrameworkElement
+    {
+        public Size LastConstraint { get; private set; }
+        public Size NaturalSize { get; set; } = new(10, 10);
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            LastConstraint = constraint;
+            return NaturalSize;
+        }
+    }
+
     private static Ex062_StackingPanel BuildPanel(params (double Width, double Height)[] children)
     {
         var panel = new Ex062_StackingPanel();
@@ -67,6 +85,22 @@ public class Ex062_CustomPanelTests : WpfTestContext
         Assert.Equal(new Size(40, 20), ((FrameworkElement)children[0]).RenderSize);
         Assert.Equal(new Size(60, 30), ((FrameworkElement)children[1]).RenderSize);
         Assert.Equal(new Size(20, 50), ((FrameworkElement)children[2]).RenderSize);
+    }
+
+    [WpfFact]
+    public void Each_Child_Is_Measured_With_An_Unconstrained_Height()
+    {
+        var panel = new Ex062_StackingPanel();
+        var probe = new ConstraintProbeElement { NaturalSize = new Size(30, 20) };
+        panel.Children.Add(probe);
+
+        // Deliberately a small available HEIGHT - against "child.Measure(availableSize)" instead
+        // of an unconstrained height: that mutant would pass a finite (50) height straight
+        // through, not PositiveInfinity.
+        Layout(panel, new Size(200, 50));
+
+        Assert.Equal(200, probe.LastConstraint.Width);
+        Assert.True(double.IsPositiveInfinity(probe.LastConstraint.Height), $"expected an unconstrained height, got {probe.LastConstraint.Height}");
     }
 
     [WpfFact]

@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using FeWoLearning.Wpf.Exercises.Intermediate;
@@ -10,12 +9,6 @@ public class Ex063_VirtualizationSwitchesTests : WpfTestContext
     private static readonly Size Viewport = new(300, 200);
 
     private static List<string> BuildItems(int count) => Enumerable.Range(0, count).Select(i => $"item {i}").ToList();
-
-    private static void CompleteInit(ISupportInitialize element)
-    {
-        element.BeginInit();
-        element.EndInit();
-    }
 
     private static int CountRealized(ItemsControl control, int itemCount)
     {
@@ -37,7 +30,7 @@ public class Ex063_VirtualizationSwitchesTests : WpfTestContext
         var items = BuildItems(200);
         var list = Ex063_VirtualizationSwitches.BuildVirtualizedList(items, isVirtualizing: true, VirtualizationMode.Standard, ScrollUnit.Item);
 
-        CompleteInit(list);
+        CompleteInitialization(list);
         Layout(list, Viewport);
         Pump();
 
@@ -56,7 +49,7 @@ public class Ex063_VirtualizationSwitchesTests : WpfTestContext
         var items = BuildItems(200);
         var list = Ex063_VirtualizationSwitches.BuildVirtualizedList(items, isVirtualizing: false, VirtualizationMode.Standard, ScrollUnit.Item);
 
-        CompleteInit(list);
+        CompleteInitialization(list);
         Layout(list, Viewport);
         Pump();
 
@@ -68,9 +61,11 @@ public class Ex063_VirtualizationSwitchesTests : WpfTestContext
     {
         var items = BuildItems(50);
 
-        // Deliberately every value away from its own default, and varied from the previous
-        // tests' arguments - a mutant that sets only two of the three (leaving the third at its
-        // default) is caught here regardless of which one it drops.
+        // Every value here is away from its own registered default EXCEPT isVirtualizing (true
+        // already IS the default) - so a mutant dropping SetVirtualizationMode or SetScrollUnit is
+        // caught right here, but one dropping SetIsVirtualizing is not (true is what it would
+        // still read back either way); that one is caught instead by the tests above/below, which
+        // both pass isVirtualizing: false - away from the default - for exactly this reason.
         var list = Ex063_VirtualizationSwitches.BuildVirtualizedList(items, isVirtualizing: true, VirtualizationMode.Recycling, ScrollUnit.Pixel);
 
         Assert.True(VirtualizingPanel.GetIsVirtualizing(list));

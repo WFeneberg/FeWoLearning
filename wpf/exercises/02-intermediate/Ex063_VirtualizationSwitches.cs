@@ -34,5 +34,5 @@ public static class Ex063_VirtualizationSwitches
     /// default panel is a plain StackPanel that silently ignores every one of these switches.
     /// </summary>
     public static ItemsControl BuildVirtualizedList(IEnumerable items, bool isVirtualizing, VirtualizationMode mode, ScrollUnit scrollUnit)
-        => throw new NotImplementedException("TODO: Ex063 - build a new ListBox { ItemsSource = items } (a ListBox, not a bare ItemsControl - see the Goal comment for why that choice matters), then set VirtualizingPanel.IsVirtualizing, VirtualizingPanel.VirtualizationMode and VirtualizingPanel.ScrollUnit on THAT ListBox to isVirtualizing/mode/scrollUnit respectively (all three - leaving any one of them at its default is not the same as declaring it), and return it");
+        => throw new NotImplementedException("TODO: Ex063 - build a ListBox (not a bare ItemsControl - see the Goal comment for why that choice matters) bound to items, then declare all three virtualization switches - IsVirtualizing, VirtualizationMode and ScrollUnit - on that ListBox to the given values (leaving any one of them at its default is not the same as declaring it), and hand the ListBox back");
 }

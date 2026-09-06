@@ -28,8 +28,8 @@ namespace FeWoLearning.Wpf.Exercises.Intermediate;
 public class Ex062_StackingPanel : Panel
 {
     protected override Size MeasureOverride(Size availableSize)
-        => throw new NotImplementedException("TODO: Ex062 - foreach (UIElement child in InternalChildren): child.Measure(new Size(availableSize.Width, double.PositiveInfinity)); then return a Size whose Width is the MAX of every child.DesiredSize.Width and whose Height is the SUM of every child.DesiredSize.Height");
+        => throw new NotImplementedException("TODO: Ex062 - measure every child in InternalChildren against this panel's own available width but an UNCONSTRAINED height (a vertical stack never runs out of room to grow into) - then report this panel's own desired size as the widest child's measured width and the sum of every child's measured height");
 
     protected override Size ArrangeOverride(Size finalSize)
-        => throw new NotImplementedException("TODO: Ex062 - walk InternalChildren in order, keeping a running Y offset starting at 0: child.Arrange(new Rect(0, runningY, child.DesiredSize.Width, child.DesiredSize.Height)), then add THAT child's DesiredSize.Height onto runningY before the next child (do not use finalSize.Width, and do not use a fixed increment - each child's own DesiredSize decides how far the next one moves down). Return a Size whose Width is the max child width and whose Height is the final runningY - the panel's own natural stacked size, NOT finalSize verbatim");
+        => throw new NotImplementedException("TODO: Ex062 - arrange each child, in the order InternalChildren holds them, directly below the one before it - each at its OWN measured size, never stretched - so how far the next child sits down depends on how tall the previous ones actually measured, never a fixed step and never finalSize's width; report this panel's own final size as the widest child and the total height actually used, not finalSize itself");
 }

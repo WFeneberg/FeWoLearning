@@ -1,6 +1,6 @@
-// Exercise 065 - Templates as resources: where the dictionary lives, and what a collision does
-// (intermediate). REFERENCE SOLUTION.
-// Goal:   Row 041 already established the one fact every implicit DataTemplate lookup needs -
+// Exercise 065 - Templates as resources (intermediate). REFERENCE SOLUTION.
+// Goal:   Where the dictionary lives, and what a collision does. Row 041 already established the
+//         one fact every implicit DataTemplate lookup needs -
 //         the key is System.Windows.DataTemplateKey(type), never the bare Type - and used it to
 //         drive a single ContentControl from one adjacent dictionary. This row does not re-teach
 //         that; it does not even repeat row 041's ContentControl/live-Binding shape at all. What
@@ -16,11 +16,14 @@
 //         Application.Current.Resources stop is simply absent here too - every dictionary in this
 //         row's tests lives on an element somewhere in the tree, never anywhere else.
 // Drills: registering a DataTemplate directly into a given ResourceDictionary, keyed by the
-//         template's OWN DataType property (System.Windows.DataTemplateKey(template.DataType) -
+//         template's OWN DataType property (the same DataTemplateKey wrapper row 041 established -
 //         not a separately-passed Type the way row 041's RegisterViewTemplate took one); and
 //         registering a template inside a FRESH ResourceDictionary that is then merged into a
-//         host's Resources.MergedDictionaries - the shape templates usually ship in for real,
-//         reused across an app - rather than written directly into the host's own dictionary.
+//         host's own MergedDictionaries - the shape templates usually ship in for real, reused
+//         across an app - rather than written directly into the host's own dictionary. The
+//         discriminator between the two, and against a mutant that quietly merges its own
+//         dictionary in either way: ResourceDictionary.Keys (unlike Contains or the indexer) never
+//         sees through MergedDictionaries - already the case row 026 rests on for the same reason.
 
 using System.Windows;
 using System.Windows.Controls;

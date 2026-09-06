@@ -424,18 +424,23 @@ measurement walked, not the general mechanism it seems to imply.
 
 #### Markup extensions
 
-- **`XamlReader.Parse` CAN resolve a custom `MarkupExtension` from a runtime `clr-namespace`
-  reference, but only by its LITERAL type name, `Extension` suffix included - the
-  suffix-stripping convention markup-compiled XAML normally allows is a XAML-COMPILER feature,
-  not something `XamlReader.Parse`'s own runtime type resolution honors.** Measured directly while
-  scoping row 064: `{local:FooExtension ...}` against a public, top-level `FooExtension :
-  MarkupExtension` succeeds; `{local:Foo ...}` against the identical type throws
-  `XamlParseException` ("unknown type ... cannot be created"). Row 064 ships no XAML and no
-  `XamlReader.Parse` test anyway - `MarkupExtension.ProvideValue`/`IProvideValueTarget` are both
-  already fully exercised by calling `ProvideValue` directly with a hand-built
-  `IServiceProvider`/`IProvideValueTarget`, the same substitution rows 025 and 058 already made in
-  this XAML-free tier - but this measurement is recorded here rather than left for a later row to
-  rediscover the hard way.
+- **`XamlReader.Parse` DOES honour the suffix-stripping convention for a custom
+  `MarkupExtension` - measured with a five-name matrix plus a negative control, after an
+  earlier draft of this file recorded the opposite (backwards) claim.** A type named
+  `FooExtension` resolves from BOTH `{local:FooExtension ...}` and the suffix-stripped
+  `{local:Foo ...}`; a type with no `Extension` suffix at all (`PlainThing`) resolves from its
+  own bare name (`{local:PlainThing ...}`) same as ever. What actually throws
+  `XamlParseException` ("unknown type ... cannot be created") is a reference to a name that
+  simply does not exist - either a genuinely unknown type (`{local:TotallyBogus ...}`, the
+  negative control) or a real suffix-less type's bare name with `Extension` wrongly appended
+  (`{local:PlainThingExtension ...}`, when only `PlainThing` exists) - the algorithm only ever
+  ADDS the suffix when a bare name is not found, it never strips one on the way to trying a
+  shorter name. Row 064 still ships no XAML and no `XamlReader.Parse` test regardless - rows
+  025 and 058's precedent for a code-only drill in this XAML-free tier is reason enough on its
+  own, and does not depend on this fact either way - but the corrected measurement is recorded
+  here so it does not go on being wrong a second time.
+
+#### Validation
 
 - **`Binding.ValidatesOnNotifyDataErrors` and `Binding.ValidatesOnDataErrors` have opposite
   defaults - measured directly, not assumed from the two interfaces looking alike.** The
@@ -540,15 +545,17 @@ measurement walked, not the general mechanism it seems to imply.
   here with no window and no real scrolling. `VirtualizationMode` and `ScrollUnit`, in contrast,
   make no difference to that realized COUNT either way (076 owns what they actually change:
   container identity across a scroll) - row 063 asserts only that the three switches read back
-  correctly off the `ListBox` they were set on. Also measured directly: `VirtualizingPanel
-  .IsVirtualizingProperty`'s own metadata does NOT set `FrameworkPropertyMetadataOptions.Inherits`
-  (confirmed via `DependencyProperty.GetMetadata(typeof(VirtualizingPanel)).Inherits == false`), so
-  the switches only take effect set directly on the `ItemsControl` whose default items panel is
-  actually a `VirtualizingStackPanel` - a bare `ItemsControl` (default panel: plain,
-  non-virtualizing `StackPanel`) silently ignores every one of them regardless of what they are
-  set to, with no exception anywhere to notice the miss by - the same "wrong element, no error"
-  shape as the `DataTemplateKey`/`FrameworkElementFactory.Name` traps recorded elsewhere in this
-  file, on a third lookup mechanism.
+  correctly off the `ListBox` they were set on. Also measured directly, for all THREE switches,
+  not just `IsVirtualizing`: none of their metadata sets `FrameworkPropertyMetadataOptions
+  .Inherits` (confirmed via `VirtualizingPanel.IsVirtualizingProperty.GetMetadata(typeof
+  (VirtualizingPanel)).Inherits`, and the identical check against `VirtualizationModeProperty`
+  and `ScrollUnitProperty`, all three reading `false`), so the switches only take effect set
+  directly on the `ItemsControl` whose default items panel is actually a `VirtualizingStackPanel`
+  - a bare `ItemsControl` (default panel: plain, non-virtualizing `StackPanel`) silently ignores
+  every one of them regardless of what they are set to, with no exception anywhere to notice the
+  miss by - the same "wrong element, no error" shape as the `DataTemplateKey`/
+  `FrameworkElementFactory.Name` traps recorded elsewhere in this file, on a third lookup
+  mechanism.
 
   Row 058 measured the other side of this same gate directly, not by inference from it: an
   EXPLICITLY assigned `Control.Template` applies - visual tree built, `GetTemplateChild`/
@@ -745,7 +752,7 @@ narrow question — does the WPF mechanism work — and deliberately does not at
 
 ## Writing an exercise without writing a test that lies
 
-Five failure modes, each of which has already shipped in some track of this repo:
+Six failure modes, each of which has already shipped in some track of this repo:
 
 - A test asserting only what the **signature** produces — wrong arity, wrong call
   style — passes before the stub's body ever runs. Assert on introspected metadata,

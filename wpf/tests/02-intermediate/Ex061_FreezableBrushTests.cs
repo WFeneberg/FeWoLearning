@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Media;
 using FeWoLearning.Wpf.Exercises.Intermediate;
 
@@ -5,6 +6,31 @@ namespace FeWoLearning.Wpf.Tests.Intermediate;
 
 public class Ex061_FreezableBrushTests : WpfTestContext
 {
+    // A Freezable whose protected FreezeCore hook (a real, documented extensibility point, not
+    // reflection) records how many times it was asked to CHECK freezability (isChecking: true) -
+    // the only externally observable difference between genuinely reading CanFreeze first and a
+    // mutant that just calls Freeze() and swallows whatever it throws. Freeze() itself already
+    // performs ONE such check internally before committing, so a correct FreezeIfPossible (which
+    // also reads freezable.CanFreeze itself, then calls Freeze()) causes TWO; a mutant that never
+    // reads CanFreeze at all and only calls Freeze() causes just the one Freeze() already performs
+    // on its own.
+    private sealed class CheckCountingFreezable : Freezable
+    {
+        public int CheckingCalls;
+
+        protected override Freezable CreateInstanceCore() => new CheckCountingFreezable();
+
+        protected override bool FreezeCore(bool isChecking)
+        {
+            if (isChecking)
+            {
+                CheckingCalls++;
+            }
+
+            return base.FreezeCore(isChecking);
+        }
+    }
+
     // Runs action on a brand-new background thread and reports whatever it threw (or null, if
     // nothing did) - test-local plumbing, not something the exercise itself needs to ship, the
     // same "abstract plumbing only in the content library, probes test-local" shape rows
@@ -56,6 +82,20 @@ public class Ex061_FreezableBrushTests : WpfTestContext
 
         Assert.False(result);
         Assert.False(brush.IsFrozen);
+    }
+
+    [WpfFact]
+    public void FreezeIfPossible_Actually_Reads_CanFreeze_Rather_Than_Just_Calling_Freeze_And_Catching()
+    {
+        var freezable = new CheckCountingFreezable();
+
+        var result = Ex061_FreezableBrush.FreezeIfPossible(freezable);
+
+        Assert.True(result);
+        // Against "try { freezable.Freeze(); } catch { } return freezable.IsFrozen;": that mutant
+        // reaches the same IsFrozen==true outcome, but never reads CanFreeze itself, so it only
+        // ever causes Freeze()'s own single internal check - one, not two.
+        Assert.Equal(2, freezable.CheckingCalls);
     }
 
     [WpfFact]

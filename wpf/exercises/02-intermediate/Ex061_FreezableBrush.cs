@@ -11,6 +11,10 @@
 //         IsFrozen, and - measured directly, not assumed - that an unfrozen Freezable throws
 //         InvalidOperationException the moment a different thread so much as READS one of its
 //         properties, while the identical read from a FROZEN instance succeeds on any thread.
+//         A plausible-looking bypass this row also rejects: calling Freeze() unconditionally and
+//         swallowing whatever it throws ends up at the same IsFrozen outcome as genuinely
+//         consulting CanFreeze first, so this row verifies CanFreeze is actually READ, not merely
+//         implied by the result.
 // Passes: dotnet test --filter FullyQualifiedName~Ex061_
 
 using System.Windows;
@@ -28,12 +32,12 @@ public static class Ex061_FreezableBrush
     /// up frozen, so a caller can tell which happened without inspecting IsFrozen itself.
     /// </summary>
     public static bool FreezeIfPossible(Freezable freezable)
-        => throw new NotImplementedException("TODO: Ex061 - if freezable.CanFreeze, call freezable.Freeze(); either way (including when CanFreeze is false), return freezable.IsFrozen afterwards - never call Freeze() when CanFreeze is false");
+        => throw new NotImplementedException("TODO: Ex061 - only attempt to freeze freezable when it is actually freezable, then report back whether it ends up frozen either way - this must never throw, even when it cannot freeze");
 
     /// <summary>
     /// Builds a new SolidColorBrush from <paramref name="color"/> and freezes it immediately - a
     /// plain brush with no bindings or animations attached can always freeze, so this never fails.
     /// </summary>
     public static SolidColorBrush CreateFrozenBrush(Color color)
-        => throw new NotImplementedException("TODO: Ex061 - build a new SolidColorBrush(color), freeze it, and return it");
+        => throw new NotImplementedException("TODO: Ex061 - construct a solid-color brush of the given color and hand back an already-frozen instance of it");
 }

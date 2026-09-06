@@ -53,7 +53,13 @@ public class Ex065_TemplatesAsResourcesTests : WpfTestContext
 
         Ex065_TemplatesAsResources.RegisterImplicit(resources, template);
 
-        Assert.True(resources.Contains(new DataTemplateKey(typeof(Widget))));
+        // resources.Keys enumerates only the dictionary's OWN entries, never anything reachable
+        // only through a MergedDictionaries entry (see README, "Resources and template lookup") -
+        // unlike Contains/the indexer, which see through MergedDictionaries and would be
+        // satisfied just as well by a mutant that builds its own dictionary and merges THAT in,
+        // rather than writing directly into resources as instructed.
+        Assert.Contains(new DataTemplateKey(typeof(Widget)), resources.Keys.Cast<object>());
+        Assert.Empty(resources.MergedDictionaries);
         Assert.Same(template, resources[new DataTemplateKey(typeof(Widget))]);
     }
 
@@ -66,9 +72,12 @@ public class Ex065_TemplatesAsResourcesTests : WpfTestContext
         Ex065_TemplatesAsResources.RegisterImplicit(resourcesA, BuildTemplate("marker"));
 
         // Against a mutant that quietly writes into a dictionary of its own instead of the one
-        // passed in: the CALLER's dictionary must actually change.
-        Assert.True(resourcesA.Contains(new DataTemplateKey(typeof(Widget))));
-        Assert.False(resourcesB.Contains(new DataTemplateKey(typeof(Widget))));
+        // passed in - including one that merges that dictionary of its own INTO resourcesA,
+        // which Contains/the indexer cannot tell apart from a direct write at all: Keys is what
+        // actually discriminates a direct write from anything reached only via MergedDictionaries.
+        Assert.Contains(new DataTemplateKey(typeof(Widget)), resourcesA.Keys.Cast<object>());
+        Assert.Empty(resourcesA.MergedDictionaries);
+        Assert.DoesNotContain(new DataTemplateKey(typeof(Widget)), resourcesB.Keys.Cast<object>());
     }
 
     [WpfFact]
@@ -106,6 +115,9 @@ public class Ex065_TemplatesAsResourcesTests : WpfTestContext
         // attachment itself must be observable directly, not only through the full render.
         Assert.Single(grandparent.Resources.MergedDictionaries);
         Assert.True(grandparent.Resources.MergedDictionaries[0].Contains(new DataTemplateKey(typeof(Widget))));
+        // And the contrast with RegisterImplicit: the entry lives in the MERGED child, never
+        // written directly into grandparent.Resources itself.
+        Assert.DoesNotContain(new DataTemplateKey(typeof(Widget)), grandparent.Resources.Keys.Cast<object>());
 
         Layout(grandparent);
         Pump();

@@ -1,19 +1,17 @@
-// Exercise 064 - A custom MarkupExtension, and the XAML question decided the way row 058 decided
-// it (intermediate).
+// Exercise 064 - A custom MarkupExtension (intermediate).
 // Goal:   A MarkupExtension is a normal class with one virtual method - ProvideValue(IServiceProvider) -
 //         so calling it directly with a hand-built IServiceProvider/IProvideValueTarget is a
 //         legitimate, complete drill with no XAML involved at all, the same substitution rows 025
-//         and 058 already made for this XAML-free tier. Probed directly for this row, the way row
-//         058 probed XamlReader.Parse for its own subject: a custom MarkupExtension CAN be resolved
-//         by XamlReader.Parse from a runtime-compiled clr-namespace reference - but only by its
-//         literal type name, "Extension" suffix included ({local:FooExtension ...}); the
-//         suffix-stripping convention markup-compiled XAML normally allows ({local:Foo ...}) is a
-//         XAML-COMPILER feature, not something XamlReader.Parse's runtime type resolution honors -
-//         {local:UpperCase ...} throws XamlParseException ("unknown type"), {local:UpperCaseExtension
-//         ...} succeeds. Since the row's own Concepts (ProvideValue, IProvideValueTarget) are both
-//         already fully exercised without it, and the literal markup form is this finicky about a
-//         detail unrelated to either concept, this row ships no XAML and no XamlReader.Parse test -
-//         the measurement above is recorded here, not turned into a graded assertion.
+//         and 058 already made for this XAML-free tier: that precedent is reason enough on its
+//         own, and it is the actual reason this row ships no XAML. (An earlier draft of this row
+//         additionally claimed XamlReader.Parse could not resolve a custom MarkupExtension by its
+//         suffix-stripped name - that claim was backwards. Re-measured with a five-name matrix
+//         plus a negative control: XamlReader.Parse DOES honour suffix stripping - a type named
+//         FooExtension resolves from both {local:FooExtension ...} and {local:Foo ...}; only a
+//         type reference that does not exist at all throws XamlParseException, whether that is a
+//         genuinely unknown name or a real type's bare name with "Extension" wrongly appended. The
+//         row's scope decision does not depend on this fact either way, so it is recorded here and
+//         nowhere else - not turned into a graded assertion.)
 // Drills: MarkupExtension.ProvideValue(IServiceProvider) and IProvideValueTarget.TargetProperty -
 //         a markup extension that hands back whatever the TARGET DependencyProperty's own
 //         registered default value is, instead of a value baked into the extension itself. That
@@ -34,5 +32,5 @@ namespace FeWoLearning.Wpf.Exercises.Intermediate;
 public sealed class Ex064_PropertyDefaultExtension : MarkupExtension
 {
     public override object? ProvideValue(IServiceProvider serviceProvider)
-        => throw new NotImplementedException("TODO: Ex064 - get IProvideValueTarget via serviceProvider.GetService(typeof(IProvideValueTarget)); read its TargetProperty as a DependencyProperty and its TargetObject as a DependencyObject; return targetProperty.GetMetadata(targetObject.GetType()).DefaultValue - the TARGET property's own registered default, never a value hard-coded into this extension");
+        => throw new NotImplementedException("TODO: Ex064 - obtain the IProvideValueTarget service from serviceProvider; from it, determine which DependencyProperty is being targeted and which DependencyObject it belongs to; resolve and return THAT property's own registered default value for the target's actual type - never a value hard-coded into this extension");
 }

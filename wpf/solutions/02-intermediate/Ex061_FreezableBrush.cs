@@ -11,6 +11,10 @@
 //         IsFrozen, and - measured directly, not assumed - that an unfrozen Freezable throws
 //         InvalidOperationException the moment a different thread so much as READS one of its
 //         properties, while the identical read from a FROZEN instance succeeds on any thread.
+//         A plausible-looking bypass this row also rejects: calling Freeze() unconditionally and
+//         swallowing whatever it throws ends up at the same IsFrozen outcome as genuinely
+//         consulting CanFreeze first, so this row verifies CanFreeze is actually READ, not merely
+//         implied by the result.
 
 using System.Windows;
 using System.Windows.Media;
