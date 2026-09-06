@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 55 ✅ / 45 ⬜**
+**Status: 60 ✅ / 40 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -104,11 +104,11 @@ Two deliberate content gaps:
 | 053 | CollectionViewSourceBasics | `ICollectionView`, `CurrentItem`, `MoveCurrentTo` | ✅ |
 | 054 | SortAndGroup | `SortDescriptions`, `GroupDescriptions` | ✅ |
 | 055 | FilterPredicate | `ICollectionView.Filter`, `Refresh` | ✅ |
-| 056 | DeferRefresh | batch several changes, count the refreshes collapsed | ⬜ |
-| 057 | EditableObjectTransactions | `IEditableObject` begin/cancel/end edit | ⬜ |
-| 058 | ControlTemplateAndTemplateBinding | retemplate a control, `TemplateBinding`, `GetTemplateChild` | ⬜ |
-| 059 | VisualStateManager | `VisualStateGroup`, `VisualStateManager.GoToState` | ⬜ |
-| 060 | AttachedBehavior | replace code-behind with an attached-property behavior | ⬜ |
+| 056 | DeferRefresh | batch several changes, count the refreshes collapsed | ✅ |
+| 057 | EditableObjectTransactions | `IEditableObject` begin/cancel/end edit | ✅ |
+| 058 | ControlTemplateAndTemplateBinding | retemplate a control in code, `GetTemplateChild`, the code equivalent of `TemplateBinding` (`RelativeSource.TemplatedParent`) | ✅ |
+| 059 | VisualStateManager | `VisualStateGroup`, `VisualStateManager.GoToState` | ✅ |
+| 060 | AttachedBehavior | replace code-behind with an attached-property behavior | ✅ |
 | 061 | FreezableBrush | `Freeze`, `IsFrozen`, `CanFreeze`, sharing across threads | ⬜ |
 | 062 | CustomPanel | a real `Panel` with `MeasureOverride`/`ArrangeOverride` | ⬜ |
 | 063 | VirtualizationSwitches | `VirtualizingStackPanel.IsVirtualizing`, `VirtualizationMode`, `ScrollUnit` | ⬜ |

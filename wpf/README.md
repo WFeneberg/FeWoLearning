@@ -248,6 +248,25 @@ measurement walked, not the general mechanism it seems to imply.
   captured state changes elsewhere - the view has no way to notice that on its own and goes on
   showing the stale result until something calls `Refresh()`. Row 055 is built around exactly
   that gap, not around `Filter` needing `Refresh()` in general.
+- **`ICollectionView.DeferRefresh()` does NOT tolerate mutating the SOURCE collection while a
+  scope is open - measured directly, and the opposite of what older WPF folklore about
+  `DeferRefresh` demonstrates.** A single `ObservableCollection<T>.Add(...)` inside an open
+  `DeferRefresh()` scope throws `InvalidOperationException` ("cannot change or verify the
+  content or Current-position of 'CollectionView' while a Refresh is deferred") synchronously,
+  from the `Add` call itself - with or without a `CollectionChanged` subscriber attached, with
+  zero, one or several prior adds, regardless of `CurrentPosition`. What `DeferRefresh` actually
+  batches safely here is VIEW-level state - `SortDescriptions`/`GroupDescriptions`/`Filter` -
+  each of which (rows 054/055) already re-applies (and raises its own `Reset`) the moment it
+  changes; wrapping several such changes in one `DeferRefresh()` scope collapses them into a
+  single `Reset` when the scope's `Dispose` runs, confirmed directly by counting
+  `((INotifyCollectionChanged)view).CollectionChanged` invocations. Row 056 is built entirely on
+  batching view-level changes for exactly this reason. Also measured: nested `DeferRefresh()`
+  scopes only fire the collapsed `Reset` when the OUTERMOST scope's `Dispose` runs - disposing an
+  inner scope while the outer one is still open produces nothing; and reading `CurrentItem`
+  (or enumerating the view at all) from code running INSIDE an open scope throws the same
+  `InvalidOperationException` - confirmed directly, not merely documented - which is what makes
+  "did `mutate` actually run inside the deferred window" a real, catchable assertion rather than
+  an inference.
 
 #### Layout and sizing
 
@@ -300,7 +319,18 @@ measurement walked, not the general mechanism it seems to imply.
   (`MetadataInheritance`) and any later row that touches inheritance (016
   `DataContextInheritance`, 060 `AttachedBehavior`) depend on this: register the
   inheritable property as attached, the way `FontSize` and `DataContext` are, not as
-  an instance property on the class that happens to consume it.
+  an instance property on the class that happens to consume it. Row 060 turned out not to need
+  `Inherits` at all — its attached property drives per-element event wiring, not a value
+  descendants read — but it is registered via `RegisterAttached` regardless, matching this rule
+  rather than contradicting it.
+- **An attached property's `PropertyChangedCallback` is the only place row 060's behavior can
+  correctly subscribe AND unsubscribe an event handler — wiring the same handler through
+  `EventManager.RegisterClassHandler` in a static constructor instead reacts to every instance of
+  the target type, forever, regardless of whether the attached property was ever set on it.**
+  Measured directly by running exactly that mutant: a `TextBox` that never had the attached
+  property touched at all still got the behavior's effect, because class-handler registration is
+  per-TYPE, not per-element. The property system's own callback is what makes the behavior
+  actually track individual elements' opt-in/opt-out.
 
 #### Resources and template lookup
 
@@ -329,6 +359,19 @@ measurement walked, not the general mechanism it seems to imply.
   `DataTemplate`'s own `DataType` plays no part in the lookup itself - a template registered
   under the correct `DataTemplateKey` but with no `DataType` set at all still resolves; the
   key is the whole mechanism.
+- **A `FrameworkElementFactory` part built for a `ControlTemplate` must be named through its own
+  `Name` property, not `SetValue(FrameworkElement.NameProperty, ...)` - measured directly
+  building row 058.** Both compile and both eventually show up on the instantiated element once
+  the template applies, but only `factory.Name = "..."` actually registers the name in the
+  template's own name scope: with `SetValue(NameProperty, ...)` instead,
+  `Control.GetTemplateChild("...")` and `FrameworkTemplate.FindName("...", control)` both return
+  null forever, even after `ApplyTemplate()` and a full layout pass, with no exception anywhere
+  to notice the miss by - the same "wrong key, no error" shape as the `DataTemplateKey` trap
+  above, on a different lookup. Also measured for row 058: an EXPLICITLY assigned
+  `Control.Template` applies fully - visual tree built, named parts resolvable through
+  `GetTemplateChild`/`FindName` - regardless of `IsInitialized` and with no
+  `CompleteInitialization` call anywhere; see the `IsInitialized` finding under "Initialization"
+  below for why that is NOT the same path rows 031-034 measured.
 
 #### Validation
 
@@ -426,6 +469,15 @@ measurement walked, not the general mechanism it seems to imply.
   `EnableCollectionSynchronization`/`ItemContainerGenerator` corruption bullet under "Timing and
   the dispatcher", for why that turned out to be the right call for reasons unrelated to
   initialization.
+
+  Row 058 measured the other side of this same gate directly, not by inference from it: an
+  EXPLICITLY assigned `Control.Template` applies - visual tree built, `GetTemplateChild`/
+  `FindName` both resolve a named part - with `IsInitialized` still `false` and with no
+  `CompleteInitialization`/`BeginInit`-`EndInit` call anywhere, whether or not
+  `Control.ApplyTemplate()` is also called explicitly first. `IsInitialized` only gates looking
+  up a control's UNSET *default* Style/Template (rows 031-034's finding above); nothing has to be
+  looked up when a `Template` is assigned directly, so the gate simply does not apply to that
+  path. Row 058's tests call no `CompleteInitialization` anywhere for exactly this reason.
 
 #### Stub shape and compiler warnings
 
@@ -530,6 +582,15 @@ narrow question — does the WPF mechanism work — and deliberately does not at
   the performance rows (076–080) assert *that* the mechanism fired (container identity
   across a scroll, `IsFrozen`, the number of measure passes an invalidation caused)
   rather than how fast it fired.
+- **A `VisualState`'s `Storyboard` does not actually run here.** Measured directly building row
+  059: `VisualStateManager.GoToElementState(root, "Highlighted", false)` returns `true` and the
+  owning `VisualStateGroup.CurrentState` correctly updates to the target state, but a
+  `DoubleAnimation` targeting the root's own `Opacity` inside that state's `Storyboard` never
+  visibly moves it — not immediately, not after pumping every dispatcher priority, not after a
+  `Thread.Sleep` plus another pump. There is no frame loop or rendering clock behind it, the same
+  absence documented above for wall-clock timing. Row 059 is built entirely on the MECHANISM
+  instead — `GoToElementState`'s own return value, `GetVisualStateGroups`, and `CurrentState` —
+  never an animated property value, and it ships with no `Storyboard` in its own states at all.
 - **`Show(...)` really does open a window.** It is off-screen and unactivated, but it
   is a real `Window.Show()` — the same constraint `caliburn/README.md` states for
   itself. Running the full suite needs a real, interactive desktop session; it will
