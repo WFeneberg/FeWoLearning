@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 35 ✅ / 35 ⬜**
+**Status: 40 ✅ / 30 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -68,11 +68,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 033 | MetricViews | rename, drop, tag-key selection for cardinality control, explicit histogram bounds | ✅ |
 | 034 | MetricTemporality | Delta vs Cumulative across two collections | ✅ |
 | 035 | Exemplars | a measurement carrying the trace id that produced it, exemplar filtering | ✅ |
-| 036 | OtelLogsPipeline | `AddOpenTelemetry` logging, `LogRecord` fields, formatted message vs state | ⬜ |
-| 037 | LogTraceCorrelation | `LogRecord.TraceId` matching `Activity.Current`, `ParseStateValues`, `IncludeScopes` | ⬜ |
-| 038 | ContextPropagators | `TextMapPropagator` inject/extract, the composite default | ⬜ |
-| 039 | BaggagePropagation | baggage across a boundary, why it is not a span tag until you make it one | ⬜ |
-| 040 | SemanticConventions | stable attribute names; why hand-rolled names silently break every dashboard | ⬜ |
+| 036 | OtelLogsPipeline | `AddOpenTelemetry` logging, `LogRecord` fields, formatted message vs state | ✅ |
+| 037 | LogTraceCorrelation | `LogRecord.TraceId` matching `Activity.Current`, `ParseStateValues`, `IncludeScopes` | ✅ |
+| 038 | ContextPropagators | `TextMapPropagator` inject/extract, the composite default | ✅ |
+| 039 | BaggagePropagation | baggage across a boundary, why it is not a span tag until you make it one | ✅ |
+| 040 | SemanticConventions | stable attribute names; why hand-rolled names silently break every dashboard | ✅ |
 | 041 | InstrumentationLibraries | `AddHttpClientInstrumentation`/`AddAspNetCoreInstrumentation`: what is automatic vs yours | ⬜ |
 | 042 | OtlpExporterConfiguration | endpoint, protocol, headers, env-var precedence; a real collector receives the span | 🐳 ⬜ |
 | 043 | PrometheusScrapeEndpoint | the text exposition format, name mangling and the `_total` suffix | 🐳 ⬜ |

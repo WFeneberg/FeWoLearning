@@ -488,3 +488,40 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–035: **176 facts total** (170 exercise + 6 harness).
   Red run 170 failed / 5 passed / 1 skipped; green run 175 passed / 1 skipped; green
   with `-p:Containers=true` 176 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, rows 036–040 — logs join the SDK, and context crosses a boundary:**
+
+- **`LogRecord.Body` holds the message TEMPLATE, not the rendered sentence.** Measured:
+  a `LogInformation("Order {OrderId} shipped to {City}", …)` produces
+  `Body == "Order {OrderId} shipped to {City}"`, and `FormattedMessage` is **null**
+  unless the pipeline sets `IncludeFormattedMessage`. Everyone reads "Body" as "the
+  message" and an OTLP viewer shows it that way — but this is good news, because
+  grouping and alerting by event work on `Body` directly while the varying part lives in
+  `Attributes`.
+- **`LogRecord.Attributes` needs no opt-in.** The structured fields and the
+  `{OriginalFormat}` entry are simply there for a normal message template.
+  `ParseStateValues` still exists and is not obsolete, but it is not what makes this
+  work — do not reach for it.
+- **`LogRecord` objects are NOT reused between exports** (two records are two distinct
+  instances), unlike `Metric`. So `LogRecordReadout` is a convenience where
+  `MetricReadout` is a necessity. The metric side is the exception, not the rule.
+- **Two logging libraries in this repository disagree about scopes, and neither says
+  so.** `FakeLogger` (block 01) captures them unconditionally; the OpenTelemetry
+  pipeline drops them silently unless built with `IncludeScopes = true`. Ex037 grades
+  both directions for exactly this reason.
+- **Trace correlation is read from `Activity.Current`, not configured.** Nothing in the
+  logging call mentions a trace, and with no span in scope the SDK writes **all-zero**
+  ids rather than inventing one — which a backend reads as "unlinked" rather than as a
+  trace it has lost.
+- **The SDK's default propagator is a composite** (trace context **plus** baggage), and
+  that matters: a hand-rolled injector writing only `traceparent` drops every piece of
+  baggage at that boundary silently, and nothing downstream can tell "no baggage was
+  set" from "the hop threw it away".
+- **Ex039 deliberately builds on ex038** and calls its `Inject`/`Extract`. Consequence
+  measured during the probe: with ex038 *also* wrong, four of ex039's five facts fail
+  instead of the one the row is about. Isolated, its wrong implementation fails exactly
+  `Adversarial_A`. The dependency is now stated in ex039's header — do those two rows in
+  order.
+- Batch baseline after rows 001–040: **200 facts total** (194 exercise + 6 harness).
+  Red run 194 failed / 5 passed / 1 skipped; green run 199 passed / 1 skipped; green
+  with `-p:Containers=true` 200 passed / 0 skipped. 0 warnings in both modes.
