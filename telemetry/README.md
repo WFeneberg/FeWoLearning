@@ -323,3 +323,35 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–015: **71 facts total** (65 exercise + 6 harness).
   Red run 65 failed / 5 passed / 1 skipped; green run 70 passed / 1 skipped; green
   with `-p:Containers=true` 71 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, rows 016–020 — `02-diagnostics` under way:**
+
+- **`ActivityContext.TryParse` validates more than its name suggests.** It checks the
+  version, the field count, the lengths and lowercase-hex validity — **and rejects the
+  all-zero trace and span ids** that the W3C spec forbids despite them being correctly
+  shaped. Measured by deleting an explicit all-zero guard from ex020's reference
+  solution and watching every fact still pass; the guard was dead code and was removed.
+  The all-zero test case still earns its place, because it grades a **hand-rolled**
+  parser (`Split('-')` plus `ActivityTraceId.CreateFromString`), which is a plausible
+  implementation and which does not get that check for free.
+- **`new Activity(name).Start()` needs no listener at all.** It sets `Activity.Current`
+  and behaves normally. Only `ActivitySource.StartActivity` returns null unheard — the
+  ex015 trap. This is what lets ex016's ambient-context fact set up a caller-side
+  activity without registering a second listener.
+- **`Activity.Baggage` and `GetBaggageItem` walk the parent chain**, so baggage set on
+  a parent is readable from a child regardless of the order the two were created in.
+  Tags do not walk anything.
+- **A `using var` declared inside a `foreach` body is disposed per iteration**, which
+  is the difference between a fan-out and a staircase in ex016. Hoisting it out — or
+  dropping the `using` — leaves each step current while the next starts, so the trace
+  renders as a chain of dependencies that do not exist, with no error anywhere.
+- **Passing an explicit `default` `ActivityContext` as `parentContext` makes a root**,
+  overriding `Activity.Current` rather than inheriting it. That is how ex019's batch
+  consumer belongs to no single message's trace. Links must be supplied at start.
+- Two of this batch's five wrong implementations were again caught by **exactly one**
+  fact: ex017's "belt and braces" (baggage *and* a tag, which makes every behavioural
+  fact pass while hiding which mechanism did the work) and ex019's "parent the batch on
+  the first message".
+- Batch baseline after rows 001–020: **102 facts total** (96 exercise + 6 harness).
+  Red run 96 failed / 5 passed / 1 skipped; green run 101 passed / 1 skipped; green
+  with `-p:Containers=true` 102 passed / 0 skipped. 0 warnings in both modes.

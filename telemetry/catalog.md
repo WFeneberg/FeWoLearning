@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 15 ✅ / 55 ⬜**
+**Status: 20 ✅ / 50 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -43,11 +43,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
 | 015 | ActivitySourceAndListener | `StartActivity` returns **null** with no listener; `ActivityListener`, `Sample` → `AllData` | ✅ |
-| 016 | ActivityParentChild | nesting, `Parent`/`ParentId`, `Activity.Current` restored on `Dispose` | ⬜ |
-| 017 | TagsBaggageEvents | `SetTag` vs `AddBaggage` (baggage inherits down, tags do not), `AddEvent` | ⬜ |
-| 018 | StatusAndException | `SetStatus`, `AddException`, the error tag convention | ⬜ |
-| 019 | KindAndLinks | `ActivityKind` Client/Server/Producer/Consumer, `ActivityLink` for fan-in | ⬜ |
-| 020 | W3CTraceContext | `traceparent`/`tracestate` parse and format, `ActivityContext` round-trip, id format | ⬜ |
+| 016 | ActivityParentChild | nesting, `Parent`/`ParentId`, `Activity.Current` restored on `Dispose` | ✅ |
+| 017 | TagsBaggageEvents | `SetTag` vs `AddBaggage` (baggage inherits down, tags do not), `AddEvent` | ✅ |
+| 018 | StatusAndException | `SetStatus`, `AddException`, the error tag convention | ✅ |
+| 019 | KindAndLinks | `ActivityKind` Client/Server/Producer/Consumer, `ActivityLink` for fan-in | ✅ |
+| 020 | W3CTraceContext | `traceparent`/`tracestate` parse and format, `ActivityContext` round-trip, id format | ✅ |
 | 021 | MeterAndCounter | `Meter`, `Counter<T>`, `MeterListener`, tags as dimensions | ⬜ |
 | 022 | HistogramAndBuckets | `Histogram<T>`, what a distribution can and cannot answer | ⬜ |
 | 023 | ObservableInstruments | `ObservableGauge`/`ObservableCounter` pull model, `UpDownCounter` vs `Counter` | ⬜ |
