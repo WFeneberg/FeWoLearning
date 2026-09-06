@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 41 ✅ / 19 ⬜**
+**Status: 46 ✅ / 14 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -74,11 +74,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 039 | PessimisticLocking 🐳 | locked read, serialised writers, deadlock avoidance ordering | ✅ |
 | 040 | SagaProcessManager | multi-step process, compensation on failure, saga state | ✅ |
 | 041 | ChoreographyVsOrchestration | the same flow in two topologies, coupling trade-off | ✅ |
-| 042 | EventSourcingAppendStream | append-only stream, rehydration, expected-version check | ⬜ |
-| 043 | EventSourcedProjection | catch-up projection, idempotent apply, checkpoint | ⬜ |
-| 044 | CqrsReadModel | separate read store, eventual consistency, staleness window | ⬜ |
-| 045 | MessageBusAbstraction | publish/subscribe port, topic routing, transport independence | ⬜ |
-| 046 | CompetingConsumers 🐳 | work distribution, per-key ordering via partition key | ⬜ |
+| 042 | EventSourcingAppendStream | append-only stream, rehydration, expected-version check | ✅ |
+| 043 | EventSourcedProjection | catch-up projection, idempotent apply, checkpoint | ✅ |
+| 044 | CqrsReadModel | separate read store, eventual consistency, staleness window | ✅ |
+| 045 | MessageBusAbstraction | publish/subscribe port, topic routing, transport independence | ✅ |
+| 046 | CompetingConsumers 🐳 | work distribution, per-key ordering via partition key | ✅ |
 | 047 | DeadLetterQueue 🐳 | poison message, max attempts, dead-letter move with reason | ⬜ |
 | 048 | RetryWithBackoff | exponential backoff, jitter, virtual clock, budget exhaustion | ⬜ |
 | 049 | MqttTelemetryIngest | real in-process MQTT broker, topic hierarchy, wildcard subscription | ⬜ |
