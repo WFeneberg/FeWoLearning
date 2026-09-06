@@ -20,6 +20,11 @@ public static class ExerciseRegistry
         ["ex008"] = Ex008_ContainerArgsAndEntrypoint.Configure,
         ["ex009"] = Ex009_VolumesAndBindMounts.Configure,
         ["ex010"] = Ex010_ContainerLifetime.Configure,
+        ["ex011"] = Ex011_ProjectResources.Configure,
+        ["ex012"] = Ex012_ExecutableResources.Configure,
+        ["ex013"] = Ex013_ConnectionStringResources.Configure,
+        ["ex014"] = Ex014_ParentAndChildResources.Configure,
+        ["ex015"] = Ex015_WaitForCompletion.Configure,
     };
 
     public static Action<IDistributedApplicationBuilder>? Lookup(string id)
