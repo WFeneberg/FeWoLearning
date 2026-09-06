@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 45 ✅ / 55 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -73,11 +73,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 043 | CoroutineResultValue | `IResult<T>.Result` (read-only on the interface, not `Result.Value`) - reaches you only through the instance inside a `Coroutine.ExecuteAsync` sequence (still a plain `Task`), but `TaskExtensions.ExecuteAsync<TResult>(this IResult<TResult>, ...)` returns `Task<TResult>` directly for a single step | ✅ |
 | 044 | CoroutineFromTask | `TaskExtensions.AsResult()`/`AsResult<T>()` adapting a `Task`/`Task<T>` into the coroutine pipeline - the coroutine genuinely waits for it, and a faulted task surfaces as `AggregateException`, not the original exception | ✅ |
 | 045 | CoroutineCancellation | a sequence stops early two ways - `WasCancelled` throws `TaskCanceledException`, `Error` throws that same original exception - and no later step ever runs either way | ✅ |
-| 046 | CoroutineExecutionContext | `Target` and `View` on the context | ⬜ |
-| 047 | WindowManagerDialog | `ShowDialogAsync` | ⬜ |
-| 048 | DialogResult | `TryCloseAsync(bool?)` flowing back to the caller | ⬜ |
-| 049 | WindowManagerSettings | the settings dictionary applied to the window | ⬜ |
-| 050 | ViewLocatorForDialogs | locating a window-shaped view | ⬜ |
+| 046 | CoroutineExecutionContext | `CoroutineExecutionContext.Source`/`View`/`Target` - all settable, all `null` on a directly-constructed context, the SAME instance handed to every step in a `Coroutine.ExecuteAsync` sequence, including one a middle step mutates | ✅ |
+| 047 | WindowManagerDialog | showing a dialog through an INJECTED `IWindowManager.ShowDialogAsync` and awaiting its outcome - the modal frame is why the close has to be scheduled from inside it | ✅ |
+| 048 | DialogResult | `TryCloseAsync(bool?)` flowing back to the caller - measured: `true`\|`false`\|`null` in, but only `true`/`false` out, `TryCloseAsync(null)` resolving `ShowDialogAsync` to `false`, not `null` | ✅ |
+| 049 | WindowManagerSettings | the settings dictionary applied to the window by reflection - `Title`/`ShowInTaskbar` stick, but `Width`/`Left` do not: `EnsureWindow` applies `SizeToContent`/a centred `WindowStartupLocation` afterwards, overriding them | ✅ |
+| 050 | ViewLocatorForDialogs | `ViewLocator.LocateForModelType` (the type-based lookup `WindowManager` itself uses) - a `Window`-derived located view is used AS-IS as the dialog's own window, anything else gets WRAPPED in a bare `Window`; either way `GetView()` is `null` once closed | ✅ |
 | 051 | ConductorActivationChain | activating a conductor activates its active child | ⬜ |
 | 052 | ConductorCloseGuard | `CanCloseAsync` cascading through children | ⬜ |
 | 053 | DefaultCloseStrategy | how the built-in strategy decides | ⬜ |

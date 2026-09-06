@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -138,8 +139,21 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
     /// eventually reaches TryCloseAsync - directly, or through an exercise's own method, as
     /// ex048's ConfirmAsync/DeclineAsync/DismissAsync do) to run from inside the nested modal
     /// frame the caller is about to push, capturing the hosting Window first if asked.
+    ///
+    /// CRITICAL (measured the hard way - this is what an unfinished stub actually does): if
+    /// closer itself throws (e.g. an exercise's own method is still a bare
+    /// NotImplementedException) BEFORE ever reaching TryCloseAsync, the window never closes,
+    /// and Window.ShowDialog()'s nested message loop then waits FOREVER - a Task-level
+    /// Task.WhenAny/Task.Delay race in whatever is awaiting the dialog does NOT reach into that
+    /// native loop and stop it; the loop only ever ends when the WINDOW actually closes. So this
+    /// method force-closes the captured window itself on any closer failure, and reports that
+    /// failure via onCloserFailed rather than letting it vanish inside this fire-and-forget
+    /// callback - a caller that ignores onCloserFailed would otherwise see whatever ShowDialogAsync
+    /// resolves a forced, DialogResult-less Close() to (false) and could wrongly read that as a
+    /// legitimate result instead of the stub failure it actually was.
     /// </summary>
-    protected static void ScheduleFromInsideModalFrame(Screen rootModel, Func<Task> closer, Action<Window>? onWindowCaptured = null)
+    protected static void ScheduleFromInsideModalFrame(
+        Screen rootModel, Func<Task> closer, Action<Window>? onWindowCaptured = null, Action<Exception>? onCloserFailed = null)
     {
         // The BeginInvoke callback itself must stay synchronous (Action, not a Task-returning
         // delegate) - a fire-and-forget async lambda here triggers CS4014, and this project
@@ -156,24 +170,43 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
         async Task RunAsync()
         {
             await Task.Yield(); // let the modal frame establish before touching it
-            if (onWindowCaptured != null && ((IViewAware)rootModel).GetView() is FrameworkElement v)
-                onWindowCaptured(Window.GetWindow(v));
-            await closer();
+            Window? window = null;
+            if (((IViewAware)rootModel).GetView() is FrameworkElement v)
+                window = Window.GetWindow(v);
+            onWindowCaptured?.Invoke(window!);
+
+            try
+            {
+                await closer();
+            }
+            catch (Exception ex)
+            {
+                onCloserFailed?.Invoke(ex);
+                window?.Close(); // force the modal loop to actually return - see the doc comment above
+            }
         }
     }
 
     /// <summary>
-    /// Awaits dialogTask, but only up to 8 seconds - a stub that never calls TryCloseAsync
-    /// (directly, or via ShowDialogAsync on an un-closed dialog) must fail red with a clear
-    /// timeout message instead of hanging the suite; this machine already carries one
-    /// unkillable hung test host from an earlier mistake here. Shared by every dialog
-    /// exercise's test rather than each bounding its own await.
+    /// Awaits dialogTask, but only up to 8 seconds - a stub that calls TryCloseAsync's caller
+    /// correctly but simply never reaches it (e.g. an empty method body that returns
+    /// Task.CompletedTask without doing anything) must fail red with a clear timeout message
+    /// instead of hanging the suite; this machine already carries one unkillable hung test host
+    /// from an earlier mistake here. On timeout this ALSO force-closes capturedWindow, for the
+    /// same reason <see cref="ScheduleFromInsideModalFrame"/> does on a closer exception: giving
+    /// up on WAITING does not, by itself, make Window.ShowDialog()'s nested loop return - only
+    /// the window actually closing does that.
     /// </summary>
-    protected static async Task<T> BoundedDialogAsync<T>(Task<T> dialogTask)
+    protected static async Task<T> BoundedDialogAsync<T>(Task<T> dialogTask, Func<Window?>? capturedWindow = null)
     {
-        if (await Task.WhenAny(dialogTask, Task.Delay(TimeSpan.FromSeconds(8))) != dialogTask)
+        var winner = await Task.WhenAny(dialogTask, Task.Delay(TimeSpan.FromSeconds(8)));
+        if (winner != dialogTask)
+        {
+            capturedWindow?.Invoke()?.Close();
+            await Task.WhenAny(dialogTask, Task.Delay(TimeSpan.FromSeconds(3)));
             throw new TimeoutException(
-                "A dialog-producing task never completed - a stub that never calls TryCloseAsync leaves the dialog open forever instead of failing.");
+                "A dialog-producing task never completed within 8 seconds - a stub that never calls TryCloseAsync leaves the dialog open forever instead of failing.");
+        }
         return await dialogTask;
     }
 
@@ -193,7 +226,9 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
         Window? capturedWindow = null;
         ScheduleTryClose(rootModel, closeWith, w => capturedWindow = w);
 
-        var result = await BoundedDialogAsync(new WindowManager().ShowDialogAsync(rootModel, null, settings ?? InvisibleDialogSettings));
+        var result = await BoundedDialogAsync(
+            new WindowManager().ShowDialogAsync(rootModel, null, settings ?? InvisibleDialogSettings),
+            () => capturedWindow);
         return (result, capturedWindow!);
     }
 
@@ -201,15 +236,25 @@ public abstract class CaliburnViewContext : CaliburnCoreContext, IDisposable
     /// Like <see cref="ShowDialogAndCloseAsync"/>, but closes by invoking closer (an exercise's
     /// own method that is itself expected to reach TryCloseAsync) rather than calling
     /// TryCloseAsync directly - for ex048, whose whole point is that DIFFERENT calls to
-    /// TryCloseAsync(bool?) are the exercise, not the show/await plumbing around them.
+    /// TryCloseAsync(bool?) are the exercise, not the show/await plumbing around them. If closer
+    /// throws (an unfinished ex048 stub), that exception is rethrown here - see
+    /// <see cref="ScheduleFromInsideModalFrame"/>'s doc comment for why it must not be allowed
+    /// to just vanish.
     /// </summary>
     protected static async Task<(bool? Result, Window Window)> ShowDialogInvokingAsync(
         Screen rootModel, Func<Task> closer, IDictionary<string, object>? settings = null)
     {
         Window? capturedWindow = null;
-        ScheduleFromInsideModalFrame(rootModel, closer, w => capturedWindow = w);
+        Exception? closerFailure = null;
+        ScheduleFromInsideModalFrame(rootModel, closer, w => capturedWindow = w, ex => closerFailure = ex);
 
-        var result = await BoundedDialogAsync(new WindowManager().ShowDialogAsync(rootModel, null, settings ?? InvisibleDialogSettings));
+        var result = await BoundedDialogAsync(
+            new WindowManager().ShowDialogAsync(rootModel, null, settings ?? InvisibleDialogSettings),
+            () => capturedWindow);
+
+        if (closerFailure != null)
+            throw new TargetInvocationException("The exercise's own close method threw before the dialog could close.", closerFailure);
+
         return (result, capturedWindow!);
     }
 }
