@@ -18,7 +18,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 95 ✅ / 5 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -161,8 +161,8 @@ the types the business talks in, and the processes that outlive a single request
 | 093 | ObjectPoolReuse | reset on return, and the object that remembers the last caller | ✅ |
 | 094 | MultiLevelCache 🐳 | L1 and L2, promotion on hit, coherence between them | ✅ |
 | 095 | TagBasedInvalidation | invalidating by what a thing IS rather than by its key | ✅ |
-| 096 | GracefulDegradation | a fallback chain that reports which quality level answered | ⬜ |
-| 097 | TimeoutBudget | one deadline, shrinking as it propagates down the call chain | ⬜ |
-| 098 | PoisonPillDetection | telling a bad message apart from a bad day | ⬜ |
-| 099 | ActorSingleThreadedOwnership | a mailbox instead of a lock, and the ordering it buys | ⬜ |
-| 100 | SupervisionRestartStrategy | restart, backoff, give up, and one-for-one vs one-for-all | ⬜ |
+| 096 | GracefulDegradation | a fallback chain that reports which quality level answered | ✅ |
+| 097 | TimeoutBudget | one deadline, shrinking as it propagates down the call chain | ✅ |
+| 098 | PoisonPillDetection | telling a bad message apart from a bad day | ✅ |
+| 099 | ActorSingleThreadedOwnership | a mailbox instead of a lock, and the ordering it buys | ✅ |
+| 100 | SupervisionRestartStrategy | restart, backoff, give up, and one-for-one vs one-for-all | ✅ |

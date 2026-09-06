@@ -96,10 +96,11 @@ the same `global.json` opt-in.
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
   verified as of 2026-09-05: the beginner tier (001-035) is complete and the
-  intermediate tier is through ex045 — `dotnet test` shows 254 failed,
-  7 passed on the untouched tree (254 exercise facts across ex001-ex045, plus
-  the 7 harness smoke tests, which pass in both modes) — and
-  `dotnet test -p:UseSolutions=true` shows 261 passed, 0 failed. **`wpf/`**'s beginner tier
+  intermediate tier is through ex050 — the track's halfway point — where
+  `dotnet test` shows 283 failed, 8 passed on the untouched tree (283
+  exercise facts across ex001-ex050, plus 8 harness smoke tests — one more
+  than before, covering the new dialog helper — which pass in both modes) —
+  and `dotnet test -p:UseSolutions=true` shows 291 passed, 0 failed. **`wpf/`**'s beginner tier
   (35/100, `01-beginner` ex001-ex035) is verified end-to-end as of 2026-09-05, on
   **.NET 10.0.400** with **xunit.v3 4.0.0** and **Xunit.StaFact 4.0.23**
   (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5 passed (the
@@ -387,6 +388,34 @@ the same `global.json` opt-in.
   **Virtualization is real**: 500 rows realized 2/4/9 containers at 60/120/300-unit
   viewports, and `ScrollIntoView(300)` recycled index 0 to null — while an
   `ItemsPanel` of a plain `StackPanel` realized all 500.
+
+  **`03-advanced` (ex071–ex090) is complete as of 2026-09-06**, verified by a
+  full-suite run in both modes: 408 facts, 401 red / 7 green on the untouched
+  tree and 408 / 0 under `-p:UseSolutions=true`. Four more findings from its last
+  batch. **`TryGetResource` does not walk up the tree** — a control inside a
+  panel returned false for every one of that panel's keys, and the panel false
+  for its window's; each host answers only for its own dictionary plus what is
+  merged into it, and tree-wide inheritance is a property of the *binding*
+  (`DynamicResource`), not the lookup. Same for theme dictionaries, so a consumer
+  binds rather than looks up. **Merged precedence**: a host's own entries beat
+  every merged dictionary, and among the merged ones the *last added* wins.
+  **To extend a FluentTheme control theme** you need `BasedOn`, and the theme is
+  findable only on the application — a styled `Button`'s `Theme` is null and
+  neither it nor its window answers for `typeof(Button)`; an implicit theme in a
+  host's `Resources` scopes to that subtree but must be in place *before* the
+  host is shown. **Right-to-left mirrors text and nothing else observable**:
+  panel `Bounds` were identical in both directions, `RenderTransform` null,
+  `TransformToVisual` the identity and `HasMirrorTransform` false, because
+  non-text mirroring happens render-side — but `TextBlock.TextLayout` mirrors
+  exactly (`TextLines[0].Start` moved from 0 to `Width - TextLayout.Width`), so
+  that is what ex090 grades. Also worth knowing for any culture-dependent code
+  here: **the ambient culture on this machine is `de-CH`/`de-DE`, not English**,
+  so an explicit `CultureInfo` is mandatory in code and tests alike.
+
+  Note that expert row **098 is `RenderedFrameCapture` — `CaptureRenderedFrame`
+  pixel assertions**, so the Skia harness switch that ex071 documents as a gap
+  is not optional for the last tier: it is that row's whole subject, and it wants
+  doing as its own pass with a full re-verification before ex091–ex100 start.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -838,14 +867,14 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 85 / 100 (verified) | 15 |
+| `avalonia/`| 90 / 100 (verified) | 10 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 45 / 100 (verified) | 55 |
+| `caliburn/`| 50 / 100 (verified) | 50 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
-| `Architecture/`| 80 / 80 (verified) | —         |
+| `Architecture/`| 100 / 100 (verified) | —         |
 | `telemetry/`| 20 / 70 (verified) | 50 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
@@ -1045,15 +1074,19 @@ into both content libraries), and wall-clock performance assertions (rows
 
 ## The `Architecture/` track
 
-Application and system architecture on .NET 10 — **80 rows in six subject-area
-blocks**, not 100 rows in four difficulty tiers, for the same reason `security/`
+Application and system architecture on .NET 10 — **100 rows in eight subject-area
+blocks**, not four difficulty tiers, for the same reason `security/`
 departs: "beginner architecture" is not a meaningful axis, and difficulty rises
 *within* each block instead. `01-web` 001–016, `02-desktop` 017–028,
 `03-services-data` 029–052, `04-cross-cutting` 053–060, `05-scale` 061–073,
-`06-evolution` 074–080. The first four build one process that is correct; `05`
-asks what happens when there are fifty of it sharing a finite resource, and `06`
+`06-evolution` 074–080, `07-domain` 081–090, `08-runtime` 091–100. The first four
+build one process that is correct; `05`
+asks what happens when there are fifty of it sharing a finite resource, `06`
 what happens when two versions of everything are live while the schema changes
-underneath. The folder is capitalised
+underneath, `07` how the domain itself is modelled — value objects, aggregate
+boundaries, state machines, long-running work — and `08` what the process does
+when something breaks under it: pools, degradation, timeout budgets, poison
+messages, actors, supervision. The folder is capitalised
 like `MicroServices/`; deliberate, do not "fix" it.
 
 It is **not** a second `MicroServices/`: that track teaches Aspire and the
@@ -1068,19 +1101,20 @@ headless and needs no Windows desktop session**. Everything targets plain
 
 Three projects on the `UseSolutions` mechanism shared with `blazor/`, `uno/`,
 `wpf/`, `caliburn/`, `avalonia/` and `security/`. `dotnet test` is red,
-`-p:UseSolutions=true` green, `-p:Containers=true` additionally runs the eight
+`-p:UseSolutions=true` green, `-p:Containers=true` additionally runs the thirteen
 container-backed rows (032, 036, 037, 038, 039, 046, 047, 050,
-065, 066, 074), which are otherwise skipped — every one of those exercises is still fully graded without
+065, 066, 074, 092, 094), which are otherwise skipped — every one of those exercises is still fully graded without
 Docker by its in-process facts.
 
-**Verified end-to-end on 2026-09-06**: 517 test facts. `dotnet test` gives 502
-failed / 4 passed (the harness smoke facts) / 11 skipped (the container rows);
-`-p:UseSolutions=true` gives 0 failed / 506 passed / 11 skipped; and
-`-p:UseSolutions=true -p:Containers=true` gives 517 passed, 0 skipped, in 21 s
+**Verified end-to-end on 2026-09-06, complete at 100/100**: 679 test facts.
+`dotnet test` gives 662
+failed / 4 passed (the harness smoke facts) / 13 skipped (the container rows);
+`-p:UseSolutions=true` gives 0 failed / 666 passed / 13 skipped; and
+`-p:UseSolutions=true -p:Containers=true` gives 679 passed, 0 skipped, in 20 s
 against Docker 29.7.2 with `postgres:17-alpine`, `redis:7-alpine`,
 `rabbitmq:4-alpine` and `eclipse-mosquitto:2`. Both builds are clean - every
-build warning is `CS9113`/`CS0649` from `exercises/` stubs; `solutions/` and
-`tests/` emit none.
+build warning is `CS9113`/`CS0169`/`CS0649` from `exercises/` stubs; `solutions/`
+and `tests/` emit none.
 
 **A fact that HANGS is worse than one that fails**, and blocks 05/06 produced two
 of them before the probe caught it: an admission controller or bulkhead that
@@ -1131,9 +1165,10 @@ outcome is reachable *without* the pattern (an outbox test asserting only "the
 message arrived" passes a direct publish; a cache test asserting only "the value
 came back" passes having no cache); the pattern is asserted but never *exercised*
 (an idempotency test that delivers each message once grades nothing); and a test
-asserts *structure the runtime does not enforce*, which is why rows 001, 011, 026,
-041, 058 and 060 read assembly metadata by reflection and go red on an assertion
-rather than on a `NotImplementedException`. Every batch is therefore checked with
+asserts *structure the runtime does not enforce*, which is why rows 001, 005, 011,
+026, 041, 058, 060, 081, 083, 084, 091 and 099 read type or assembly metadata by
+reflection. Each of those anchors the metadata assertion to a real call on the
+exercise first, because a fact asserting only metadata passes on the stub. Every batch is therefore checked with
 **two** probes, not one: the degenerate implementation, and then the *plausible
 wrong* one — the pattern implemented earnestly with the wrong mechanism. The
 second probe is the one that finds things. Measured in the first batch: Ex004's
