@@ -95,12 +95,12 @@ the same `global.json` opt-in.
   untouched tree; the same 115 facts pass under `-p:UseSolutions=true` — unlike
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
-  verified as of 2026-09-05: the beginner tier (001-035) is complete and the
-  intermediate tier is through ex060, where
-  `dotnet test` shows 349 failed, 8 passed on the untouched tree (349
-  exercise facts across ex001-ex060, plus 8 harness smoke tests which pass
+  verified as of 2026-09-06: the beginner tier (001-035) is complete and the
+  intermediate tier is through ex065, where
+  `dotnet test` shows 376 failed, 10 passed on the untouched tree (376
+  exercise facts across ex001-ex065, plus 10 harness smoke tests which pass
   in both modes) —
-  and `dotnet test -p:UseSolutions=true` shows 357 passed, 0 failed. **`wpf/`** has both its
+  and `dotnet test -p:UseSolutions=true` shows 386 passed, 0 failed. **`wpf/`** has both its
   beginner and intermediate tiers complete (70/100, `01-beginner` ex001-ex035 plus
   `02-intermediate` ex036-ex070) as of 2026-09-06, on **.NET 10.0.400** with **xunit.v3 4.0.0**
   and **Xunit.StaFact 4.0.23** (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5
@@ -511,8 +511,9 @@ the same `global.json` opt-in.
   view never reaches that view's children. An element must not be named
   after a `FrameworkElement` member: `x:Name="Name"` hides
   `FrameworkElement.Name` (`CS0108`). Exercises use `UserName`-style names.
-  The `exercises/` build emits expected `CS0067`/`CS0649`/`CS0169`/`CS0414`
-  warnings from stubs whose members throw; `solutions/` builds with **0
+  The `exercises/` build emits expected
+  `CS0067`/`CS0649`/`CS0169`/`CS0414`/`CS9113` warnings from stubs whose
+  members throw or whose inputs only the learner's code reads; `solutions/` builds with **0
   warnings** and a warning there is a finding; `tests/` suppresses
   `xUnit1051` only, via `NoWarn` in its `.csproj`, and any other warning there
   is a finding too — the full register is in `caliburn/README.md`. Same
@@ -526,16 +527,17 @@ the same `global.json` opt-in.
   → `OnActivatedAsync` — so they are the same lifecycle point and the
   non-obsolete name is the one to override. `OnDeactivateAsync` is **not**
   obsolete and has no `OnDeactivatedAsync` counterpart.
-  `tests/_harness/CaliburnCoreContext.cs` resets six process-global Caliburn
+  `tests/_harness/CaliburnCoreContext.cs` resets seven process-global Caliburn
   statics before every test — `PlatformProvider.Current`,
-  `AssemblySource.Instance`, the `IoC` delegates,
-  `ViewLocator.NameTransformer`, and (see below) `AssemblySource.FindTypeByNames`
-  and `AssemblySourceCache.ExtractTypes` — and that list is incomplete **by design**:
+  `AssemblySource.Instance`, `AssemblySource.FindTypeByNames`,
+  `AssemblySourceCache.ExtractTypes` (both see below), the `IoC` delegates,
+  `ViewLocator.NameTransformer` and `LogManager.GetLog` — and that list is
+  incomplete **by design**:
   it does not yet reset `ViewLocator.LocateTypeForModelType`,
   `ViewModelLocator`'s own separate `NameTransformer` (measured: a genuinely
   different object from `ViewLocator.NameTransformer`, not an alias) and
   locator delegates, `ViewModelBinder.*`, `MessageBinder.*`,
-  `ActionMessage.*`, `LogManager.GetLog` or `BindingScope.GetNamedElements`.
+  `ActionMessage.*` or `BindingScope.GetNamedElements`.
   There is no public `ConventionManager.ElementConventions` — the real
   surface is `ConventionManager.AddElementConvention`, which writes into a
   **private** static dictionary with no public removal, so it cannot be
@@ -563,7 +565,7 @@ the same `global.json` opt-in.
   `ViewModelLocator` — fail for the rest of the run.
   `tests/_harness/CaliburnCoreContext.cs` therefore snapshots and restores
   both `AssemblySource.FindTypeByNames` and `AssemblySourceCache.ExtractTypes`;
-  the harness now resets **six** process-globals per test.
+  the harness now resets **seven** process-globals per test.
   **`SimpleContainer.BuildUp` injects interface-typed properties only.**
   Measured: an interface-typed property is injected whether its setter is
   public or private; a **concrete**-typed property is never injected, even
@@ -1048,7 +1050,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 100 / 100 (verified) | — |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 60 / 100 (verified) | 40 |
+| `caliburn/`| 65 / 100 (verified) | 35 |
 | `wpf/`    | 70 / 100 (verified) | 30 |
 | `MicroServices/`| 30 / 100 (verified) | 70 |
 | `security/`| 60 / 60 (verified) | —         |
