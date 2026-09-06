@@ -31,6 +31,14 @@
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.11" />
   </ItemGroup>
 
+  <!-- ex034's L3 fact seeds a row through its OWN connection before asking the learner's
+       code to read it back, so the test needs a raw Npgsql client of its own. Pinned to
+       the exact version Aspire.Npgsql 13.5.3 resolves in the two content libraries, so
+       the test and the exercise never run two different drivers. -->
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="10.0.2" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
@@ -43,6 +51,28 @@
   </ItemGroup>
   <ItemGroup Condition="'$(UseSolutions)' == 'true'">
     <ProjectReference Include="..\solutions\FeWoLearning.MicroServices.Solutions.csproj" />
+  </ItemGroup>
+
+
+  <!-- L3 (container) rows only. Starting a real DistributedApplication needs DCP, the
+       orchestrator the Aspire.AppHost.Sdk normally supplies; this is a plain test
+       project, so the two pieces are pulled in BY HAND and only when -p:Containers=true,
+       which already forces a rebuild. The default `dotnet test` therefore restores and
+       builds exactly what it did before: no DCP, no Docker, no Aspire CLI.
+       The orchestration package's targets set $(DcpDir) to its own tools folder; that
+       alone satisfies Aspire.Hosting.AppHost's SetOrchestrationDiscoveryAttributes
+       target, which stamps [AssemblyMetadata("dcpclipath"/"dcpextensionpaths")] onto
+       THIS test assembly - where Aspire looks for the orchestrator at run time.
+       Do NOT set IsAspireHost=true to "make it an AppHost": the .NET 10 SDK's
+       _CheckForAspireWorkloadDeprecation fires on IsAspireHost without the
+       AspireHostingSDKVersion only the Aspire.AppHost.Sdk sets, and the build dies with
+       NETSDK1228 ("depends on the deprecated Aspire workload"). The attribute target
+       does not need it. DCP comes from the version-pinned NuGet package rather than
+       from whatever the machine's `aspire` CLI happens to have unpacked, so a green
+       container run does not depend on the CLI at all. -->
+  <ItemGroup Condition="'$(Containers)' == 'true'">
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.Orchestration.$(NETCoreSdkRuntimeIdentifier)" Version="13.5.3" />
   </ItemGroup>
 
   <!-- `-p:Containers=true` reaches the test process through runtimeconfig.json.

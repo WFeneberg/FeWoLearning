@@ -22,6 +22,22 @@
     <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="13.5.3" />
   </ItemGroup>
 
+  <!-- Client integration (ex033, ex034): the SERVICE side of PostgreSQL. Aspire.Npgsql
+       is what AddNpgsqlDataSource lives in, and it brings Npgsql itself, which ex034's
+       real query uses. Same 13.5.3 as the hosting packages. Keep identical in the sibling. -->
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql" Version="13.5.3" />
+  </ItemGroup>
+
+  <!-- ex032's init scripts. Real files, because WithInitFiles COPIES what is on disk:
+       the annotation's callback enumerates this folder, so an empty or missing one makes
+       the exercise grade nothing. They flow to the TEST assembly's output directory
+       through the ProjectReference, which is where builder.AppHostDirectory points under
+       the harnesses (README section 5). Keep byte-identical in the sibling library. -->
+  <ItemGroup>
+    <Content Include="initdb\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!-- Service-side rows (021-023) need ASP.NET Core plus the OpenTelemetry,
        service-discovery and resilience packages that Aspire's ServiceDefaults is
        made of. They live in THIS library pair rather than a third pair of

@@ -126,4 +126,33 @@ public class HarnessMechanicsTests
         }
         Assert.Null(thrown);
     }
+
+    /// <summary>
+    /// The gate's third canary, and the one that protects the DEFAULT run rather than
+    /// the opt-in one. ContainerGate.Require() is a call an author has to remember to
+    /// write; this is the backstop for the day somebody forgets it. With containers off
+    /// ContainerHarness must refuse to build or start anything at all, so a missing
+    /// Require() turns into a loud failure in the L3 row instead of `dotnet test`
+    /// quietly pulling images on a machine that was promised a Docker-free run.
+    ///
+    /// It asserts a THROW, not a skip: skipping here would be the same silence the two
+    /// canaries above exist to break. Never touches Docker - the guard is the first
+    /// statement in RunAsync, before a builder is even constructed. Force(false) is
+    /// what lets it grade the closed gate in BOTH modes, so `-p:Containers=true` keeps
+    /// reporting zero skips rather than growing one that nobody reads.
+    /// </summary>
+    [Fact]
+    public async Task ContainerHarness_refuses_to_start_anything_when_the_gate_is_closed()
+    {
+        using var forced = ContainerGate.Force(false);
+        Assert.False(ContainerGate.Enabled, "ContainerGate.Force(false) did not reach Enabled.");
+
+        var thrown = await Record.ExceptionAsync(() => ContainerHarness.RunAsync(
+            _ => Assert.Fail("ContainerHarness ran configure() with containers off."),
+            _ => Task.CompletedTask,
+            TestContext.Current.CancellationToken));
+
+        Assert.IsType<InvalidOperationException>(thrown);
+        Assert.Contains("ContainerGate.Require()", thrown.Message);
+    }
 }

@@ -61,38 +61,67 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-06; `catalog.md` at 30 ✅ / 70 ⬜, so the
-thirty delivered exercises contribute 95 red facts):
+**Current measured state** (2026-09-07; `catalog.md` at 35 ✅ / 65 ⬜, so the
+thirty-five delivered exercises contribute 111 facts, of which one is 🐳):
 
 ```
-dotnet test                      →  95 failed, 7 passed, 1 skipped (103 total)
-dotnet test -p:UseSolutions=true →   0 failed, 102 passed, 1 skipped (103 total)
+dotnet test                                         → 109 failed,   8 passed, 2 skipped (119 total),   18 s
+dotnet test -p:UseSolutions=true                    →   0 failed, 117 passed, 2 skipped (119 total), 1 m 27 s
+dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 119 passed, 0 skipped (119 total), 2 m 18 s
 ```
 
-`-p:Containers=true` unskips the harness's container-gate fact, which then passes; no
-🐳 exercise row exists yet, so it has not been re-measured since ex005.
+The 8 that pass in the red run and the 2 that skip are the harness's own facts, which
+grade the harness rather than an exercise. The two skips are ex034's container fact and
+the container-gate canary that proves `Require()` still closes; `-p:Containers=true`
+unskips both. The whole cost of the container lane today is the difference between the
+last two lines: **~51 s** for one Postgres row.
 
-**A correct default run is red, and that is not a broken checkout.** Ninety-five
+**A correct default run is red, and that is not a broken checkout.** A hundred and nine
 failures is exactly what an untouched tree gives: one `NotImplementedException` per
-unimplemented `Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
+unimplemented `Configure`, plus the facts that depend on it. The 8 that pass and the 2 that skip are
 the harness's own facts, which pass in *both* modes because they grade the harness
 rather than an exercise. Update these numbers whenever a batch lands.
 
-The skipped one is the harness's container-gate fact, and it is only **half** the
-canary. It fails if `ContainerGate.Require()` ever stops skipping with containers off —
+Two facts skip in the default run: ex034's container fact (which is a real 🐳 exercise
+row, gated) and the harness's container-gate canary. That canary is only **one third**
+of the gate's protection. It fails if `ContainerGate.Require()` ever stops skipping with containers off —
 the mutant that would start real containers in the default run. The opposite and more
 dangerous mutant, a `Require()` that *always* skips, would silently disable all 25 🐳
 rows while every run still reported green; that one is caught by
 `ContainerGate_Require_lets_the_test_through_when_containers_are_on`, which forces the
 switch on for its own async flow only and **fails** (never skips) if the gate stays
-closed. Both mutants were built and observed, not reasoned about. Keep both facts.
+closed. The third guards the direction neither of those covers: an author who simply
+forgets `ContainerGate.Require()` in a future 🐳 row.
+`ContainerHarness.RunAsync` throws rather than starting anything when the gate is
+closed, and `ContainerHarness_refuses_to_start_anything_when_the_gate_is_closed` grades
+that — forcing the gate shut for its own flow so it runs in *both* modes and
+`-p:Containers=true` keeps reporting zero skips. All three mutants were built and
+observed, not reasoned about. Keep all three facts.
 
 ### `-p:Containers=true`, and the no-rebuild alternative
 
 `-p:Containers=true` reaches the test process through a
 `RuntimeHostConfigurationOption` in `tests/…csproj`, i.e. through
 `runtimeconfig.json`, so it requires a build. Setting `FEWO_MS_CONTAINERS=1` in the
-environment does the same thing without one.
+environment opens the **gate** without one.
+
+**But since ex034 the env var is no longer a full substitute, and the difference is
+not the gate.** Starting a real `DistributedApplication` needs DCP, and `tests/` pulls
+`Aspire.Hosting.AppHost` + `Aspire.Hosting.Orchestration.<rid>` in an item group
+conditioned on `'$(Containers)' == 'true'` — precisely so the default restore and build
+stay as small and Docker-free as they were. `FEWO_MS_CONTAINERS=1` flips the gate but
+cannot add a package reference, so an L3 row let through that way reaches DCP that was
+never restored and dies in **161 ms** with
+
+```
+Microsoft.Extensions.Options.OptionsValidationException :
+  Property CliPath: The path to the DCP executable used for Aspire orchestration is required.
+```
+
+Measured 2026-09-07. It is loud, immediate and cannot be mistaken for a pass, which is
+why the conditioning was kept rather than making every default restore carry the
+orchestrator. Use `FEWO_MS_CONTAINERS=1` to exercise the **gate**; use
+`-p:Containers=true` to actually run a 🐳 row.
 
 The gate deliberately checks **only the switch**, never whether Docker is reachable.
 With the switch on and no daemon the L3 tests **fail**, loudly. A broken Docker setup
@@ -165,6 +194,70 @@ a general limitation of in-process publish. See §6.
 Mongo aggregation actually returning documents, an index actually being *used*, an
 outbox actually delivering, a Redis key actually expiring. **25 of the 100 rows** are
 L3, marked 🐳 in `catalog.md`. Everything else stays in the fast loop.
+
+### What a 🐳 test may assume — measured on 2026-09-07, when ex034 became the first one
+
+`tests/_support/ContainerHarness.cs` is the only place in the track that touches
+Docker. Every 🐳 row goes through `ContainerHarness.RunAsync(configure, body)`, and
+every 🐳 test's **first line** is `ContainerGate.Require()`. These are the numbers and
+the failure shapes the next twenty-four rows inherit.
+
+- **Images are pulled on demand, and the pull is inside the session's budget.**
+  Measured directly: `busybox:1.36` was absent from `docker images` before the run and
+  present (6.76 MB) after, with no `docker pull` anywhere in the loop — DCP fetches
+  what it does not have. A 🐳 row therefore does **not** need a warm cache to be
+  correct, only to be quick, and the harness's 5-minute default budget is sized for a
+  cold pull on a slow line rather than for the warm case.
+- **A warm Postgres row costs ~57 s wall clock**, of which about ten is teardown.
+  ex034's L3 fact was measured at **55 s, 57 s and 60 s** across five runs with
+  `postgres:18.3` already local; `dotnet test -p:UseSolutions=true` goes from
+  **1 m 27 s to 2 m 18 s** when `-p:Containers=true` adds that single row. Budget
+  roughly a minute per 🐳 row, and remember the assembly runs serially (§6), so
+  twenty-five of them will be a twenty-five-minute lane, not a parallel one. That is
+  the reason 🐳 is opt-in and the reason the fast loop is where everything else lives.
+- **With the switch ON and Docker unreachable, a 🐳 row FAILS — it does not skip, and
+  it does not hang to the deadline.** Measured by poisoning `DOCKER_HOST`: the test
+  failed after **28 s** with
+
+  ```
+  Aspire.Hosting.DistributedApplicationException : Stopped waiting for resource 'orders'
+    to become healthy because it failed to start.
+  ```
+
+  Note what that message does *not* say: "Docker". It names the resource, not the
+  daemon, so a reader seeing it should check `docker ps` before reading the exercise.
+  The important property is the one the gate exists for — a broken Docker setup cannot
+  masquerade as a green run by quietly skipping.
+- **With the switch OFF, nothing is touched.** `Assert.SkipUnless` in
+  `ContainerGate.Require()` skips before a builder exists, and `ContainerHarness.RunAsync`
+  additionally **throws** if it is ever reached with the gate closed, so a forgotten
+  `Require()` cannot make the default `dotnet test` pull images. That guard has its own
+  canary, `ContainerHarness_refuses_to_start_anything_when_the_gate_is_closed`, which
+  runs in *both* modes because it forces the gate shut for its own flow.
+- **A hung container fails its own test and nothing else.** `RunAsync` links the test's
+  token to a **5-minute** deadline and converts the cancellation into a
+  `TimeoutException` naming the budget and how far the session got. Measured with the
+  budget dialled down to 8 s: it threw at **8.06 s** — *"The container session exceeded
+  8 s (it had NOT finished starting after 00:00:08.06). Is Docker running, and is the
+  image already pulled?"* — and the whole call returned at 19 s, the balance being
+  teardown, which gets its own 2-minute budget precisely because the session token is
+  already cancelled by then.
+- **Nothing leaks, including when the test fails.** `docker ps -a`, `docker network ls`
+  and `docker volume ls` were counted before and after **seven** container runs —
+  two green, three deliberately-failing mutants, one Docker-off failure and one forced
+  timeout — and came back to the same 82 / 4 / 46 every time. The load-bearing piece is
+  `DcpPublisher:WaitForResourceCleanup`, which the harness sets: without it the
+  per-session Docker *network* outlives the run, one per test, forever. Any
+  pre-existing `dapr_*` containers on this machine belong to other work and are not
+  part of that count.
+- **Assume nothing about ports.** DCP publishes on an ephemeral host port, never the
+  flavour's default — ex034 asserts `Port != 5432` for exactly that reason, and it is
+  the most legible single proof that a hard-coded connection string could not have
+  reached the database.
+- **Do not assume the resolved connection string is free of braces.** Aspire generates
+  Postgres passwords from a character set that includes `{`, so a run in ten produces a
+  perfectly resolved string containing one. Assert that the named placeholders are gone
+  (`{pg.`, `.connectionString}`), never that no brace remains.
 
 ## 5. How an exercise works
 
@@ -637,6 +730,79 @@ Each of these cost real time. None is a guess.
   the helpers call `ExcludeFromManifest` for you rather than branching on
   `IsRunMode`. The relationship `Type` strings are undocumented — ex030 pins them
   and is the tripwire, the same stance ex004 takes on health-check keys.
+- **`WithDataVolume(name, …)` and `WithVolume(name, target)` are byte-identical in the
+  model, so a flavour-aware helper cannot be graded by the mount it writes.** Measured
+  on 13.5.3 while writing ex031: `AddPostgres("pg").WithVolume("pgdata",
+  "/var/lib/postgresql")` and `AddPostgres("pg").WithDataVolume("pgdata")` produce
+  `ContainerMountAnnotation`s equal in `Type`, `Source`, `Target` and `IsReadOnly`, and
+  the resource's annotation list is otherwise identical. An implementation that looks
+  all five container paths up once and types them therefore passes every path
+  assertion — which it should, because it produces the same container; the thing it has
+  not done is use the API the row is about. The **one** observable difference is the
+  name the *anonymous* overload generates:
+  `fewolearning.microservices.tests-549a2a9f7b-pgauto-data` in the red run and
+  `…-9a0e1cce07-…` in the green one, the hash being derived from the AppHost. ex031
+  carries a sixth server, `pgauto`, purely so that one resource's volume name is
+  something no learner can commit, and grades its shape. Any future row about a
+  `With<Something>Volume` helper needs the same trick or it grades a path, not a call.
+- **The Postgres data directory depends on the image TAG, and the call order decides
+  which one you get.** Measured: `WithDataVolume` reads the tag configured *at the
+  moment it runs*. On the default tag (18.3) it lands on `/var/lib/postgresql`; on
+  `17.5` it lands on `/var/lib/postgresql/data` — the path every tutorial quotes.
+  `WithImageTag("17.5")` **then** `WithDataVolume(…)` gives the 17 path;
+  `WithDataVolume(…)` **then** `WithImageTag("17.5")` gives the 18 path on a 17 image,
+  silently, and the container initdb's into an empty directory beside the real one on
+  every run. Nothing warns. Mongo is `/data/db` and SQL Server `/var/opt/mssql`.
+- **SQL Server's two data helpers are asymmetric: one mount versus three.**
+  `AddSqlServer("x").WithDataVolume("d")` writes a single volume at `/var/opt/mssql`;
+  `AddSqlServer("x").WithDataBindMount("./d")` writes **three** bind mounts, at
+  `/var/opt/mssql/data`, `/log` and `/secrets`. A host directory cannot be mounted over
+  the whole of `/var/opt/mssql` without hiding the server binaries, so the helper splits
+  it. The obvious hand-rolled equivalent — `WithBindMount("./d", "/var/opt/mssql")` —
+  produces one mount, a container that will not start, and a model that reads correctly.
+- **`WithInitFiles` and `WithInitBindMount` are two different mechanisms, not two
+  spellings.** Measured while writing ex032. `WithInitFiles(dir)` writes a
+  **`ContainerFileSystemCallbackAnnotation`** (`DestinationPath`
+  `/docker-entrypoint-initdb.d`) whose callback enumerates the source folder when
+  invoked and yields one `ContainerFile` per script — so a test can *run* the callback
+  and discover whether the folder pointed at actually contained anything, which is the
+  only way to reject an implementation aimed at an empty directory. Each `ContainerFile`
+  carries `SourcePath` and leaves `Contents` **null**: the bytes are streamed at run
+  time, not captured at model time, so assert the path and never the SQL.
+  `WithInitBindMount(dir)` is `[Obsolete]` and writes an ordinary
+  `ContainerMountAnnotation` instead — **`IsReadOnly` true**, unlike the generic
+  `WithBindMount`, which defaults to false. `WithInitFiles` also validates its source at
+  model-build time, throwing `InvalidOperationException` from inside `Configure` and
+  naming the absolute path, so a relative literal is a hard failure rather than a silent
+  no-op — and `builder.AppHostDirectory` is three different places (§5), so exercises
+  point both helpers at `Path.Combine(AppContext.BaseDirectory, "initdb")` and ship the
+  scripts as `Content` from both content libraries.
+- **A bare integration resource carries no mount and no file-system callback.**
+  Measured on 13.5.3 for `AddPostgres`, `AddSqlServer` and `AddMongoDB`: each arrives
+  with `EndpointAnnotation`, `ContainerImageAnnotation`, `ResourceIconAnnotation`, some
+  `Environment*` annotations and a `HealthCheckAnnotation` — and **zero**
+  `ContainerMountAnnotation` and **zero** `ContainerFileSystemCallbackAnnotation`. So
+  unlike the health-check case above, "this resource has no mounts" and "this resource
+  has no file callback" are real statements about an answer, and ex031/ex032 grade both
+  directions with them.
+- **Npgsql strips the password out of `NpgsqlDataSource.ConnectionString`, so a
+  sentinel has to live elsewhere in the string.** Measured on Npgsql 10.0.2 while
+  writing ex033. `Application Name` survives normalisation and nothing else writes it,
+  which makes it the place to put a value the test invented microseconds ago.
+  Two more things that decide what a client-integration row can grade: the failure for
+  a **missing** `ConnectionStrings:<name>` key is thrown when the data source is
+  *resolved*, not when it is registered — `AddNpgsqlDataSource` returns happily against
+  an empty configuration — so the negative half has to ask the container for the
+  service; and the integration registers `NpgsqlConnection`, `DbDataSource` and
+  `DbConnection` alongside the data source plus a health-check registration named
+  `PostgreSql`, none of which a hand-rolled
+  `AddSingleton(NpgsqlDataSource.Create(config.GetConnectionString(…)!))` produces.
+  That hand-rolled version also throws `ArgumentNullException` ("Parameter 'Host'")
+  rather than an `InvalidOperationException` naming the key. The sharpest mutant in the
+  row is neither of those: `AddNpgsqlDataSource(name, s => s.ConnectionString ??=
+  "Host=localhost;…")` — the real integration with a "safe" local fallback bolted on —
+  passes the sentinel fact and the health-check fact and dies **only** on the
+  missing-key fact. Any row prescribing a sentinel needs the missing-key half too.
 - **`NU1603` silently upgrades the test runner.** `xunit.runner.visualstudio` has **no
   3.1.6 and no 3.1.7** — 3.1.5 is the last 3.x and the next version is 4.0.0. Naming a
   3.x that does not exist does not fail the build: NuGet resolves *forward* to 4.0.0 with
@@ -776,7 +942,10 @@ Each of these cost real time. None is a guess.
 | `Microsoft.Extensions.ServiceDiscovery` | 10.9.0 | `exercises/` + `solutions/` |
 | `Microsoft.Extensions.Http.Resilience` | 10.9.0 | `exercises/` + `solutions/` |
 | `OpenTelemetry.*` (`.Extensions.Hosting`, `.Instrumentation.AspNetCore` / `.Http` / `.Runtime`, `.Exporter.OpenTelemetryProtocol`) | 1.18.0 | `exercises/` + `solutions/` |
+| `Aspire.Npgsql` | 13.5.3 | `exercises/` + `solutions/` |
 | `Aspire.Hosting.Testing` | 13.5.3 | `tests/` |
+| `Aspire.Hosting.AppHost` + `Aspire.Hosting.Orchestration.$(NETCoreSdkRuntimeIdentifier)` | 13.5.3 | `tests/`, **only** under `Condition="'$(Containers)' == 'true'"` |
+| `Npgsql` | 10.0.2 | `tests/` |
 | `OpenTelemetry.Exporter.InMemory` | 1.18.0 | `tests/` |
 | `Microsoft.AspNetCore.TestHost` | 10.0.11 | `tests/` |
 | `xunit.v3` | 3.2.2 | `tests/` |
@@ -786,9 +955,27 @@ Each of these cost real time. None is a guess.
 This table is the **pinning policy**, not an inventory: a package is added to the two
 content libraries when the first row needing it is written. Referenced today:
 `Aspire.Hosting`, `.PostgreSQL`, `.SqlServer`, `.MongoDB`, `.Redis`,
-`.Azure.AppContainers` and `.Azure.Storage` — the last two because the harness's Bicep
+`.Azure.AppContainers`, `.Azure.Storage` and the client-side `Aspire.Npgsql` — the last two because the harness's Bicep
 fact needs them and the Azure rows will — plus the non-Aspire service-side set rows
 021-023 added, and a `FrameworkReference` to `Microsoft.AspNetCore.App` (see §5).
+`Aspire.Npgsql` arrived with ex033/ex034 — the first rows that cross from the AppHost
+into a **service** — and went into both content libraries at 13.5.3 like every other
+Aspire package. `Npgsql` 10.0.2 in `tests/` is not an independent choice: ex034's L3
+fact seeds a row through its own connection before asking the learner's code to read it
+back, and 10.0.2 is exactly what `Aspire.Npgsql` 13.5.3 resolves in the two content
+libraries (verified in `project.assets.json`), so the test and the exercise never run
+two different drivers.
+
+The two DCP packages are the track's only **conditional** references. They exist because
+starting a real `DistributedApplication` needs the orchestrator that `Aspire.AppHost.Sdk`
+normally supplies, and `tests/` is a plain test project. Two things not to do to them:
+do **not** set `IsAspireHost=true` "to make it an AppHost" — the .NET 10 SDK's
+`_CheckForAspireWorkloadDeprecation` then fires without the `AspireHostingSDKVersion`
+only that SDK sets, and the build dies `NETSDK1228`; and do **not** make them
+unconditional, because the whole point is that the default `dotnet test` restores and
+builds exactly what it did before ex034 landed. The cost of the condition is documented
+in §3: `FEWO_MS_CONTAINERS=1` alone can no longer run a 🐳 row.
+
 Those non-Aspire versions are chosen for currency and coherence rather than pinned to
 Aspire: OpenTelemetry ships as one release train, so all five of its packages sit on the
 same 1.18.0 (the InMemory exporter in `tests/` included, since it shares the SDK's
@@ -841,8 +1028,8 @@ a summary of it:
   host's own pre-existing containers — so the container's Docker client genuinely reaches
   the **host** daemon rather than a nested one;
 - `dotnet test` inside gives **4 passed / 1 skipped**, matching the host exactly. That
-  measurement predates the first exercises; the host now gives 12 failed / 7 passed /
-  1 skipped (§3), and the DevContainer has not been re-measured since.
+  measurement predates the first exercises; the host now gives 109 failed / 8 passed /
+  2 skipped (§3), and the DevContainer has not been re-measured since.
 
 **What remains unproven, and the specific way it is likely to break.** Spec §7 set the
 bar at *Aspire starting a sibling database container from inside the DevContainer*, and
@@ -867,10 +1054,17 @@ the containers to the devcontainer's own network, or `--network host` are all pl
 fixes, and Aspire may already do the right thing. It is a reason not to claim success
 before someone runs it. The honest claim today is **"the DevContainer builds, reaches
 the host daemon, and runs the default test suite"** — not "verified end-to-end".
-Whoever lands the first 🐳 exercise (row 034 is the earliest) should run
-`dotnet test -p:Containers=true --filter …Ex034_` inside the container and, if it passes,
-upgrade this section to the §7 bar — and if it fails on `localhost`, record which of the
-fixes above worked, because every later 🐳 row inherits it.
+**Row 034 now exists, and this is still unproven.** As of 2026-09-07 the first 🐳 row
+is written and green **on the host** (§4), but it has *not* been run inside the
+DevContainer — that needs a rebuild and a full restore of the conditional DCP packages,
+and it was left to whoever next opens the container rather than claimed untested. The
+command is `dotnet test -p:Containers=true --filter …Ex034_`. If it passes, upgrade this
+section to the §7 bar; if it fails on `localhost`, record which of the fixes above
+worked, because every later 🐳 row inherits it. One extra thing to check that the
+paragraph above predates: the conditional `Aspire.Hosting.Orchestration.$(NETCoreSdkRuntimeIdentifier)`
+reference resolves a **runtime-identifier-specific** package, so the DevContainer
+restores `linux-x64` where the host restores `win-x64` — a first run in there will
+download it.
 
 ### It does not use the `docker-outside-of-docker` or `node` features
 

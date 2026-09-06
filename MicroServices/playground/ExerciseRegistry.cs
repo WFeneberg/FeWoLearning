@@ -37,6 +37,10 @@ public static class ExerciseRegistry
         ["ex028"] = Ex028_MongoFirstConnection.Configure,
         ["ex029"] = Ex029_RedisFirstConnection.Configure,
         ["ex030"] = Ex030_DatabaseAdminTools.Configure,
+        ["ex031"] = Ex031_DataVolumesPerFlavour.Configure,
+        ["ex032"] = Ex032_DatabaseInitScripts.Configure,
+        ["ex034"] = Ex034_FirstRealQuery.Configure,
+        ["ex035"] = Ex035_BeginnerCapstoneModel.Configure,
     };
 
     /// <summary>
@@ -56,6 +60,9 @@ public static class ExerciseRegistry
         ["ex023"] = "ex023 (LivenessVersusReadiness) is service-side: it registers health checks "
                     + "and maps two probe endpoints, and has no resource graph. Run `dotnet test "
                     + "--filter FullyQualifiedName~Ex023_` instead.",
+        ["ex033"] = "ex033 (ClientIntegrationRegistration) is service-side: it registers the "
+                    + "Npgsql client integration in an IHostApplicationBuilder, and has no "
+                    + "resource graph. Run `dotnet test --filter FullyQualifiedName~Ex033_` instead.",
     };
 
     /// <summary>Why an exercise cannot be run in the playground, or null if it can.</summary>

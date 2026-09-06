@@ -57,7 +57,7 @@ as oversights:
   and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
   093/094/099/100 assert on the generated Bicep for real.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜**
 
 ## Beginner (001–035) — Aspire model and first persistence
 
@@ -93,11 +93,11 @@ as oversights:
 | 028 | MongoFirstConnection | `AddMongoDB().AddDatabase()`, `MongoDBDatabaseResource`, and the `mongodb://…?authSource=admin&authMechanism=SCRAM-SHA-256` URI decomposed as a URI — scheme, userinfo, authority, PATH SEGMENT for the database name, query — not a keyed connection string; plus the consequence only a URI has, the `annotated.string` / `filter: "uri"` resource the manifest interpolates in place of the raw password | ✅ |
 | 029 | RedisFirstConnection | `AddRedis()` and `RedisResource`: a host:port with no scheme and **no database child resource**, which is exactly how Redis differs from the three above — graded in both directions against a Postgres control in the same model. Comma-separated StackExchange.Redis option syntax, and the scheme that does exist on the BINDING (`UriScheme` "redis") and not in the string | ✅ |
 | 030 | DatabaseAdminTools | `WithPgAdmin`, `WithMongoExpress`, `WithRedisInsight`; each adds a *separate* container resource tied to its parent — assert the extra resource and the link, not a port number. The link is a `ResourceRelationshipAnnotation` (never `IResourceWithParent`), whose `Type` differs per integration (`PgAdmin` / `Parent` / `RedisInsight`), and the console names follow three different rules; none of the three reaches `aspire-manifest.json` | ✅ |
-| 031 | DataVolumesPerFlavour | `WithDataVolume` vs `WithDataBindMount`, and that the container path is flavour-specific (`/var/lib/postgresql/data`, `/data/db`, `/var/opt/mssql`) — one shared constant is wrong | ⬜ |
-| 032 | DatabaseInitScripts | `WithInitBindMount`/`WithInitFiles` targeting `/docker-entrypoint-initdb.d`; the mount annotation plus the `WaitFor` ordering that makes the script run before a consumer connects | ⬜ |
-| 033 | ClientIntegrationRegistration | `AddNpgsqlDataSource("orders")` reading `ConnectionStrings:orders`; build the service's configuration with a **sentinel** value and assert the registered data source carries it, then remove the key and assert registration fails — a hardcoded connection string fails both halves | ⬜ |
-| 034 | FirstRealQuery | start Postgres for real, `WaitFor` it, and execute a query through the *injected* connection string — proves the expression resolves, which no model-level test can | 🐳 ⬜ |
-| 035 | BeginnerCapstoneModel | catalog + orders + reviews + cache in one graph: four resource types, four distinct connection expressions, and consumers carrying both `WithReference` and `WaitFor` | ⬜ |
+| 031 | DataVolumesPerFlavour | `WithDataVolume` vs `WithDataBindMount`, and that the container path is flavour-specific (`/var/lib/postgresql/data`, `/data/db`, `/var/opt/mssql`) — one shared constant is wrong |✅ |
+| 032 | DatabaseInitScripts | `WithInitBindMount`/`WithInitFiles` targeting `/docker-entrypoint-initdb.d`; the mount annotation plus the `WaitFor` ordering that makes the script run before a consumer connects |✅ |
+| 033 | ClientIntegrationRegistration | `AddNpgsqlDataSource("orders")` reading `ConnectionStrings:orders`; build the service's configuration with a **sentinel** value and assert the registered data source carries it, then remove the key and assert registration fails — a hardcoded connection string fails both halves |✅ |
+| 034 | FirstRealQuery | start Postgres for real, `WaitFor` it, and execute a query through the *injected* connection string — proves the expression resolves, which no model-level test can | 🐳✅ |
+| 035 | BeginnerCapstoneModel | catalog + orders + reviews + cache in one graph: four resource types, four distinct connection expressions, and consumers carrying both `WithReference` and `WaitFor` |✅ |
 
 ## Intermediate (036–070) — persistence in depth, then communication
 
