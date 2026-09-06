@@ -61,18 +61,18 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-06; `catalog.md` at 25 ✅ / 75 ⬜, so the
-twenty-five delivered exercises contribute 80 red facts):
+**Current measured state** (2026-09-06; `catalog.md` at 30 ✅ / 70 ⬜, so the
+thirty delivered exercises contribute 95 red facts):
 
 ```
-dotnet test                      →  80 failed, 7 passed, 1 skipped (88 total)
-dotnet test -p:UseSolutions=true →   0 failed, 87 passed, 1 skipped (88 total)
+dotnet test                      →  95 failed, 7 passed, 1 skipped (103 total)
+dotnet test -p:UseSolutions=true →   0 failed, 102 passed, 1 skipped (103 total)
 ```
 
 `-p:Containers=true` unskips the harness's container-gate fact, which then passes; no
 🐳 exercise row exists yet, so it has not been re-measured since ex005.
 
-**A correct default run is red, and that is not a broken checkout.** Eighty
+**A correct default run is red, and that is not a broken checkout.** Ninety-five
 failures is exactly what an untouched tree gives: one `NotImplementedException` per
 unimplemented `Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
 the harness's own facts, which pass in *both* modes because they grade the harness
@@ -551,6 +551,92 @@ Each of these cost real time. None is a guess.
   and the branch leaves nothing (a plain `AddContainer` carries none, so the annotation
   is a real difference and not something everything has). Any future row about
   run-mode-only resources needs that third assertion or it grades the wrong exercise.
+- **The four stores in this tier produce four structurally different connection
+  strings, and only one of them is keyed the way ADO.NET is.** Measured on 13.5.3
+  while writing rows 026-029, and the reason those rows are not the same exercise
+  four times:
+
+  ```
+  sqldata :: SqlServerServerResource :: Server={sqldata.bindings.tcp.host},{sqldata.bindings.tcp.port};User ID=sa;Password={sa-pw.value};TrustServerCertificate=true
+  catalog :: SqlServerDatabaseResource :: {sqldata.connectionString};Initial Catalog=catalog
+  pg      :: PostgresServerResource   :: Host={pg.bindings.tcp.host};Port={pg.bindings.tcp.port};Username=postgres;Password={pg-password.value}
+  docs    :: MongoDBServerResource    :: mongodb://admin:{docs-password.value}@{docs.bindings.tcp.host}:{docs.bindings.tcp.port}/?authSource=admin&authMechanism=SCRAM-SHA-256
+  cache   :: RedisResource            :: {cache.bindings.tcp.host}:{cache.bindings.tcp.port},password={cache-password.value}{cond-cache-bindings-tcp-tlsenabled-<hash>.connectionString}
+  ```
+
+  SQL Server joins host and port with a **comma** and fixes the login to `sa`;
+  Postgres uses two keyed clauses and fixes it to `postgres`; Mongo is a URI whose
+  database name is a **path segment**; Redis is a bare `host:port` with
+  comma-separated StackExchange.Redis options and **no scheme** — although its
+  *endpoint* does carry `UriScheme` "redis" where Postgres's carries "tcp", so "no
+  scheme" is a claim about the string, not about the model. Redis is also the only
+  one of the four with **no database child resource at all**.
+  Two tails not to pin: Redis's conditional TLS fragment carries a **content hash**
+  in its resource name (`cond-cache-bindings-tcp-tlsenabled-3eddb73a` for "cache",
+  `…-9058fe65` for "sessions" — deterministic per name, but not a contract), and
+  the `cond-…` resource does **not** appear in `builder.Resources` even though the
+  expression interpolates it.
+- **A referenced database hands its consumer seven variables beside
+  `ConnectionStrings__*`, and a hand-rolled connection string hands it none.**
+  Measured on 13.5.3 while writing ex027, and it is the sharpest grading hook this
+  batch found. `AddContainer("api","nginx").WithReference(db)` where `db` is
+  `AddPostgres("pg").AddDatabase("ordersdb", "orders_v2")` writes:
+
+  ```
+  ConnectionStrings__ordersdb   = {ordersdb.connectionString}
+  ORDERSDB_HOST                 = {pg.bindings.tcp.host}
+  ORDERSDB_PORT                 = {pg.bindings.tcp.port}
+  ORDERSDB_USERNAME             = postgres
+  ORDERSDB_PASSWORD             = {pg-password.value}
+  ORDERSDB_DATABASENAME         = orders_v2
+  ORDERSDB_URI                  = postgresql://postgres:{pg-password.value}@{pg.bindings.tcp.host}:{pg.bindings.tcp.port}/orders_v2
+  ORDERSDB_JDBCCONNECTIONSTRING = jdbc:postgresql://{pg.bindings.tcp.host}:{pg.bindings.tcp.port}/orders_v2
+  ```
+
+  Every key is the **resource** name upper-cased; only `_DATABASENAME` and the tail
+  of the two URI forms carry the **database** name. SQL Server and MongoDB emit the
+  same shape with their own flavours (`mssql://sa:…`, `jdbc:sqlserver://…;
+  databaseName=…;trustServerCertificate=true`; Mongo adds
+  `_AUTHENTICATIONDATABASE` and `_AUTHENTICATIONMECHANISM`), and Redis emits five
+  with `CACHE_URI = {cache.bindings.tcp.scheme}://:{cache-password.value}@…` — the
+  scheme coming from the binding, not from the connection string.
+  The grading consequence: `AddConnectionString("ordersdb",
+  ReferenceExpression.Create($"{pg.Resource};Database=orders_v2"))` renders the
+  byte-identical connection string (the mutant ex014 already documents) and its
+  consumer receives **exactly one** variable. ex027 was re-scoped onto this, because
+  its original spec — `AddPostgres().AddDatabase()` plus
+  `{pg.connectionString};Database=orders` — was already covered assertion-for-
+  assertion by ex001 and ex014.
+- **MongoDB's password is published through a URI-encoding filter; nobody else's
+  is.** Measured on 13.5.3. In `aspire-manifest.json` the Mongo connection strings
+  interpolate `{docs-password-uri-encoded.value}`, not `{docs-password.value}`, and
+  the manifest gains a resource `docs-password-uri-encoded` of type
+  **`annotated.string`** with `"filter": "uri"` and `"value":
+  "{docs-password.value}"` — a manifest resource type nothing else in this track
+  produces. It exists because the password sits in a URI's userinfo rather than in a
+  `Password=` clause. Note the model and the manifest therefore **disagree** on
+  Mongo's connection-string expression, which is why ex028 pins the model form at L1
+  and the encoded form at L2 rather than asserting one string in both places.
+- **The three admin-console helpers add a sibling resource and link it with a
+  `ResourceRelationshipAnnotation`, and all three differ from each other.** Measured
+  on 13.5.3 for row 030:
+
+  | call | resource added | type | relationship `Type` |
+  |---|---|---|---|
+  | `AddPostgres("pg").WithPgAdmin()` | `pgadmin` | `Aspire.Hosting.Postgres.PgAdminContainerResource` | `"PgAdmin"` |
+  | `AddMongoDB("docs").WithMongoExpress()` | `docs-mongoexpress` | `Aspire.Hosting.MongoDB.MongoExpressContainerResource` | `"Parent"` |
+  | `AddRedis("cache").WithRedisInsight()` | `redisinsight` | `Aspire.Hosting.Redis.RedisInsightResource` | `"RedisInsight"` |
+
+  None of the three is `IResourceWithParent` — the link is a relationship, not
+  parenting — and the store carries no annotation pointing back, so the link is
+  one-way. pgAdmin and RedisInsight are **singletons**: two Postgres servers each
+  calling `WithPgAdmin()` still yield exactly one `pgadmin`, and measured, it holds a
+  relationship to the **first** server only, so do not build a row on the
+  two-server case. Mongo Express is per-server and named after its parent. All three
+  are present in the **publish-mode model** and absent from `aspire-manifest.json`:
+  the helpers call `ExcludeFromManifest` for you rather than branching on
+  `IsRunMode`. The relationship `Type` strings are undocumented — ex030 pins them
+  and is the tripwire, the same stance ex004 takes on health-check keys.
 - **`NU1603` silently upgrades the test runner.** `xunit.runner.visualstudio` has **no
   3.1.6 and no 3.1.7** — 3.1.5 is the last 3.x and the next version is 4.0.0. Naming a
   3.x that does not exist does not fail the build: NuGet resolves *forward* to 4.0.0 with

@@ -32,6 +32,11 @@ public static class ExerciseRegistry
         ["ex020"] = Ex020_RunVersusPublishMode.Configure,
         ["ex024"] = Ex024_ResourceCommands.Configure,
         ["ex025"] = Ex025_EventingAndLifecycleHooks.Configure,
+        ["ex026"] = Ex026_SqlServerFirstConnection.Configure,
+        ["ex027"] = Ex027_PostgresFirstConnection.Configure,
+        ["ex028"] = Ex028_MongoFirstConnection.Configure,
+        ["ex029"] = Ex029_RedisFirstConnection.Configure,
+        ["ex030"] = Ex030_DatabaseAdminTools.Configure,
     };
 
     /// <summary>
