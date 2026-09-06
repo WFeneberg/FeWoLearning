@@ -603,3 +603,34 @@ surprise the next batch pays for again.
   which 3 are container-gated. Red run 249 failed / 5 passed / 3 skipped; green run 254
   passed / 3 skipped; green with `-p:Containers=true` 257 passed / 0 skipped. 0 warnings
   in both modes.
+
+**2026-09-06, rows 051–055:**
+
+- **`WriteAsJsonAsync` overwrites `Response.ContentType`.** Setting
+  `application/problem+json` beforehand is silently undone — the response arrives as
+  `application/json`. The `contentType` argument is the fix, and it comes *after* the
+  serializer options: the overload is `(value, options, contentType, …)`, so
+  `(value, contentType)` does not compile.
+- **Registering a `LogProbe` as the host's `ILoggerFactory` captures the framework's own
+  records too** — Hosting starting, route matching, the lot. Ex055's first draft did
+  that and `Assert.Single` saw eleven records. A middleware that uses the probe directly
+  needs nothing in DI at all.
+- **`PostgreSqlBuilder()`'s parameterless constructor is `[Obsolete]`** in
+  Testcontainers 4.14, exactly like `ContainerBuilder()`. Pass the image:
+  `new PostgreSqlBuilder("postgres:17-alpine")`.
+- **A bare `() => throw …` endpoint lambda is inferred as a `RequestDelegate`** and fails
+  with `CS1593`. An explicit return type — `string () => throw …` — disambiguates it.
+- **Row 051 is deliberately provider-agnostic**, written against `System.Data.Common`
+  rather than any one driver. That is what lets the same helper be graded in process
+  against SQLite and, behind the 🐳 gate, against a real PostgreSQL server through
+  Npgsql — and both the in-process fact and the container fact catch a parameter-value
+  leak, so the container is a second opinion rather than the only one.
+- **Row 053's ordering constraint is forced rather than chosen**, and it is worth
+  noticing: the retry counter is dimensioned by how the *whole call* ended, which is not
+  known while the retries are happening. A dimension learned late means a measurement
+  recorded late — and it is also why a call with no retries records nothing at all
+  rather than a zero.
+- Batch baseline after rows 001–055: **279 facts total** (273 exercise + 6 harness), of
+  which **4 are container-gated**. Red run 270 failed / 5 passed / 4 skipped; green run
+  275 passed / 4 skipped; green with `-p:Containers=true` **279 passed / 0 skipped**.
+  0 warnings in both modes.

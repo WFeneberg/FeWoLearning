@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 50 ✅ / 20 ⬜**
+**Status: 55 ✅ / 15 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -88,11 +88,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 048 | QueuePropagationProducerConsumer | inject into message headers, extract on the consumer, Producer/Consumer kinds and a link | ✅ |
 | 049 | BackgroundServiceInstrumentation | one root activity **per iteration**, not one per service lifetime | ✅ |
 | 050 | RedMetricsAndCardinality | rate/errors/duration by `http.route`; a tag cardinality budget | ✅ |
-| 051 | DatabaseInstrumentation | `db.system`/`db.query.text`, and why parameter values must never reach the span | 🐳 ⬜ |
-| 052 | HealthChecksAndProbes | composition, tag-filtered liveness vs readiness, check results as metrics | ⬜ |
-| 053 | ResilienceTelemetry | Polly retries visible as events and metrics; the retry-hides-the-failure bug | ⬜ |
-| 054 | ErrorStatusAndProblemDetails | exception → span status → correlated log, never swallowed | ⬜ |
-| 055 | HttpRequestLogging | request logging duration measured at the right place; query-string PII | ⬜ |
+| 051 | DatabaseInstrumentation | `db.system`/`db.query.text`, and why parameter values must never reach the span | 🐳 ✅ |
+| 052 | HealthChecksAndProbes | composition, tag-filtered liveness vs readiness, check results as metrics | ✅ |
+| 053 | ResilienceTelemetry | Polly retries visible as events and metrics; the retry-hides-the-failure bug | ✅ |
+| 054 | ErrorStatusAndProblemDetails | exception → span status → correlated log, never swallowed | ✅ |
+| 055 | HttpRequestLogging | request logging duration measured at the right place; query-string PII | ✅ |
 | 056 | CollectorPipeline | an OTel Collector container with a processor; what the collector can fix that the app cannot | 🐳 ⬜ |
 | 057 | BackendIngestion | structured logs into a real backend; fields are queryable, a baked-in message is not | 🐳 ⬜ |
 | 058 | MultiHopTraceCapstone | HTTP → in-process queue → background worker, one trace across all three hops | ⬜ |

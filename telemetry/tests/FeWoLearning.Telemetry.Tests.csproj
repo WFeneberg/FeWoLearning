@@ -44,6 +44,18 @@
        exercised only under -p:Containers=true. -->
   <ItemGroup>
     <PackageReference Include="Testcontainers" Version="4.14.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.14.0" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
+
+  <!-- Row 051 grades a provider-agnostic helper over System.Data.Common, so it needs two
+       real providers to prove it: SQLite in process for the facts that always run, and
+       Npgsql against a real server for the container fact. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <!-- Pinned above Microsoft.Data.Sqlite's own transitive 2.1.11, which carries
+         GHSA-2m69-gcr7-jv3q and emits NU1903 on every build. -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
   </ItemGroup>
 
   <ItemGroup>
