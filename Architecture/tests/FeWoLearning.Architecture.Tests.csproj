@@ -30,6 +30,18 @@
     <PackageReference Include="MQTTnet.Server" Version="5.2.0.1603" />
   </ItemGroup>
 
+  <!-- Container-backed facts only. Every one of them is behind
+       ContainerGate.SkipUnlessEnabled(), so these packages are restored always and
+       exercised only under -p:Containers=true. -->
+  <ItemGroup>
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.14.0" />
+    <PackageReference Include="Testcontainers.Redis" Version="4.14.0" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="4.14.0" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <PackageReference Include="StackExchange.Redis" Version="3.1.31" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.2" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>

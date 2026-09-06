@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 31 ✅ / 29 ⬜**
+**Status: 36 ✅ / 24 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -64,11 +64,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 029 | RepositoryUnitOfWork | repository boundary, unit of work, single commit per operation | ✅ |
 | 030 | SpecificationPattern | composable specifications, AND/OR/NOT, translation to a query | ✅ |
 | 031 | AggregateDomainEvents | aggregate invariants, event collection, dispatch after commit | ✅ |
-| 032 | TransactionalOutbox 🐳 | persist + enqueue in one transaction, relay, rollback atomicity | ⬜ |
-| 033 | IdempotentConsumer | inbox dedup, at-least-once delivery, duplicate suppression | ⬜ |
-| 034 | CacheAside | hit/miss, loader invocation count, negative caching | ⬜ |
-| 035 | WriteThroughWriteBehind | write-through vs write-behind, flush semantics, loss window | ⬜ |
-| 036 | CacheStampede 🐳 | single-flight, concurrent loaders, one load per key | ⬜ |
+| 032 | TransactionalOutbox 🐳 | persist + enqueue in one transaction, relay, rollback atomicity | ✅ |
+| 033 | IdempotentConsumer | inbox dedup, at-least-once delivery, duplicate suppression | ✅ |
+| 034 | CacheAside | hit/miss, loader invocation count, negative caching | ✅ |
+| 035 | WriteThroughWriteBehind | write-through vs write-behind, flush semantics, loss window | ✅ |
+| 036 | CacheStampede 🐳 | single-flight, concurrent loaders, one load per key | ✅ |
 | 037 | DistributedLock 🐳 | lease acquisition, expiry, fencing token | ⬜ |
 | 038 | OptimisticConcurrency 🐳 | version column, conflict detection, lost-update prevention | ⬜ |
 | 039 | PessimisticLocking 🐳 | locked read, serialised writers, deadlock avoidance ordering | ⬜ |
