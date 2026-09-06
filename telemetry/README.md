@@ -286,3 +286,40 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–010: **49 facts total** (43 exercise + 6 harness).
   Red run 43 failed / 5 passed / 1 skipped; green run 48 passed / 1 skipped; green
   with `-p:Containers=true` 49 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, rows 011–015 — block `01-logging` complete, `02-diagnostics` begun:**
+
+- **`Activity.IsAllDataRequested` is a hint to the caller, not a guard the API
+  applies.** This corrects a claim repeated all over the internet and, briefly, in this
+  track's own first draft of ex015. Under
+  `ActivitySamplingResult.PropagationData` the flag is `false` — and `SetTag` **still
+  writes**; the tag is present on the activity afterwards. Measured here by running a
+  `PropagationData` sampler against ex015's own facts: only the assertion on the flag
+  failed, the assertion on the tag passed. So the cost of ignoring the flag is not a
+  missing tag, it is building and storing detail the listener said it did not want, for
+  an activity an SDK downstream discards anyway. Expensive tagging belongs behind
+  `if (activity.IsAllDataRequested)`, and nothing will ever tell you that you forgot.
+  **Consequence for grading: a fact that asserts only the tag cannot tell the two
+  samplers apart.** It has to assert the flag.
+- **`using Serilog;` next to `using Microsoft.Extensions.Logging;` makes the bare name
+  `ILogger` ambiguous (`CS0104`)** — both namespaces declare one, and `using Serilog;`
+  is unavoidable because `LoggerConfiguration` and the `AddSerilog` extension live
+  there. `using ILogger = Microsoft.Extensions.Logging.ILogger;` settles it. The stub
+  for ex012 says so, because this is a toolchain wart and not the lesson.
+- **Serilog's `@` destructuring hint travels into the stored event's template text.**
+  `logEvent.MessageTemplate.Text` reads `"Order {OrderId} placed by {@Customer}"`, not
+  the `@`-less form — so a fact asserting the template has to include it.
+- **Serilog's file sink buffers**; the logger must be disposed before its files are
+  read, which is also the honest lesson (the last records only exist once it closes).
+  `ScratchDirectory` in the harness gives the file-based rows a temp directory that
+  cleans itself up, best-effort.
+- **Ex011's wrong-implementation probe was the sharpest illustration yet of asserting
+  too little.** Given an id invented inline at the call site as
+  `new EventId(1002, "OrderDeclined")` — right number, drifted name — the fact checking
+  each method's level and numeric id **passed**. Only the catalog-consistency fact
+  ("every emitted id appears in `All`, by id *and* name") caught it. Two of this
+  batch's five wrong implementations were likewise caught by exactly one fact each:
+  ex014's fixed-grid window, and ex015's `PropagationData` sampler.
+- Batch baseline after rows 001–015: **71 facts total** (65 exercise + 6 harness).
+  Red run 65 failed / 5 passed / 1 skipped; green run 70 passed / 1 skipped; green
+  with `-p:Containers=true` 71 passed / 0 skipped. 0 warnings in both modes.

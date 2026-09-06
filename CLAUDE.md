@@ -756,6 +756,18 @@ the same `global.json` opt-in.
   every file here and the resulting `CS0246` is otherwise baffling. That last
   one applies to `wpf/`, `caliburn/` and `security/` too.
 
+  **`Activity.IsAllDataRequested` is a hint to the caller, not a guard the
+  API applies** — measured 2026-09-06, and it corrects a claim repeated all
+  over the internet. Under `ActivitySamplingResult.PropagationData` the flag
+  is `false` and `SetTag` **still writes**; the tag is on the activity
+  afterwards. The cost of ignoring the flag is therefore not a missing tag
+  but building detail the listener said it did not want, for an activity an
+  SDK downstream discards anyway. Grading consequence: a fact asserting only
+  the tag cannot distinguish `PropagationData` from `AllData` — it must
+  assert the flag. Also: `using Serilog;` next to
+  `using Microsoft.Extensions.Logging;` makes the bare `ILogger` ambiguous
+  (`CS0104`), since both namespaces declare one.
+
   One more, general enough to be worth stating outside this track: **a
   reflection fact asserting that a type *declares* an interface grades
   nothing when the stub already declares it.** Ex008's provider has to declare
@@ -834,7 +846,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
 | `Architecture/`| 80 / 80 (verified) | —         |
-| `telemetry/`| 10 / 70 (verified) | 60 |
+| `telemetry/`| 15 / 70 (verified) | 55 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above

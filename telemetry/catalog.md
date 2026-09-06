@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 10 ✅ / 60 ⬜**
+**Status: 15 ✅ / 55 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -33,16 +33,16 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 008 | CustomILoggerProvider | a provider + logger + `ISupportExternalScope` written by hand | ✅ |
 | 009 | RedactionAndPii | structural scrubbing of named fields, not a regex over the rendered message | ✅ |
 | 010 | LogEnrichment | ambient properties (version, tenant, machine) attached once, not per call site | ✅ |
-| 011 | EventIdConventions | stable ids, id/name pairing, filtering by `EventId` | ⬜ |
-| 012 | SerilogStructuredSink | Serilog behind `ILogger`, destructuring with `@`, properties as fields | ⬜ |
-| 013 | SerilogRollingFileAndOverrides | rolling file sink, `MinimumLevel.Override` per source, retention | ⬜ |
-| 014 | LogSamplingAndRateLimit | suppressing repetition, first-N-per-window, virtual clock | ⬜ |
+| 011 | EventIdConventions | stable ids, id/name pairing, filtering by `EventId` | ✅ |
+| 012 | SerilogStructuredSink | Serilog behind `ILogger`, destructuring with `@`, properties as fields | ✅ |
+| 013 | SerilogRollingFileAndOverrides | rolling file sink, `MinimumLevel.Override` per source, retention | ✅ |
+| 014 | LogSamplingAndRateLimit | suppressing repetition, first-N-per-window, virtual clock | ✅ |
 
 ## diagnostics (015–026) — the BCL primitives, before any SDK
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 015 | ActivitySourceAndListener | `StartActivity` returns **null** with no listener; `ActivityListener`, `Sample` → `AllData` | ⬜ |
+| 015 | ActivitySourceAndListener | `StartActivity` returns **null** with no listener; `ActivityListener`, `Sample` → `AllData` | ✅ |
 | 016 | ActivityParentChild | nesting, `Parent`/`ParentId`, `Activity.Current` restored on `Dispose` | ⬜ |
 | 017 | TagsBaggageEvents | `SetTag` vs `AddBaggage` (baggage inherits down, tags do not), `AddEvent` | ⬜ |
 | 018 | StatusAndException | `SetStatus`, `AddException`, the error tag convention | ⬜ |
