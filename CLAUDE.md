@@ -569,6 +569,37 @@ the same `global.json` opt-in.
   step runs. `TaskExtensions.AsResult()` adapts `Task`/`Task<T>`, and a
   **faulted task surfaces as `AggregateException`** — unlike a hand-written
   `IResult` setting `Error`, which surfaces the original directly.
+  **A modal dialog cannot be escaped by a timeout — only by closing the
+  window.** `WindowManager.ShowDialogAsync` awaits `CreateWindowAsync` (which
+  completes synchronously) and then calls `Window.ShowDialog()`, which pushes
+  its own managed `DispatcherFrame`. The STA test thread is blocked *inside*
+  that call, so a `Task.WhenAny(dialogTask, Task.Delay(...))` losing the race
+  cannot unwind it — the timeout continuation runs only because the frame
+  keeps pumping, and the sole way out is to close the window.
+  `tests/_harness/CaliburnViewContext.cs` therefore schedules the close from
+  inside the frame *before* showing, and on timeout re-derives the hosting
+  window from the root model (`((IViewAware)vm).GetView()` yields it while
+  the dialog is open) and force-closes it. Anything less hangs the suite
+  instead of failing it — and the hang is reachable from a *correct* learner
+  implementation that merely `await`s something before calling
+  `ShowDialogAsync`.
+  **`WindowManager` mutates the settings dictionary you hand it.** Measured: a
+  shared static settings dictionary works for the first dialog and is
+  consumed thereafter, so every later dialog silently renders as a real,
+  visible, centred window instead of the invisible one you configured. Hand
+  out a fresh dictionary per call. This was worth roughly 75 seconds of wall
+  clock across one suite run before it was found.
+  **Dialog semantics, measured:** `TryCloseAsync(true)` → `true`,
+  `TryCloseAsync(false)` → `false`, and **`TryCloseAsync(null)` → `false`, not
+  `null`** — a `bool?` return offers three shapes but only two
+  distinguishable outcomes, so an application needs its own state to tell
+  "dismissed" from "declined". A `UserControl` view is wrapped in a plain
+  `Window`; a `Window`-derived view is used as-is; after the dialog closes
+  `GetView()` returns null. The settings dictionary applies arbitrary window
+  properties, but **not size or position**: `EnsureWindow` sets
+  `SizeToContent` and a centred `WindowStartupLocation` *before* the
+  dictionary is applied, the dictionary's `Width`/`Left` do land on the
+  window, and WPF then discards them at `Show()` time to honour those two.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
