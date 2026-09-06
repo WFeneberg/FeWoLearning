@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 46 ✅ / 14 ⬜**
+**Status: 52 ✅ / 8 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -79,12 +79,12 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 044 | CqrsReadModel | separate read store, eventual consistency, staleness window | ✅ |
 | 045 | MessageBusAbstraction | publish/subscribe port, topic routing, transport independence | ✅ |
 | 046 | CompetingConsumers 🐳 | work distribution, per-key ordering via partition key | ✅ |
-| 047 | DeadLetterQueue 🐳 | poison message, max attempts, dead-letter move with reason | ⬜ |
-| 048 | RetryWithBackoff | exponential backoff, jitter, virtual clock, budget exhaustion | ⬜ |
-| 049 | MqttTelemetryIngest | real in-process MQTT broker, topic hierarchy, wildcard subscription | ⬜ |
-| 050 | MqttQosRetainedLastWill 🐳 | QoS semantics, retained messages, last will and testament | ⬜ |
-| 051 | MqttRequestReply | response topic, correlation data, timeout handling | ⬜ |
-| 052 | EventSchemaEvolution | versioned events, upcasting, tolerant reader | ⬜ |
+| 047 | DeadLetterQueue 🐳 | poison message, max attempts, dead-letter move with reason | ✅ |
+| 048 | RetryWithBackoff | exponential backoff, jitter, virtual clock, budget exhaustion | ✅ |
+| 049 | MqttTelemetryIngest | real in-process MQTT broker, topic hierarchy, wildcard subscription | ✅ |
+| 050 | MqttQosRetainedLastWill 🐳 | QoS semantics, retained messages, last will and testament | ✅ |
+| 051 | MqttRequestReply | response topic, correlation data, timeout handling | ✅ |
+| 052 | EventSchemaEvolution | versioned events, upcasting, tolerant reader | ✅ |
 
 ## cross-cutting (053–060)
 
