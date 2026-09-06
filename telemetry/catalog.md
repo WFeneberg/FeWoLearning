@@ -17,17 +17,17 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 1 ✅ / 69 ⬜**
+**Status: 5 ✅ / 65 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
 | 001 | StructuredMessageTemplate | message template vs interpolated string; named fields survive into the log state | ✅ |
-| 002 | LogLevelsAndFiltering | `IsEnabled`, filter rules by category and level, per-provider minimum level | ⬜ |
-| 003 | CategoriesAndTypedLogger | `ILogger<T>` category naming, `CreateLogger(string)`, category-based filtering | ⬜ |
-| 004 | LoggingScopes | `BeginScope`, nesting, scope state on the record, providers must opt in | ⬜ |
-| 005 | LoggerMessageSourceGenerator | `[LoggerMessage]` partial method, `EventId`, compile-time template | ⬜ |
+| 002 | LogLevelsAndFiltering | `IsEnabled`, filter rules by category and level, per-provider minimum level | ✅ |
+| 003 | CategoriesAndTypedLogger | `ILogger<T>` category naming, `CreateLogger(string)`, category-based filtering | ✅ |
+| 004 | LoggingScopes | `BeginScope`, nesting, scope state on the record, providers must opt in | ✅ |
+| 005 | LoggerMessageSourceGenerator | `[LoggerMessage]` partial method, `EventId`, compile-time template | ✅ |
 | 006 | HighPerformanceGuardClause | `IsEnabled` guard, `LoggerMessage.Define`, avoiding boxing on the disabled path | ⬜ |
 | 007 | ExceptionLogging | the exception argument vs `ex.ToString()` in the message; inner and aggregate exceptions | ⬜ |
 | 008 | CustomILoggerProvider | a provider + logger + `ISupportExternalScope` written by hand | ⬜ |

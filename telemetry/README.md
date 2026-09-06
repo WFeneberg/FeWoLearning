@@ -223,3 +223,31 @@ surprise the next batch pays for again.
 - Harness baseline: **5 passed / 1 skipped** on a plain run, **6 passed / 0 skipped**
   under `-p:Containers=true`, identical in both `UseSolutions` modes, 0 warnings on
   `--no-incremental` builds of both.
+
+**2026-09-06, block `01-logging` rows 001–005:**
+
+- **A generic logger's category drops the type argument entirely.**
+  `factory.CreateLogger<Repository<OrderProcessor>>()` produces the category
+  `…Logging.Repository` — no `` `1 `` arity marker, no `[OrderProcessor]`. A category
+  is a *display* name, not a CLR type name. Operationally that means
+  `Repository<Order>` and `Repository<Invoice>` share one category and therefore one
+  filter rule, so you cannot raise the level for just one of them.
+- **`ILogger<T>` and `CreateLogger("the.same.string")` are behaviourally
+  indistinguishable** — same category, same filtering, same records. The difference
+  only shows up when someone renames the type and the filter rules silently stop
+  matching. Ex003 grades it by asserting the returned instance is generic and closed
+  over the type, since no log record can carry that.
+- **`[LoggerMessage]` survives into metadata on the partial declaration**, so
+  `MethodInfo.GetCustomAttributes` sees it. This is the only honest way to grade
+  ex005: a hand-written `logger.LogWarning(new EventId(5001, "CacheMiss"), …)`
+  satisfies every behavioural fact, and what the generator actually adds — the guard,
+  the allocation-free argument path, one declaration site — leaves no trace in a
+  record. `blazor/` ex069 and ex100 are graded on metadata for the same reason.
+  Consequence: ex005's `Adversarial_A` goes red on an **assertion** rather than on the
+  stub's `NotImplementedException`. That is deliberate and is the only fact in the
+  batch that does so.
+- The stub class for ex005 is `static` and the solution makes it `static partial`.
+  Both compile, so the red run still builds — which is the invariant that matters.
+- Batch baseline after rows 001–005: **27 facts total** (21 exercise + 6 harness).
+  Red run 21 failed / 5 passed / 1 skipped; green run 26 passed / 1 skipped; green
+  with `-p:Containers=true` 27 passed / 0 skipped. 0 warnings in both modes.

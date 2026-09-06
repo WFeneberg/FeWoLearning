@@ -21,7 +21,7 @@ folder with an isolated toolchain, its own test runner, and a graded set of
 | `kotlin/`   | Kotlin                           | JUnit 5     | 100 / 100 (unverified) | planned |
 | `flutter/`  | Flutter / Dart                   | `package:test` / `flutter_test` | 100 / 100 (unverified) | planned |
 | `caliburn/` | Caliburn.Micro 5 MVVM on WPF (C#) | xUnit v3 + StaFact | **45 / 100** | ✅ .NET 10 |
-| `telemetry/`| Monitoring, Logging, OpenTelemetry (C#) | xUnit v3 + StaFact | **0 / 70** | ✅ .NET 10 |
+| `telemetry/`| Monitoring, Logging, OpenTelemetry (C#) | xUnit v3 + StaFact | **5 / 70** | ✅ .NET 10 |
 
 Each track's `catalog.md` is the authoritative per-exercise ledger: it lists all
 100 entries with ✅ (written) or ⬜ (planned).
