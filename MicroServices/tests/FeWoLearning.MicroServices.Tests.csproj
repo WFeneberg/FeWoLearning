@@ -20,6 +20,17 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
   </ItemGroup>
 
+  <!-- Service-side rows (021-023). The in-memory OTel exporter is TEST equipment,
+       not exercise content, so it lives here and not in the two content libraries;
+       it is pinned to the same 1.18.0 they are. TestHost gives ex023 real /alive
+       and /health responses without a socket, and matches the installed
+       Microsoft.AspNetCore.App 10.0.11. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.18.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.11" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>

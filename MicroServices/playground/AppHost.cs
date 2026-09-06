@@ -11,6 +11,12 @@ if (string.IsNullOrWhiteSpace(id))
     return;
 }
 
+if (ExerciseRegistry.NoModelReason(id) is { } reason)
+{
+    Console.Error.WriteLine(reason);
+    return;
+}
+
 var configure = ExerciseRegistry.Lookup(id)
     ?? throw new InvalidOperationException(
         $"Unknown exercise '{id}'. Known: {string.Join(", ", ExerciseRegistry.Known)}");

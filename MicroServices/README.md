@@ -61,18 +61,18 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-06; `catalog.md` at 20 ✅ / 80 ⬜, so the twenty
-delivered exercises contribute 60 red facts):
+**Current measured state** (2026-09-06; `catalog.md` at 25 ✅ / 75 ⬜, so the
+twenty-five delivered exercises contribute 79 red facts):
 
 ```
-dotnet test                      →  60 failed, 7 passed, 1 skipped (68 total)
-dotnet test -p:UseSolutions=true →   0 failed, 67 passed, 1 skipped (68 total)
+dotnet test                      →  79 failed, 7 passed, 1 skipped (87 total)
+dotnet test -p:UseSolutions=true →   0 failed, 86 passed, 1 skipped (87 total)
 ```
 
 `-p:Containers=true` unskips the harness's container-gate fact, which then passes; no
 🐳 exercise row exists yet, so it has not been re-measured since ex005.
 
-**A correct default run is red, and that is not a broken checkout.** Sixty
+**A correct default run is red, and that is not a broken checkout.** Seventy-nine
 failures is exactly what an untouched tree gives: one `NotImplementedException` per
 unimplemented `Configure`, plus the facts that depend on it. The 7 that pass and the 1 that skips are
 the harness's own facts, which pass in *both* modes because they grade the harness
@@ -300,6 +300,54 @@ the red and the green run:
   `AppHostDirectory` is `MicroServices/playground` — disagreeing with them. The walk-up
   above is the one form correct in all three hosts.
 
+### Service-side rows live in the same library pair — deliberately
+
+Rows 021-023 are the first that leave the AppHost model and grade code that runs
+*inside a service*: `AddServiceDefaults`, a custom `ActivitySource`/`Meter`
+registration, and a pair of health-check probe endpoints. They need ASP.NET Core and
+the OpenTelemetry / service-discovery / resilience packages, which the two content
+libraries did not carry.
+
+They were given to **`exercises/` and `solutions/`**, not to a third pair of projects.
+The reason is the `UseSolutions` switch: it works because `tests/` references *exactly
+one* content library, and a second pair would mean a second switch to keep in step -
+the same reasoning that keeps `blazor/`'s RCLs at one pair. So both `.csproj` files
+gained, identically and in one commit:
+
+```xml
+<FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+Microsoft.Extensions.ServiceDiscovery              10.9.0
+Microsoft.Extensions.Http.Resilience               10.9.0
+OpenTelemetry.Extensions.Hosting                    1.18.0
+OpenTelemetry.Instrumentation.AspNetCore            1.18.0
+OpenTelemetry.Instrumentation.Http                  1.18.0
+OpenTelemetry.Instrumentation.Runtime               1.18.0
+OpenTelemetry.Exporter.OpenTelemetryProtocol        1.18.0
+```
+
+Two consequences a later author should know.
+
+- **A service-side row exposes something other than `Configure`.** ex021 and ex022 are
+  `IHostApplicationBuilder` extension methods; ex023 exposes `ConfigureProbes` plus
+  `MapProbes`. That is the same freedom §5 already grants ("rows whose subject includes
+  application code expose further members alongside `Configure`"), taken one step
+  further: these three have no `Configure` at all, because they have no resource graph.
+- **They are in `ExerciseRegistry` but not runnable in the playground.** The registry
+  now carries a second dictionary, `WithoutAModel`, mapping those three ids to the
+  reason; `AppHost.cs` prints it and exits instead of throwing "Unknown exercise", and
+  `Known` lists them alongside the runnable ones. Inventing a fake resource graph purely
+  so that `aspire run --exercise ex021` did something would have added ungraded content,
+  which is worse than saying so.
+
+**`services/Catalog` and `services/Orders` were deliberately not touched.** ex021 grades
+a learner-written `AddServiceDefaults`, not those two projects calling one, for three
+reasons: they are fixed fixtures that ex011 already asserts against (§5); they would have
+to take a `ProjectReference` on `exercises/` to call the learner's extension, which puts
+learner code inside a resource the AppHost launches; and the row's own spec says to
+assert the registrations in the `IServiceCollection` rather than that an app started. A
+`Host.CreateApplicationBuilder()` inside the test is the whole fixture needed.
+
 ### `solutions/` is in the build here — deliberately
 
 `exercises/` and `solutions/` compile **the same type names into the same namespaces**,
@@ -509,13 +557,77 @@ Each of these cost real time. None is a guess.
   only an `NU1603` warning, quietly landing the project on the runner generation this
   track is avoiding. Treat `NU1603` here as an error, not noise.
 
+- **What a bare host builder already registers, for anyone grading an
+  `IServiceCollection`.** Measured on .NET 10.0.400 while writing ex021:
+  `Host.CreateApplicationBuilder()` arrives with **52 descriptors over 42 distinct
+  service types**, and `WebApplication.CreateBuilder()` with **117 over 95**. None of
+  `TracerProvider`, `MeterProvider`, `HealthCheckService`, `ServiceEndpointResolver`
+  or `IHttpClientFactory` is among them, so all five are honest assertion targets.
+  What *is* free, and therefore grades nothing: `IMeterFactory` on the plain host
+  builder, plus `ActivitySource`, `DiagnosticListener` and
+  `DistributedContextPropagator` on the web one. ex021 measures the bare builder inside
+  its own first fact rather than beside it, so the guard cannot rot.
+- **Two service-discovery spellings register the same types; only the options tell them
+  apart.** `services.AddServiceDiscovery()` and
+  `ConfigureHttpClientDefaults(http => http.AddServiceDiscovery())` both leave a
+  `ServiceEndpointResolver` and an `IServiceDiscoveryHttpMessageHandlerFactory`, so
+  neither type discriminates. Measured on `Microsoft.Extensions.ServiceDiscovery`
+  10.9.0, what does:
+  `IOptionsMonitor<HttpClientFactoryOptions>.Get(<any name at all>)
+  .HttpMessageHandlerBuilderActions` is **2** for a full ServiceDefaults, **1** if only
+  one of the two handlers is on the defaults, and **0** for
+  `AddHttpClient("catalog").AddStandardResilienceHandler().AddServiceDiscovery()`, since
+  a named client configures only its own name. ex021 asks about a client name nobody
+  ever mentioned, for exactly this reason. Separately, the *standard* resilience handler
+  is the only one that registers `IValidateOptions<HttpStandardResilienceOptions>`; a
+  hand-rolled `AddResilienceHandler("...", p => p.AddRetry(...))` registers none and is
+  otherwise indistinguishable.
+- **An unregistered `ActivitySource` does not merely go unexported - `StartActivity`
+  returns `null`.** Measured on OpenTelemetry 1.18.0. That makes ex022's negative fact
+  sharp rather than decorative, and it is also the only thing that rejects
+  `AddSource("*")`: under a wildcard the same call returns a real `Activity`, and the
+  matching `AddMeter("*")` additionally drags in 18 `System.Runtime` metrics nobody
+  asked for.
+- **A bare `AddContainer` carries no `ResourceCommandAnnotation`.** Measured on 13.5.3.
+  Unlike `HealthCheckAnnotation` on an integration resource (above), nothing is there
+  for free - the start/stop/restart buttons the dashboard shows for every resource are
+  not model annotations. So a command row *can* grade the annotation's presence. What it
+  cannot grade is the presence of `UpdateState`: `WithCommand` supplies a default that
+  always answers `Enabled`, so the property is never null, and only **calling** it with
+  two different `CustomResourceSnapshot`s separates "reads the resource" from "ignores
+  the resource". ex024 calls it three times - `Running`, `Exited`, and no state at all.
+- **Publishing `BeforeStartEvent` in-process needs two DCP configuration keys, or
+  Aspire's own subscriber throws first.** Measured while writing ex025:
+  `BeforeStartEvent` carries a built-in subscription, `InitializeDcpAnnotations`, which
+  reads the DCP options and dies with `OptionsValidationException` ("The path to the DCP
+  executable ... is required") **before** any learner subscription is reached. Setting
+  `DcpPublisher:CliPath` and `DcpPublisher:DashboardPath` on `builder.Configuration` to
+  any non-empty placeholder fixes it; nothing ever executes them, because nothing is
+  started. That is what `tests/_support/EventingHarness.cs` does, and it is why that
+  harness exists rather than a `ModelHarness` overload - `ModelHarness` disposes the app
+  before it returns, and an eventing test needs the app's service provider alive.
+- **`builder.Eventing` and the app's `IDistributedApplicationEventing` are the same
+  instance**, so a subscription made while the graph was assembled is live on the built
+  app and a test can publish lifecycle events by hand. Measured, and it is what makes an
+  eventing row deterministic with no wall clock: the test *is* the orchestrator. Measured
+  too, and the mutant ex025 exists to reject: `Subscribe<T>(handler)` - the app-scoped
+  overload - fires for **every** resource when used with a resource-scoped event such as
+  `ResourceReadyEvent`, while `Subscribe<T>(resource, handler)` fires only for that one.
+  Both compile, both pass every positive assertion, and only publishing the event for a
+  resource nobody subscribed to tells them apart.
+
 ## 7. Pinned versions
 
 | Package | Version | Where |
 |---|---|---|
 | `Aspire.Hosting` + all `Aspire.Hosting.*` integrations | 13.5.3 | `exercises/` + `solutions/` |
 | `Aspire.Hosting.Elasticsearch` | **13.3.0** | `exercises/` + `solutions/`, *when row 051 lands* |
+| `Microsoft.Extensions.ServiceDiscovery` | 10.9.0 | `exercises/` + `solutions/` |
+| `Microsoft.Extensions.Http.Resilience` | 10.9.0 | `exercises/` + `solutions/` |
+| `OpenTelemetry.*` (`.Extensions.Hosting`, `.Instrumentation.AspNetCore` / `.Http` / `.Runtime`, `.Exporter.OpenTelemetryProtocol`) | 1.18.0 | `exercises/` + `solutions/` |
 | `Aspire.Hosting.Testing` | 13.5.3 | `tests/` |
+| `OpenTelemetry.Exporter.InMemory` | 1.18.0 | `tests/` |
+| `Microsoft.AspNetCore.TestHost` | 10.0.11 | `tests/` |
 | `xunit.v3` | 3.2.2 | `tests/` |
 | `xunit.runner.visualstudio` | 3.1.5 | `tests/` |
 | `Microsoft.NET.Test.Sdk` | 17.14.1 | `tests/` |
@@ -524,7 +636,15 @@ This table is the **pinning policy**, not an inventory: a package is added to th
 content libraries when the first row needing it is written. Referenced today:
 `Aspire.Hosting`, `.PostgreSQL`, `.SqlServer`, `.MongoDB`, `.Redis`,
 `.Azure.AppContainers` and `.Azure.Storage` — the last two because the harness's Bicep
-fact needs them and the Azure rows will. Whatever is added next goes into **both**
+fact needs them and the Azure rows will — plus the non-Aspire service-side set rows
+021-023 added, and a `FrameworkReference` to `Microsoft.AspNetCore.App` (see §5).
+Those non-Aspire versions are chosen for currency and coherence rather than pinned to
+Aspire: OpenTelemetry ships as one release train, so all five of its packages sit on the
+same 1.18.0 (the InMemory exporter in `tests/` included, since it shares the SDK's
+internals); `Microsoft.Extensions.ServiceDiscovery` and
+`Microsoft.Extensions.Http.Resilience` ship together out of `dotnet/extensions` and are
+both 10.9.0; and `Microsoft.AspNetCore.TestHost` is 10.0.11 to match the installed
+`Microsoft.AspNetCore.App` 10.0.11 exactly, because it substitutes for the server. Whatever is added next goes into **both**
 `.csproj` files identically, at 13.5.3, or the two libraries stop being interchangeable.
 
 ### The Elasticsearch version lag is deliberate
