@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 60 ✅ / 40 ⬜**
+**Status: 65 ✅ / 35 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -88,11 +88,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 058 | ItemsConventionBinding | an `ItemsControl` named after a collection binds `ItemsSource` `Mode=OneWay` (get-only, per ex018) leaving `DisplayMemberPath`/`ItemTemplate` both at their defaults for plain strings (contrast ex060); a name matching nothing binds nothing at all - that is ex017's general rule (`ViewModelBinder` skips an unmatched element entirely, on any element type), not something peculiar to `ItemsControl` | ✅ |
 | 059 | ActiveItemSelectedItem | the selection convention derives `SelectedItem`'s name FROM the collection's own name and wires a `ListBox.SelectedItem` to the conductor's `ActiveItem` `Mode=TwoWay` with no XAML written for it, genuinely bidirectionally; a `ContentControl` named `ActiveItem` binds Caliburn's own `View.Model` attached property `TwoWay` instead of `Content`, which gets no binding at all | ✅ |
 | 060 | ItemTemplateViewLocator | `ConventionManager.DefaultItemTemplate` is assigned for any reference-type item collection other than `string` (measured: even a plain non-Caliburn POCO, not just a view model) while a value-type or `string` collection gets `null`; per Caliburn's own source (not exercised live here - the shared static template's cross-thread realization is a documented trap) its content is a `ContentControl` with `View.Model` bound directly to the item itself, which is what runs the ViewLocator per row | ✅ |
-| 061 | AsyncGuardRefresh | async work flipping a guard | ⬜ |
-| 062 | ExecuteOnUIThread | `Execute`, `PlatformProvider`, marshalling | ⬜ |
-| 063 | LogManagerCustomLogger | plugging a logger into `LogManager` | ⬜ |
-| 064 | DesignTimeDetection | `Execute.InDesignMode` and design-time data | ⬜ |
-| 065 | CustomIoCDelegates | replacing `SimpleContainer` through the `IoC` delegates | ⬜ |
+| 061 | AsyncGuardRefresh | a `CanXxx` guard's state can be settled by an AWAIT, not a synchronous setter - the announcement (`NotifyOfPropertyChange`) has to happen only after that await genuinely completes, never eagerly in its place | ✅ |
+| 062 | ExecuteOnUIThread | `Execute.OnUIThread`/`OnUIThreadAsync`/`BeginOnUIThread` all forward to `PlatformProvider.Current`; measured on this machine, a background-thread call BLOCKS under `XamlPlatformProvider` (a synchronous `Dispatcher.Invoke`, not fire-and-forget) but runs the callback INLINE, on that same thread, under `DefaultPlatformProvider` - no marshal at all | ✅ |
+| 063 | LogManagerCustomLogger | `LogManager`'s entire public surface is one settable field, `Func<Type, ILog> GetLog`; `ILog` has exactly `Info(string, object[])`/`Warn(string, object[])`/`Error(Exception)` - no `Debug` - with `Error` taking the exception itself, not a message | ✅ |
+| 064 | DesignTimeDetection | `Execute.InDesignMode` is not a fact about the process - it is whatever `IPlatformProvider.InDesignMode` says; measured `false` under `XamlPlatformProvider` but the surprising `true` under `DefaultPlatformProvider` (the viewless harness's own default) | ✅ |
+| 065 | CustomIoCDelegates | `IoC.GetInstance`/`GetAllInstances`/`BuildUp` are three plain settable delegates behind the `Get<T>`/`GetAll<T>`/`BuildUp` facade; the harness's own `GetInstance` falls back to `Activator.CreateInstance`, so "unregistered resolves to null" only holds once a container's own delegates replace it | ✅ |
 | 066 | MicrosoftDIBootstrapper | Caliburn on `Microsoft.Extensions.DependencyInjection` | ⬜ |
 | 067 | BootstrapperLifecycle | `Configure` and `OnStartup` ordering | ⬜ |
 | 068 | ActionMessageCustomization | the `ActionMessage.InvokeAction` hook | ⬜ |

@@ -51,6 +51,47 @@ public class HarnessCoreSmokeTests : CaliburnCoreContext
 
         Assert.Equal(5, ViewLocator.NameTransformer.Count);
     }
+
+    // Proves the LogManager.GetLog reset added for ex063. Same shape as the NameTransformer pair
+    // above, for the same reason: xunit.v3 orders test cases within a class by a stable sort over
+    // case IDs, not source order, so a single mutating fact would prove nothing about order
+    // independence - both facts have to mutate, so whichever runs second observes the leak if the
+    // reset is ever removed. Unlike NameTransformer, GetLog has no count to compare - it is a
+    // single delegate value - so "pristine" is proven by reference identity against
+    // CaliburnCoreContext's own protected PristineGetLog snapshot instead.
+    [Fact]
+    public void First_Test_Sees_The_Pristine_GetLog_Delegate_Then_Replaces_It()
+    {
+        // If the OTHER fact's replacement below ever leaked into this one, GetLog would already
+        // be some OTHER delegate here, not the same reference captured once in the static ctor.
+        Assert.Same(PristineGetLog, LogManager.GetLog);
+
+        LogManager.GetLog = _ => new HarnessNoOpLog();
+
+        Assert.NotSame(PristineGetLog, LogManager.GetLog);
+    }
+
+    [Fact]
+    public void Second_Test_Also_Sees_The_Pristine_GetLog_Delegate_Then_Replaces_It()
+    {
+        // Without the harness reset, this fails whenever it happens to run after the test above
+        // -- GetLog would still be the OTHER fact's replacement instead of freshly reset back to
+        // PristineGetLog, regardless of which of these two facts xunit decides to run first.
+        Assert.Same(PristineGetLog, LogManager.GetLog);
+
+        LogManager.GetLog = _ => new HarnessNoOpLog();
+
+        Assert.NotSame(PristineGetLog, LogManager.GetLog);
+    }
+
+    /// <summary>A do-nothing ILog, only ever needed as a distinct delegate target above - never
+    /// actually invoked, so its three methods are bodies-only, not a recording double.</summary>
+    sealed class HarnessNoOpLog : ILog
+    {
+        public void Info(string format, params object[] args) { }
+        public void Warn(string format, params object[] args) { }
+        public void Error(Exception exception) { }
+    }
 }
 
 /// <summary>

@@ -68,11 +68,29 @@ public abstract class CaliburnCoreContext
     // the CollectionChanged handler on every invocation, never captured once by closure.
     static readonly Func<Assembly, IEnumerable<Type>> PristineExtractTypes;
 
+    // Added for ex063 (LogManagerCustomLogger): LogManager.GetLog is LogManager's entire public
+    // surface - one settable Func<Type, ILog> field, defaulting to a no-op logger that discards
+    // everything. Exactly like the three globals above, nothing in Caliburn itself ever resets
+    // it, so the first exercise to assign LogManager.GetLog = _ => myCustomLogger would leak that
+    // custom logger into every OTHER test in the run (any of them that happen to touch a
+    // Caliburn type which logs, e.g. via LogManager.GetLog(typeof(X)).Info(...)) unless something
+    // restores the pristine delegate afterward. Measured working: assigning the captured original
+    // back onto LogManager.GetLog restores it BY REFERENCE - no cloning or wrapping needed, the
+    // same "assign the whole delegate back" recipe as PristineFindTypeByNames/PristineExtractTypes
+    // above, not the "Clear() and re-add" recipe NameTransformer needs (GetLog is a single
+    // delegate value, not a mutable collection). Unlike the three fields above, this one is
+    // `protected` rather than private: LogManager's own default logger is a private nested type
+    // (LogManager+NullLog), so there is no public identity to name from a test - the harness
+    // smoke test below proves the reset by comparing LogManager.GetLog back against THIS field
+    // by reference instead, which needs derived-class access.
+    protected static readonly Func<Type, ILog> PristineGetLog;
+
     static CaliburnCoreContext()
     {
         PristineNameTransformerRules = ViewLocator.NameTransformer.ToList();
         PristineFindTypeByNames = AssemblySource.FindTypeByNames;
         PristineExtractTypes = AssemblySourceCache.ExtractTypes;
+        PristineGetLog = LogManager.GetLog;
     }
 
     protected SimpleContainer Container { get; } = new();
@@ -116,6 +134,12 @@ public abstract class CaliburnCoreContext
         ViewLocator.NameTransformer.Clear();
         foreach (var rule in PristineNameTransformerRules)
             ViewLocator.NameTransformer.Add(rule);
+
+        // Undo whatever a previous test's ex063 (or any future exercise's) LogManager.GetLog
+        // assignment left behind - see PristineGetLog's comment above for why this is a
+        // "reset at the start of every test" restore, not a teardown, and why re-assigning the
+        // captured delegate is enough (no Clear()+re-add dance needed here).
+        LogManager.GetLog = PristineGetLog;
     }
 
     // Added for ex041-ex045 (coroutines): a step whose IResult/IResult<T>.Execute never raises

@@ -168,15 +168,16 @@ Caliburn's configuration — `IoC`, `PlatformProvider`, `AssemblySource`, the
 `ViewLocator` — is process-global, not per-test.
 
 **Forward risk: the harness does not reset every process-global static.**
-`CaliburnCoreContext` resets exactly four globals per test now —
-`PlatformProvider.Current`, `AssemblySource.Instance`, the `IoC` delegates, and (since
-ex011–ex015) `ViewLocator.NameTransformer`, the first of these globals an exercise
-actually mutated. It still does **not** reset `ViewLocator.LocateTypeForModelType` (a
-second writable static delegate field on the very type ex013–ex015 already touch, sitting
-right next to the one that now is reset), `ViewModelBinder.BindProperties`/`BindActions`,
+`CaliburnCoreContext` resets exactly five globals per test now —
+`PlatformProvider.Current`, `AssemblySource.Instance`, the `IoC` delegates,
+`ViewLocator.NameTransformer` (since ex011–ex015), and `LogManager.GetLog` (since
+ex063) — each the first of these globals an exercise actually mutated. It still does
+**not** reset `ViewLocator.LocateTypeForModelType` (a second writable static delegate
+field on the very type ex013–ex015 already touch, sitting right next to the one that
+now is reset), `ViewModelBinder.BindProperties`/`BindActions`,
 `MessageBinder.SpecialValues`/`CustomConverters`, `ActionMessage.InvokeAction`/
-`ApplyAvailabilityEffect`, `LogManager.GetLog`, or `BindingScope.GetNamedElements` — all
-equally static and equally process-global. Nor does it reset `Caliburn.Micro.ViewModelLocator`
+`ApplyAvailabilityEffect`, or `BindingScope.GetNamedElements` — all equally static and
+equally process-global. Nor does it reset `Caliburn.Micro.ViewModelLocator`
 — a **separate type** from `ViewLocator`, with its **own** `NameTransformer` static field
 (measured: `ReferenceEquals(ViewModelLocator.NameTransformer, ViewLocator.NameTransformer)`
 is `false` — a genuinely different object, both starting at 4 rules) plus
@@ -225,8 +226,10 @@ loading the template at all — it proves the assignment rule by reference ident
 learner-written type predicate, and states what the template's content actually contains
 only as attributed, unexecuted knowledge from Caliburn's own source.
 
-Beyond that, nothing shipped so far touches ex063, ex068–ex073, ex087, ex095 or ex096's
-statics, but those will. Because the assembly runs serially with no restore between tests,
+Beyond that, nothing shipped so far touches ex068–ex073, ex087, ex095 or ex096's
+statics, but those will (ex063 is now shipped, and did require exactly this: its
+`LogManager.GetLog` mutation is why the register above now lists five reset globals
+instead of four). Because the assembly runs serially with no restore between tests,
 the first of those to mutate one of the *resettable* statics above will leak into every
 later test in the run unless whoever writes it first extends `CaliburnCoreContext` (or
 `CaliburnViewContext`) the same way ex015's `NameTransformer` reset was added: snapshot the
@@ -235,8 +238,9 @@ every test's instance constructor. Until then, a later exercise failing for no v
 reason of its own is this, not a bug in that exercise.
 
 `tests/_harness/HarnessSmokeTests.cs` proves the harness itself: `HarnessCoreSmokeTests`
-(3 `[Fact]`) exercises the core context with no view at all — including that a
-`NameTransformer.AddRule` in one test cannot survive into another — and `HarnessSmokeTests`
+(5 `[Fact]`) exercises the core context with no view at all — including that a
+`NameTransformer.AddRule` in one test cannot survive into another, nor can a
+`LogManager.GetLog` replacement (added for ex063) — and `HarnessSmokeTests`
 (5 `[WpfFact]`) exercises `Show`, convention binding, guard gating, action
 invocation and (added for ex046–ex050) `ShowDialogAndCloseAsync` end to end. Neither is a
 catalog exercise — they exist so the harness is proven green in the real tree from the
