@@ -85,4 +85,37 @@ public class Ex054_CustomCloseStrategyTests : CaliburnCoreContext
 
         Assert.True(canClose);
     }
+
+    [Fact]
+    public async Task When_The_Vote_Fails_This_Same_CanCloseAsync_Call_Still_Deactivates_And_Removes_The_Willing_Minority()
+    {
+        var conductor = new Conductor<Ex054_Item>.Collection.AllActive();
+        var w = new Ex054_Item();
+        var r1 = new Ex054_Item { RefuseClose = true };
+        var r2 = new Ex054_Item { RefuseClose = true };
+        await ((IActivate)conductor).ActivateAsync();
+        await conductor.ActivateItemAsync(w);
+        await conductor.ActivateItemAsync(r1);
+        await conductor.ActivateItemAsync(r2);
+        conductor.CloseStrategy = new Ex054_MajorityRulesCloseStrategy();
+
+        var canClose = await conductor.CanCloseAsync();
+
+        // The vote loses overall (w is outnumbered two-to-one)...
+        Assert.False(canClose);
+        // ...but w was individually willing, and this strategy's Children always surfaces the
+        // willing subset regardless of the overall outcome (see the tests above) - so this VERY
+        // SAME CanCloseAsync call deactivates w with close: true and removes it from Items, even
+        // though the group as a whole was refused. CanCloseAsync is not a pure query in general -
+        // this is precisely the behaviour ex052's own (corrected) claim scopes to the DEFAULT
+        // strategy, where it cannot happen. A stub that never reaches this because it swallows
+        // exceptions, or one that returns Children as a copy nobody ever iterates, would leave w
+        // active and still in Items instead.
+        Assert.False(w.IsActive);
+        Assert.DoesNotContain(w, conductor.Items);
+        // The refusers were never willing, so the strategy never offered them up to be closed -
+        // they are untouched by this call.
+        Assert.True(r1.IsActive);
+        Assert.True(r2.IsActive);
+    }
 }

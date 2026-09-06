@@ -72,4 +72,21 @@ public class Ex053_DefaultCloseStrategyTests : CaliburnCoreContext
         Assert.False(withFlagFalse.CloseCanOccur);
         Assert.Empty(withFlagFalse.Children);
     }
+
+    [Fact]
+    public async Task CompareFlagsAsync_Runs_The_Same_Items_Through_Both_Flags_And_Only_Children_Differs()
+    {
+        var w = new Ex053_Item();
+        var r = new Ex053_Item { RefuseClose = true };
+
+        var (withDefaultFlag, withFlagTrue) = await Ex053_DefaultCloseStrategy.CompareFlagsAsync(new[] { w, r });
+
+        // A stub that swaps the two calls (runs true first, false second) or reuses one result
+        // for both fails this side-by-side comparison even though each RunAsync call alone
+        // might look right in isolation.
+        Assert.False(withDefaultFlag.CloseCanOccur);
+        Assert.Empty(withDefaultFlag.Children);
+        Assert.False(withFlagTrue.CloseCanOccur);
+        Assert.Equal(new[] { w }, withFlagTrue.Children);
+    }
 }

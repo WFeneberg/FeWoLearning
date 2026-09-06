@@ -1,13 +1,20 @@
 // Exercise 054 - Custom Close Strategy (intermediate).
-// Goal:   ICloseStrategy&lt;T&gt; has exactly one member - ExecuteAsync(IEnumerable&lt;T&gt;,
-//         CancellationToken) -> Task&lt;ICloseResult&lt;T&gt;&gt; - and ConductorBase&lt;T&gt;.CloseStrategy
-//         is a plain SETTABLE property, so a hand-written policy plugs in wherever Caliburn's own
+// Goal:   ICloseStrategy<T> has exactly one member - ExecuteAsync(IEnumerable<T>,
+//         CancellationToken) -> Task<ICloseResult<T>> - and ConductorBase<T>.CloseStrategy is a
+//         plain SETTABLE property, so a hand-written policy plugs in wherever Caliburn's own
 //         DefaultCloseStrategy (ex053) would otherwise run.
-// Drills: implementing ICloseStrategy&lt;T&gt; from scratch with a genuinely different decision rule -
+// Drills: implementing ICloseStrategy<T> from scratch with a genuinely different decision rule -
 //         a MAJORITY vote (more than half of the items individually willing) instead of Caliburn's
 //         own all-or-nothing DefaultCloseStrategy - and assigning it to a real conductor's
 //         CloseStrategy property.
 // Passes: dotnet test --filter FullyQualifiedName~Ex054_
+//
+// Sharp edge, measured: when the vote LOSES, this strategy's Children still holds whoever was
+// individually willing - and a real conductor's CanCloseAsync deactivates (close: true) and
+// removes exactly those children from Items as a side effect of merely being asked, even though
+// CloseCanOccur came back false for the group as a whole. CanCloseAsync is not a pure query in
+// general - see ex052's own corrected claim, scoped to the DEFAULT strategy, where this same side
+// effect cannot happen because the default strategy's Children is empty on any refusal.
 
 using System.Linq;
 using System.Threading;

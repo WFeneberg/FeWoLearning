@@ -1,15 +1,22 @@
 // Exercise 053 - Default Close Strategy (intermediate).
-// Goal:   Caliburn.Micro's own Caliburn.Micro.DefaultCloseStrategy&lt;T&gt; answers close requests
-//         in two parts - CloseCanOccur (a bool) and Children (the items that may actually be
-//         closed) - and its constructor flag does NOT change whether the whole group may close.
-//         It changes whether the children that WERE willing get closed anyway when the group as
-//         a whole is refused.
-// Drills: constructing and running Caliburn's real DefaultCloseStrategy&lt;T&gt; directly, rather
-//         than through a conductor - the exercise type name and Caliburn's own type share a
-//         plain-English name, but are two different types in two different namespaces.
+// Goal:   Caliburn's own DefaultCloseStrategy<T> answers close requests in two parts -
+//         CloseCanOccur (a bool) and Children (the items that may actually be closed) - and its
+//         constructor flag does NOT change whether the whole group may close. It changes whether
+//         the children that WERE willing get closed anyway when the group as a whole is refused.
+// Drills: constructing and running Caliburn's real DefaultCloseStrategy<T> directly, rather than
+//         through a conductor, and running the SAME input through both constructor flags to
+//         compare them side by side.
 // Passes: dotnet test --filter FullyQualifiedName~Ex053_
 //
-// Measured on this machine (Caliburn.Micro 5.0.258), running Caliburn.Micro.DefaultCloseStrategy<T>
+// NOTE on the name collision: the exercise type below and Caliburn's own type share a
+// plain-English name, but are two different types in two different namespaces - this file's own
+// namespace starts with FeWoLearning.Caliburn, so inside it the FULLY QUALIFIED form
+// Caliburn.Micro.DefaultCloseStrategy<T> does NOT compile (CS0234: the leading "Caliburn" segment
+// binds to the enclosing FeWoLearning.Caliburn namespace, not the global Caliburn.Micro one). The
+// unqualified name DefaultCloseStrategy<T>, reached only through "using Caliburn.Micro;" (already
+// present below), is the sole way to reference Caliburn's type from code in this file.
+//
+// Measured on this machine (Caliburn.Micro 5.0.258), running Caliburn's own DefaultCloseStrategy<T>
 // directly against one refusing item (r) and one willing item (w):
 //
 //   constructor flag                        CloseCanOccur   Children
@@ -40,11 +47,17 @@ public class Ex053_Item : Screen
 
 public static class Ex053_DefaultCloseStrategy
 {
-    /// <summary>Runs Caliburn's own Caliburn.Micro.DefaultCloseStrategy&lt;T&gt; - constructed with
-    /// closeConductedItemsWhenConductorCannotClose - against toClose, and hands back its raw
-    /// result unchanged.</summary>
+    /// <summary>Constructs Caliburn's own close strategy with the given flag and runs it against
+    /// toClose, returning its result unchanged.</summary>
     public static Task<ICloseResult<Ex053_Item>> RunAsync(
         IEnumerable<Ex053_Item> toClose, bool closeConductedItemsWhenConductorCannotClose) =>
         throw new NotImplementedException(
-            "TODO: Ex053 - new DefaultCloseStrategy<Ex053_Item>(closeConductedItemsWhenConductorCannotClose).ExecuteAsync(toClose, ...)");
+            "TODO: Ex053 - construct Caliburn's own close strategy with this flag and run it against toClose");
+
+    /// <summary>Runs the SAME toClose through RunAsync twice - once with the flag false, once
+    /// true - and returns both results together, so the two can be compared side by side.</summary>
+    public static Task<(ICloseResult<Ex053_Item> WithDefaultFlag, ICloseResult<Ex053_Item> WithFlagTrue)> CompareFlagsAsync(
+        IEnumerable<Ex053_Item> toClose) =>
+        throw new NotImplementedException(
+            "TODO: Ex053 - run RunAsync against toClose with the flag false, then again with it true; return both results");
 }

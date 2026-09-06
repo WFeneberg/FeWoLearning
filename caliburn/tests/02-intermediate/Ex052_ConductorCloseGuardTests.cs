@@ -5,19 +5,13 @@ namespace FeWoLearning.Caliburn.Tests.Intermediate;
 
 public class Ex052_ConductorCloseGuardTests : CaliburnCoreContext
 {
-    [Fact]
-    public async Task ActivateBothAsync_Activates_The_Conductor_And_Both_Children_Simultaneously()
+    static async Task<Ex052_ConductorCloseGuard> ActiveConductorAsync(params Ex052_Child[] children)
     {
         var conductor = new Ex052_ConductorCloseGuard();
-        var a = new Ex052_Child();
-        var b = new Ex052_Child();
-
-        await conductor.ActivateBothAsync(a, b);
-
-        Assert.True(conductor.IsActive);
-        // AllActive: both stay active at the same time - neither replaces the other.
-        Assert.True(a.IsActive);
-        Assert.True(b.IsActive);
+        await ((IActivate)conductor).ActivateAsync();
+        foreach (var child in children)
+            await conductor.ActivateItemAsync(child);
+        return conductor;
     }
 
     [Fact]
@@ -35,10 +29,9 @@ public class Ex052_ConductorCloseGuardTests : CaliburnCoreContext
     [Fact]
     public async Task Both_Children_Willing_The_Conductors_CanCloseAsync_Returns_True_And_Asks_Both_Children_Exactly_Once()
     {
-        var conductor = new Ex052_ConductorCloseGuard();
         var a = new Ex052_Child();
         var b = new Ex052_Child();
-        await conductor.ActivateBothAsync(a, b);
+        var conductor = await ActiveConductorAsync(a, b);
 
         var canClose = await conductor.CanCloseAsync();
 
@@ -48,40 +41,72 @@ public class Ex052_ConductorCloseGuardTests : CaliburnCoreContext
     }
 
     [Fact]
-    public async Task One_Refusing_Child_Makes_The_Conductors_CanCloseAsync_Return_False_Even_Though_The_Other_Is_Willing()
+    public async Task One_Refusing_Child_First_Makes_The_Conductors_CanCloseAsync_Return_False_But_With_The_Default_Strategy_Touches_Neither_Child()
     {
-        var conductor = new Ex052_ConductorCloseGuard();
+        // The refuser is FIRST: a stub that short-circuits after the first refusal (instead of
+        // the framework's real behaviour of asking everyone) would leave b's call count at 0.
         var a = new Ex052_Child { RefuseClose = true };
         var b = new Ex052_Child();
-        await conductor.ActivateBothAsync(a, b);
+        var conductor = await ActiveConductorAsync(a, b);
 
         var canClose = await conductor.CanCloseAsync();
 
-        // A stub that answers true whenever ANY child is willing (an "OR" instead of the correct
-        // "AND" over every child) fails right here.
         Assert.False(canClose);
-        // Both children are genuinely asked - not just the refuser, and not short-circuited.
         Assert.Equal(1, a.CanCloseAsyncCallCount);
         Assert.Equal(1, b.CanCloseAsyncCallCount);
+        // The scoped half of this exercise's own claim: with the DEFAULT close strategy (the one
+        // this whole file uses), one refusal makes Children come back empty - so asking closes
+        // NOTHING. This is not a property of CanCloseAsync in general (see ex053/ex054, where a
+        // strategy that returns a willing subset makes this very call deactivate and remove it).
+        Assert.True(a.IsActive);
+        Assert.True(b.IsActive);
+        Assert.Equal(2, conductor.Items.Count);
     }
 
     [Fact]
     public async Task Calling_CanCloseAsync_Twice_Increments_Each_Childs_Call_Count_Again_Not_Just_Once()
     {
-        var conductor = new Ex052_ConductorCloseGuard();
         var a = new Ex052_Child();
         var b = new Ex052_Child();
-        await conductor.ActivateBothAsync(a, b);
+        var conductor = await ActiveConductorAsync(a, b);
 
         await conductor.CanCloseAsync();
         await conductor.CanCloseAsync();
 
-        // The guard is a pure query, re-evaluated fresh every time - a memoized "ask once" stub
-        // would leave these at 1 instead of 2.
+        // The guard is re-evaluated fresh every time - a memoized "ask once" stub would leave
+        // these at 1 instead of 2.
         Assert.Equal(2, a.CanCloseAsyncCallCount);
         Assert.Equal(2, b.CanCloseAsyncCallCount);
-        // And still just a query: neither child was actually closed by any of this.
-        Assert.True(a.IsActive);
-        Assert.True(b.IsActive);
+    }
+
+    [Fact]
+    public async Task AllChildrenWillingToCloseAsync_Returns_True_When_Every_Child_Agrees_And_Asks_Each_Exactly_Once()
+    {
+        var a = new Ex052_Child();
+        var b = new Ex052_Child();
+        var conductor = await ActiveConductorAsync(a, b);
+
+        var result = await conductor.AllChildrenWillingToCloseAsync();
+
+        Assert.True(result);
+        Assert.Equal(1, a.CanCloseAsyncCallCount);
+        Assert.Equal(1, b.CanCloseAsyncCallCount);
+    }
+
+    [Fact]
+    public async Task AllChildrenWillingToCloseAsync_Returns_False_When_The_First_Child_Refuses_But_Still_Asks_The_Second()
+    {
+        // Same short-circuit trap as the framework-level test above, but now against the
+        // learner's OWN fold: a naive `foreach` that `return false` the moment it sees a refusal
+        // never reaches b at all, leaving b's call count at 0 instead of 1.
+        var a = new Ex052_Child { RefuseClose = true };
+        var b = new Ex052_Child();
+        var conductor = await ActiveConductorAsync(a, b);
+
+        var result = await conductor.AllChildrenWillingToCloseAsync();
+
+        Assert.False(result);
+        Assert.Equal(1, a.CanCloseAsyncCallCount);
+        Assert.Equal(1, b.CanCloseAsyncCallCount);
     }
 }
