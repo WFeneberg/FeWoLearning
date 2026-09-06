@@ -34,7 +34,7 @@ public static class Ex054_SortAndGroup
     /// collection the view was built over.
     /// </summary>
     public static void SortAscendingBy(ICollectionView view, string propertyName) =>
-        throw new NotImplementedException("TODO: Ex054 - view.SortDescriptions.Add(new SortDescription(propertyName, ListSortDirection.Ascending))");
+        throw new NotImplementedException("TODO: Ex054 - add an ascending SortDescription for propertyName to view's own SortDescriptions - never reorder whatever source collection the view was built over instead");
 
     /// <summary>
     /// Groups <paramref name="view"/> by <paramref name="propertyName"/> - via a
@@ -42,5 +42,5 @@ public static class Ex054_SortAndGroup
     /// you project into yourself; the buckets must be observable through view.Groups.
     /// </summary>
     public static void GroupBy(ICollectionView view, string propertyName) =>
-        throw new NotImplementedException("TODO: Ex054 - view.GroupDescriptions!.Add(new PropertyGroupDescription(propertyName))");
+        throw new NotImplementedException("TODO: Ex054 - add a PropertyGroupDescription for propertyName to view's own GroupDescriptions - the resulting buckets must be reachable afterward through view.Groups, never a lookup you build yourself");
 }

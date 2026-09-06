@@ -178,12 +178,21 @@ measurement walked, not the general mechanism it seems to imply.
   is watched by nothing heavier than a bare `ICollectionView`.** Measured directly for row 051: a
   `ListBox` bound to the collection instead (a real generator, not just a view) still throws
   and is still caught the same way, but the interrupted `CollectionChanged` processing leaves
-  `ItemContainerGenerator` out of sync with the collection's real count, and the NEXT layout pass
-  on that same dispatcher - even an unrelated element's `UpdateLayout()`, even the harness's own
-  `Dispose()`-time `Pump()` - throws an `InvalidOperationException` ("ItemsControl ist nicht
-  konsistent...") that is NOT caught by anything the test wrote and fails the test outright. Row
-  051 is built entirely on `CollectionViewSource.GetDefaultView(...)`, never a live `ItemsControl`,
-  for exactly this reason.
+  `ItemContainerGenerator` out of sync with the collection's real count, and the pending, already-
+  posted re-measure THAT SAME `ListBox` scheduled reaches the dispatcher's own queue drain
+  (`Dispatcher.ProcessQueue` invoking the posted `DispatcherOperation` - not any layout call, and
+  not any OTHER element's: a fresh, disconnected `Border`'s `UpdateLayout()`, tried both before and
+  after calling the damaged `ListBox`'s own `InvalidateMeasure()`, could not reproduce it either
+  way) and throws an `InvalidOperationException` ("ItemsControl ist nicht konsistent...") that is
+  NOT caught by anything the test wrote and fails the test outright - including from the harness's
+  own `Dispose()`-time `Pump()`, which is exactly the queue-drain path. The damage stays confined to
+  the causing test, though: each `[WpfFact]` owns its own STA thread and `Dispatcher` (see probe 3
+  under "Collection views" below), so the corrupted generator's pending operation dies with that
+  dispatcher and cannot reach any other test - confirmed directly with a two-test probe (one
+  causing the corruption, one clean afterward): 1 failed, 1 passed, never both. Row 051 is built
+  entirely on `CollectionViewSource.GetDefaultView(...)`, never a live `ItemsControl`, purely to
+  keep this row's own assertions meaningful - not because the corruption could otherwise escape
+  into a different row's test.
 - **`BindingOperations.EnableCollectionSynchronization` only checks that SOME lock object was
   registered for a collection - never that the mutating thread is actually holding it.** Measured
   directly: a background thread that mutates while holding no lock at all, or the wrong one,
@@ -407,12 +416,16 @@ measurement walked, not the general mechanism it seems to imply.
   `ContainersGenerated` with BOTH containers realized after `CompleteInitialization` +
   `Layout(...)` - `VirtualizingStackPanel` (the default panel for `ListBox`/`ListView`,
   unlike `ItemsControl`'s plain, non-virtualizing `StackPanel`) does not reproduce `uno/`'s
-  one-item realization limit here. This is a live trap for the `02-intermediate` tier's five
-  `CollectionViewSourceBasics`/`SortAndGroup`/`FilterPredicate`/`DeferRefresh`/
-  `EditableObjectTransactions` rows (053-057) and any later row driving a `ListBox`/
+  one-item realization limit here. This is a live trap for `DeferRefresh`/
+  `EditableObjectTransactions` (rows 056-057) and any later row driving a `ListBox`/
   `ComboBox`/other `ItemsControl`-derived control's default appearance - anything built by
   plain code with no logical child and no `Content` needs `CompleteInitialization(...)`
-  before its default Style/Template can be trusted.
+  before its default Style/Template can be trusted. `CollectionViewSourceBasics`/`SortAndGroup`/
+  `FilterPredicate` (rows 053-055) turned out NOT to need this forecast at all: none of them
+  builds an `ItemsControl` of any kind - see "Collection views" below, and the
+  `EnableCollectionSynchronization`/`ItemContainerGenerator` corruption bullet under "Timing and
+  the dispatcher", for why that turned out to be the right call for reasons unrelated to
+  initialization.
 
 #### Stub shape and compiler warnings
 

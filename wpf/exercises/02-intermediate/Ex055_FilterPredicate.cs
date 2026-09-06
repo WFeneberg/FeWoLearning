@@ -24,7 +24,7 @@ public static class Ex055_FilterPredicate
     /// non-matching items from whatever source collection the view was built over.
     /// </summary>
     public static void ApplyFilter(ICollectionView view, Predicate<object> predicate) =>
-        throw new NotImplementedException("TODO: Ex055 - view.Filter = predicate");
+        throw new NotImplementedException("TODO: Ex055 - assign predicate as view's own Filter - never remove non-matching items from whatever source collection the view was built over instead");
 
     /// <summary>
     /// Forces <paramref name="view"/> to re-run its CURRENT filter predicate against every item
@@ -32,5 +32,5 @@ public static class Ex055_FilterPredicate
     /// without a new delegate ever being assigned to Filter.
     /// </summary>
     public static void ReapplyFilter(ICollectionView view) =>
-        throw new NotImplementedException("TODO: Ex055 - view.Refresh()");
+        throw new NotImplementedException("TODO: Ex055 - force view to re-run its current filter predicate against every item, using view's own refresh mechanism - not a no-op");
 }

@@ -35,5 +35,5 @@ public static class Ex052_BackgroundWorkerToTask
     /// marshalling ProgressChanged/RunWorkerCompleted back to.
     /// </summary>
     public static Task<int> RunAsync(Func<Action<int>, int> doWork, IProgress<int> progress) =>
-        throw new NotImplementedException("TODO: Ex052 - build a BackgroundWorker { WorkerReportsProgress = true }; in DoWork, set e.Result = doWork(p => worker.ReportProgress(p)); in ProgressChanged, call progress.Report(e.ProgressPercentage); in RunWorkerCompleted, complete a TaskCompletionSource<int> with e.Error as a fault (TrySetException) or (int)e.Result! on success (TrySetResult) - never ignore e.Error; then call RunWorkerAsync() synchronously right here and return the TaskCompletionSource's Task");
+        throw new NotImplementedException("TODO: Ex052 - run doWork on a BackgroundWorker configured to report progress; every percentage the operation reports must reach progress through the IProgress<int> interface and nothing else; the task this method returns may only complete once the worker's own RunWorkerCompleted notification fires - never earlier, from inside DoWork itself - carrying doWork's real return value on success or its real exception on failure, neither one discarded; start the worker synchronously, on the thread RunAsync itself is called from, not from inside a separate background operation");
 }

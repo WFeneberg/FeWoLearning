@@ -26,7 +26,7 @@ public static class Ex053_CollectionViewSourceBasics
     /// type of your own construction.
     /// </summary>
     public static ICollectionView GetDefaultView(IEnumerable items) =>
-        throw new NotImplementedException("TODO: Ex053 - return CollectionViewSource.GetDefaultView(items)");
+        throw new NotImplementedException("TODO: Ex053 - hand back the actual cached view CollectionViewSource's own default-view lookup builds for items, not a view of your own construction");
 
     /// <summary>
     /// Moves <paramref name="view"/>'s current position to <paramref name="item"/> via
@@ -36,5 +36,5 @@ public static class Ex053_CollectionViewSourceBasics
     /// CurrentPosition becoming -1).
     /// </summary>
     public static object? MoveToItem(ICollectionView view, object item) =>
-        throw new NotImplementedException("TODO: Ex053 - call view.MoveCurrentTo(item), then return view.CurrentItem");
+        throw new NotImplementedException("TODO: Ex053 - move view's own current position to item using its MoveCurrentTo mechanism, then hand back whatever CurrentItem reads afterward - never a value computed against the source collection instead");
 }

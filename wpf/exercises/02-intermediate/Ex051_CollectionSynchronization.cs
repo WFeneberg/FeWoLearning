@@ -31,5 +31,5 @@ public static class Ex051_CollectionSynchronization
     /// EnableCollectionSynchronization, not a new object of your own.
     /// </summary>
     public static Action PrepareSynchronizedMutator(IEnumerable collection, object gate, Action mutate) =>
-        throw new NotImplementedException("TODO: Ex051 - call BindingOperations.EnableCollectionSynchronization(collection, gate) here, before returning; then return () => { lock (gate) { mutate(); } } using the SAME gate object");
+        throw new NotImplementedException("TODO: Ex051 - register collection for cross-thread mutation with BindingOperations before this method returns, using gate as the object that registration expects; the delegate you hand back must only ever run mutate while gate itself - not a substitute of your own - is held, so any thread that later invokes it is genuinely serialized against the dispatcher");
 }

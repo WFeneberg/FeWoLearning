@@ -159,4 +159,32 @@ public class Ex051_CollectionSynchronizationTests : WpfTestContext
         Assert.Null(error);
         Assert.Equal(4, items.Count);
     }
+
+    [WpfFact]
+    public void Registers_The_Given_Gate_Itself_Not_A_Private_Substitute()
+    {
+        // Load-bearing against a mutant that registers EnableCollectionSynchronization with
+        // SOME object of its own (a private lock, say) while still locking on `gate` when
+        // performing the mutation - every test above stays green against that bypass, because
+        // they only ever probe what the MUTATION holds, never what was actually registered:
+        // WPF then takes ITS OWN private object on the dispatcher side while the mutating
+        // thread takes `gate`, so there is no mutual exclusion between them at all, even
+        // though both individually "look" locked.
+        //
+        // BindingOperations.AccessCollection is the same public entry point WPF's own
+        // dispatcher-side code uses to touch a synchronized collection - it takes whatever
+        // lock was registered before invoking its callback, so Monitor.IsEntered(gate) inside
+        // that callback is exactly "was gate itself the object EnableCollectionSynchronization
+        // was called with" - no threading needed to observe it.
+        var items = new ObservableCollection<int> { 1, 2, 3 };
+        _ = CollectionViewSource.GetDefaultView(items);
+        var gate = new object();
+
+        _ = Ex051_CollectionSynchronization.PrepareSynchronizedMutator(items, gate, () => { });
+
+        bool? isEntered = null;
+        BindingOperations.AccessCollection(items, () => isEntered = Monitor.IsEntered(gate), true);
+
+        Assert.True(isEntered, "gate itself was not the object registered via EnableCollectionSynchronization");
+    }
 }

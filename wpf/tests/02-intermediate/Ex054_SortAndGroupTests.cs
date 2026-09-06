@@ -85,10 +85,15 @@ public class Ex054_SortAndGroupTests : WpfTestContext
         };
         var view = CollectionViewSource.GetDefaultView(items);
 
-        Ex054_SortAndGroup.GroupBy(view, nameof(Ex054_Item.Category));
+        // A genuinely DIFFERENT property than the test above - Name, not Category. The
+        // previous version of this test passed the SAME property (Category) both times, so
+        // the parameter never actually varied and a hardcoded "Category" string satisfied it
+        // undetected. Name is distinct per item here, producing five single-item buckets -
+        // Category's two-bucket split cannot satisfy this instead.
+        Ex054_SortAndGroup.GroupBy(view, nameof(Ex054_Item.Name));
 
-        var groupsByName = view.Groups!.Cast<CollectionViewGroup>().ToDictionary(g => (string)g.Name, g => g.ItemCount);
-        Assert.Equal(3, groupsByName["X"]);
-        Assert.Equal(2, groupsByName["Y"]);
+        var groupNames = view.Groups!.Cast<CollectionViewGroup>().Select(g => (string)g.Name).OrderBy(n => n).ToArray();
+        Assert.Equal(new[] { "Five", "Four", "One", "Three", "Two" }, groupNames);
+        Assert.All(view.Groups!.Cast<CollectionViewGroup>(), g => Assert.Equal(1, g.ItemCount));
     }
 }
