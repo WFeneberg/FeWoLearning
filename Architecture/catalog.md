@@ -1,7 +1,8 @@
-# Architecture (C#) — Exercise Catalog (80)
+# Architecture (C#) — Exercise Catalog (100)
 
 Blocks: **web** 001–016 · **desktop** 017–028 · **services-data** 029–052 ·
-**cross-cutting** 053–060 · **scale** 061–073 · **evolution** 074–080.
+**cross-cutting** 053–060 · **scale** 061–073 · **evolution** 074–080 ·
+**domain** 081–090 · **runtime** 091–100.
 
 Legend: ✅ seeded (stub + test + solution present, red and green both verified) ·
 ⬜ planned · 🐳 carries extra container-backed facts, skipped unless `-p:Containers=true`.
@@ -17,7 +18,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 80 ✅ / 0 ⬜**
+**Status: 80 ✅ / 20 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -132,3 +133,36 @@ fits on one machine.
 | 078 | FeatureFlagTargeting | targeting rules, stable percentage bucketing, flag removal | ✅ |
 | 079 | CanaryRelease | routing a fraction, comparing outcomes, automatic rollback | ✅ |
 | 080 | ObservabilitySpans | parent/child spans, trace context across a boundary, sampling | ✅ |
+
+## domain (081–090) — modelling the work, and the work that takes days
+
+Blocks 01–06 are about the machinery. This one is about what the machinery is FOR:
+the types the business talks in, and the processes that outlive a single request.
+
+| # | Slug | Concepts | Status |
+|---|------|----------|--------|
+| 081 | ValueObjectInvariants | self-validating values, equality by value, no invalid instance | ⬜ |
+| 082 | EntityIdentity | identity vs equality, id generation as a port, unsaved entities | ⬜ |
+| 083 | AggregateTransactionBoundary | one aggregate per transaction, referencing others by id | ⬜ |
+| 084 | DomainServicePlacement | logic that belongs to no single entity, and what that costs | ⬜ |
+| 085 | WorkflowStateMachine | explicit states, illegal transitions refused, not a bool soup | ⬜ |
+| 086 | WorkflowTimeouts | a step waiting on the world, with a deadline and an escape | ⬜ |
+| 087 | HumanInTheLoop | pausing for a decision and resuming days later | ⬜ |
+| 088 | LongRunningOperation | 202 Accepted, a status resource, and where the result lives | ⬜ |
+| 089 | WebhookDelivery | signing, retries, replay protection, delivery order | ⬜ |
+| 090 | ChangeDataCapture | turning row changes into an event stream nobody has to write | ⬜ |
+
+## runtime (091–100) — resources, degradation, and staying up
+
+| # | Slug | Concepts | Status |
+|---|------|----------|--------|
+| 091 | DeterministicByDesign | clock, ids and randomness as ports - the track's own idiom, taught | ⬜ |
+| 092 | ConnectionPooling 🐳 | leasing, exhaustion, returning, detecting a leak | ⬜ |
+| 093 | ObjectPoolReuse | reset on return, and the object that remembers the last caller | ⬜ |
+| 094 | MultiLevelCache 🐳 | L1 and L2, promotion on hit, coherence between them | ⬜ |
+| 095 | TagBasedInvalidation | invalidating by what a thing IS rather than by its key | ⬜ |
+| 096 | GracefulDegradation | a fallback chain that reports which quality level answered | ⬜ |
+| 097 | TimeoutBudget | one deadline, shrinking as it propagates down the call chain | ⬜ |
+| 098 | PoisonPillDetection | telling a bad message apart from a bad day | ⬜ |
+| 099 | ActorSingleThreadedOwnership | a mailbox instead of a lock, and the ordering it buys | ⬜ |
+| 100 | SupervisionRestartStrategy | restart, backoff, give up, and one-for-one vs one-for-all | ⬜ |

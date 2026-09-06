@@ -320,3 +320,42 @@ The grading rules, the two-probe procedure, the `UseSolutions` mechanism, the
 toolchain pins and the container gate all carry over unchanged. Three new rows carry
 container facts (065 Redis, 066 Redis, 074 Postgres), bringing the total to eleven.
 Everything stays `net10.0` and headless.
+
+
+---
+
+## Second addendum, 2026-09-06 — blocks 07 and 08 (rows 081–100)
+
+Takes the track to **100 rows**, matching the ledger size every other completed track
+in this repo uses. Two more blocks, closing two gaps the first six left.
+
+### `07-domain` (081–090) — modelling the work, and the work that takes days
+
+`FeWoLearning.Architecture.Exercises.Domain`, folder `07-domain`.
+
+Blocks 01–06 are about machinery: pipelines, buses, caches, leases. None of them ask
+what the machinery is FOR. This block covers the tactical modelling decisions - value
+objects, entity identity, aggregate transaction boundaries, where logic goes when it
+belongs to no single entity - and then the processes that outlive a single request:
+state machines, workflow timeouts, human approval steps, long-running operations,
+webhook delivery, and change data capture.
+
+The recurring shape is **a rule that must hold no matter who calls**. A pipeline can
+be bypassed by a new caller; an invariant enforced in a constructor cannot.
+
+### `08-runtime` (091–100) — resources, degradation, and staying up
+
+`FeWoLearning.Architecture.Exercises.Runtime`, folder `08-runtime`.
+
+Deterministic design (clock, ids and randomness as ports - the idiom this whole track
+has been using since exercise 015, finally taught rather than assumed), connection and
+object pooling, multi-level caching, tag-based invalidation, graceful degradation,
+timeout budgets, poison-pill detection, actor-style single-threaded ownership, and
+supervision restart strategies.
+
+The recurring shape is **a finite thing that must be given back**. Every row is a
+resource, a deadline or a budget that one caller can exhaust for everybody else.
+
+Two new container rows (092 Postgres, 094 Redis) bring the total to thirteen.
+Everything stays `net10.0` and headless; the grading rules and the two-probe procedure
+carry over unchanged.
