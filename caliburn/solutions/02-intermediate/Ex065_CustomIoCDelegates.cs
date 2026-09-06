@@ -1,11 +1,11 @@
 // Exercise 065 - Custom IoC Delegates (intermediate).
-// Goal:   Caliburn has no built-in container of its own - IoC.GetInstance, IoC.GetAllInstances
-//         and IoC.BuildUp are three plain, settable delegate fields, and IoC.Get<T>()/
-//         GetAll<T>()/BuildUp(object) are just a generic facade calling straight through them.
-//         Replacing SimpleContainer with any container of your own is exactly this: point those
-//         three delegates at your container's own methods. The harness re-establishes all three
-//         per test (it needs IoC initialized even for coroutine-only exercises), so this is
-//         cleaned up automatically - no extra reset to write here.
+// Goal:   Caliburn's IoC is not itself a container - it is three plain, settable delegate fields
+//         (GetInstance, GetAllInstances, BuildUp), with IoC.Get<T>()/GetAll<T>()/BuildUp(object)
+//         as a thin generic facade over them. Caliburn does ship SimpleContainer (ex029/ex030),
+//         but nothing binds IoC to it: replacing it with any container of your own is exactly
+//         this - point those three delegates at your container's own methods. The harness
+//         re-establishes all three per test (it needs IoC initialized even for coroutine-only
+//         exercises), so this is cleaned up automatically - no extra reset to write here.
 // Drills: writing a small container's GetInstance/GetAllInstances/BuildUp, and wiring
 //         IoC's three delegates to it - then proving both the facade (IoC.Get<T>/GetAll<T>) and
 //         a fresh Install() genuinely REPLACE what was there before, rather than merely adding
@@ -76,6 +76,9 @@ public class Ex065_FrenchGreeter : Ex065_IGreeter
     public string Greet() => "Bonjour";
 }
 
-/// <summary>A type deliberately never registered with anything in this exercise - used to prove
-/// the "unregistered resolves to null" contrast with the harness's own Activator fallback.</summary>
+/// <summary>Never registered with anything in the "unregistered resolves to null" test, used
+/// there to prove that contrast with the harness's own Activator fallback - but registered
+/// under its own type elsewhere, as the assignability negative control for GetAllInstances
+/// (structurally incapable of implementing Ex065_IGreeter, so it can never sneak into a
+/// GetAll&lt;Ex065_IGreeter&gt;() result).</summary>
 public class Ex065_UnregisteredThing { }

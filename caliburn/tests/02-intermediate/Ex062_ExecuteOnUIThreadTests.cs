@@ -66,13 +66,23 @@ public class Ex062_ExecuteOnUIThreadTests : CaliburnViewContext
     }
 
     [WpfFact]
-    public void Execute_OnUIThread_Called_From_The_UI_Thread_Itself_Just_Runs_There_Directly()
+    public async Task Execute_OnUIThread_Runs_Directly_When_Called_From_The_UI_Thread_And_Still_Marshals_When_Called_From_A_Pool_Thread()
     {
         var uiThreadId = Environment.CurrentManagedThreadId;
         var subject = new Ex062_ExecuteOnUIThread();
 
-        var callbackThreadId = subject.RunOnUIThreadFromCallingThread();
+        var directCallbackThreadId = subject.RunOnUIThreadFromCallingThread();
+        Assert.Equal(uiThreadId, directCallbackThreadId);
 
-        Assert.Equal(uiThreadId, callbackThreadId);
+        // A stub that never really calls Execute.OnUIThread at all - just
+        // "return Environment.CurrentManagedThreadId;" - would pass the assertion above for
+        // free, because the UI thread IS the calling thread there. Calling the SAME method from
+        // a pool thread tells them apart: the cheat returns the pool thread's own id, while a
+        // real Execute.OnUIThread marshals the callback back onto the UI thread before this
+        // (synchronous) method returns, so the result is uiThreadId either way.
+        var marshalledCallbackThreadId = await BoundedAsync(
+            Task.Run(() => subject.RunOnUIThreadFromCallingThread()),
+            "Execute.OnUIThread to marshal a pool-thread call back onto the UI thread");
+        Assert.Equal(uiThreadId, marshalledCallbackThreadId);
     }
 }

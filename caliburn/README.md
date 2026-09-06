@@ -105,6 +105,14 @@ it:
 - resets `PlatformProvider.Current` back to the inline default provider,
   undoing whatever a previous view test installed;
 - clears and re-seeds `AssemblySource.Instance`;
+- resets `AssemblySource.FindTypeByNames` back to its pristine, uncached
+  lookup, undoing whatever a previous test's real
+  `BootstrapperBase.Initialize()` call installed via
+  `AssemblySourceCache.Install()` (since ex031–ex035; `CaliburnCoreContext.cs:117`);
+- resets `AssemblySourceCache.ExtractTypes` the same way — `Initialize()`
+  re-wraps it on **every** call, not just once, so it needs restoring every
+  test too, not merely undone the first time (same batch;
+  `CaliburnCoreContext.cs:120`);
 - initializes the `IoC` delegates (`GetInstance`, `GetAllInstances`,
   `BuildUp`) from a fresh `SimpleContainer`;
 - resets `ViewLocator.NameTransformer` back to Caliburn's 4 built-in rules,
@@ -119,7 +127,10 @@ it:
   came back `Count=0` every time, because `Clear()` had already emptied the
   live collection before the lazily-deferred snapshot was ever taken. An
   explicit static constructor removes `beforefieldinit`, which forces the
-  CLR to run it before any instance of the class can be constructed at all.
+  CLR to run it before any instance of the class can be constructed at all;
+- resets `LogManager.GetLog` back to its pristine delegate, undoing whatever
+  a previous test's `LogManager.GetLog` replacement (ex063 onward) left
+  behind.
 
 **`CaliburnViewContext : CaliburnCoreContext, IDisposable`** — for exercises
 with a view (ex012 onward). Runs only under `[WpfFact]`/`[WpfTheory]`, because
@@ -168,10 +179,15 @@ Caliburn's configuration — `IoC`, `PlatformProvider`, `AssemblySource`, the
 `ViewLocator` — is process-global, not per-test.
 
 **Forward risk: the harness does not reset every process-global static.**
-`CaliburnCoreContext` resets exactly five globals per test now —
-`PlatformProvider.Current`, `AssemblySource.Instance`, the `IoC` delegates,
-`ViewLocator.NameTransformer` (since ex011–ex015), and `LogManager.GetLog` (since
-ex063) — each the first of these globals an exercise actually mutated. It still does
+`CaliburnCoreContext` resets seven globals per test now:
+`PlatformProvider.Current`; `AssemblySource.Instance`;
+`AssemblySource.FindTypeByNames` (since ex031–ex035, undoing
+`BootstrapperBase.Initialize()`'s one-time `AssemblySourceCache.Install()`,
+`CaliburnCoreContext.cs:117`); `AssemblySourceCache.ExtractTypes` (same batch;
+re-wrapped on every `Initialize()`, not one-time, `CaliburnCoreContext.cs:120`);
+the `IoC` delegates (`GetInstance`/`GetAllInstances`/`BuildUp`);
+`ViewLocator.NameTransformer` (since ex011–ex015, the first of these globals an
+exercise actually mutated); and `LogManager.GetLog` (since ex063). It still does
 **not** reset `ViewLocator.LocateTypeForModelType` (a second writable static delegate
 field on the very type ex013–ex015 already touch, sitting right next to the one that
 now is reset), `ViewModelBinder.BindProperties`/`BindActions`,
@@ -228,8 +244,8 @@ only as attributed, unexecuted knowledge from Caliburn's own source.
 
 Beyond that, nothing shipped so far touches ex068–ex073, ex087, ex095 or ex096's
 statics, but those will (ex063 is now shipped, and did require exactly this: its
-`LogManager.GetLog` mutation is why the register above now lists five reset globals
-instead of four). Because the assembly runs serially with no restore between tests,
+`LogManager.GetLog` mutation is why the register above now lists seven reset globals
+instead of six). Because the assembly runs serially with no restore between tests,
 the first of those to mutate one of the *resettable* statics above will leak into every
 later test in the run unless whoever writes it first extends `CaliburnCoreContext` (or
 `CaliburnViewContext`) the same way ex015's `NameTransformer` reset was added: snapshot the
@@ -275,7 +291,7 @@ not attempt:
 | ex010's guard test fails red, but not every wrong answer does | `Unsaved_Changes_Genuinely_Awaits_The_Confirmation_Before_Deciding` hands `CanCloseAsync` a `TaskCompletionSource<bool>` that is deliberately never completed until after the test asserts the outer task is still pending. A `CanCloseAsync` written as `ConfirmDiscardAsync().Result` or `.GetAwaiter().GetResult()` blocks synchronously on that same never-completing task - the test **hangs rather than fails**. If an ex010 run stalls instead of going red quickly, this is why; the fix is to `await` the delegate, not block on it. |
 | Overriding `Screen.OnInitializeAsync`/`OnActivateAsync` is the right hook | Both are `[Obsolete]` in Caliburn.Micro 5 ("Override OnInitializedAsync" / "Override OnActivatedAsync"); overriding them puts `CS0672` in the build and breaks the zero-warning rule for `solutions/`. Override `OnInitializedAsync`/`OnActivatedAsync` instead — `OnDeactivateAsync` is not obsolete and has no `OnDeactivatedAsync` counterpart. |
 | "`Xunit.StaFact` 4.x is just a newer version — bump it" | Do **not** — pin stays at 3.0.13 deliberately, not because 4.x cannot work. `Xunit.StaFact` 4.0.23 depends on `xunit.v3.extensibility.core` 4.0.0, which dropped the VSTest bridge that `Microsoft.NET.Test.Sdk` + `xunit.runner.visualstudio` rely on; on .NET 10 SDK the build dies with `Testing with VSTest target is no longer supported by Microsoft.Testing.Platform on .NET 10 SDK and later.` Neither the `TestingPlatformDotnetTestSupport` MSBuild property nor a `dotnet.config` naming that runner fixed it here. The mechanism that **does** work is a track-root `global.json` containing `{"test":{"runner":"Microsoft.Testing.Platform"}}` — the sibling `wpf/` track runs `Xunit.StaFact` 4.0.23 on xunit.v3 4.0.0 exactly that way. `caliburn/` stays on 3.0.13 to keep the VSTest path and xunit.v3 3.2.2 generation `avalonia/` runs; anyone bumping it must add that `global.json` too. |
-| A fully qualified `Caliburn.Micro.Action` (or `.View`, `.Message`) reference compiles from a plain console app but not from this track | Every `exercises`/`solutions`/`tests` file lives under `FeWoLearning.Caliburn.*`, so the leading segment `Caliburn` in a fully qualified `Caliburn.Micro.Action.SetTarget(...)` resolves against the enclosing `FeWoLearning.Caliburn` namespace, not the package root — `CS0234: The type or namespace name 'Micro' does not exist in the namespace 'FeWoLearning.Caliburn'`. Identical to the trap `avalonia/` hit with `Avalonia.Media.TextWrapping` (see the root `CLAUDE.md`). `using Caliburn.Micro;` directives are exempt (that is how every exercise already resolves `PropertyChangedBase`, `SimpleContainer`, etc. without incident) — the fix for a type whose bare name collides with something else in scope (`Action` vs `System.Action`, from `ImplicitUsings`) is a `using` alias, e.g. `using CaliburnAction = Caliburn.Micro.Action;`, not the fully qualified name. First hit by ex027/ex028; will recur for ex065, ex068, ex095/ex096. |
+| A fully qualified `Caliburn.Micro.Action` (or `.View`, `.Message`) reference compiles from a plain console app but not from this track | Every `exercises`/`solutions`/`tests` file lives under `FeWoLearning.Caliburn.*`, so the leading segment `Caliburn` in a fully qualified `Caliburn.Micro.Action.SetTarget(...)` resolves against the enclosing `FeWoLearning.Caliburn` namespace, not the package root — `CS0234: The type or namespace name 'Micro' does not exist in the namespace 'FeWoLearning.Caliburn'`. Identical to the trap `avalonia/` hit with `Avalonia.Media.TextWrapping` (see the root `CLAUDE.md`). `using Caliburn.Micro;` directives are exempt (that is how every exercise already resolves `PropertyChangedBase`, `SimpleContainer`, etc. without incident) — the fix for a type whose bare name collides with something else in scope (`Action` vs `System.Action`, from `ImplicitUsings`) is a `using` alias, e.g. `using CaliburnAction = Caliburn.Micro.Action;`, not the fully qualified name. First hit by ex027/ex028; will recur for ex065, ex068, ex095/ex096. It already recurred at ex064, in the mirrored direction: `IPlatformProvider.OnUIThread(Action)`/`BeginOnUIThread(Action)` made `Caliburn.Micro.Action` and `System.Action` ambiguous, fixed with `using SystemAction = System.Action;` — i.e. the alias names the *System* type, where ex027/ex028 aliased the *Caliburn* one. |
 | "A coroutine test that never completes just takes a while to run" | A step whose `IResult`/`IResult<T>.Execute` never raises `Completed` makes `Coroutine.ExecuteAsync`'s returned `Task` wait **forever**, not slowly — the test **hangs** rather than failing, the same sharp edge already documented above for ex010's `CanCloseAsync`. Every ex041–ex045 test that awaits a hand-written `IResult`'s coroutine bounds that await via `CaliburnCoreContext`'s shared `BoundedAsync`/`BoundedExceptionAsync` helpers instead of awaiting unconditionally (`Task.WhenAny` against a short `Task.Delay`, asserting the coroutine's own task actually won the race), so a forgotten `Completed` fails red with a clear timeout message instead of stalling the whole suite — wrapping the bounded call in `Record.ExceptionAsync` defeats this (a swallowed timeout reads as "no exception"), which is why `BoundedExceptionAsync` returns the exception itself rather than being combined with `Record.ExceptionAsync` a second time. Every coroutine await in the batch is bounded this way, including ex043's single-step `TaskExtensions.ExecuteAsync<TResult>(this IResult<TResult>, ...)` call. |
 | "A `Task.WhenAny`/`Task.Delay` race can bound a `ShowDialogAsync` await the same way it bounds a coroutine" | It cannot, and this is sharper than the coroutine trap above: `WindowManager.CreateWindowAsync` completes **synchronously**, so by the time `ShowDialogAsync` would return to the caller, the calling STA thread is already blocked inside `Window.ShowDialog()`'s own managed `Dispatcher.PushFrame` loop. A losing `Task.Delay` in a `Task.WhenAny` race is just another queued continuation on that **same** dispatcher — it can run (that pump keeps pumping, which is exactly why a timeout continuation gets to execute at all), but throwing from it does not unwind the native call stack that has `Window.ShowDialog()` on it; only the **window actually closing** makes that call return. A stub whose close logic throws *before* ever reaching `TryCloseAsync` — precisely what every unfinished ex046–ex050 stub does — therefore hangs the process rather than failing the test, unless something explicitly force-closes the hosting `Window` itself. `CaliburnViewContext`'s `ScheduleFromInsideModalFrame` and `BoundedDialogAsync` both do exactly that (on a closer exception, and on the 8-second bound expiring, respectively) — re-deriving the hosting `Window` fresh via `((IViewAware)rootModel).GetView()` each time, rather than trusting an earlier capture, because a *correct* implementation that merely `await`s something before ever calling `ShowDialogAsync` can make that earlier capture run before the dialog exists at all. Measured, repeatedly, hitting exactly this hang during this batch's own authoring: a `timeout`-bounded shell command was needed to safely recover the first few attempts. |
 
@@ -286,14 +302,21 @@ Pinned package versions, for reference: `Caliburn.Micro` 5.0.258,
 ## The stub build is not warning-free — by design
 
 Stubs that throw from a member never raise their event or assign their
-backing field, so `exercises/` emits `CS0067`/`CS0649`. These are expected
-and deliberately left unsuppressed: silencing them would silence the same
-warning class a real unused-field bug produces. `solutions/` builds with
-**0 warnings** — a warning there is a finding.
+backing field, so `exercises/` emits `CS0067`/`CS0649`. Ex064 adds a third:
+`CS9113` for `Ex064_FakeDesignModeProvider(IPlatformProvider inner, bool
+designMode)`'s unread `designMode` primary-constructor parameter
+(`Ex064_DesignTimeDetection.cs:36`) — the only member that would read
+`designMode` is `InDesignMode`, which the learner has to write, so the
+parameter reads as unused until then, the same honest-stub-artifact status as
+ex061's `CS0649`. These are expected and deliberately left unsuppressed:
+silencing them would silence the same warning class a real unused-field or
+unused-parameter bug produces. `solutions/` builds with **0 warnings** — a
+warning there is a finding.
 
 The project-wide warning stance, stated once here: `exercises/` carries its
-expected stub warnings above and nothing else; `solutions/` is **0 warnings**,
-full stop — a warning there is a finding. `tests/` suppresses exactly one rule,
+expected stub warnings above (`CS0067`/`CS0649`/`CS9113`) and nothing else;
+`solutions/` is **0 warnings**, full stop — a warning there is a finding.
+`tests/` suppresses exactly one rule,
 `xUnit1051` ("pass `TestContext.Current.CancellationToken` through"), via
 `<NoWarn>` in `FeWoLearning.Caliburn.Tests.csproj` — the suite runs serially
 (`DisableTestParallelization`) with no timeouts and nothing that ever wants

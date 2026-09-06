@@ -65,5 +65,5 @@ public class Ex064_DesignTimeAwareViewModel : PropertyChangedBase
     /// <summary>Reads Execute.InDesignMode ITSELF - not a flag passed in at construction - so
     /// this answers correctly no matter which IPlatformProvider happens to be installed.</summary>
     public string Greeting =>
-        throw new NotImplementedException("TODO: Ex064 - Execute.InDesignMode ? SampleGreeting : RealGreeting");
+        throw new NotImplementedException("TODO: Ex064 - branch on Execute.InDesignMode between the sample and real greeting");
 }
