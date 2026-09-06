@@ -96,11 +96,11 @@ the same `global.json` opt-in.
   `java/`, `kotlin/`, `flutter/` and `php/`. **Caliburn.Micro** 5.0.258 with
   **`Xunit.StaFact` 3.0.13 on xunit.v3 3.2.2, .NET 10.0.400** is likewise
   verified as of 2026-09-05: the beginner tier (001-035) is complete and the
-  intermediate tier is through ex050 — the track's halfway point — where
-  `dotnet test` shows 283 failed, 8 passed on the untouched tree (283
-  exercise facts across ex001-ex050, plus 8 harness smoke tests — one more
-  than before, covering the new dialog helper — which pass in both modes) —
-  and `dotnet test -p:UseSolutions=true` shows 291 passed, 0 failed. **`wpf/`**'s beginner tier
+  intermediate tier is through ex055, where
+  `dotnet test` shows 313 failed, 8 passed on the untouched tree (313
+  exercise facts across ex001-ex055, plus 8 harness smoke tests which pass
+  in both modes) —
+  and `dotnet test -p:UseSolutions=true` shows 321 passed, 0 failed. **`wpf/`**'s beginner tier
   (35/100, `01-beginner` ex001-ex035) is verified end-to-end as of 2026-09-05, on
   **.NET 10.0.400** with **xunit.v3 4.0.0** and **Xunit.StaFact 4.0.23**
   (`Microsoft.WindowsDesktop.App` 10.0.11): `dotnet test` shows 5 passed (the
@@ -628,6 +628,25 @@ the same `global.json` opt-in.
   `SizeToContent` and a centred `WindowStartupLocation` *before* the
   dictionary is applied, the dictionary's `Width`/`Left` do land on the
   window, and WPF then discards them at `Show()` time to honour those two.
+  **`CanCloseAsync` is not always a pure query.** Measured: with the default
+  `DefaultCloseStrategy<T>`, one refusing child makes the strategy's
+  `Children` come back empty, so asking closes nothing. But a strategy that
+  returns a willing subset alongside `CloseCanOccur == false` —
+  `DefaultCloseStrategy<T>(closeConductedItemsWhenConductorCannotClose:
+  true)`, or any custom `ICloseStrategy<T>` that does the same — makes that
+  very same `CanCloseAsync()` call deactivate those children with
+  `close: true` and remove them from `Items`. The flag never changes
+  `CloseCanOccur`; it changes what happens to the children that *were*
+  willing.
+  **Validation: the two interfaces are not symmetric.** Measured on a
+  convention-created binding: a view model implementing `IDataErrorInfo` gets
+  `ValidatesOnDataErrors == true` (a plain one gets `false`) — Caliburn's
+  convention flips it for you. A view model implementing
+  `INotifyDataErrorInfo` changes nothing at all: both it and a plain view
+  model get `ValidatesOnDataErrors == false` and
+  `ValidatesOnNotifyDataErrors == true`, because the latter is WPF's own
+  default and the newer interface needs no help. A test asserting on
+  `ValidatesOnNotifyDataErrors` therefore discriminates nothing.
 - **Blazor** — The solution is `FeWoLearning.Blazor.slnx`, with **four**
   projects: `exercises/`, `solutions/`, `tests/`, `host/`. Like `avalonia/`,
   `solutions/` is deliberately **in** the build here (the repo-wide convention
@@ -929,7 +948,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `avalonia/`| 95 / 100 (verified) | 5 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
-| `caliburn/`| 50 / 100 (verified) | 50 |
+| `caliburn/`| 55 / 100 (verified) | 45 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
