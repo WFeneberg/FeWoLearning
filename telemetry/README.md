@@ -251,3 +251,38 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–005: **27 facts total** (21 exercise + 6 harness).
   Red run 21 failed / 5 passed / 1 skipped; green run 26 passed / 1 skipped; green
   with `-p:Containers=true` 27 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, block `01-logging` rows 006–010:**
+
+- **`UseWPF=true` shortens the implicit-using list.** The generated
+  `GlobalUsings.g.cs` here is `System`, `System.Collections.Generic`, `System.Linq`,
+  `System.Threading`, `System.Threading.Tasks` — the WindowsDesktop SDK's set, which
+  drops **`System.IO` and `System.Net.Http`** from the usual `Microsoft.NET.Sdk` list.
+  So `IOException`, `Stream`, `Path` and `HttpClient` all need an explicit `using` in
+  every file on this track, and the resulting `CS0246` is otherwise baffling.
+- **A reflection fact asserting an interface is *declared* grades nothing when the
+  stub already declares it.** Ex008's provider must declare `ISupportExternalScope`
+  for its `SetScopeProvider` member to make sense, so a fact checking
+  `GetInterfaces()` passed against the untouched stub — caught by the red run
+  reporting `1 passed`, which is exactly why "no fact may pass on the stub" is checked
+  and not assumed. Dropped in favour of the behavioural fact, which cannot be
+  satisfied without using the scope provider. This is CLAUDE.md's "a test that asserts
+  what the signature produces" in a new disguise: an interface list is part of the
+  signature.
+- **The scope mechanism has two halves and only one is behavioural.** Once the factory
+  finds `ISupportExternalScope` on a provider it pushes scopes into the shared
+  `IExternalScopeProvider` and **stops calling that provider's `logger.BeginScope`** —
+  so a provider that advertises the interface and ignores the object it is handed sees
+  no scopes at all, silently. The reference implementation therefore returns `null`
+  from `BeginScope` deliberately, and reads `ForEachScope` per record rather than
+  caching.
+- **Ex009 is the clearest demonstration so far of why the plausible-wrong probe is not
+  optional.** A value-sniffing scrubber — regex for an address or a card number,
+  applied to each argument — passes **3 of the 5 facts**: the safe fields keep their
+  values, the sensitive ones are redacted, and no secret reaches the message. Only the
+  matched adversarial pair catches it: a sensitive field holding `"n/a"` must still be
+  redacted, and a safe field holding a real address must not be. Neither fact works
+  without the other.
+- Batch baseline after rows 001–010: **49 facts total** (43 exercise + 6 harness).
+  Red run 43 failed / 5 passed / 1 skipped; green run 48 passed / 1 skipped; green
+  with `-p:Containers=true` 49 passed / 0 skipped. 0 warnings in both modes.

@@ -720,13 +720,25 @@ the same `global.json` opt-in.
   Every exercise additionally owns a uniquely named
   `ActivitySource`/`Meter` (`fewolearning.telemetry.exNNN`).
 
-  Three small traps measured while scaffolding: `FakeLogger`'s accessor is
+  Four small traps measured while building this out: `FakeLogger`'s accessor is
   `logger.Collector.LatestRecord`, not `logger.Latest`; `FakeLogger` captures
   scopes with no `IncludeScopes` opt-in and does **not** flatten them, so
-  `FakeLogRecord.Scopes` holds the raw scope object; and **a literal double
+  `FakeLogRecord.Scopes` holds the raw scope object; **a literal double
   hyphen is illegal in an XML comment**, so a `.csproj` comment naming a CLI
   flag fails `MSB4025` — the rule this file records for `.axaml` applies to
-  project files too.
+  project files too; and **`UseWPF=true` shortens the implicit-using list** to
+  the WindowsDesktop SDK's set, dropping `System.IO` and `System.Net.Http`, so
+  `IOException`, `Stream`, `Path` and `HttpClient` need an explicit `using` in
+  every file here and the resulting `CS0246` is otherwise baffling. That last
+  one applies to `wpf/`, `caliburn/` and `security/` too.
+
+  One more, general enough to be worth stating outside this track: **a
+  reflection fact asserting that a type *declares* an interface grades
+  nothing when the stub already declares it.** Ex008's provider has to declare
+  `ISupportExternalScope` for its `SetScopeProvider` member to make sense, so
+  such a fact passed against the untouched stub — caught only because the red
+  run's `1 passed` was read. An interface list is part of the signature, and
+  this file's rule about facts the signature already satisfies covers it.
 
 ## Adding or completing exercises
 
@@ -798,7 +810,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
 | `Architecture/`| 60 / 60 (verified) | —         |
-| `telemetry/`| 5 / 70 (verified) | 65 |
+| `telemetry/`| 10 / 70 (verified) | 60 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above

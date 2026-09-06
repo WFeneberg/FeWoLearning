@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 5 ✅ / 65 ⬜**
+**Status: 10 ✅ / 60 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -28,11 +28,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 003 | CategoriesAndTypedLogger | `ILogger<T>` category naming, `CreateLogger(string)`, category-based filtering | ✅ |
 | 004 | LoggingScopes | `BeginScope`, nesting, scope state on the record, providers must opt in | ✅ |
 | 005 | LoggerMessageSourceGenerator | `[LoggerMessage]` partial method, `EventId`, compile-time template | ✅ |
-| 006 | HighPerformanceGuardClause | `IsEnabled` guard, `LoggerMessage.Define`, avoiding boxing on the disabled path | ⬜ |
-| 007 | ExceptionLogging | the exception argument vs `ex.ToString()` in the message; inner and aggregate exceptions | ⬜ |
-| 008 | CustomILoggerProvider | a provider + logger + `ISupportExternalScope` written by hand | ⬜ |
-| 009 | RedactionAndPii | structural scrubbing of named fields, not a regex over the rendered message | ⬜ |
-| 010 | LogEnrichment | ambient properties (version, tenant, machine) attached once, not per call site | ⬜ |
+| 006 | HighPerformanceGuardClause | `IsEnabled` guard, `LoggerMessage.Define`, avoiding boxing on the disabled path | ✅ |
+| 007 | ExceptionLogging | the exception argument vs `ex.ToString()` in the message; inner and aggregate exceptions | ✅ |
+| 008 | CustomILoggerProvider | a provider + logger + `ISupportExternalScope` written by hand | ✅ |
+| 009 | RedactionAndPii | structural scrubbing of named fields, not a regex over the rendered message | ✅ |
+| 010 | LogEnrichment | ambient properties (version, tenant, machine) attached once, not per call site | ✅ |
 | 011 | EventIdConventions | stable ids, id/name pairing, filtering by `EventId` | ⬜ |
 | 012 | SerilogStructuredSink | Serilog behind `ILogger`, destructuring with `@`, properties as fields | ⬜ |
 | 013 | SerilogRollingFileAndOverrides | rolling file sink, `MinimumLevel.Override` per source, retention | ⬜ |
