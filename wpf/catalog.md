@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 50 ✅ / 50 ⬜**
+**Status: 55 ✅ / 45 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -99,11 +99,11 @@ Two deliberate content gaps:
 | 048 | DispatcherInvokeAsyncPriorities | `Dispatcher.InvokeAsync`, execution order across priorities | ✅ |
 | 049 | SynchronizationContextCapture | why `await` returns to the UI thread; the cost of `ConfigureAwait(false)` | ✅ |
 | 050 | CommandCancellation | `CancellationTokenSource`, cancelling a running command | ✅ |
-| 051 | CollectionSynchronization | `BindingOperations.EnableCollectionSynchronization` | ⬜ |
-| 052 | BackgroundWorkerToTask | migrate `ProgressChanged`/`RunWorkerCompleted` to `Task` + `IProgress<T>` | ⬜ |
-| 053 | CollectionViewSourceBasics | `ICollectionView`, `CurrentItem`, `MoveCurrentTo` | ⬜ |
-| 054 | SortAndGroup | `SortDescriptions`, `GroupDescriptions` | ⬜ |
-| 055 | FilterPredicate | `ICollectionView.Filter`, `Refresh` | ⬜ |
+| 051 | CollectionSynchronization | `BindingOperations.EnableCollectionSynchronization` | ✅ |
+| 052 | BackgroundWorkerToTask | migrate `ProgressChanged`/`RunWorkerCompleted` to `Task` + `IProgress<T>` | ✅ |
+| 053 | CollectionViewSourceBasics | `ICollectionView`, `CurrentItem`, `MoveCurrentTo` | ✅ |
+| 054 | SortAndGroup | `SortDescriptions`, `GroupDescriptions` | ✅ |
+| 055 | FilterPredicate | `ICollectionView.Filter`, `Refresh` | ✅ |
 | 056 | DeferRefresh | batch several changes, count the refreshes collapsed | ⬜ |
 | 057 | EditableObjectTransactions | `IEditableObject` begin/cancel/end edit | ⬜ |
 | 058 | ControlTemplateAndTemplateBinding | retemplate a control, `TemplateBinding`, `GetTemplateChild` | ⬜ |

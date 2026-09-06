@@ -173,6 +173,72 @@ measurement walked, not the general mechanism it seems to imply.
   reproduces the same numbers by a different route and was judged too contrived to be a
   plausible learner mistake to guard against here - the row's honest scope stops at the thread
   id, not the mechanism that put code there.
+- **A cross-thread mutation with no `EnableCollectionSynchronization` throws `NotSupportedException`
+  synchronously, on the mutating thread itself - directly catchable - but only when the collection
+  is watched by nothing heavier than a bare `ICollectionView`.** Measured directly for row 051: a
+  `ListBox` bound to the collection instead (a real generator, not just a view) still throws
+  and is still caught the same way, but the interrupted `CollectionChanged` processing leaves
+  `ItemContainerGenerator` out of sync with the collection's real count, and the NEXT layout pass
+  on that same dispatcher - even an unrelated element's `UpdateLayout()`, even the harness's own
+  `Dispose()`-time `Pump()` - throws an `InvalidOperationException` ("ItemsControl ist nicht
+  konsistent...") that is NOT caught by anything the test wrote and fails the test outright. Row
+  051 is built entirely on `CollectionViewSource.GetDefaultView(...)`, never a live `ItemsControl`,
+  for exactly this reason.
+- **`BindingOperations.EnableCollectionSynchronization` only checks that SOME lock object was
+  registered for a collection - never that the mutating thread is actually holding it.** Measured
+  directly: a background thread that mutates while holding no lock at all, or the wrong one,
+  raises no exception whatsoever once ANY registration exists - the protection it buys is real
+  only if the caller also locks on the exact same object, and nothing enforces that. Row 051's
+  test for this locks on the registered object with a zero-timeout `Monitor.TryEnter` while the
+  mutation is deliberately paused mid-flight, rather than racing for a corruption that may never
+  manifest inside a bounded test. Also measured: calling `EnableCollectionSynchronization` from
+  the background thread itself, immediately before that SAME thread's own mutation, does not
+  suppress the exception either - registration only works reached through the normal path,
+  completed before the caller is ever handed something to mutate with.
+- **`BackgroundWorker` captures its marshalling `SynchronizationContext` at `RunWorkerAsync()`'s
+  own CALL time, not at construction - the opposite of `Progress<T>` (row 047).** Measured
+  directly for row 052: a worker constructed ON the dispatcher thread but started via
+  `RunWorkerAsync()` from a pool thread reports `ProgressChanged`/`RunWorkerCompleted` back on
+  that POOL thread; a worker constructed OFF the dispatcher (no ambient context) but started via
+  `RunWorkerAsync()` FROM the dispatcher thread reports back on the dispatcher. Row 052's
+  `RunAsync` must therefore call `RunWorkerAsync()` synchronously, on its own calling thread -
+  wrapping that call in another `Task.Run` would silently break the marshalling a caller expects.
+- **`RunWorkerCompletedEventArgs.Result`'s getter re-throws the original `DoWork` exception when
+  `Error` is not null.** A migration mutant that inspects `Result` before checking `Error` does not
+  merely fail an assertion - the re-thrown exception escapes `RunWorkerCompleted`'s own
+  `SynchronizationContext`-posted callback unhandled and crashes the whole test process (observed
+  directly building row 052: exit code matching an unhandled CLR exception, not a normal test
+  failure). `Error` must be checked first, always.
+
+#### Collection views
+
+- **`CollectionViewSource.GetDefaultView`'s cache is scoped per DISPATCHER THREAD, not merely per
+  source collection.** Measured directly for row 053: a literal `static readonly` collection,
+  deliberately shared across two separate `[WpfFact]` test methods, gets a completely FRESH view
+  in the second test - empty `SortDescriptions`, `CurrentPosition` back to 0 - because
+  `Xunit.StaFact` spins a brand-new STA thread (and Dispatcher) for every `[WpfFact]`, and a
+  `CollectionView` is thread-affine. Calling `GetDefaultView` twice on the same collection WITHIN
+  one test, by contrast, does return the identical view instance, carrying over whatever that
+  test already changed - so the risk this batch's rows 053-055 actually had to guard against was
+  never cross-test leakage (there is none, for free), only a single test calling `GetDefaultView`
+  more than once on a collection it means to treat as fresh.
+- **`GetDefaultView` returns a `ListCollectionView` for both `List<T>` and `ObservableCollection<T>`
+  (anything `IList`), and the internal, unnamed `MS.Internal.Data.EnumerableCollectionView` for a
+  bare `IEnumerable<T>` with no `IList`** - but `CanSort`/`CanGroup`/`CanFilter` measured `true` for
+  all three, and sorting/filtering a bare-enumerable-backed view worked identically to the other
+  two. Rows 053-055 use `ObservableCollection<T>` throughout regardless, matching the rest of the
+  track's convention (rows 032/033) rather than because the other shapes were found lacking.
+- **`ICollectionView.MoveCurrentTo` with an item the view cannot find sets `CurrentPosition` to
+  `-1` and `CurrentItem` to `null`, returning `false`.** Row 053's test for this is the
+  discriminator against a bypass that never touches the view at all and just echoes back
+  whatever item it was given.
+- **`SortDescriptions`/`GroupDescriptions` re-apply the moment something is added to them - no
+  `Refresh()` needed - and so does assigning a brand-new delegate to `Filter`.** All three
+  measured directly (row 054/055). `Refresh()` earns its keep for a narrower case `Filter`'s
+  auto-apply-on-assignment cannot cover: the SAME predicate delegate, never reassigned, whose own
+  captured state changes elsewhere - the view has no way to notice that on its own and goes on
+  showing the stale result until something calls `Refresh()`. Row 055 is built around exactly
+  that gap, not around `Filter` needing `Refresh()` in general.
 
 #### Layout and sizing
 
