@@ -116,4 +116,19 @@ public class HarnessSmokeTests : CaliburnViewContext
         Pump();
         Assert.Equal(1, vm.Greetings);
     }
+
+    // Proves ShowDialogAndCloseAsync (added for ex046-ex050) before any catalog exercise
+    // depends on it: WindowManager.ShowDialogAsync is modal, so this is the one place the
+    // recipe needs to be right - a wrong recipe here would otherwise surface, confusingly, as
+    // a hang in whichever exercise happened to use it first.
+    [WpfFact]
+    public async Task ShowDialogAndCloseAsync_Resolves_Without_Hanging_The_Nested_Modal_Loop()
+    {
+        var vm = new Screen();
+
+        var (result, window) = await ShowDialogAndCloseAsync(vm, true);
+
+        Assert.True(result);
+        Assert.NotNull(window);
+    }
 }
