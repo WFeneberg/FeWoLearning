@@ -25,7 +25,15 @@
 // SCOPE THIS CAREFULLY: the assignment is decided by the item's CLR type shape (any reference
 // type other than string), NOT by whether it is specifically a Screen/PropertyChangedBase, and
 // NOT by whether the ViewLocator can actually find a matching view for it - that resolution
-// happens later, per item, when the template is actually used to render.
+// happens later, per item, when the template is actually used to render. Two more preconditions,
+// separately measured on this machine: if the ItemsControl already has a non-empty
+// DisplayMemberPath, or an ItemTemplate already set (in either case, before ViewModelBinder.Bind
+// runs), the convention leaves it alone entirely - no override, whatever was already there stays.
+// One suspected precondition does NOT hold, also measured directly: the view-model PROPERTY's own
+// declared type does not need to be generic - a property declared as plain, non-generic
+// IEnumerable (backed by the identical reference-type items at runtime) still gets the template
+// assigned exactly like a BindableCollection<T> would, so this is not a check on the property's
+// static type, only on the actual items' runtime type.
 //
 // WHY THIS EXERCISE DOES NOT LOAD THE TEMPLATE'S CONTENT ITSELF (a real trap, also measured on
 // this machine): ConventionManager.DefaultItemTemplate is ONE process-wide static DataTemplate -

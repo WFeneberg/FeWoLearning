@@ -202,6 +202,29 @@ pattern any future exercise touching `ConventionManager`'s convention dictionary
 follow — register only for a type you own, rather than trying to reset a static that has
 no public way to be reset.
 
+A related but DIFFERENT trap, measured while building ex060 (`ItemTemplateViewLocator`):
+`ConventionManager.DefaultItemTemplate` is also a process-wide static, but unlike the two
+statics above it is not a plain CLR field — it is a `DataTemplate`, a `DependencyObject`,
+and WPF permanently pins any `DependencyObject`'s `Dispatcher` to whichever thread first
+realizes it. Every `[WpfFact]` in this suite runs on its own STA thread, so whichever
+exercise's test is the first anywhere in the run to bind a view-model collection ends up
+pinning this shared template to *its* thread — measured directly (two independent STA
+threads, one touching `ConventionManager` before the other): a later thread calling
+`template.LoadContent()`, or even just reading `template.VisualTree` or
+`template.Triggers`, throws `InvalidOperationException` ("the calling thread cannot access
+this object"), and marshalling onto `template.Dispatcher.Invoke(...)` from that later
+thread is not a fix either — that dispatcher's owning thread has typically already exited
+by then, so the call hangs rather than failing. This reproduced reliably once other
+exercises ran first, even though an isolated run of just one file's own tests hid it —
+exactly the kind of flake that looks like "the machine is slow" but is not. **Any future
+exercise wanting to inspect a shared static `DataTemplate`'s realized content (not just
+compare its reference identity) must not call `LoadContent()`/read `VisualTree`/`Triggers`
+on the shared instance from an arbitrary test's thread.** ex060 works around this by never
+loading the template at all — it proves the assignment rule by reference identity
+(`Assert.Same(ConventionManager.DefaultItemTemplate, itemsControl.ItemTemplate)`) and by a
+learner-written type predicate, and states what the template's content actually contains
+only as attributed, unexecuted knowledge from Caliburn's own source.
+
 Beyond that, nothing shipped so far touches ex063, ex068–ex073, ex087, ex095 or ex096's
 statics, but those will. Because the assembly runs serially with no restore between tests,
 the first of those to mutate one of the *resettable* statics above will leak into every

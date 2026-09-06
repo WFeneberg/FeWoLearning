@@ -113,6 +113,23 @@ public class Ex056_NotifyDataErrorInfoValidationTests : CaliburnViewContext
     }
 
     [WpfFact]
+    public async Task GetErrors_With_A_Null_Or_Empty_PropertyName_Returns_Every_Recorded_Error()
+    {
+        var vm = new Ex056_AsyncValidatingVm();
+        var outcome = new TaskCompletionSource<bool>();
+        var validating = vm.ValidateUserNameAsync(outcome.Task);
+        outcome.SetResult(false);
+        await validating;
+        Pump();
+
+        // A stub that only ever recognises the EXACT propertyName (returning nothing for null or
+        // "") fails right here, even though UserName really does have a recorded error - this is
+        // the branch GetErrors_Ignores_An_Unrelated_Property_Name does not cover.
+        Assert.NotEmpty(ToList(vm.GetErrors(null)));
+        Assert.NotEmpty(ToList(vm.GetErrors("")));
+    }
+
+    [WpfFact]
     public void INotifyDataErrorInfo_Gets_ValidatesOnDataErrors_False_While_IDataErrorInfo_Gets_True_On_The_Real_Binding()
     {
         var subject = new Ex056_NotifyDataErrorInfoValidation();

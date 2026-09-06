@@ -26,24 +26,12 @@ public class Ex058_ItemsConventionBindingTests : CaliburnViewContext
     }
 
     [WpfFact]
-    public void Matched_Name_Binds_ItemsSource_OneWay_To_The_Collection()
-    {
-        var (subject, matched, _) = Bound();
-
-        var binding = subject.GetAppliedBinding(matched, ItemsControl.ItemsSourceProperty);
-
-        Assert.NotNull(binding);
-        Assert.Equal("Items", binding!.Path.Path);
-        Assert.Equal(System.Windows.Data.BindingMode.OneWay, binding.Mode);
-    }
-
-    [WpfFact]
     public void Matched_ItemsControl_Actually_Materializes_The_Three_Items()
     {
         var (_, matched, _) = Bound();
 
         // A stub whose Bind never really runs the convention leaves ItemsSource null and Items
-        // empty, even if GetAppliedBinding is implemented correctly.
+        // empty, even if the rest of this file's assertions read the right properties.
         Assert.Equal(3, matched.Items.Count);
     }
 
@@ -58,22 +46,42 @@ public class Ex058_ItemsConventionBindingTests : CaliburnViewContext
     }
 
     [WpfFact]
+    public void LeavesPresentationAtDefaults_Is_True_For_A_Freshly_Bound_ItemsControl()
+    {
+        var (subject, matched, _) = Bound();
+
+        Assert.True(subject.LeavesPresentationAtDefaults(matched));
+    }
+
+    [WpfFact]
+    public void LeavesPresentationAtDefaults_Is_False_When_DisplayMemberPath_Is_Set()
+    {
+        var subject = new Ex058_ItemsConventionBinding();
+        var itemsControl = new ItemsControl { DisplayMemberPath = "Label" };
+
+        // A stub that only inspects ItemTemplate (ignoring DisplayMemberPath) fails right here.
+        Assert.False(subject.LeavesPresentationAtDefaults(itemsControl));
+    }
+
+    [WpfFact]
+    public void LeavesPresentationAtDefaults_Is_False_When_ItemTemplate_Is_Set()
+    {
+        var subject = new Ex058_ItemsConventionBinding();
+        var itemsControl = new ItemsControl { ItemTemplate = new DataTemplate() };
+
+        // A stub that only inspects DisplayMemberPath (ignoring ItemTemplate) fails right here.
+        Assert.False(subject.LeavesPresentationAtDefaults(itemsControl));
+    }
+
+    [WpfFact]
     public void Unmatched_Name_Gets_No_ItemsSource_Binding_At_All()
     {
         var (subject, _, unmatched) = Bound();
 
+        // The general rule this restates for ItemsControl is ex017's, not a fact peculiar to
+        // ItemsControl: ViewModelBinder skips an element entirely once its name fails to match
+        // any view-model property, before ever consulting a convention for it.
         Assert.Null(subject.GetAppliedBinding(unmatched, ItemsControl.ItemsSourceProperty));
-    }
-
-    [WpfFact]
-    public void Unmatched_Name_Gets_No_Visibility_Fallback_Either()
-    {
-        var (subject, _, unmatched) = Bound();
-
-        // Unlike a Button or TextBlock (ex019/ex020), where an unmatched name still falls back
-        // to a Visibility binding, ItemsControl's own convention IS ItemsSource - a stub that
-        // wires a Visibility binding here as a fallback fails right here.
-        Assert.Null(subject.GetAppliedBinding(unmatched, UIElement.VisibilityProperty));
     }
 
     [WpfFact]

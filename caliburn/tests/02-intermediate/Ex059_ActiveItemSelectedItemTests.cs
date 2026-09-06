@@ -84,13 +84,21 @@ public class Ex059_ActiveItemSelectedItemTests : CaliburnViewContext
     [WpfFact]
     public async Task Activating_The_Second_Child_Through_The_Conductor_Selects_It_In_The_ListBox()
     {
-        var (_, conductor, listBox, _, _, second) = await BoundAsync();
+        var (_, conductor, listBox, _, first, second) = await BoundAsync();
         Pump();
 
         // Nobody wrote any selection-syncing code - the convention's own two-way binding is what
         // moves this. A stub whose Bind never runs the convention leaves SelectedItem null.
         Assert.Same(second, conductor.ActiveItem);
         Assert.Same(second, listBox.SelectedItem);
+
+        // A stub that never activates THIS CONDUCTOR ITSELF before activating its children
+        // (ChangeActiveItemAsync sets ActiveItem regardless of IsActive) would still pass the
+        // two assertions above - this is the assertion that actually exercises that omission:
+        // only the conductor's OWN activation makes OnActivatedAsync/OnDeactivateAsync cascade
+        // to its children (ex033/ex034), so second must be genuinely active and first must not.
+        Assert.True(second.IsActive);
+        Assert.False(first.IsActive);
     }
 
     [WpfFact]

@@ -90,4 +90,22 @@ public class Ex060_ItemTemplateViewLocatorTests : CaliburnViewContext
         Assert.True(subject.WouldGetDefaultItemTemplate(typeof(Ex060_RowItem)));
         Assert.True(subject.WouldGetDefaultItemTemplate(typeof(object)));
     }
+
+    [WpfFact]
+    public void WouldGetDefaultItemTemplate_Agrees_With_The_Real_Measured_Binding_For_Every_Case()
+    {
+        // The predicate and the four real bindings above are checked independently everywhere
+        // else in this file - this is the one test that cross-checks them against EACH OTHER, so
+        // a predicate that quietly drifts from what ConventionManager actually does (rather than
+        // merely getting one hand-picked type wrong) cannot pass unnoticed.
+        var subject = new Ex060_ItemTemplateViewLocator();
+
+        AssertAgrees(typeof(string), Bound(new Ex060_StringsVm()));
+        AssertAgrees(typeof(int), Bound(new Ex060_IntsVm()));
+        AssertAgrees(typeof(Ex060_RowItem), Bound(new Ex060_RowsVm()));
+        AssertAgrees(typeof(object), Bound(new Ex060_PlainObjectsVm()));
+
+        void AssertAgrees(Type itemType, ItemsControl itemsControl) =>
+            Assert.Equal(itemsControl.ItemTemplate != null, subject.WouldGetDefaultItemTemplate(itemType));
+    }
 }
