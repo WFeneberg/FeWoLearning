@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 70 ✅ / 10 ⬜**
+**Status: 75 ✅ / 5 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -117,16 +117,16 @@ fits on one machine.
 | 068 | GracefulShutdown | stop accepting, drain in flight, deadline, what to do with the rest | ✅ |
 | 069 | StartupReadinessOrdering | dependency probing, fail-fast vs start-degraded, readiness gating | ✅ |
 | 070 | ShardingByKey | shard routing, rebalancing, the keys that move | ✅ |
-| 071 | ReadReplicaRouting | read/write splitting, replica lag, read-your-writes | ⬜ |
-| 072 | MultiTenancyIsolation | tenant-scoped access, the cross-tenant leak, the missing filter | ⬜ |
-| 073 | TenantConfiguration | per-tenant overrides over global defaults, inheritance, unknown tenants | ⬜ |
+| 071 | ReadReplicaRouting | read/write splitting, replica lag, read-your-writes | ✅ |
+| 072 | MultiTenancyIsolation | tenant-scoped access, the cross-tenant leak, the missing filter | ✅ |
+| 073 | TenantConfiguration | per-tenant overrides over global defaults, inheritance, unknown tenants | ✅ |
 
 ## evolution (074–080) — the system changing while it runs
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 074 | ExpandContractMigration 🐳 | the three-phase schema change, why the middle phase exists | ⬜ |
-| 075 | IdempotentBackfill | resumable batch repair, checkpoints, re-running safely | ⬜ |
+| 074 | ExpandContractMigration 🐳 | the three-phase schema change, why the middle phase exists | ✅ |
+| 075 | IdempotentBackfill | resumable batch repair, checkpoints, re-running safely | ✅ |
 | 076 | ConsumerDrivenContract | a contract test that fails when the provider breaks a consumer | ⬜ |
 | 077 | ApiDeprecationLifecycle | sunset dates, deprecation headers, usage before removal | ⬜ |
 | 078 | FeatureFlagTargeting | targeting rules, stable percentage bucketing, flag removal | ⬜ |
