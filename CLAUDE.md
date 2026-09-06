@@ -138,13 +138,13 @@ the same `global.json` opt-in.
   `%USERPROFILE%\.cargo\bin` before invoking them from a plain shell.
 - `go test` needs `GOTMPDIR` outside `%TEMP%`, or on-access scanning deletes test
   binaries before exec (`fork/exec …: file not found`).
-- **`MicroServices/`** is verified as of 2026-09-05 on **Aspire 13.5.3 with
+- **`MicroServices/`** is verified as of 2026-09-06 on **Aspire 13.5.3 with
   .NET 10.0.400**, **Docker 29.7.2**, **devcontainer CLI 0.89.0**, and
   **xunit.v3 3.2.2** (`xunit.runner.visualstudio` 3.1.5,
   `Microsoft.NET.Test.Sdk` 17.14.1) pinned on the classic VSTest path:
-  `dotnet test` gives 12 exercise facts red, 7 harness facts passed, 1 skipped
-  (20 total); `dotnet test -p:UseSolutions=true` gives 19 passed, 1 skipped,
-  0 failed; `dotnet test -p:Containers=true` gives 12 red, 8 passed, 0 skipped. `Aspire.Hosting.Elasticsearch` is deliberately pinned at 13.3.0 —
+  `dotnet test` gives 95 exercise facts red, 7 harness facts passed, 1 skipped
+  (103 total); `dotnet test -p:UseSolutions=true` gives 102 passed, 1 skipped,
+  0 failed; `dotnet test -p:Containers=true` gives 95 red, 8 passed, 0 skipped. `Aspire.Hosting.Elasticsearch` is deliberately pinned at 13.3.0 —
   its own latest stable — while every other Aspire package on the track is
   13.5.3. This also surfaced a problem elsewhere in the repo: `wpf/` sits on
   xunit.v3 4.0.0 plus a `Microsoft.Testing.Platform` `global.json`, and on
@@ -764,6 +764,40 @@ the same `global.json` opt-in.
   merely names the right resource is satisfied equally by `WaitForCompletion`,
   which models the opposite promise — the wait *type* must be asserted too.
 
+  **Tests run serially now.** `tests/` carries `[assembly:
+  CollectionBehavior(DisableTestParallelization = true)]`, because several
+  exercises keep process-global mutable state (a static `ActivitySource`,
+  health-check flags, an eventing hook log) that is only safe if test
+  classes never run concurrently. Note the version specificity: that's the
+  spelling xunit.v3 **3.2.2** accepts — `wpf/`'s `[assembly:
+  Parallelization(Mode = ParallelMode.None)]` is a 4.x form, and
+  `ParallelizationAttribute` does not exist in 3.2.2 at all. The cost is
+  real: the green suite went from about 26 seconds to about 1 minute 8
+  seconds.
+
+  Both content libraries now carry a `FrameworkReference` to
+  `Microsoft.AspNetCore.App`, plus OpenTelemetry 1.18.0,
+  `Microsoft.Extensions.ServiceDiscovery` and
+  `Microsoft.Extensions.Http.Resilience` 10.9.0. Service-side exercises live
+  in the same `exercises/`+`solutions/` pair as the AppHost-modelling ones
+  rather than in a third project pair, deliberately, so the `UseSolutions`
+  switch stays at one pair. The consequence worth recording: the repo's
+  "ASP.NET Core work belongs to `blazor/`" boundary is from here on a
+  judgement call rather than a compile error.
+
+  The model and the manifest disagree about MongoDB's connection string —
+  the model renders the raw password placeholder while the manifest renders
+  a URI-encoded one. Any later Mongo row must decide which it is grading.
+
+  Two catalog rows were corrected after being written, because the catalog
+  is this track's spec and a wrong row propagates: row 018 claimed a fixed
+  host port and replicas are contradictory, which is measurably false
+  (Aspire polices neither; a proxied endpoint puts one listener in front of
+  N instances); row 027 was a near-duplicate of ex001 and ex014 and was
+  re-scoped onto `AddDatabase(name, databaseName)`. The general lesson: when
+  a row turns out to misstate behaviour, fix the row itself, not just the
+  exercise header.
+
   The devcontainer does **not** use the `docker-outside-of-docker` or `node`
   devcontainer features — they fail on this network with `NO_PUBKEY
   62D54FD4003F6525` during apt signature verification (corporate TLS
@@ -999,7 +1033,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 60 / 100 (verified) | 40 |
 | `wpf/`    | 35 / 100 (verified) | 65 |
-| `MicroServices/`| 5 / 100 (verified) | 95 |
+| `MicroServices/`| 30 / 100 (verified) | 70 |
 | `security/`| 60 / 60 (verified) | —         |
 | `Architecture/`| 100 / 100 (verified) | —         |
 | `telemetry/`| 65 / 70 (verified) | 5 |
