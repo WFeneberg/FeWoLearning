@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 80 ✅ / 20 ⬜**
+**Status: 85 ✅ / 15 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -118,11 +118,11 @@ not a valid C# identifier.
 | 078 | GestureRecognition | `Tapped`/`DoubleTapped`, wheel deltas, gesture recognizers | ✅ |
 | 079 | KeyBindingsAndAccelerators | `KeyBinding`, `KeyGesture` | ✅ |
 | 080 | FocusManagement | focus traversal, `TabIndex`, `IsTabStop` | ✅ |
-| 081 | DragAndDropPayload | `DataObject`, `DragDrop` handlers | ⬜ |
-| 082 | ClipboardRoundTrip | clipboard read and write | ⬜ |
-| 083 | ChangeSetFilterPipeline | ReactiveUI change sets, reactive filtering | ⬜ |
-| 084 | ChangeSetSortAndCount | change-set sorting and count projection | ⬜ |
-| 085 | VirtualizationBudget | realized item count under virtualization | ⬜ |
+| 081 | DragAndDropPayload | `DataTransfer`, `DragDrop` handlers | ✅ |
+| 082 | ClipboardRoundTrip | clipboard read and write | ✅ |
+| 083 | ChangeSetFilterPipeline | ReactiveUI change sets, reactive filtering | ✅ |
+| 084 | ChangeSetSortAndCount | change-set sorting and count projection | ✅ |
+| 085 | VirtualizationBudget | realized item count under virtualization | ✅ |
 | 086 | ControlThemeOverride | overriding a FluentTheme `ControlTheme` | ⬜ |
 | 087 | ResourceDictionaryMerging | merged dictionaries, resource lookup order | ⬜ |
 | 088 | ThemeVariantSwitching | `ThemeVariant` light and dark | ⬜ |

@@ -363,6 +363,30 @@ the same `global.json` opt-in.
   silently reports zero repaints on any later measurement. With the pump the
   behaviour is exact: idle pumps repaint nothing, each `InvalidateVisual` costs
   one repaint, and five before a single pump coalesce into one.
+
+  **Three more APIs that moved, and every tutorial predates the move.** Drag
+  payloads and the clipboard both use **`DataTransfer`**: `DataObject` and
+  `DataFormats` are `[Obsolete]` and `IDataObject` is gone, so the old names put
+  warnings in a build this track keeps at zero. Watch the sync/async split — a
+  drop hands you an `IDataTransfer` with `TryGetRaw`, the clipboard an
+  `IAsyncDataTransfer` with `TryGetRawAsync` (or the tidier
+  `TryGetTextAsync()` extension). Both work headlessly: a synthesised
+  `window.DragDrop(...)` raises enter/over/drop with a readable payload, and
+  **nothing at all arrives without `DragDrop.SetAllowDrop`**; the clipboard
+  round-trips, and after `ClearAsync` `TryGetDataAsync` returns **null** rather
+  than an empty transfer (it is process-global, so a serial suite must clear
+  before trusting it). And **change sets here are ReactiveUI's own, not
+  DynamicData** — `ToReactiveChangeSet`/`IReactiveChangeSet<T>`/`ReactiveChange<T>`
+  live in `ReactiveUI.Core`, this track references no DynamicData, and there is
+  no `Filter`/`Sort`/`Transform` operator, so applying changes is the work.
+  Measured: subscribing emits one set describing what is already there (all as
+  `Add`); `Remove` puts the removed item in **`Current`**, not `Previous`;
+  `Clear()` expands into one `Remove` per item rather than a reset;
+  `IReactiveChangeSet<T>.Count` counts *changes*, not items; and
+  `WhenCountChanged()` passes an add or remove but not a replace or move.
+  **Virtualization is real**: 500 rows realized 2/4/9 containers at 60/120/300-unit
+  viewports, and `ScrollIntoView(300)` recycled index 0 to null — while an
+  `ItemsPanel` of a plain `StackPanel` realized all 500.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -802,7 +826,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 80 / 100 (verified) | 20 |
+| `avalonia/`| 85 / 100 (verified) | 15 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 45 / 100 (verified) | 55 |

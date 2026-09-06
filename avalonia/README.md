@@ -374,6 +374,74 @@ Three things input cannot show here:
   `Gestures.AddTappedHandler` route most samples use does not compile. Subscribe
   to the events on `InputElement` instead.
 
+## Clipboard, drag payloads and change sets: the APIs moved
+
+Three areas where every tutorial you will find is written against the previous
+generation of the API, verified against 12.1.1 here.
+
+**Drag payloads and the clipboard both use `DataTransfer`, not `DataObject`.**
+`DataObject` and `DataFormats` are marked `[Obsolete]` ("Use DataTransfer
+instead", "Use DataFormat instead") and `IDataObject` is gone outright — so
+reaching for them puts warnings in a build this track keeps at zero. The shape
+now is a `DataTransfer` holding `DataTransferItem`s, each carrying values under a
+`DataFormat` (`DataFormat.Text`, or your own from
+`DataFormat.CreateStringApplicationFormat`).
+
+Mind the sync/async split, which is easy to trip over: a **drop** hands you an
+`IDataTransfer`, whose items expose `TryGetRaw(format)`, while the **clipboard**
+hands you an `IAsyncDataTransfer`, whose items expose `TryGetRawAsync` instead.
+`AsyncDataTransferExtensions.TryGetTextAsync()` is the short, idiomatic route for
+text and the one to prefer.
+
+**Both work headlessly, and both are properly gradeable.** Measured:
+
+- A synthesised drag through `window.DragDrop(point, RawDragEventType.…, …)`
+  raises `DragEnter`, `DragOver` and `Drop` in order, with the payload readable
+  and `GetPosition` control-relative. **Without `DragDrop.SetAllowDrop(target,
+  true)` nothing arrives at all** — no enter, no over, no drop. The opt-in is not
+  advisory, which makes it a clean thing to grade on its own.
+- The clipboard round-trips: `SetDataAsync` then `TryGetDataAsync` returns the
+  text, with `Formats` reporting exactly `Text`. After `ClearAsync`,
+  `TryGetDataAsync` returns **null** rather than an empty transfer — so any
+  implementation that assumes a transfer is always there throws on the state the
+  clipboard is in most of the time. It is process-global, and this suite is
+  serial, so a test must clear it before it trusts it.
+
+**Change sets are ReactiveUI's own, not DynamicData.** ReactiveUI 24 ships
+`ToReactiveChangeSet`, `IReactiveChangeSet<T>` and `ReactiveChange<T>` in
+**ReactiveUI.Core**, and this track references no DynamicData at all. The API is
+far smaller than DynamicData's — there is no `Filter`, `Sort` or `Transform`
+operator — so applying the changes yourself is the work. Measured behaviour, all
+of which exercises depend on:
+
+- Subscribing emits **one change set describing the collection as it already
+  stands**, every existing item as an `Add`. A pipeline that only listens for
+  later changes starts out empty and wrong.
+- `Add` carries the item in `Current` and its position in `CurrentIndex`.
+- `Remove` carries the **removed item in `Current`** — not in `Previous`, which
+  is the counter-intuitive one — and its old position in `CurrentIndex`.
+- `Replace` carries the old value in `Previous` and the new one in `Current`.
+- `Move` carries `PreviousIndex` and `CurrentIndex`.
+- **`Clear()` is expanded into one `Remove` per item**, not a single reset — so a
+  handler that understands `Remove` gets `Clear` for free.
+- `IReactiveChangeSet<T>.Count` is the number of **changes**, not the size of the
+  collection. The size has to come from the collection itself.
+- `WhenCountChanged()` and `CountHasChanged()` separate a size change from a
+  content change: an `Add` or a `Remove` passes, a `Replace` or a `Move` does not.
+
+## Virtualization is real here
+
+Measured with 500 rows about 37 units tall: a `ListBox` realized **2** containers
+in a 60-unit viewport, **4** in 120 and **9** in 300 — a viewport's worth plus
+one. After `ScrollIntoView(300)` the realized range was 297..300 and
+`ContainerFromIndex(0)` had become **null**: containers are recycled, not merely
+few. A `ListBox` given an `ItemsPanel` of a plain `StackPanel` realized all 500
+regardless of viewport, which is the contrast ex085 grades.
+
+Assert the relationships rather than those exact counts — a row's height depends
+on font metrics — but the gap between "a handful" and "all 500" is not
+measurement noise.
+
 ## Non-goals
 
 Not in this catalog, because they cannot be tested honestly under a headless

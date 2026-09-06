@@ -7,7 +7,7 @@ public static class GalleryCatalog
 {
     /// <summary>
     /// One entry per exercise whose result is visual. View-model-only exercises
-    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex075) deliberately
+    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex085) deliberately
     /// have no page -
     /// ex050's ViewModelViewHost and ex052/ex053's RoutedViewHost both only
     /// resolve their content on attach-to-visual-tree (via IViewLocator.ResolveView,
@@ -37,6 +37,12 @@ public static class GalleryCatalog
     /// let the smoke test pass against the untouched stubs and silently break the
     /// red/green invariant. ex074 and ex075 build geometry and brushes and have no
     /// control of their own at all.
+    /// ex081-ex085 have none for a mix of both reasons. ex083, ex084 and ex085 are
+    /// pipelines and list builders with no view. ex082's stub throws from its
+    /// properties rather than its constructor, so a merely-constructed page would
+    /// build against the untouched stub - the ex060 trap. ex081 does throw on
+    /// construction and could be registered, but a transparent drop target renders
+    /// nothing a reader could look at, so it is left out on its own merits.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [
