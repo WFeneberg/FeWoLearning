@@ -226,6 +226,19 @@ the red and the green run:
   `DistributedApplicationException: The project file "<fully resolved path>" was not
   found` **from `AddProject` itself**, i.e. inside `Configure`, naming the absolute path
   it tried — a loud failure, not a silent one.
+- **The walk-up has a measured limit: an output tree outside `MicroServices/`.** Running
+  `dotnet test -p:UseSolutions=true -p:ArtifactsPath=<a directory outside the track>`
+  produces exactly **7 failures** — ex011's three facts and ex012's four — because the
+  walk-up starts from `builder.AppHostDirectory`, which is now outside `MicroServices/`,
+  and never reaches `FeWoLearning.MicroServices.slnx`. Every supported configuration —
+  the red run, the green run, `-p:Containers=true`, the playground — keeps its output
+  directory inside the track, so this is a **limit**, not a bug, and leaving it alone was
+  a deliberate choice. A more robust alternative exists — injecting the track root as a
+  `RuntimeHostConfigurationOption` from `Directory.Build.props`, the same mechanism
+  `Containers` already uses (§3) — and it was consciously not adopted: only a handful of
+  rows use the walk-up, and it is correct everywhere the track is actually run. Anyone
+  who points `ArtifactsPath` outside `MicroServices/` and sees exactly these 7 failures
+  should recognise this paragraph, not go bug-hunting.
 - **What you get.** `Aspire.Hosting.ApplicationModel.ProjectResource`, which is both
   `IResourceWithEndpoints` and `IResourceWithServiceDiscovery`. Its annotations at
   `Build()` time are `ProjectMetadata` (the `IProjectMetadata`, whose `ProjectPath` is
@@ -255,6 +268,16 @@ the red and the green run:
   `EndpointAnnotation` **identical in every observable field** to the profile's, so the
   only trace of the difference is that `ExcludeLaunchProfileAnnotation`. ex011 asserts
   its absence for exactly that reason.
+- **The two `launchSettings.json` files are now exercise contract, not scaffolding.**
+  ex011 asserts directly against the shape measured above: the default profile's single
+  `http` endpoint (port 5080 for Catalog, 5081 for Orders), the `https` profile's two
+  endpoints from its one two-URL `applicationUrl` (7081 and 5081 for Orders), and
+  `launchProfileName: null`'s `ExcludeLaunchProfileAnnotation` with zero endpoints.
+  **Editing either file — tidying ports, standardising profiles across `services/` —
+  reddens ex011**, with no compile error and nothing in the diff pointing back at the
+  exercise. Treat `services/Catalog/Properties/launchSettings.json` and
+  `services/Orders/Properties/launchSettings.json` as fixed once ex011 depends on them,
+  the same way `tests/_support/` is fixed once exercises depend on it.
 - **`AddProject` adds a second, hidden resource.** Measured: each project also brings a
   `<name>-rebuilder` `ProjectRebuilderResource` (a subclass of `ExecutableResource`,
   carrying `HiddenAnnotation`), so a model that declared two projects holds four
