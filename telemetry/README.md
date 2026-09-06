@@ -355,3 +355,45 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–020: **102 facts total** (96 exercise + 6 harness).
   Red run 96 failed / 5 passed / 1 skipped; green run 101 passed / 1 skipped; green
   with `-p:Containers=true` 102 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, rows 021–025 — metrics, still before any SDK:**
+
+- **`MeasurementProbe` is the BCL-level probe and is not interchangeable with
+  `MetricProbe`.** Block `02-diagnostics` is explicitly about the primitives, so its
+  rows are graded on what a raw `MeterListener` delivers, never on what an
+  OpenTelemetry pipeline made of it. `MetricProbe` belongs to block `03-otel-sdk`.
+- **`EventListener.OnEventSourceCreated` runs during the *base* constructor**, before a
+  single field initializer of the derived class. Two consequences, both silent, and
+  both hit while writing ex025:
+  - a field declared `private readonly List<string> _names = [];` is assigned **after**
+    the base constructor, wiping every name collected during construction — so a
+    collecting listener must declare the field with **no initializer** and create it
+    lazily inside the callback;
+  - calling `EnableEvents` from that callback subscribes with whatever the settings
+    fields happen to hold, which is `default` — hence the two-step in the test's
+    `Subscriber`: remember the source during construction, subscribe once the settings
+    exist.
+- **A `Meter`'s instruments cannot be removed once published.** Registering a second
+  `ObservableGauge` under the same name leaves both alive and every collection then
+  reports the value twice — which reads as a doubled queue rather than as a bug. Ex023
+  therefore specifies "create the gauge at most once; later calls swap the source", and
+  its callback closes over a *field* rather than over the parameter. The same
+  constraint is why every instrument in these rows is a `static readonly` field, and
+  why ex021's "exactly one published instrument" fact incidentally enforces it.
+- **A listener created per test still sees instruments created by earlier tests**,
+  because `InstrumentPublished` replays existing instruments on `Start()`. Measurements
+  do not replay, so a probe only ever collects its own test's — but a probe that is
+  still alive when the *next* batch is recorded collects that too. Ex022's
+  distribution-comparison facts dispose each probe before recording the next set for
+  exactly this reason.
+- **Ex022 grades the lesson rather than an API.** The reference implementation records
+  each request both into a histogram and into a sum/count pair, and two facts then show
+  `[10,10,10,10,1000]` and `[208,208,208,208,208]` producing an identical mean of 208 ms
+  while the histogram separates them. That is the row: an average is not a latency
+  measurement, demonstrated on numbers you can check by hand.
+- Three of this batch's five wrong implementations were again caught by **exactly one**
+  fact: ex022's `Math.Round` before recording, ex023's release decrementing the
+  monotonic counter, and ex025's keyword copy-pasted onto the wrong event.
+- Batch baseline after rows 001–025: **127 facts total** (121 exercise + 6 harness).
+  Red run 121 failed / 5 passed / 1 skipped; green run 126 passed / 1 skipped; green
+  with `-p:Containers=true` 127 passed / 0 skipped. 0 warnings in both modes.

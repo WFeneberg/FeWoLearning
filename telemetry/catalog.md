@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 20 ✅ / 50 ⬜**
+**Status: 25 ✅ / 45 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -48,11 +48,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 018 | StatusAndException | `SetStatus`, `AddException`, the error tag convention | ✅ |
 | 019 | KindAndLinks | `ActivityKind` Client/Server/Producer/Consumer, `ActivityLink` for fan-in | ✅ |
 | 020 | W3CTraceContext | `traceparent`/`tracestate` parse and format, `ActivityContext` round-trip, id format | ✅ |
-| 021 | MeterAndCounter | `Meter`, `Counter<T>`, `MeterListener`, tags as dimensions | ⬜ |
-| 022 | HistogramAndBuckets | `Histogram<T>`, what a distribution can and cannot answer | ⬜ |
-| 023 | ObservableInstruments | `ObservableGauge`/`ObservableCounter` pull model, `UpDownCounter` vs `Counter` | ⬜ |
-| 024 | MeterListenerLifecycle | `InstrumentPublished`, `EnableMeasurementEvents`, dispose, no double counting | ⬜ |
-| 025 | EventSourceAndCounters | a custom `EventSource`, keywords and levels, `EventListener`, runtime counters | ⬜ |
+| 021 | MeterAndCounter | `Meter`, `Counter<T>`, `MeterListener`, tags as dimensions | ✅ |
+| 022 | HistogramAndBuckets | `Histogram<T>`, what a distribution can and cannot answer | ✅ |
+| 023 | ObservableInstruments | `ObservableGauge`/`ObservableCounter` pull model, `UpDownCounter` vs `Counter` | ✅ |
+| 024 | MeterListenerLifecycle | `InstrumentPublished`, `EnableMeasurementEvents`, dispose, no double counting | ✅ |
+| 025 | EventSourceAndCounters | a custom `EventSource`, keywords and levels, `EventListener`, runtime counters | ✅ |
 | 026 | DiagnosticSourceListener | `DiagnosticListener`, `IsEnabled`, anonymous payloads, the framework's own events | ⬜ |
 
 ## otel-sdk (027–044) — the OpenTelemetry SDK
