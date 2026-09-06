@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 57 ✅ / 3 ⬜**
+**Status: 60 ✅ / 0 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -95,6 +95,6 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 055 | CorrelationContextPropagation | correlation id across process and transport boundaries, Activity | ✅ |
 | 056 | StructuredLoggingBoundary | log as a port, scopes, no message formatting in the domain | ✅ |
 | 057 | ConfigurationLayering | provider precedence, secret sources, reload-on-change | ✅ |
-| 058 | AntiCorruptionLayer | translation between bounded contexts, no foreign model leak | ⬜ |
-| 059 | StranglerFigFacade | routing facade, legacy vs replacement, gradual cutover | ⬜ |
-| 060 | ArchitectureFitnessTests | dependency direction enforced by reflection over assembly metadata | ⬜ |
+| 058 | AntiCorruptionLayer | translation between bounded contexts, no foreign model leak | ✅ |
+| 059 | StranglerFigFacade | routing facade, legacy vs replacement, gradual cutover | ✅ |
+| 060 | ArchitectureFitnessTests | dependency direction enforced by reflection over assembly metadata | ✅ |

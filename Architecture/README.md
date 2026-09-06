@@ -32,12 +32,22 @@ interactive Windows desktop session.
 Nothing to install for the default run. Run every command **from inside
 `Architecture/`**, not the repo root.
 
-| Run | Command |
-|---|---|
-| Stubs (red) | `dotnet test` |
-| Solutions (green) | `dotnet test -p:UseSolutions=true` |
-| Including the container rows | `dotnet test -p:Containers=true` (needs Docker) |
-| One exercise | `dotnet test --filter FullyQualifiedName~Ex001_` |
+| Run | Command | Measured on 2026-09-06 |
+|---|---|---|
+| Stubs (red) | `dotnet test` | 371 total — **359 failed**, 4 passed, 8 skipped |
+| Solutions (green) | `dotnet test -p:UseSolutions=true` | 371 total — **0 failed**, 363 passed, 8 skipped |
+| Including the container rows | `dotnet test -p:UseSolutions=true -p:Containers=true` | 371 total — **0 failed, 0 skipped**, 17 s |
+| One exercise | `dotnet test --filter FullyQualifiedName~Ex001_` | |
+
+The 4 that pass on the red run are the harness smoke facts; the 8 skipped are the
+container-backed facts on rows 032, 036, 037, 038, 039, 046, 047 and 050. Both
+builds are clean: the 38 build warnings all come from `exercises/` and are
+exclusively `CS9113` and `CS0649` — the documented stub warnings. `solutions/`
+and `tests/` emit none.
+
+The container run needs Docker; it was verified here against **Docker 29.7.2**
+with `postgres:17-alpine`, `redis:7-alpine`, `rabbitmq:4-alpine` and
+`eclipse-mosquitto:2`.
 
 `-p:UseSolutions=true` swaps which content library `tests/` references. Because
 `exercises/` and `solutions/` compile **the same type names into the same

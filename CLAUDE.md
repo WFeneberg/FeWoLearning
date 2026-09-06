@@ -714,7 +714,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `wpf/`    | 35 / 100 (verified) | 65 |
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
-| `Architecture/`| 16 / 60 (verified) | 44 |
+| `Architecture/`| 60 / 60 (verified) | —         |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above
@@ -936,6 +936,30 @@ Three projects on the `UseSolutions` mechanism shared with `blazor/`, `uno/`,
 container-backed rows (032, 036, 037, 038, 039, 046, 047, 050), which are
 otherwise skipped — every one of those exercises is still fully graded without
 Docker by its in-process facts.
+
+**Verified end-to-end on 2026-09-06**: 371 test facts. `dotnet test` gives 359
+failed / 4 passed (the harness smoke facts) / 8 skipped (the container rows);
+`-p:UseSolutions=true` gives 0 failed / 363 passed / 8 skipped; and
+`-p:UseSolutions=true -p:Containers=true` gives 371 passed, 0 skipped, in 17 s
+against Docker 29.7.2 with `postgres:17-alpine`, `redis:7-alpine`,
+`rabbitmq:4-alpine` and `eclipse-mosquitto:2`. Both builds are clean - the 38
+build warnings are all `CS9113`/`CS0649` from `exercises/` stubs; `solutions/`
+and `tests/` emit none.
+
+**Broker and driver traps, all measured here.** RabbitMQ 4 refuses a transient
+non-exclusive queue - `INTERNAL_ERROR - Feature 'transient_nonexcl_queues' is
+deprecated` - and reports it as an AMQP connection close rather than a
+validation error, so `QueueDeclareAsync` needs `durable: true`; its move to a
+dead-letter exchange is asynchronous, so a single `BasicGet` after the reject
+races it. MQTTnet 5.2's own broker does **not** publish a client's will in
+response to `DisconnectAsync` with
+`MqttClientDisconnectOptionsReason.DisconnectWithWillMessage`, with or without
+`WithProtocolVersion(V500)` - disposing the client does. A single MQTTnet client
+delivers to its `ApplicationMessageReceivedAsync` handler **sequentially**, so a
+test cannot force two in-flight requests by blocking in a responder.
+`ConcurrentDictionary.GetOrAdd` does not promise to run its factory once, which
+makes a single-flight cache built directly on it start two loads under
+contention (measured: failing 2 runs in 3) - `Lazy<Task<T>>` fixes it.
 
 **Toolchain, all measured.** xunit.v3 **3.2.2** + `xunit.runner.visualstudio`
 **3.1.5** + `Microsoft.NET.Test.Sdk` 17.14.1 on the classic VSTest path, and
