@@ -647,6 +647,56 @@ measurement walked, not the general mechanism it seems to imply.
   measured directly; a defensive mutant that throws when `IsFrozen` is already `true` (assuming
   it is a bug to be asked twice) fails row 061's idempotency test for exactly this reason.
 
+#### Localization, exception hooks and diagnostics
+
+- **A `ResourceManager`'s culture always comes from `CultureInfo.CurrentUICulture`, never
+  `CurrentCulture` - measured directly for row 066, the same asymmetry the "Bindings and
+  culture" section above documents for `Binding` (which follows neither thread property, only
+  `ConverterCulture`/`Language`).** Forcing `CurrentCulture` to German while `CurrentUICulture`
+  stays whatever it already was leaves a `GetString` lookup reading the neutral resource, not
+  the German satellite - row 066's own satellite (`Ex066_Strings.de.resx`, sitting alongside the
+  neutral `Ex066_Strings.resx`) resolves correctly for `de-DE` and falls back to neutral for a
+  culture with no satellite of its own (`fr-FR`, tried directly), exactly as the fallback chain
+  promises. This row is also this track's first non-`.cs` content file after 65 exercises that
+  each found a way to avoid one (rows 038/058's precedent) - satellite resources genuinely need a
+  `.resx` pair, so this row pays that cost. Setting an explicit `<LogicalName>` on both
+  `EmbeddedResource` items (identical in both `exercises/FeWoLearning.Wpf.Exercises.csproj` and
+  `solutions/FeWoLearning.Wpf.Solutions.csproj`) keeps the manifest resource name matching this
+  tier's C# namespace instead of the SDK's own default, which sanitizes the `02-intermediate`
+  folder segment into `_02_intermediate`; no `<Generator>` is set on either file, so no
+  designer-generated accessor class is ever emitted into the namespace both content libraries
+  share - `Ex066_Strings` is a hand-written wrapper instead, for exactly that reason.
+- **`Dispatcher.UnhandledException`/`UnhandledExceptionFilter` exist on `Dispatcher` itself, not
+  `Application` - and there is no `Application` in this harness (see "What the harness cannot
+  do" below) to exercise the `Application`-scoped event instead.** Measured directly for row 067:
+  an exception thrown inside a `Dispatcher.BeginInvoke` callback, with `e.Handled` set `true` in
+  an `UnhandledException` handler, does NOT tear down the run - the dispatcher stays fully
+  usable for whatever runs after it, confirmed by a second, unrelated `BeginInvoke` completing
+  normally in the same test. Leaving `e.Handled` unset instead does not hang or crash the test
+  host either: the exception propagates as an ordinary .NET exception out of
+  `Dispatcher.PushFrame` (and so out of `WpfTestContext.Pump()`), failing only the one test that
+  triggered it - each `[WpfFact]` owns its own STA thread and `Dispatcher`, so nothing leaks to a
+  later test. `UnhandledExceptionFilter`'s `RequestCatch = false` skips the `UnhandledException`
+  handler entirely for a given exception (confirmed by counting handler invocations: the filter
+  ran once, the handler zero times, and the original exception message reached the caller
+  unchanged) - it decides whether an exception is even OFFERED to the handler, not merely
+  whether the handler chooses to act on it.
+- **`PresentationTraceSources.Refresh()` reloads trace configuration and, called AFTER a switch's
+  `Level` has been raised, resets that level straight back down - so it has to run FIRST.**
+  Measured directly for row 070 with a real broken `Binding` (a `Path` naming a property that
+  does not exist) and a custom `TraceListener` added to
+  `PresentationTraceSources.DataBindingSource.Listeners`: `Refresh()` → raise `Switch.Level` to
+  `SourceLevels.All` → add the listener captures the real diagnostic text (`"System.Windows.Data
+  Error: 40 : BindingExpression..."`, naming the missing property); raising the level BEFORE
+  calling `Refresh()` captures nothing at all, silently, with no exception anywhere to notice the
+  miss by - the same "wrong order, no error" shape as several lookup traps recorded elsewhere in
+  this file. A correctly bound property produces no diagnostic output whatsoever once capture is
+  enabled - the mechanism is genuinely silent for genuinely correct bindings, which is the whole
+  reason row 070 exists. Separately, `PresentationTraceSources.GetTraceLevel` on a `Binding` no
+  one has ever called `SetTraceLevel` on reads `PresentationTraceLevel.None` by default (measured
+  directly) - `SetTraceLevel` writes a genuinely per-binding attached property, not some shared
+  ambient level every binding would otherwise read as `High`.
+
 ### `Show(...)` — opt-in, and the only reason a window ever appears
 
 A few things genuinely need a real `PresentationSource`: `Loaded`, keyboard focus,

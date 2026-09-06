@@ -16,4 +16,15 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
   </ItemGroup>
 
+  <!-- Kept identical to exercises/FeWoLearning.Wpf.Exercises.csproj's own override - see the
+       comment there for why this exists at all. -->
+  <ItemGroup>
+    <EmbeddedResource Update="02-intermediate\Ex066_Strings.resx">
+      <LogicalName>FeWoLearning.Wpf.Exercises.Intermediate.Ex066_Strings.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="02-intermediate\Ex066_Strings.de.resx">
+      <LogicalName>FeWoLearning.Wpf.Exercises.Intermediate.Ex066_Strings.de.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

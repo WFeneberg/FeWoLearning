@@ -38,7 +38,7 @@ Two deliberate content gaps:
   container identity across a scroll, `IsFrozen`, the number of measure passes an
   invalidation caused.
 
-**Status: 65 ✅ / 35 ⬜**
+**Status: 70 ✅ / 30 ⬜**
 
 ## 01-beginner (001–035)
 
@@ -114,11 +114,11 @@ Two deliberate content gaps:
 | 063 | VirtualizationSwitches | `VirtualizingStackPanel.IsVirtualizing`, `VirtualizationMode`, `ScrollUnit` | ✅ |
 | 064 | CustomMarkupExtension | `MarkupExtension.ProvideValue`, `IProvideValueTarget` | ✅ |
 | 065 | TemplatesAsResources | `DataTemplate` keyed by `DataType`, implicit lookup | ✅ |
-| 066 | Localization | satellite resources, `ResourceManager`, switching culture at runtime | ⬜ |
-| 067 | GlobalExceptionHooks | `Dispatcher.UnhandledException`, `DispatcherUnhandledExceptionFilter` | ⬜ |
-| 068 | SettingsMigration | a versioned settings store upgrading an old shape | ⬜ |
-| 069 | ConverterCulture | `ConverterCulture` vs `Thread.CurrentUICulture` | ⬜ |
-| 070 | BindingDiagnostics | `PresentationTraceSources.TraceLevel`, catching a silent binding failure | ⬜ |
+| 066 | Localization | satellite resources, `ResourceManager`, switching culture at runtime | ✅ |
+| 067 | GlobalExceptionHooks | `Dispatcher.UnhandledException`, `DispatcherUnhandledExceptionFilter` | ✅ |
+| 068 | SettingsMigration | a versioned settings store upgrading an old shape | ✅ |
+| 069 | ConverterCulture | `ConverterCulture` vs `Thread.CurrentUICulture` | ✅ |
+| 070 | BindingDiagnostics | `PresentationTraceSources.TraceLevel`, catching a silent binding failure | ✅ |
 
 ## 03-advanced (071–090)
 

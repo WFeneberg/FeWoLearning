@@ -18,4 +18,25 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
   </ItemGroup>
 
+  <!-- Row 066's satellite resources: the track's first non-.cs content files (65 exercises in,
+       every prior row avoided this - see row 038/058's precedent for choosing a code equivalent
+       instead). Localization genuinely IS ResourceManager plus satellites, so this row pays that
+       cost rather than substitute something that would teach nothing. LogicalName is pinned
+       explicitly here (rather than left to the SDK's default, which derives a manifest name from
+       the "02-intermediate" folder segment, sanitized to "_02_intermediate") so the manifest
+       resource name matches this tier's C# namespace convention instead of the folder's literal,
+       non-identifier name - kept byte-for-byte identical to solutions/'s own override below. No
+       <Generator> is set on either resx: a designer-generated accessor class would be emitted into
+       the SAME shared RootNamespace both libraries compile into, which is exactly the collision
+       this convention exists to avoid - Ex066_Strings below is hand-written instead, wrapping a
+       plain ResourceManager constructed from this exact manifest name. -->
+  <ItemGroup>
+    <EmbeddedResource Update="02-intermediate\Ex066_Strings.resx">
+      <LogicalName>FeWoLearning.Wpf.Exercises.Intermediate.Ex066_Strings.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="02-intermediate\Ex066_Strings.de.resx">
+      <LogicalName>FeWoLearning.Wpf.Exercises.Intermediate.Ex066_Strings.de.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
