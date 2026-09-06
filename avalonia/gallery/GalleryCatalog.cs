@@ -8,7 +8,7 @@ public static class GalleryCatalog
 {
     /// <summary>
     /// One entry per exercise whose result is visual. View-model-only exercises
-    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex093, ex095)
+    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex093, ex095-ex100)
     /// deliberately
     /// have no page -
     /// ex050's ViewModelViewHost and ex052/ex053's RoutedViewHost both only
@@ -49,7 +49,9 @@ public static class GalleryCatalog
     /// ExNNN_-named Control to construct, so there is nothing for a page to host.
     /// ex091-ex093 and ex095 are shells, locators and containers with no view
     /// either; ex094 is the expert tier's one view so far and does get a page,
-    /// since its stub throws from the constructor.
+    /// since its stub throws from the constructor. ex096-ex100 are windows,
+    /// scans, frame captures, builders and view models - none of them an
+    /// ExNNN_-named Control a page could host.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [

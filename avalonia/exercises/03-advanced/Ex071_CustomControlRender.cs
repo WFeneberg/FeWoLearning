@@ -15,25 +15,25 @@ namespace FeWoLearning.Avalonia.Exercises.Advanced;
 /// Passes: dotnet test --filter FullyQualifiedName~Ex071_
 ///
 /// WHAT IS GRADED, AND WHAT CANNOT BE. The mapping is graded exactly, through
-/// BuildPoints. The drawing is not graded at all, and here is why - three separate
-/// measurements, each of which rules out one obvious approach:
+/// BuildPoints. The individual DRAW CALLS are not graded, and cannot be - two
+/// measurements rule out the obvious approaches:
 ///   - DrawingContext has a PRIVATE constructor, so no recording double can be
 ///     derived from it;
 ///   - the render data a real context records is entirely internal
 ///     (RenderDataDrawingContext, CompositionRenderData, and Visual's own
-///     CompositionVisual are all non-public);
-///   - the headless backend discards draw commands. RenderTargetBitmap.Render
-///     followed by CopyPixels does not throw, which makes this the nastiest of the
-///     three, because it looks like it worked: rendering a solid red 8x8 Border
-///     returned 22 distinct pixel values, i.e. uninitialized noise.
+///     CompositionVisual are all non-public).
 /// Nor can the geometry be inspected instead - a StreamGeometry is write-only by
 /// design, and FillContains is not usable here either (see ex074's header for that
 /// measurement). Hence BuildPoints: the arithmetic worth teaching is separated out
 /// where a test can actually reach it.
 ///
-/// Window.GetLastRenderedFrame names the cure in its own exception message: the
-/// app must be built with .UseSkia() and UseHeadlessDrawing turned off. This track
-/// does not do that today.
+/// PIXELS, HOWEVER, ARE READABLE. The harness builds its app with .UseSkia() and
+/// UseHeadlessDrawing turned off, so TopLevel.CaptureRenderedFrame returns a real
+/// frame - that is ex098's whole subject. This exercise still grades the maths
+/// rather than the picture, on purpose: a two-unit anti-aliased polyline is a poor
+/// thing to sample, because whether any given pixel is black depends on coverage
+/// rather than on the code being right. ex098 asserts pixels where the shapes are
+/// solid blocks and the answer is unambiguous.
 public class Ex071_CustomControlRender : Control
 {
     /// <summary>Given. Do not change.</summary>

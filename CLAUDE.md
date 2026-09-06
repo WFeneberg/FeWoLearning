@@ -444,6 +444,31 @@ the same `global.json` opt-in.
   constructor takes arguments, so a name-based locator crashes rather than
   degrading — that, plus its willingness to resolve types nobody registered, is
   what ex095 grades as the trimming failure in miniature.
+
+  **The track is complete at 100 / 100 as of 2026-09-06**: 485 facts, 478 red / 7
+  green on the untouched tree and 485 / 0 under `-p:UseSolutions=true`,
+  `solutions/` at 0 warnings. **The harness now renders for real**: ex098 is
+  `CaptureRenderedFrame`, which refuses outright without `.UseSkia()` and
+  `UseHeadlessDrawing = false`, so `tests/` gained an `Avalonia.Skia` 12.1.1
+  reference and `TestAppBuilder` sets both. Pixels come back as `Rgba8888` — byte
+  0 is **red**, not blue — and a solid fill captures exactly. Two follow-on
+  consequences, both fixed rather than left to rot: the old claim that pixels are
+  uninitialized noise was true only of the null backend and is gone from
+  `avalonia/README.md` and ex071's header; and `Geometry.GetRenderBounds(pen)` is
+  **backend-dependent** — it used to be a plain bounding-box inflate by half the
+  thickness, and Skia computes the true stroke outline, which moved ex074's
+  chevron from 104 wide to 101.37, so that test now asserts a relationship rather
+  than a rectangle. Also measured in this last batch:
+  **`Application.ApplicationLifetime` is null** under headless (no head installs
+  one), so row 096 is re-scoped to owned windows and `Closing` cancellation and
+  the catalog says so; **ReactiveUI's own `RegisterViewsForViewModels` throws** on
+  the first view without a parameterless constructor, losing the whole scan, which
+  is why ex097 has the learner write a skipping one; a second `AppBuilder` can be
+  **composed but not started** and is fully inspectable, which is how ex099 is
+  graded without pulling `Avalonia.Headless`/`Themes.Fluent` into a content
+  library; and **`ReactiveCommand` needs `Sequencer.CurrentThread`** to be
+  observable inline — draining the dispatcher afterwards does not help, and
+  waiting on `IsExecuting` returns its current `false` before the command starts.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -945,7 +970,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 95 / 100 (verified) | 5 |
+| `avalonia/`| 100 / 100 (verified) | — |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 55 / 100 (verified) | 45 |

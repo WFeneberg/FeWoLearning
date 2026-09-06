@@ -14,6 +14,9 @@
   <ItemGroup>
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
     <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.1" />
+    <!-- Needed by TestAppBuilder's .UseSkia(): without a real drawing backend
+         GetLastRenderedFrame refuses outright. Same 12.1.1 pin as the rest. -->
+    <PackageReference Include="Avalonia.Skia" Version="12.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />

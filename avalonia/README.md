@@ -252,28 +252,38 @@ the `Matrix` directly, and a `ScaleTransform(2, 3)` measures `M11 = 2`,
 
 ## Rendering: what a headless test can and cannot see
 
-Nothing that a `Render` override *draws* is observable here. Three separate
-measurements, each ruling out one obvious approach:
+**Pixels are readable.** `tests/_harness/TestAppHarness.cs` builds the app with
+`.UseSkia()` and `UseHeadlessDrawing = false`, so `TopLevel.CaptureRenderedFrame()`
+and `GetLastRenderedFrame()` return a real `WriteableBitmap`. Without those two
+they refuse outright, with a `NotSupportedException` naming exactly them — which
+is why ex098 could not exist before the switch. Measured after it: a red `Border`
+filling a 40×30 window captured as 40×30 `Rgba8888` with every pixel
+`(255, 0, 0, 255)`, and a blue-over-lime stack captured as exactly two distinct
+values in the right halves. **Mind the channel order** — the format is
+`Rgba8888`, so byte 0 of a pixel is *red*, not blue.
+
+Pump a frame before capturing: `ViewHarness.PumpRender()`, then capture.
+
+**Individual draw calls are still not observable**, and two measurements rule out
+the obvious approaches:
 
 - **`DrawingContext` has a private constructor**, so a recording double cannot be
   derived from it.
 - **The render data a real context records is entirely internal** —
   `RenderDataDrawingContext`, `CompositionRenderData` and `Visual`'s own
   `CompositionVisual` are all non-public.
-- **The headless backend discards draw commands.** This is the nastiest of the
-  three, because it looks like it worked: `RenderTargetBitmap.Render` followed by
-  `CopyPixels` throws nothing and returns plausible-looking bytes. Rendering a
-  solid red 8×8 `Border` produced **22 distinct pixel values** — uninitialized
-  noise. Never assert on pixels obtained this way.
 
-`Window.GetLastRenderedFrame()` names the cure in its own exception message:
-*"make sure that headless application was initialized with `.UseSkia()` and
-disabled `UseHeadlessDrawing` in the `AvaloniaHeadlessPlatformOptions`."*
-This track does **not** do that today, and `CaptureRenderedFrame()` returns
-`null` under the current options. Turning it on would make real pixel assertions
-possible and would close the gap ex071 documents — it is a harness-wide change
-(`tests/_harness/TestAppHarness.cs`), so it needs its own pass and a full
-re-verification of every existing test, not a drive-by edit inside a batch.
+So a `Render` override is graded by what it *produces* — pixels, or the geometry
+and coordinates it computes — never by which methods it called.
+
+**A warning about what the switch changed.** The old null drawing backend did not
+merely fail to draw; it also made some geometry APIs answer differently.
+`Geometry.GetRenderBounds(pen)` used to be a plain bounding-box inflate by half
+the thickness, and under Skia it computes the **true stroke outline** — so the
+chevron in ex074, whose right tip is a sharp point with a round join, went from a
+width of 104 to 101.37. Assert relationships, not rectangles. If you find a claim
+in this file or in an exercise header that pixels are noise, it predates the
+switch and is wrong; say so and fix it.
 
 What *is* reliable, all measured:
 
@@ -298,9 +308,8 @@ What *is* reliable, all measured:
 - **Layout is exact.** `MeasureOverride` sees the real constraint (including
   `double.PositiveInfinity`), `DesiredSize` clamps as computed, `ArrangeOverride`
   sees `finalSize`, and children land precisely where they were arranged.
-- **`Geometry.Bounds` and `Geometry.GetRenderBounds(pen)` are exact.** A pen
-  inflates the bounds by exactly half its thickness on every side — verified at
-  thicknesses 1, 4 and 10.
+- **`Geometry.Bounds` is exact.** `GetRenderBounds(pen)` is dependable but
+  backend-dependent and not a simple inflate — see the warning above.
 - **`PathGeometry` is inspectable, `StreamGeometry` is not.** A `StreamGeometry`
   is write-only by design: segments go into a sink and cannot be read back, so a
   test can learn nothing about the shape beyond its `Bounds`, which a plain
@@ -565,6 +574,50 @@ whose constructor takes arguments it raises `MissingMethodException`, so a
 name-based locator does not quietly return `null` — it crashes. Together with the
 fact that such a locator happily resolves types *nobody registered*, that is the
 trimming failure in miniature, and it is what ex095 grades.
+
+## The expert tier's platform limits
+
+**There is no application lifetime.** Measured,
+`Application.Current.ApplicationLifetime` is **null** under the headless platform,
+because a lifetime is something a platform head installs and this harness has no
+head. So `IClassicDesktopStyleApplicationLifetime`, `MainWindow`, `Shutdown` and
+`ShutdownMode` are all out of reach — which is why `catalog.md` row 096 now names
+owned windows and close cancellation instead. It is worth knowing beyond this
+track: the same null appears at design time and in any unit test of an
+application, so code that reads `ApplicationLifetime` must cope.
+
+Multi-window behaviour itself is fully observable: `Show(owner)` sets `Owner` and
+adds to the parent's `OwnedWindows`; a `Closing` handler setting `e.Cancel` leaves
+the child **visible and still owned**; and a second `Close` really closes it and
+removes it from `OwnedWindows`.
+
+**ReactiveUI's own assembly scan is fragile.**
+`DependencyResolverMixins.RegisterViewsForViewModels(resolver, assembly)` **threw**
+against this repo's own content assembly — *"Failed to register type
+…Ex092_DocumentView because it is missing a parameterless constructor"* — losing
+the whole scan over one view that takes a dependency. ex097 therefore has the
+learner write the scan and skip what it cannot construct, which is the behaviour
+a plugin host actually needs.
+
+**A second `AppBuilder` can be composed but never started.**
+`AppBuilder.Configure` works fine inside a process that already has an
+`Application`, and `ApplicationType`, `WindowingSubsystemName`,
+`RenderingSubsystemName` and the subsystem initialisers are all public and
+readable — so a harness builder is gradeable by inspection. `Start` or
+`SetupWithoutStarting` would fight the running app. Note also that
+`Avalonia.Headless` and `Avalonia.Themes.Fluent` are **test-project** references:
+ex099 takes its subsystem installers as delegates rather than dragging those
+packages into a content library, which is itself the architectural point.
+
+**`ReactiveCommand` needs an explicit sequencer to be observable inline.** Pass
+`Sequencer.CurrentThread` to `CreateFromTask`, as ex041 and ex100 do. Without it
+the result lands on another scheduler and neither a navigation nor an error
+surface has happened by the time a test looks. Two dead ends measured while
+writing ex100, both worth avoiding: draining the dispatcher afterwards does not
+help, and waiting on `IsExecuting` does not either — it is a behaviour, so
+`Where(not executing).FirstAsync()` returns its *current* `false` immediately,
+before the command has started. Decide a fake gateway's outcome up front and
+`await Execute().ToTask(...)`.
 
 ## Non-goals
 

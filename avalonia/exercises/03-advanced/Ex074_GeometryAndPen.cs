@@ -32,8 +32,12 @@ namespace FeWoLearning.Avalonia.Exercises.Advanced;
 ///
 /// StrokeContains is worse: it returned false for a point plainly inside a 10 px
 /// stroke down the middle of a horizontal line. Do not build anything on it.
-/// GetRenderBounds, by contrast, is exact - measured across thicknesses 1, 4 and
-/// 10, it inflates the bounds by precisely half the thickness on every side.
+/// GetRenderBounds is dependable, but it is BACKEND-DEPENDENT and not a simple
+/// inflate: against a null drawing backend it just grew the bounding box by half
+/// the thickness on every side, while the real Skia backend this harness now uses
+/// computes the true stroke outline - so a sharp tip with a round join reaches
+/// less far sideways than half the thickness. Assert the relationship, not a
+/// rectangle.
 public static class Ex074_GeometryAndPen
 {
     /// <summary>

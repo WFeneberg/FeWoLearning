@@ -20,8 +20,20 @@ public class TestApp : Application
 
 public static class TestAppBuilder
 {
+    /// <summary>
+    /// Headless, but with a REAL drawing backend rather than the null one.
+    ///
+    /// UseHeadlessDrawing = false plus .UseSkia() is what
+    /// TopLevel.GetLastRenderedFrame demands - measured, it refuses with
+    /// NotSupportedException naming exactly these two otherwise - so ex098 cannot
+    /// exist without them. It also means draw commands are really executed, which
+    /// is why the rendering section of README.md had to be rewritten: pixels are
+    /// now readable instead of being noise.
+    /// </summary>
     public static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<TestApp>().UseHeadless(new AvaloniaHeadlessPlatformOptions());
+        AppBuilder.Configure<TestApp>()
+            .UseSkia()
+            .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
 }
 
 /// <summary>

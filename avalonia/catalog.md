@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 95 ✅ / 5 ⬜**
+**Status: 100 ✅ / 0 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -138,8 +138,8 @@ not a valid C# identifier.
 | 093 | DependencyInjectionWiring | a DI container behind the ReactiveUI resolver | ✅ |
 | 094 | CompiledBindingPerformance | compiled versus reflection binding cost | ✅ |
 | 095 | TrimmingFriendlyBindings | AOT- and trim-safe binding patterns | ✅ |
-| 096 | MultiWindowLifetime | `IClassicDesktopStyleApplicationLifetime`, extra windows | ⬜ |
-| 097 | PluginLoadedViews | views from a dynamically loaded assembly | ⬜ |
-| 098 | RenderedFrameCapture | `CaptureRenderedFrame` pixel assertions | ⬜ |
-| 099 | CustomHeadlessTestHarness | a bespoke `AppBuilder` for tests | ⬜ |
-| 100 | EndToEndMvvmFeature | routing plus validation plus async in one feature | ⬜ |
+| 096 | MultiWindowLifetime | owned windows, `Closing` cancellation (no desktop lifetime here) | ✅ |
+| 097 | PluginLoadedViews | views from a dynamically loaded assembly | ✅ |
+| 098 | RenderedFrameCapture | `CaptureRenderedFrame` pixel assertions | ✅ |
+| 099 | CustomHeadlessTestHarness | a bespoke `AppBuilder` for tests | ✅ |
+| 100 | EndToEndMvvmFeature | routing plus validation plus async in one feature | ✅ |
