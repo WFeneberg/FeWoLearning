@@ -46,10 +46,17 @@ public sealed class CollectorContainer : IAsyncDisposable
     public Uri TracesEndpoint =>
         new($"http://{_container.Hostname}:{_container.GetMappedPublicPort(OtlpHttpPort)}/v1/traces");
 
-    public static async Task<CollectorContainer> StartAsync()
+    /// <summary>Start with the default receive-and-print pipeline.</summary>
+    public static Task<CollectorContainer> StartAsync() => StartAsync(Config);
+
+    /// <summary>
+    /// Start with a caller-supplied configuration - which is how row 056 gets its
+    /// YAML actually parsed by the thing that has to read it.
+    /// </summary>
+    public static async Task<CollectorContainer> StartAsync(string configuration)
     {
         var container = new ContainerBuilder(Image)
-            .WithResourceMapping(Encoding.UTF8.GetBytes(Config), "/etc/otelcol/config.yaml")
+            .WithResourceMapping(Encoding.UTF8.GetBytes(configuration), "/etc/otelcol/config.yaml")
             .WithPortBinding(OtlpHttpPort, assignRandomHostPort: true)
             .WithWaitStrategy(
                 Wait.ForUnixContainer().UntilMessageIsLogged("Everything is ready"))

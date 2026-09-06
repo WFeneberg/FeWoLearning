@@ -634,3 +634,39 @@ surprise the next batch pays for again.
   which **4 are container-gated**. Red run 270 failed / 5 passed / 4 skipped; green run
   275 passed / 4 skipped; green with `-p:Containers=true` **279 passed / 0 skipped**.
   0 warnings in both modes.
+
+**2026-09-06, rows 056–060 — `04-web-services` complete, `05-desktop-ops` begun:**
+
+- **WPF works here and needs no interactive desktop session.** Measured and now a
+  permanent canary in `WpfSmokeTests`: `[WpfFact]` from `Xunit.StaFact` 3.0.13 gives an
+  STA thread, a live `Dispatcher.CurrentDispatcher`, and a
+  `DispatcherSynchronizationContext` so `await` resumes on the UI thread. No row in
+  block 05 opens a `Window`, which is why this track differs from `caliburn/`.
+- **Seq, measured before being relied on:** `ACCEPT_EULA=Y` is required, anonymous
+  ingestion and querying need no configuration, `/ingest/clef` answers **201**, and
+  `/api/events?filter=…` returns the event with its properties still typed — a number
+  arrives as a JSON number, and the message template comes back as
+  `MessageTemplateTokens` rather than as rendered text. That last detail is the whole of
+  row 057 visible on the wire.
+- The harness now has **three deliberately different container shapes**, and the
+  differences are the lesson: `PromtoolContainer` needs no ports and reads an exit code;
+  `CollectorContainer` needs one port and reads its own logs; `SeqContainer` needs a
+  port, a readiness probe *and* is asked a question afterwards. Reach for the cheapest
+  one the fact allows.
+- **`() => throw …` is ambiguous in two different places.** As a minimal-API endpoint it
+  is inferred as a `RequestDelegate` (`CS1593`); as a `Dispatcher.BeginInvoke` callback
+  it cannot be inferred at all (`CS8917`). An explicit return type fixes the first, a
+  block body the second.
+- **Row 058 says something rows 045, 048 and 049 could not on their own.** Row 049
+  insisted a worker's iterations be roots; here the worker continues somebody else's
+  trace, and both are right. The unit of work has not changed — what changed is whether
+  a context arrived with it. Use the one you were given; open a root when you were given
+  none.
+- **`ActivityContext.Parse` has no `isRemote` parameter**, so a consumer that validates
+  with `TryParse(…, isRemote: true, …)` and then re-parses with `Parse` silently loses
+  the remote flag. Use the context `TryParse` handed back. (Found by this batch's own
+  green run, in the reference solution.)
+- Batch baseline after rows 001–060: **306 facts total** (297 exercise + 9 harness), of
+  which **6 are container-gated**. Red run 293 failed / 8 passed / 5 skipped; green run
+  301 passed / 5 skipped; green with `-p:Containers=true` **306 passed / 0 skipped**.
+  0 warnings in both modes.

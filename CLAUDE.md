@@ -978,7 +978,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
 | `Architecture/`| 100 / 100 (verified) | —         |
-| `telemetry/`| 55 / 70 (verified) | 15 |
+| `telemetry/`| 60 / 70 (verified) | 10 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above

@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 55 ✅ / 15 ⬜**
+**Status: 60 ✅ / 10 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -93,9 +93,9 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 053 | ResilienceTelemetry | Polly retries visible as events and metrics; the retry-hides-the-failure bug | ✅ |
 | 054 | ErrorStatusAndProblemDetails | exception → span status → correlated log, never swallowed | ✅ |
 | 055 | HttpRequestLogging | request logging duration measured at the right place; query-string PII | ✅ |
-| 056 | CollectorPipeline | an OTel Collector container with a processor; what the collector can fix that the app cannot | 🐳 ⬜ |
-| 057 | BackendIngestion | structured logs into a real backend; fields are queryable, a baked-in message is not | 🐳 ⬜ |
-| 058 | MultiHopTraceCapstone | HTTP → in-process queue → background worker, one trace across all three hops | ⬜ |
+| 056 | CollectorPipeline | an OTel Collector container with a processor; what the collector can fix that the app cannot | 🐳 ✅ |
+| 057 | BackendIngestion | structured logs into a real backend; fields are queryable, a baked-in message is not | 🐳 ✅ |
+| 058 | MultiHopTraceCapstone | HTTP → in-process queue → background worker, one trace across all three hops | ✅ |
 
 ## desktop-ops (059–070) — WPF, and running in a container
 
@@ -103,8 +103,8 @@ Rows 059–062 are `[WpfFact]` (STA thread). None opens a window.
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 059 | DispatcherLatencyMetric | UI-thread queue latency as a histogram, measured on the `Dispatcher` | ⬜ |
-| 060 | UnhandledExceptionCapture | `DispatcherUnhandledException`, `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException` — one record, not three or none | ⬜ |
+| 059 | DispatcherLatencyMetric | UI-thread queue latency as a histogram, measured on the `Dispatcher` | ✅ |
+| 060 | UnhandledExceptionCapture | `DispatcherUnhandledException`, `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException` — one record, not three or none | ✅ |
 | 061 | CommandActivityTracing | an activity spanning a user command, surviving the dispatcher hop and `await` | ⬜ |
 | 062 | BindingErrorMonitoring | `PresentationTraceSources` binding failures turned into structured logs | ⬜ |
 | 063 | StartupPerformanceTracing | cold-start phases as nested activities | ⬜ |
