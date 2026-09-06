@@ -448,3 +448,43 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–030: **152 facts total** (146 exercise + 6 harness).
   Red run 146 failed / 5 passed / 1 skipped; green run 151 passed / 1 skipped; green
   with `-p:Containers=true` 152 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, rows 031–035 — the metrics half of the SDK; the track is halfway:**
+
+- **The in-memory metric exporter hands back the SAME `Metric` object on every
+  collection.** Measured: after two collections the exported list holds two entries that
+  are one instance, so the first entry reports the *second* collection's numbers. A
+  Delta-vs-Cumulative test that keeps `Metric` objects and reads them at the end agrees
+  with itself while measuring nothing. This is lie #7 in its sharpest form, and it is
+  why the harness grew `MetricReadout.Of(...)`: **snapshot immediately after every
+  collection.** `MetricProbe` now delegates to it.
+- **`MetricReadout` had to be named that**, because `OpenTelemetry.Metrics` already
+  declares a public `MetricSnapshot` and the obvious name collides (`CS0104`).
+- **Reading a `MetricPoint` needs a writable copy and type-aware accessors.**
+  `GetHistogramBuckets()` is not declared `readonly`, so calling it on the `ref readonly`
+  loop variable is `CS1510`; the buckets enumerator yields `HistogramBucket` **by value**,
+  so a `ref readonly` loop variable over it is `CS1510` again; and calling the wrong
+  accessor (`GetSumLong` on a histogram) throws, so `metric.MetricType.IsHistogram()` /
+  `IsGauge()` / `IsLong()` have to be consulted first.
+- **A `Sampler` sees only the tags passed to `StartActivity`.** It runs before the span
+  exists — that is the point, since its answer decides whether the span gets built — so
+  a tag set afterwards can never influence it. Deciding on a status code or a duration
+  is not possible here at all; that is what tail sampling in a collector is for, and why
+  row 056 exists.
+- **`RecordOnly` is not "half sampled".** Measured: the activity is fully populated
+  (`IsAllDataRequested` true) so a processor can read it, `Recorded` is false so
+  downstream sees an unsampled traceparent, and it is **never exported**. A `Drop` and a
+  `RecordOnly` are indistinguishable by export count alone — `IsAllDataRequested` is
+  what separates them, which is exactly what ex031's adversarial fact asserts.
+- **There is no metric backlog.** An instrument written to before a `MeterProvider`
+  existed had nowhere to aggregate, so those measurements were not buffered, not queued
+  and not late — as far as any reader is concerned they never happened. Metrics recorded
+  during startup, before the host is built, are lost silently.
+- **`ExemplarFilterType.TraceBased` reads `Activity.Current` at `Record` time**, so a
+  measurement taken after the span closed carries no exemplar — which is what ex035's
+  wrong-implementation probe demonstrates.
+- Every wrong implementation was caught; two by exactly one fact (ex031's `RecordOnly`
+  collapsed into `Drop`, ex032's wildcard `AddMeter`).
+- Batch baseline after rows 001–035: **176 facts total** (170 exercise + 6 harness).
+  Red run 170 failed / 5 passed / 1 skipped; green run 175 passed / 1 skipped; green
+  with `-p:Containers=true` 176 passed / 0 skipped. 0 warnings in both modes.

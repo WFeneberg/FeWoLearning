@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 30 ✅ / 40 ⬜**
+**Status: 35 ✅ / 35 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -63,11 +63,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 028 | ResourceAttributes | `service.name`/`version`/`instance.id`, `ResourceBuilder`, env-var detection | ✅ |
 | 029 | SpanProcessors | simple vs batch export, ordering, a custom processor enriching in `OnStart`/`OnEnd` | ✅ |
 | 030 | Samplers | AlwaysOn/AlwaysOff/TraceIdRatioBased/ParentBased; sampled flag vs recording | ✅ |
-| 031 | CustomSampler | implementing `Sampler`, `Drop` vs `RecordOnly` vs `RecordAndSample` | ⬜ |
-| 032 | MeterProviderAndReader | `AddMeter`, periodic vs manual `Collect`, in-memory metric exporter | ⬜ |
-| 033 | MetricViews | rename, drop, tag-key selection for cardinality control, explicit histogram bounds | ⬜ |
-| 034 | MetricTemporality | Delta vs Cumulative across two collections | ⬜ |
-| 035 | Exemplars | a measurement carrying the trace id that produced it, exemplar filtering | ⬜ |
+| 031 | CustomSampler | implementing `Sampler`, `Drop` vs `RecordOnly` vs `RecordAndSample` | ✅ |
+| 032 | MeterProviderAndReader | `AddMeter`, periodic vs manual `Collect`, in-memory metric exporter | ✅ |
+| 033 | MetricViews | rename, drop, tag-key selection for cardinality control, explicit histogram bounds | ✅ |
+| 034 | MetricTemporality | Delta vs Cumulative across two collections | ✅ |
+| 035 | Exemplars | a measurement carrying the trace id that produced it, exemplar filtering | ✅ |
 | 036 | OtelLogsPipeline | `AddOpenTelemetry` logging, `LogRecord` fields, formatted message vs state | ⬜ |
 | 037 | LogTraceCorrelation | `LogRecord.TraceId` matching `Activity.Current`, `ParseStateValues`, `IncludeScopes` | ⬜ |
 | 038 | ContextPropagators | `TextMapPropagator` inject/extract, the composite default | ⬜ |

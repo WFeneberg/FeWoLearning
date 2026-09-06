@@ -76,8 +76,9 @@ public class HarnessSmokeTests
         using var meter = new System.Diagnostics.Metrics.Meter("harness.smoke.meter");
         meter.CreateCounter<long>("hits").Add(3);
 
-        var metric = Assert.Single(probe.Collect());
-        Assert.Equal("hits", metric.Name);
+        var point = Assert.Single(probe.Collect());
+        Assert.Equal("hits", point.Instrument);
+        Assert.Equal(3d, point.Sum);
     }
 
     [Fact]
