@@ -81,11 +81,50 @@ public class Ex057_EditableObjectTransactionsTests : WpfTestContext
 
         person.BeginEdit();
         person.Name = "Temp";
+        person.Age = 99;
         raised.Clear();
 
         person.CancelEdit();
 
+        // Against a mutant restoring ONE property through its setter and the OTHER by poking the
+        // backing field directly (a partial bypass a Name-only assertion could not catch): both
+        // properties' restores must go through their setters, so both must raise PropertyChanged.
         Assert.Contains(nameof(Ex057_EditablePerson.Name), raised);
+        Assert.Contains(nameof(Ex057_EditablePerson.Age), raised);
         Assert.Equal("Dana", person.Name);
+        Assert.Equal(20, person.Age);
+    }
+
+    [WpfFact]
+    public void EndEdit_Clears_The_Snapshot_So_A_Later_CancelEdit_Is_A_NoOp()
+    {
+        var person = new Ex057_EditablePerson { Name = "Ada" };
+
+        person.BeginEdit();
+        person.Name = "Grace";
+        person.EndEdit();
+        person.CancelEdit(); // nothing is being edited anymore - must do nothing
+
+        // Against an EndEdit that commits the values but leaves the snapshot in place (an empty
+        // body, say): this later, unrelated CancelEdit would still find a snapshot to roll back
+        // to and incorrectly revert to "Ada".
+        Assert.Equal("Grace", person.Name);
+    }
+
+    [WpfFact]
+    public void CancelEdit_Clears_The_Snapshot_So_A_Later_Edit_With_No_BeginEdit_Is_Unaffected()
+    {
+        var person = new Ex057_EditablePerson { Name = "Ada" };
+
+        person.BeginEdit();
+        person.Name = "Grace";
+        person.CancelEdit();
+        person.Name = "Hopper"; // a plain edit outside any transaction - no BeginEdit here
+        person.CancelEdit(); // nothing is being edited - must do nothing
+
+        // Against a CancelEdit that restores correctly but never clears the snapshot: the stale
+        // snapshot from the FIRST BeginEdit would still be sitting there, and this second,
+        // unrelated CancelEdit call would incorrectly roll back to "Ada" again.
+        Assert.Equal("Hopper", person.Name);
     }
 }

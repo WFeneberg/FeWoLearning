@@ -68,5 +68,5 @@ public static class Ex058_ControlTemplateAndTemplateBinding
     /// waiting for a layout pass to trigger it.
     /// </summary>
     public static void Retemplate(Ex058_HeaderedControl control, ControlTemplate template)
-        => throw new NotImplementedException("TODO: Ex058 - assign template to control.Template, then call control.ApplyTemplate() so the new template's visual tree is built immediately rather than only whenever the next layout pass happens to trigger it");
+        => throw new NotImplementedException("TODO: Ex058 - install template as control's own Template, then force it to apply right away rather than merely assigning it and leaving the next layout pass to trigger it whenever that happens to be");
 }

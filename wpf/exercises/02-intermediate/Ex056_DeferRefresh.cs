@@ -27,5 +27,5 @@ public static class Ex056_DeferRefresh
     /// Refresh per change.
     /// </summary>
     public static void ApplyBatched(ICollectionView view, Action mutate)
-        => throw new NotImplementedException("TODO: Ex056 - open view.DeferRefresh() as a using scope and call mutate() INSIDE it, so mutate's changes are still deferred while it runs and only collapse into one Refresh once the scope's Dispose runs at the end of the using block - never call mutate() before opening the scope, after disposing it, or outside it entirely");
+        => throw new NotImplementedException("TODO: Ex056 - run mutate WHILE view's own refresh-deferral scope is genuinely open, so its changes stay deferred for the scope's entire lifetime and only collapse once that scope ends - never before the scope exists, after it has already ended, or anywhere outside its lifetime");
 }

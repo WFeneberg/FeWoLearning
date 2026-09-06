@@ -15,7 +15,10 @@
 //         VisualStateManager.GetVisualStateGroups(root) - a group nobody ever added there cannot
 //         be found later - and VisualStateManager.GoToElementState(root, stateName, useTransitions)
 //         as the one way to move between states, reporting false (and leaving CurrentState
-//         unchanged) for a state name that group does not have.
+//         unchanged) for a state name that group does not have. Note: useTransitions is passed
+//         through unchanged, not exercised - with no Storyboard actually running here (see the
+//         Goal above), true and false are not observably different in this harness, so its own
+//         value is not asserted; the row is about the transition mechanism, not transition timing.
 // Passes: dotnet test --filter FullyQualifiedName~Ex059_
 
 using System.Windows;

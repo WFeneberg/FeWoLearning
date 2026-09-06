@@ -106,7 +106,7 @@ Two deliberate content gaps:
 | 055 | FilterPredicate | `ICollectionView.Filter`, `Refresh` | ✅ |
 | 056 | DeferRefresh | batch several changes, count the refreshes collapsed | ✅ |
 | 057 | EditableObjectTransactions | `IEditableObject` begin/cancel/end edit | ✅ |
-| 058 | ControlTemplateAndTemplateBinding | retemplate a control in code, `GetTemplateChild`, the code equivalent of `TemplateBinding` (`RelativeSource.TemplatedParent`) | ✅ |
+| 058 | ControlTemplateAndTemplateBinding | retemplate a control in code, naming a template part so `GetTemplateChild` resolves it, the code equivalent of `TemplateBinding` (`RelativeSource.TemplatedParent`) | ✅ |
 | 059 | VisualStateManager | `VisualStateGroup`, `VisualStateManager.GoToState` | ✅ |
 | 060 | AttachedBehavior | replace code-behind with an attached-property behavior | ✅ |
 | 061 | FreezableBrush | `Freeze`, `IsFrozen`, `CanFreeze`, sharing across threads | ⬜ |

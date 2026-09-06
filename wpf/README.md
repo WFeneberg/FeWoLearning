@@ -248,20 +248,30 @@ measurement walked, not the general mechanism it seems to imply.
   captured state changes elsewhere - the view has no way to notice that on its own and goes on
   showing the stale result until something calls `Refresh()`. Row 055 is built around exactly
   that gap, not around `Filter` needing `Refresh()` in general.
-- **`ICollectionView.DeferRefresh()` does NOT tolerate mutating the SOURCE collection while a
-  scope is open - measured directly, and the opposite of what older WPF folklore about
-  `DeferRefresh` demonstrates.** A single `ObservableCollection<T>.Add(...)` inside an open
-  `DeferRefresh()` scope throws `InvalidOperationException` ("cannot change or verify the
-  content or Current-position of 'CollectionView' while a Refresh is deferred") synchronously,
-  from the `Add` call itself - with or without a `CollectionChanged` subscriber attached, with
-  zero, one or several prior adds, regardless of `CurrentPosition`. What `DeferRefresh` actually
-  batches safely here is VIEW-level state - `SortDescriptions`/`GroupDescriptions`/`Filter` -
-  each of which (rows 054/055) already re-applies (and raises its own `Reset`) the moment it
-  changes; wrapping several such changes in one `DeferRefresh()` scope collapses them into a
-  single `Reset` when the scope's `Dispose` runs, confirmed directly by counting
-  `((INotifyCollectionChanged)view).CollectionChanged` invocations. Row 056 is built entirely on
-  batching view-level changes for exactly this reason. Also measured: nested `DeferRefresh()`
-  scopes only fire the collapsed `Reset` when the OUTERMOST scope's `Dispose` runs - disposing an
+- **`ICollectionView.DeferRefresh()` does NOT tolerate most SOURCE-collection mutations while a
+  scope is open - measured directly, per-action, and the opposite of what older WPF folklore
+  about `DeferRefresh` demonstrates.** Against an `ObservableCollection<T>` source: `Add`,
+  `Insert`, `Remove`, `RemoveAt`, `Move` and an indexer-set (`items[i] = x`) each throw
+  `InvalidOperationException` ("cannot change or verify the content or Current-position of
+  'CollectionView' while a Refresh is deferred") synchronously, from the mutating call itself -
+  with or without a `CollectionChanged` subscriber attached, with zero, one or several prior
+  mutations, regardless of `CurrentPosition`. `Clear()` is the one exception: it does NOT throw,
+  because a clear already means `NotifyCollectionChangedAction.Reset` - "re-read everything" -
+  which bypasses the position-adjustment path the other actions go through and that is what the
+  verify-not-deferred check actually guards. The real cause, not merely the symptom: it is the
+  SOURCE's own `CollectionChanged` notification reaching a view that is mid-defer that throws,
+  not something inherent to the view type or to mutation in general - confirmed by swapping the
+  source for a plain `List<T>` behind the IDENTICAL `ListCollectionView`: every one of the same
+  actions (`Add` included) throws NOTHING, because `List<T>` never raises `CollectionChanged` in
+  the first place, so nothing ever reaches the deferred view to trip the check. What
+  `DeferRefresh` actually batches safely here, regardless of source type, is VIEW-level state -
+  `SortDescriptions`/`GroupDescriptions`/`Filter` - each of which (rows 054/055) already
+  re-applies (and raises its own `Reset`) the moment it changes; wrapping several such changes in
+  one `DeferRefresh()` scope collapses them into a single `Reset` when the scope's `Dispose` runs,
+  confirmed directly by counting `((INotifyCollectionChanged)view).CollectionChanged` invocations.
+  Row 056 is built entirely on batching view-level changes for exactly this reason. Also measured:
+  nested `DeferRefresh()` scopes only fire the collapsed `Reset` when the OUTERMOST scope's
+  `Dispose` runs - disposing an
   inner scope while the outer one is still open produces nothing; and reading `CurrentItem`
   (or enumerating the view at all) from code running INSIDE an open scope throws the same
   `InvalidOperationException` - confirmed directly, not merely documented - which is what makes
