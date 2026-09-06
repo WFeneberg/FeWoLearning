@@ -61,30 +61,35 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-07; `catalog.md` at 35 ✅ / 65 ⬜, so the
-thirty-five delivered exercises contribute 111 facts, of which one is 🐳):
+**Current measured state** (2026-09-07; `catalog.md` at 35 ✅ / 65 ⬜). Counted on
+disk: **110 exercise facts** across the thirty-five delivered rows, of which one is 🐳,
+plus **10 harness facts** in `tests/_support/` — **120** in total.
 
 ```
-dotnet test                                         → 109 failed,   8 passed, 2 skipped (119 total),   18 s
-dotnet test -p:UseSolutions=true                    →   0 failed, 117 passed, 2 skipped (119 total), 1 m 27 s
-dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 119 passed, 0 skipped (119 total), 2 m 18 s
+dotnet test                                         → 109 failed,   8 passed, 3 skipped (120 total),   17 s
+dotnet test -p:UseSolutions=true                    →   0 failed, 117 passed, 3 skipped (120 total), 1 m 32 s
+dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 120 passed, 0 skipped (120 total), 2 m 51 s
 ```
 
-The 8 that pass in the red run and the 2 that skip are the harness's own facts, which
-grade the harness rather than an exercise. The two skips are ex034's container fact and
-the container-gate canary that proves `Require()` still closes; `-p:Containers=true`
-unskips both. The whole cost of the container lane today is the difference between the
-last two lines: **~51 s** for one Postgres row.
+**The three skips are not all harness facts, and the distinction matters.** One is a
+real exercise fact — ex034's 🐳 row, gated like every 🐳 row will be. The other two are
+harness facts that are *deliberately* gated shut in the default run: the container-gate
+canary that proves `Require()` still closes, and the teardown canary that needs a
+started application. `-p:Containers=true` unskips all three. The 8 that pass in the red
+run are the remaining harness facts, which pass in *both* modes because they grade the
+harness rather than an exercise.
+
+The container lane costs the difference between the last two lines, **~79 s**: about
+51 s for ex034's Postgres and about 28 s for the two applications the teardown canary
+starts (it starts no containers — see §4).
 
 **A correct default run is red, and that is not a broken checkout.** A hundred and nine
 failures is exactly what an untouched tree gives: one `NotImplementedException` per
-unimplemented `Configure`, plus the facts that depend on it. The 8 that pass and the 2 that skip are
-the harness's own facts, which pass in *both* modes because they grade the harness
-rather than an exercise. Update these numbers whenever a batch lands.
+unimplemented `Configure`, plus the facts that depend on it. Update these numbers
+whenever a batch lands.
 
-Two facts skip in the default run: ex034's container fact (which is a real 🐳 exercise
-row, gated) and the harness's container-gate canary. That canary is only **one third**
-of the gate's protection. It fails if `ContainerGate.Require()` ever stops skipping with containers off —
+The container-gate canary that skips here is only **one third** of the gate's
+protection. It fails if `ContainerGate.Require()` ever stops skipping with containers off —
 the mutant that would start real containers in the default run. The opposite and more
 dangerous mutant, a `Require()` that *always* skips, would silently disable all 25 🐳
 rows while every run still reported green; that one is caught by
@@ -250,6 +255,24 @@ the failure shapes the next twenty-four rows inherit.
   per-session Docker *network* outlives the run, one per test, forever. Any
   pre-existing `dapr_*` containers on this machine belong to other work and are not
   part of that count.
+- **A failing teardown must never replace a failing test, and the harness now
+  guarantees it.** This is the piece most likely to be copied wrong, so it is stated as
+  a contract: `RunAsync` **captures** the session's failure rather than throwing it,
+  runs teardown to completion, and only then rethrows — so the real assertion always
+  wins. Teardown itself is bounded: `StopAsync` **and** `DisposeAsync` share one
+  2-minute budget that is never the session token (when the deadline is what killed the
+  test, that token is already cancelled and cleanup is exactly what still needs to
+  happen). Both are attempted even if the other threw, and the first failure is kept.
+  When the body **succeeded**, a teardown failure *is* reported, wrapped in an
+  `InvalidOperationException` telling the reader to check `docker ps -a` — because a
+  `StopAsync` that failed is how leftovers start poisoning every test behind it.
+  This is a regression, not a hypothetical. The first version tore down inside a plain
+  `finally`, where whatever it throws wins; measured against that version, a body
+  failing with "THE REAL ASSERTION FAILURE" surfaced as
+  `InvalidOperationException: TEARDOWN BLEW UP` instead, and a learner would have gone
+  looking in the wrong place. `ContainerHarness_teardown_never_replaces_the_real_failure`
+  pins both directions. It needs a started application (DCP), so it is gated — but it
+  starts **no containers**: an empty model plus one hosted service that throws on stop.
 - **Assume nothing about ports.** DCP publishes on an ephemeral host port, never the
   flavour's default — ex034 asserts `Port != 5432` for exactly that reason, and it is
   the most legible single proof that a hard-coded connection string could not have
@@ -892,6 +915,21 @@ Each of these cost real time. None is a guess.
   stub throws before it does any work). Worth re-measuring as the catalog fills: if the
   green run ever becomes the bottleneck, the answer is a `[Collection]` per group of
   globally-stateful rows rather than turning this off.
+  **Where the green run's time actually goes — profiled 2026-09-07, and it is not where
+  it looks.** At 35 delivered rows the green run is 1 m 30 s, up from 26 s at ex025, and
+  the obvious explanation (more rows, and rows that build real host builders) is wrong.
+  Per-test durations from a `--logger trx` run: **16 of the 120 facts — 13% — account
+  for 87.3 s of the 90.2 s of test time. The other 104 facts together take 2.8 s.** Twelve of those
+  sixteen have `manifest`, `publish` or `bicep` in their own name, and the rest are the
+  same shape. Every one of them is an **L2 in-process publish**, which §6 already
+  measures at ~3.7 s (~7.5 s with Azure resources) — a fixed per-*fact* cost, paid once
+  per fact and not shared. The whole of rows 031-035, fifteen facts including three
+  `Host.CreateApplicationBuilder()` calls, contributes **0.20 s**. So the green run
+  tracks the number of **publish-shaped facts**, not the number of rows, and it grows by
+  roughly 5 s each time one is added — while the red run stays flat, because a stub
+  throws before it reaches the publish. Anyone budgeting a future batch should count its
+  L2 facts and ignore everything else; and if this ever does need fixing, the lever is
+  sharing one publish across the facts that assert on it, not parallelism.
 - **A count of `HttpMessageHandlerBuilderActions` says how many handlers, never which.**
   Measured while closing a review finding on ex021:
   `ConfigureHttpClientDefaults(h => { h.AddStandardResilienceHandler();
@@ -1029,7 +1067,7 @@ a summary of it:
   the **host** daemon rather than a nested one;
 - `dotnet test` inside gives **4 passed / 1 skipped**, matching the host exactly. That
   measurement predates the first exercises; the host now gives 109 failed / 8 passed /
-  2 skipped (§3), and the DevContainer has not been re-measured since.
+  3 skipped (§3), and the DevContainer has not been re-measured since.
 
 **What remains unproven, and the specific way it is likely to break.** Spec §7 set the
 bar at *Aspire starting a sibling database container from inside the DevContainer*, and

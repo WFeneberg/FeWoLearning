@@ -2,6 +2,8 @@ using FeWoLearning.MicroServices.Exercises.Beginner;
 using Xunit.Sdk;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace FeWoLearning.MicroServices.Tests;
 
@@ -92,10 +94,12 @@ public class HarnessMechanicsTests
         Assert.False(Directory.Exists(dir), $"PublishOutput left {dir} behind.");
     }
 
-    // --- the container gate's two canaries -------------------------------------
-    // Both directions matter. A gate that never skips would start real containers in
+    // --- the container gate's three canaries -----------------------------------
+    // Three directions matter. A gate that never skips would start real containers in
     // the default run; a gate that ALWAYS skips would silently disable all 25 container
-    // rows while every run still looked green. One fact each.
+    // rows while every run still looked green; and an author who simply forgets to call
+    // Require() would do the first of those by accident. One fact each. A fourth fact
+    // below guards ContainerHarness's teardown rather than its gate.
 
     [Fact]
     public void ContainerGate_Require_skips_when_containers_are_off()
@@ -154,5 +158,64 @@ public class HarnessMechanicsTests
 
         Assert.IsType<InvalidOperationException>(thrown);
         Assert.Contains("ContainerGate.Require()", thrown.Message);
+    }
+
+    // --- ContainerHarness's teardown contract ----------------------------------
+
+    /// <summary>
+    /// The single highest-leverage invariant in this file, because
+    /// <see cref="ContainerHarness.RunAsync"/> is what all 25 container rows share:
+    /// **a failing teardown must never replace a failing test.**
+    ///
+    /// This is a REGRESSION test, not a hypothetical. The first version of the harness
+    /// tore down inside a plain `finally`, where anything thrown wins. Measured against
+    /// that version, with this exact probe: the body failed with
+    /// "THE REAL ASSERTION FAILURE" and what surfaced was
+    /// `InvalidOperationException: TEARDOWN BLEW UP`. A genuinely broken exercise would
+    /// have reported a teardown error instead of what actually went wrong, and the
+    /// learner would have gone looking in the wrong place.
+    ///
+    /// The second half is the other direction, and it is not symmetric: when the body
+    /// SUCCEEDS, a teardown failure must be reported rather than swallowed, because a
+    /// StopAsync that failed is how containers, networks and volumes start surviving
+    /// the run and poisoning every test behind them.
+    ///
+    /// It needs a real application (StartAsync needs DCP), so it is gated - but it
+    /// starts NO containers: the model is empty and the only moving part is a hosted
+    /// service that throws on stop.
+    /// </summary>
+    [Fact]
+    public async Task ContainerHarness_teardown_never_replaces_the_real_failure()
+    {
+        ContainerGate.Require();
+        var token = TestContext.Current.CancellationToken;
+
+        var real = await Record.ExceptionAsync(() => ContainerHarness.RunAsync(
+            builder => builder.Services.AddHostedService<ThrowsOnStop>(),
+            _ => throw new XunitException("THE REAL ASSERTION FAILURE"),
+            token,
+            TimeSpan.FromMinutes(2)));
+
+        var surfaced = Assert.IsType<XunitException>(real);
+        Assert.Equal("THE REAL ASSERTION FAILURE", surfaced.Message);
+
+        var teardownOnly = await Record.ExceptionAsync(() => ContainerHarness.RunAsync(
+            builder => builder.Services.AddHostedService<ThrowsOnStop>(),
+            _ => Task.CompletedTask,
+            token,
+            TimeSpan.FromMinutes(2)));
+
+        var reported = Assert.IsType<InvalidOperationException>(teardownOnly);
+        Assert.Contains("tearing the application down", reported.Message);
+        Assert.Contains("TEARDOWN BLEW UP", reported.InnerException?.Message);
+    }
+
+    /// <summary>A hosted service whose only job is to fail <c>StopAsync</c>.</summary>
+    private sealed class ThrowsOnStop : IHostedService
+    {
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken)
+            => throw new InvalidOperationException("TEARDOWN BLEW UP");
     }
 }

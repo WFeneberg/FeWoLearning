@@ -75,8 +75,20 @@
     <PackageReference Include="Aspire.Hosting.Orchestration.$(NETCoreSdkRuntimeIdentifier)" Version="13.5.3" />
   </ItemGroup>
 
-  <!-- `-p:Containers=true` reaches the test process through runtimeconfig.json.
-       FEWO_MS_CONTAINERS=1 is the no-rebuild alternative. -->
+  <!-- `-p:Containers=true` reaches the test process through runtimeconfig.json, so it
+       needs a build. FEWO_MS_CONTAINERS=1 opens the same GATE without one - but since
+       ex034 that is NO LONGER a full substitute, and the difference is not the gate.
+       The DCP packages above are conditioned on '$(Containers)', and an environment
+       variable cannot add a PackageReference: an L3 row let through by the env var
+       alone reaches an orchestrator that was never restored and dies in ~160 ms with
+       "OptionsValidationException: Property CliPath: The path to the DCP executable
+       used for Aspire orchestration is required."
+       That conditioning is deliberate, not an oversight. It is what keeps the default
+       `dotnet test` restoring and building exactly what it did before the first
+       container row landed - no DCP, no Docker, no RID-specific orchestrator download -
+       and the failure above is loud and immediate, so it can never be mistaken for a
+       pass. Use FEWO_MS_CONTAINERS=1 to exercise the gate; use -p:Containers=true to
+       actually run a container row. See MicroServices/README.md section 3. -->
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="FeWoLearning.MicroServices.Containers"
                                     Value="$(Containers)"

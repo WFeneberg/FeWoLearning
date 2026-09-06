@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
@@ -153,6 +154,12 @@ public static class ContainerHarness
         var app = builder.Build();
         var started = false;
         var stopwatch = Stopwatch.StartNew();
+
+        // The session's own failure is CAPTURED rather than thrown, so that teardown can
+        // run to completion and still not be able to replace it. A `finally` block cannot
+        // express that: anything it throws wins, and a test whose real assertion failed
+        // would report a teardown error instead of what actually went wrong.
+        Exception? sessionFailure = null;
         try
         {
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -172,19 +179,80 @@ public static class ContainerHarness
                     + "Is Docker running, and is the image already pulled?");
             }
         }
-        finally
+        catch (Exception exception)
         {
-            // Its own budget, and never the session token - see CleanupTimeout.
-            using var cleanup = new CancellationTokenSource(CleanupTimeout);
+            sessionFailure = exception;
+        }
+
+        var teardownFailure = await TearDownAsync(app, started);
+
+        // Order matters and is the whole point: the real failure always wins.
+        if (sessionFailure is not null)
+        {
+            ExceptionDispatchInfo.Capture(sessionFailure).Throw();
+        }
+
+        // Only when the session itself succeeded is a broken teardown worth reporting -
+        // and then it must be reported, because a StopAsync that failed is how containers,
+        // networks and volumes start surviving the run.
+        if (teardownFailure is not null)
+        {
+            throw new InvalidOperationException(
+                "The container session's body succeeded, but tearing the application down "
+                + "did not. Check `docker ps -a`, `docker network ls` and `docker volume ls` "
+                + "for leftovers before trusting any later run in this suite.",
+                teardownFailure);
+        }
+    }
+
+    /// <summary>
+    /// Stops and disposes the application on <see cref="CleanupTimeout"/>, swallowing
+    /// nothing and throwing nothing: the first failure is handed back to the caller,
+    /// which decides whether it is allowed to surface.
+    ///
+    /// Three things here are deliberate, and all three exist because this method is what
+    /// 25 container rows share.
+    /// <list type="number">
+    ///   <item>The budget is its OWN, never the session token. When the session deadline
+    ///   is what killed the test, that token is already cancelled, and passing it here
+    ///   would skip cleanup exactly when cleanup matters most.</item>
+    ///   <item><c>DisposeAsync</c> is bounded too, not just <c>StopAsync</c>. The assembly
+    ///   runs serially, so an unbounded dispose does not fail one test - it wedges every
+    ///   test behind it, which is precisely what the session deadline exists to prevent.
+    ///   <c>WaitAsync</c> abandons a hung dispose rather than cancelling it (there is no
+    ///   cancellable overload); that is the right trade, because a dispose that has
+    ///   already hung is not going to clean up either way and the suite must keep moving.</item>
+    ///   <item>Dispose is attempted even when Stop threw, and the FIRST failure is the one
+    ///   returned - a stop failure explains a dispose failure far more often than the
+    ///   other way round.</item>
+    /// </list>
+    /// </summary>
+    private static async Task<Exception?> TearDownAsync(DistributedApplication app, bool started)
+    {
+        Exception? failure = null;
+        using var cleanup = new CancellationTokenSource(CleanupTimeout);
+
+        if (started)
+        {
             try
             {
-                if (started) await app.StopAsync(cleanup.Token);
+                await app.StopAsync(cleanup.Token);
             }
-            catch (Exception) when (cleanup.IsCancellationRequested)
+            catch (Exception exception)
             {
-                // A teardown that itself hangs must not replace the real failure.
+                failure = exception;
             }
-            await app.DisposeAsync();
         }
+
+        try
+        {
+            await app.DisposeAsync().AsTask().WaitAsync(cleanup.Token);
+        }
+        catch (Exception exception)
+        {
+            failure ??= exception;
+        }
+
+        return failure;
     }
 }
