@@ -1,10 +1,13 @@
 # Architecture Track
 
-60 graded C# exercises in **application and system architecture** on .NET 10,
+80 graded C# exercises in **application and system architecture** on .NET 10,
 across the three areas this repo's owner actually ships into — **web**
 (ASP.NET Core), **desktop** (the composition and lifecycle patterns behind a UI),
 and **services + data** (databases, caches, message buses, MQTT) — plus a
-**cross-cutting** block for the concerns that run through all three.
+**cross-cutting** block for the concerns that run through all three, and two more
+for what the first four deliberately leave out: **scale** (many instances, a finite
+shared resource, data that no longer fits on one machine) and **evolution** (two
+versions of everything live at once while the schema changes underneath).
 
 See `catalog.md` for the row-by-row ledger, and
 `docs/superpowers/specs/2026-09-06-architecture-track-design.md` for the design.
@@ -214,5 +217,5 @@ check with `-p:UseSolutions=true`, flip exactly those rows, commit as
 Stubs carry a `Goal:` / `Drills:` / `Passes:` header comment, throw
 `NotImplementedException` at runtime, and must still **compile** while unfinished.
 Namespaces are pinned per block — `FeWoLearning.Architecture.Exercises.Web`,
-`.Desktop`, `.ServicesData`, `.CrossCutting` — because `01-web` is not a valid C#
-identifier. Tests mirror them as `FeWoLearning.Architecture.Tests.<Block>`.
+`.Desktop`, `.ServicesData`, `.CrossCutting`, `.Scale`, `.Evolution` — because
+`01-web` is not a valid C# identifier. Tests mirror them as `FeWoLearning.Architecture.Tests.<Block>`.

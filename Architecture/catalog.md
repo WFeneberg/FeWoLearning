@@ -1,7 +1,7 @@
-# Architecture (C#) — Exercise Catalog (60)
+# Architecture (C#) — Exercise Catalog (80)
 
 Blocks: **web** 001–016 · **desktop** 017–028 · **services-data** 029–052 ·
-**cross-cutting** 053–060.
+**cross-cutting** 053–060 · **scale** 061–073 · **evolution** 074–080.
 
 Legend: ✅ seeded (stub + test + solution present, red and green both verified) ·
 ⬜ planned · 🐳 carries extra container-backed facts, skipped unless `-p:Containers=true`.
@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 60 ✅ / 0 ⬜**
+**Status: 60 ✅ / 20 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -98,3 +98,37 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 058 | AntiCorruptionLayer | translation between bounded contexts, no foreign model leak | ✅ |
 | 059 | StranglerFigFacade | routing facade, legacy vs replacement, gradual cutover | ✅ |
 | 060 | ArchitectureFitnessTests | dependency direction enforced by reflection over assembly metadata | ✅ |
+
+## scale (061–073) — the system under load, and across instances
+
+Where the first four blocks build one process that is correct, this block asks what
+happens when there are many of them, all of them are busy, and the data no longer
+fits on one machine.
+
+| # | Slug | Concepts | Status |
+|---|------|----------|--------|
+| 061 | BulkheadIsolation | resource partitioning, one slow dependency not exhausting the pool | ⬜ |
+| 062 | ConcurrencyLimiter | admission control, load shedding, queue vs reject | ⬜ |
+| 063 | BackpressureBoundedQueue | bounded buffers, block vs drop vs shed, the unbounded-queue failure | ⬜ |
+| 064 | CostAwareBatching | batch size vs latency, flush triggers, partial-batch failure | ⬜ |
+| 065 | IdempotencyKeys 🐳 | HTTP idempotency keys, stored responses, replay vs re-execute | ⬜ |
+| 066 | LeaderElection 🐳 | lease-based single writer, renewal, loss of leadership mid-work | ⬜ |
+| 067 | DistributedScheduling | a job that runs once across N instances, missed and overlapping ticks | ⬜ |
+| 068 | GracefulShutdown | stop accepting, drain in flight, deadline, what to do with the rest | ⬜ |
+| 069 | StartupReadinessOrdering | dependency probing, fail-fast vs start-degraded, readiness gating | ⬜ |
+| 070 | ShardingByKey | shard routing, rebalancing, the keys that move | ⬜ |
+| 071 | ReadReplicaRouting | read/write splitting, replica lag, read-your-writes | ⬜ |
+| 072 | MultiTenancyIsolation | tenant-scoped access, the cross-tenant leak, the missing filter | ⬜ |
+| 073 | TenantConfiguration | per-tenant overrides over global defaults, inheritance, unknown tenants | ⬜ |
+
+## evolution (074–080) — the system changing while it runs
+
+| # | Slug | Concepts | Status |
+|---|------|----------|--------|
+| 074 | ExpandContractMigration 🐳 | the three-phase schema change, why the middle phase exists | ⬜ |
+| 075 | IdempotentBackfill | resumable batch repair, checkpoints, re-running safely | ⬜ |
+| 076 | ConsumerDrivenContract | a contract test that fails when the provider breaks a consumer | ⬜ |
+| 077 | ApiDeprecationLifecycle | sunset dates, deprecation headers, usage before removal | ⬜ |
+| 078 | FeatureFlagTargeting | targeting rules, stable percentage bucketing, flag removal | ⬜ |
+| 079 | CanaryRelease | routing a fraction, comparing outcomes, automatic rollback | ⬜ |
+| 080 | ObservabilitySpans | parent/child spans, trace context across a boundary, sampling | ⬜ |

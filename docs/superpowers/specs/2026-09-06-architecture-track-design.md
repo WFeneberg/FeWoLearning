@@ -275,3 +275,48 @@ filtered red check, run the green check under `-p:UseSolutions=true`, flip exact
 those five catalog rows, commit as `Architecture: exNNN–exNNN`. Documentation is
 English, matching the rest of the repo. `CLAUDE.md` gains an `Architecture/` row in
 its command, toolchain and current-state tables once the first batch is verified.
+
+
+---
+
+## Addendum, 2026-09-06 — blocks 05 and 06 (rows 061–080)
+
+The original 60 were delivered and verified (371 facts, red 359/4/8, green 0/363/8,
+containers 371/0). This addendum extends the track to **80 rows** at the owner's
+request, with two blocks the first four deliberately did not cover.
+
+Blocks 01–04 build **one process that is correct**. Everything in them can be
+reasoned about by a single reader looking at a single instance: the outbox is atomic,
+the cache counts its loader, the saga compensates. What none of them ask is what
+happens when there are fifty of that process, all of them busy, the data no longer
+fits on one machine, and the schema has to change while all of it stays up.
+
+### `05-scale` (061–073) — many instances, all busy
+
+`FeWoLearning.Architecture.Exercises.Scale`, folder `05-scale`.
+
+Bulkhead isolation, admission control, backpressure, batching, HTTP idempotency
+keys, leader election, distributed scheduling, graceful shutdown, startup readiness
+ordering, sharding, read-replica routing, and the two multi-tenancy rows.
+
+The recurring shape here is **a resource that is finite and shared**. Blocks 01–04
+mostly assume the thing you call will answer; this block assumes it sometimes will
+not, and asks what the caller does with the queue that builds up behind it.
+
+### `06-evolution` (074–080) — the system changing while it runs
+
+`FeWoLearning.Architecture.Exercises.Evolution`, folder `06-evolution`.
+
+Expand-contract migration, resumable backfills, consumer-driven contracts, API
+deprecation, feature-flag targeting, canary releases, and observability spans.
+
+The recurring shape here is **two versions coexisting**. Every row is a case where
+the old thing and the new thing are both live and both correct, and the exercise is
+the mechanism that keeps them from noticing each other.
+
+### What does not change
+
+The grading rules, the two-probe procedure, the `UseSolutions` mechanism, the
+toolchain pins and the container gate all carry over unchanged. Three new rows carry
+container facts (065 Redis, 066 Redis, 074 Postgres), bringing the total to eleven.
+Everything stays `net10.0` and headless.
