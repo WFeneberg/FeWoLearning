@@ -179,6 +179,21 @@ mechanism — and confirming the facts still fail. Probe (b) is the one that mat
 it is the bug class `security/`'s final review found after every per-batch review
 had already passed, and the degenerate probe never catches it.
 
+## An unreproduced flake, recorded rather than claimed fixed
+
+On 2026-09-06 one full green run (`dotnet test -p:UseSolutions=true`, no containers)
+reported **1 failed / 235 passed / 5 skipped** instead of the usual 236/5. It happened
+in the run immediately after a `-p:Containers=true` pass, while Docker was still tearing
+containers down. It has not recurred: 26 consecutive full green runs since, plus 12
+targeted runs of the four exercises with any timing or GC sensitivity at all (021, 024,
+036, 039), all clean. The detailed logger never caught it, so the failing fact is
+unknown.
+
+It is recorded here rather than declared fixed or declared a defect, because neither
+would be honest. If you see a single failure in an otherwise green run, note **which
+fact** it was before re-running — that is the piece of information this entry is
+missing.
+
 ## Adding an exercise
 
 Follow the repo procedure in `CLAUDE.md` ("Adding or completing exercises"):

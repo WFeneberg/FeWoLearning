@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 36 ✅ / 24 ⬜**
+**Status: 41 ✅ / 19 ⬜**
 
 ## web (001–016) — ASP.NET Core composition and request flow
 
@@ -69,11 +69,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 034 | CacheAside | hit/miss, loader invocation count, negative caching | ✅ |
 | 035 | WriteThroughWriteBehind | write-through vs write-behind, flush semantics, loss window | ✅ |
 | 036 | CacheStampede 🐳 | single-flight, concurrent loaders, one load per key | ✅ |
-| 037 | DistributedLock 🐳 | lease acquisition, expiry, fencing token | ⬜ |
-| 038 | OptimisticConcurrency 🐳 | version column, conflict detection, lost-update prevention | ⬜ |
-| 039 | PessimisticLocking 🐳 | locked read, serialised writers, deadlock avoidance ordering | ⬜ |
-| 040 | SagaProcessManager | multi-step process, compensation on failure, saga state | ⬜ |
-| 041 | ChoreographyVsOrchestration | the same flow in two topologies, coupling trade-off | ⬜ |
+| 037 | DistributedLock 🐳 | lease acquisition, expiry, fencing token | ✅ |
+| 038 | OptimisticConcurrency 🐳 | version column, conflict detection, lost-update prevention | ✅ |
+| 039 | PessimisticLocking 🐳 | locked read, serialised writers, deadlock avoidance ordering | ✅ |
+| 040 | SagaProcessManager | multi-step process, compensation on failure, saga state | ✅ |
+| 041 | ChoreographyVsOrchestration | the same flow in two topologies, coupling trade-off | ✅ |
 | 042 | EventSourcingAppendStream | append-only stream, rehydration, expected-version check | ⬜ |
 | 043 | EventSourcedProjection | catch-up projection, idempotent apply, checkpoint | ⬜ |
 | 044 | CqrsReadModel | separate read store, eventual consistency, staleness window | ⬜ |
