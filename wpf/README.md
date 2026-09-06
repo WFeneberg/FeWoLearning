@@ -341,6 +341,20 @@ measurement walked, not the general mechanism it seems to imply.
   property touched at all still got the behavior's effect, because class-handler registration is
   per-TYPE, not per-element. The property system's own callback is what makes the behavior
   actually track individual elements' opt-in/opt-out.
+- **WPF raises no `TextChanged` at all for writing an IDENTICAL string back onto `Text`.**
+  Measured directly building row 060: a handler that reacts to `TextChanged` by forcing
+  `Text = Text.ToUpperInvariant()` re-enters itself once the write actually changes something,
+  but once the text is already upper-invariant, writing the same value back raises nothing - the
+  handler re-enters at most once, with or without an explicit reentrancy guard. An earlier draft
+  of row 060 assumed the opposite (that skipping a redundant write was necessary to avoid
+  "infinite re-entrant recursion") and built a whole second transform just to make that guard
+  load-bearing - the crash that produced (a genuinely non-idempotent transform recurses without
+  end, and does so by design once "prevent infinite recursion" is asserted rather than merely
+  documented) is why the row does not carry a reentrancy drill at all; see row 052's
+  `RunWorkerCompletedEventArgs.Result` bullet above for the same crash SHAPE found as a hazard to
+  document, not as a mechanism to assert against. Any later row reacting to its own target
+  property's change from inside that property's own change handler gets this same protection for
+  free, for an identical write - not for one that produces a genuinely different value.
 
 #### Resources and template lookup
 
