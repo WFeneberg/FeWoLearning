@@ -31,6 +31,11 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.18.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.18.0" />
+    <!-- Block 03 builds the pipeline itself, exporter included, so this belongs in the
+         content libraries and not only in tests/. The GRADING instruments - LogProbe,
+         TraceProbe, MetricProbe, MeasurementProbe - stay in tests/ where an exercise
+         cannot see them. -->
+    <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.18.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.18.0-beta.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />

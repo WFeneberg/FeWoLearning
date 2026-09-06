@@ -106,6 +106,13 @@ before flipping its catalog cell.
    test running concurrently. `Sdk.SetDefaultTextMapPropagator`,
    `Activity.DefaultIdFormat`, `Activity.ForceDefaultIdFormat`, `Activity.Current` and
    `static Meter` fields are all process-wide.
+7. **The in-memory exporter does not snapshot.** It stores the `Activity` *object*, so
+   anything that mutates a span after it was exported still changes what the test sees
+   — measured, with a processor registered after the exporter. An attribute being
+   present at assertion time therefore proves nothing about *when* it was set. Grade
+   ordering on a call log, never on which tags exist at the end. (This one is an
+   artefact of in-memory grading: a real exporter serialises and the question never
+   arises — which is exactly why it is easy to miss.)
 
 Two mitigations for (6), both mandatory and both already in place:
 
@@ -397,3 +404,47 @@ surprise the next batch pays for again.
 - Batch baseline after rows 001–025: **127 facts total** (121 exercise + 6 harness).
   Red run 121 failed / 5 passed / 1 skipped; green run 126 passed / 1 skipped; green
   with `-p:Containers=true` 127 passed / 0 skipped. 0 warnings in both modes.
+
+**2026-09-06, rows 026–030 — `02-diagnostics` complete, `03-otel-sdk` begun:**
+
+- **The in-memory exporter stores the `Activity` object, not a snapshot of it.**
+  Measured: a processor registered *after* `AddInMemoryExporter` still mutates the
+  exported span in its `OnEnd`, because the test is holding the same reference. So an
+  attribute being present at assertion time proves nothing about *when* it was set, and
+  any row about processor ordering must be graded on a call log rather than on which
+  tags happen to exist at the end. This is a seventh way a telemetry test lies and it
+  is specific to in-memory grading — a real exporter serialises and the question never
+  arises.
+- **Processor chains do not unwind.** Both `OnStart` and `OnEnd` run in *registration*
+  order — OTel composes processors into a list and walks it head to tail for both
+  hooks, unlike an ASP.NET middleware pipeline, which nests. Measured in ex029:
+  `["first:start", "second:start", "first:end", "second:end"]`. Consequence: "the last
+  processor gets the final say" is true for `OnEnd` only because it is last in the
+  list, and anything added after the exporter runs *after* the export rather than
+  around it.
+- **`ForceFlush` and `GetResource` live in different namespaces.** `ForceFlush` is an
+  extension in `OpenTelemetry.Trace` (`TracerProviderExtensions`); `GetResource` is one
+  in the root `OpenTelemetry` namespace. A file using both needs both `using`
+  directives, and the `CS1061` you get otherwise names the method rather than the
+  namespace.
+- **`OpenTelemetry.Exporter.InMemory` had to move into the content libraries.** Block
+  03's rows build the pipeline themselves, exporter included, so the package cannot
+  live in `tests/` alone. The principle it seemed to violate is narrower than it looks:
+  what must stay out of an exercise's reach is the **grading instruments** — `LogProbe`,
+  `TraceProbe`, `MetricProbe`, `MeasurementProbe` — not a pipeline component the
+  learner is being asked to compose.
+- **A fact asserting that the stub's own declarations exist grades nothing**, again.
+  Ex027 originally carried "both sources exist and are used", which passed on the
+  untouched tree because the stub declares both `ActivitySource` properties. Removed;
+  the guarantee it was reaching for comes from the signature instead, since `DoWork`
+  takes the source as a *parameter* and therefore cannot treat the two differently.
+  This is the third time this shape has appeared (ex008, ex027, and the near-miss in
+  ex003) — **check the red run's pass count, every batch.**
+- Every one of this batch's five wrong implementations was caught, and every failing
+  fact was an `Adversarial_` one: an unconditional `Write` with no `IsEnabled` gate, a
+  `AddSource("...ex027*")` wildcard that also catches the unregistered source, a
+  forgotten `AddEnvironmentVariableDetector`, processors registered in reverse on the
+  middleware intuition, and a `DoWork` that drops the incoming parent context.
+- Batch baseline after rows 001–030: **152 facts total** (146 exercise + 6 harness).
+  Red run 146 failed / 5 passed / 1 skipped; green run 151 passed / 1 skipped; green
+  with `-p:Containers=true` 152 passed / 0 skipped. 0 warnings in both modes.

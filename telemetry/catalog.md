@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 25 ✅ / 45 ⬜**
+**Status: 30 ✅ / 40 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -53,16 +53,16 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | 023 | ObservableInstruments | `ObservableGauge`/`ObservableCounter` pull model, `UpDownCounter` vs `Counter` | ✅ |
 | 024 | MeterListenerLifecycle | `InstrumentPublished`, `EnableMeasurementEvents`, dispose, no double counting | ✅ |
 | 025 | EventSourceAndCounters | a custom `EventSource`, keywords and levels, `EventListener`, runtime counters | ✅ |
-| 026 | DiagnosticSourceListener | `DiagnosticListener`, `IsEnabled`, anonymous payloads, the framework's own events | ⬜ |
+| 026 | DiagnosticSourceListener | `DiagnosticListener`, `IsEnabled`, anonymous payloads, the framework's own events | ✅ |
 
 ## otel-sdk (027–044) — the OpenTelemetry SDK
 
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
-| 027 | TracerProviderBuilder | `AddSource`, `Build`, in-memory exporter; an unregistered source produces nothing | ⬜ |
-| 028 | ResourceAttributes | `service.name`/`version`/`instance.id`, `ResourceBuilder`, env-var detection | ⬜ |
-| 029 | SpanProcessors | simple vs batch export, ordering, a custom processor enriching in `OnStart`/`OnEnd` | ⬜ |
-| 030 | Samplers | AlwaysOn/AlwaysOff/TraceIdRatioBased/ParentBased; sampled flag vs recording | ⬜ |
+| 027 | TracerProviderBuilder | `AddSource`, `Build`, in-memory exporter; an unregistered source produces nothing | ✅ |
+| 028 | ResourceAttributes | `service.name`/`version`/`instance.id`, `ResourceBuilder`, env-var detection | ✅ |
+| 029 | SpanProcessors | simple vs batch export, ordering, a custom processor enriching in `OnStart`/`OnEnd` | ✅ |
+| 030 | Samplers | AlwaysOn/AlwaysOff/TraceIdRatioBased/ParentBased; sampled flag vs recording | ✅ |
 | 031 | CustomSampler | implementing `Sampler`, `Drop` vs `RecordOnly` vs `RecordAndSample` | ⬜ |
 | 032 | MeterProviderAndReader | `AddMeter`, periodic vs manual `Collect`, in-memory metric exporter | ⬜ |
 | 033 | MetricViews | rename, drop, tag-key selection for cardinality control, explicit histogram bounds | ⬜ |
