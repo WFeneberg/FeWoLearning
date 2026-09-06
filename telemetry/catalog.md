@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 60 ✅ / 10 ⬜**
+**Status: 65 ✅ / 5 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -105,11 +105,11 @@ Rows 059–062 are `[WpfFact]` (STA thread). None opens a window.
 |---|------|----------|--------|
 | 059 | DispatcherLatencyMetric | UI-thread queue latency as a histogram, measured on the `Dispatcher` | ✅ |
 | 060 | UnhandledExceptionCapture | `DispatcherUnhandledException`, `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException` — one record, not three or none | ✅ |
-| 061 | CommandActivityTracing | an activity spanning a user command, surviving the dispatcher hop and `await` | ⬜ |
-| 062 | BindingErrorMonitoring | `PresentationTraceSources` binding failures turned into structured logs | ⬜ |
-| 063 | StartupPerformanceTracing | cold-start phases as nested activities | ⬜ |
-| 064 | OfflineBufferAndReplay | a bounded buffer while the exporter is unreachable, replay on reconnect, explicit drop policy | ⬜ |
-| 065 | FlushOnShutdown | flushing on exit; the size of the window that is lost when you do not | ⬜ |
+| 061 | CommandActivityTracing | an activity spanning a user command, surviving the dispatcher hop and `await` | ✅ |
+| 062 | BindingErrorMonitoring | `PresentationTraceSources` binding failures turned into structured logs | ✅ |
+| 063 | StartupPerformanceTracing | cold-start phases as nested activities | ✅ |
+| 064 | OfflineBufferAndReplay | a bounded buffer while the exporter is unreachable, replay on reconnect, explicit drop policy | ✅ |
+| 065 | FlushOnShutdown | flushing on exit; the size of the window that is lost when you do not | ✅ |
 | 066 | PiiScrubbingAndConsent | user names, paths and machine identifiers; an opt-in consent flag that actually gates emission | ⬜ |
 | 067 | SessionCorrelation | a stable anonymous install/session id tying one run's logs, traces and metrics together | ⬜ |
 | 068 | LocalRollingFileAndSupportBundle | a size-capped rolling local log and a support bundle a user can send | ⬜ |

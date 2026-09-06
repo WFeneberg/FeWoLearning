@@ -670,3 +670,35 @@ surprise the next batch pays for again.
   which **6 are container-gated**. Red run 293 failed / 8 passed / 5 skipped; green run
   301 passed / 5 skipped; green with `-p:Containers=true` **306 passed / 0 skipped**.
   0 warnings in both modes.
+
+**2026-09-06, rows 061–065:**
+
+- **Capturing WPF binding errors has four prerequisites and getting any one wrong yields
+  exactly zero records.** All measured on this machine:
+  - `PresentationTraceSources.Refresh()` must be called **first**. It re-reads
+    configuration, so a listener added or a switch level set before it is silently undone.
+    This was the whole reason the first three attempts produced nothing.
+  - `DataBindingSource.Switch.Level` defaults to `Off` and must be raised.
+  - Override **`TraceEvent`, not `Write`**. Measured: `writes=0, events=2` for two failing
+    bindings — the binding engine never calls `Write`, so a listener built on it is
+    completely silent. (At `SourceLevels.All` the same run produced 20 events and 0
+    writes, which is also worth knowing before choosing a level.)
+  - **No `Window` and no `FrameworkElement` are needed.** A binding on a plain
+    `DependencyObject` reports identically.
+- **`Activity.Current` survives every hop a desktop command makes.** Measured across
+  `Dispatcher.InvokeAsync`, `Dispatcher.BeginInvoke` and `await` — all three capture the
+  `ExecutionContext`, so a command that starts on the UI thread, works on a pool thread
+  and comes back stays one trace with nothing threaded through any signature. Where it
+  does *not* flow is worth knowing too: the context travels with the **capture**, not the
+  call, so a delegate captured before the span started carries the older context.
+- **`Batch<T>` is only valid inside the `Export` call.** Row 064's buffering exporter
+  copies the names out before storing anything, because holding a reference into the batch
+  past the call is a use-after-free in a struct enumerator's clothing.
+- Row 064's drop policy goes against instinct and that is the point: when a bounded buffer
+  is full, the **oldest** go, because the newest records are the ones nearest to whatever
+  is going wrong now. Writing it down as a policy is the difference between choosing it
+  and inheriting a queue's default behaviour.
+- Batch baseline after rows 001–065: **331 facts total** (322 exercise + 9 harness), of
+  which 6 are container-gated. Red run 318 failed / 8 passed / 5 skipped; green run 326
+  passed / 5 skipped; green with `-p:Containers=true` **331 passed / 0 skipped**.
+  0 warnings in both modes.
