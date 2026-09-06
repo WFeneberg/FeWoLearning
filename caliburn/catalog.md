@@ -24,7 +24,7 @@ exercises throughout the rest of the catalog also use `CaliburnCoreContext`;
 exercises **with a view** derive from `CaliburnViewContext` and must be hosted with
 `Show(...)` before any action can fire — the first of these is ex012. See `README.md`.
 
-**Status: 55 ✅ / 45 ⬜**
+**Status: 60 ✅ / 40 ⬜**
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
@@ -83,11 +83,11 @@ exercises **with a view** derive from `CaliburnViewContext` and must be hosted w
 | 053 | DefaultCloseStrategy | `DefaultCloseStrategy<T>`'s constructor flag never changes `CloseCanOccur` - one refusal always makes the whole group refuse either way; it only changes whether `Children` comes back empty (default) or holding the willing subset (`true`), and even with the flag `true`, `Children` is empty when nobody is willing | ✅ |
 | 054 | CustomCloseStrategy | `ICloseStrategy<T>` has exactly one member, `ExecuteAsync(IEnumerable<T>, CancellationToken) -> Task<ICloseResult<T>>` (`CloseCanOccur` + `Children`); `ConductorBase<T>.CloseStrategy` is a plain settable property, so a hand-written majority-vote policy plugs in and is honoured in place of Caliburn's own all-or-nothing default | ✅ |
 | 055 | DataErrorInfoValidation | implementing `IDataErrorInfo` on a screen flips a real `Binding`'s `ValidatesOnDataErrors` to `true` by Caliburn's own naming convention (a plain `PropertyChangedBase`/`Screen` gets `false`) - `ValidatesOnNotifyDataErrors` is `true` for both and proves nothing about the convention by itself | ✅ |
-| 056 | NotifyDataErrorInfoValidation | `INotifyDataErrorInfo`, asynchronous errors | ⬜ |
-| 057 | ValidatingScreen | validation gating `CanClose` | ⬜ |
-| 058 | ItemsConventionBinding | `ItemsControl` named after a collection | ⬜ |
-| 059 | ActiveItemSelectedItem | `ActiveItem` ↔ `SelectedItem` convention | ⬜ |
-| 060 | ItemTemplateViewLocator | the ViewLocator inside a `DataTemplate` | ⬜ |
+| 056 | NotifyDataErrorInfoValidation | `INotifyDataErrorInfo` does NOT change the binding - `ValidatesOnDataErrors` stays `false` and `ValidatesOnNotifyDataErrors` stays `true` (WPF's own default) for both an `INotifyDataErrorInfo` screen and a plain one, unlike ex055's `IDataErrorInfo`; the lesson lives on `HasErrors`/`GetErrors`/`ErrorsChanged` instead, including an error that only exists once an async validation task completes | ✅ |
+| 057 | ValidatingScreen | `CanCloseAsync` derived from the screen's own computed validation state rather than an externally-toggled flag - and, measured, a `Screen` with no `Parent` and no attached view never has `CanCloseAsync` invoked by `TryCloseAsync` at all, so the guard is asked directly and through a close-request method that must act on its answer | ✅ |
+| 058 | ItemsConventionBinding | an `ItemsControl` named after a collection binds `ItemsSource` `Mode=OneWay` (get-only) with `DisplayMemberPath`/`ItemTemplate` left untouched for plain strings - a name matching NOTHING binds nothing at all, not even the `Visibility` fallback other elements get, since `ItemsControl`'s own convention IS `ItemsSource` | ✅ |
+| 059 | ActiveItemSelectedItem | the selection convention derives `SelectedItem`'s name FROM the collection's own name and wires a `ListBox.SelectedItem` to the conductor's `ActiveItem` `Mode=TwoWay` with no XAML written for it, genuinely bidirectionally; a `ContentControl` named `ActiveItem` binds Caliburn's own `View.Model` attached property `TwoWay` instead of `Content`, which gets no binding at all | ✅ |
+| 060 | ItemTemplateViewLocator | `ConventionManager.DefaultItemTemplate` is assigned for any reference-type item collection other than `string` (measured: even a plain non-Caliburn POCO, not just a view model) while a value-type or `string` collection gets `null`; the template's own loaded content is a `ContentControl` with `View.Model` bound directly to the item itself (`Binding.Path` is `null`, not an empty `PropertyPath`) - which is what runs the ViewLocator per row | ✅ |
 | 061 | AsyncGuardRefresh | async work flipping a guard | ⬜ |
 | 062 | ExecuteOnUIThread | `Execute`, `PlatformProvider`, marshalling | ⬜ |
 | 063 | LogManagerCustomLogger | plugging a logger into `LogManager` | ⬜ |
