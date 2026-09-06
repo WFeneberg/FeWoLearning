@@ -23,6 +23,12 @@ public class Ex050_ViewLocatorForDialogsTests : CaliburnViewContext
     [WpfFact]
     public void An_Arbitrary_FrameworkElement_View_Also_Does_Not_Resolve_To_A_Window()
     {
+        // Pin down that the naming convention actually FOUND Ex050_GridShapedView first - an
+        // unresolvable model also yields a non-Window (a fallback TextBlock reading "Cannot
+        // find view for ..."), so without this the assertion below could not tell "located a
+        // real Grid-shaped view" apart from "located nothing at all".
+        Assert.IsType<Ex050_GridShapedView>(ViewLocator.LocateForModelType(typeof(Ex050_GridShapedViewModel), null, null));
+
         // A stub that checked `is UserControl` instead of `is Window` (the wrong half of the
         // condition to test) would wrongly say true for a plain UserControl and never notice
         // it had the check backwards until faced with a THIRD shape like this one.

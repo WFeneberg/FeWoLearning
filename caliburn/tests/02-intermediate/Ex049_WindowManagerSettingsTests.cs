@@ -36,7 +36,7 @@ public class Ex049_WindowManagerSettingsTests : CaliburnViewContext
     }
 
     [WpfFact]
-    public async Task Width_And_Left_Do_Not_Survive_Because_EnsureWindow_Overrides_Them_Afterwards()
+    public async Task Width_And_Left_Do_Not_Survive_Because_Show_Discards_Them_To_Honor_SizeToContent_And_Centering()
     {
         var vm = new Screen();
         var settings = Ex049_WindowManagerSettings.BuildSettings("Hello", showInTaskbar: false, width: 321, left: -32000);
@@ -46,9 +46,13 @@ public class Ex049_WindowManagerSettingsTests : CaliburnViewContext
         // The sharp half of this exercise: these two do NOT come back as requested.
         Assert.NotEqual(321.0, window.Width);
         Assert.NotEqual(-32000.0, window.Left);
-        // The mechanism, not just the symptom: Caliburn's own SizeToContent/centring applied
-        // afterwards is WHY - a settings dictionary that (say) forgot Width/Left entirely would
-        // still make the two asserts above pass vacuously, so this pins down the actual cause.
+        // The mechanism, not just the symptom - and NOT "EnsureWindow overrides the dictionary":
+        // EnsureWindow sets these two BEFORE the dictionary is even applied, and never touches
+        // Width/Left itself (measured: Width/Left are still NaN when EnsureWindow returns). It is
+        // WPF's OWN layout at Show() time, honouring the SizeToContent/WindowStartupLocation
+        // EnsureWindow set earlier, that discards whatever the dictionary put there. A settings
+        // dictionary that (say) forgot Width/Left entirely would still make the two asserts above
+        // pass vacuously, so this pins down the actual cause rather than just the symptom.
         Assert.Equal(SizeToContent.WidthAndHeight, window.SizeToContent);
         Assert.Equal(WindowStartupLocation.CenterScreen, window.WindowStartupLocation);
     }

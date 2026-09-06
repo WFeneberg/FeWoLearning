@@ -124,7 +124,7 @@ it:
 **`CaliburnViewContext : CaliburnCoreContext, IDisposable`** — for exercises
 with a view (ex012 onward). Runs only under `[WpfFact]`/`[WpfTheory]`, because
 it installs `XamlPlatformProvider`, which must capture the *test's own* STA
-dispatcher. It adds four helpers:
+dispatcher. It adds ten helpers:
 
 - **`Show(view)`** — opens the off-screen `Window` (parked at `Left`/`Top`
   `-32000`, `Opacity = 0`, `ShowActivated = false`, `ShowInTaskbar = false`),
@@ -137,6 +137,30 @@ dispatcher. It adds four helpers:
   cases that need the callback but not a real window.
 - **`Pump(priority)`** — drains the dispatcher queue before an assertion, so
   marshalled work has actually run.
+- **`InvisibleDialogSettings()`** — a fresh settings dictionary (`WindowStyle
+  = None`, `AllowsTransparency = true`, `Opacity = 0`, `ShowInTaskbar = false`,
+  `ShowActivated = false`) per call, so no test can mutate a shared one and
+  leak into a later dialog. Added for ex046–ex050; see the modal-dialog trap
+  below before touching any of the next six.
+- **`ScheduleTryClose(rootModel, closeWith, onWindowCaptured?)`** — schedules
+  `rootModel.TryCloseAsync(closeWith)` to run from inside whatever nested
+  modal frame is about to start pumping. Must be called *before* the call
+  that shows the dialog, never after.
+- **`ScheduleFromInsideModalFrame(rootModel, closer, onWindowCaptured?, onCloserFailed?)`**
+  — generalizes `ScheduleTryClose` to an arbitrary closer (an exercise's own
+  method, not just a raw `TryCloseAsync` call). Force-closes the dialog on
+  any exception from the capture or the closer, and reports that exception
+  via `onCloserFailed` instead of letting it vanish.
+- **`BoundedDialogAsync(dialogTask, rootModel, because?)`** — awaits a
+  dialog-producing task for at most 8 seconds, then force-closes whatever
+  `Window` currently hosts `rootModel` (re-derived fresh at the moment of
+  timeout, not from an earlier capture) and fails with a clear message.
+- **`ShowDialogInvokingAsync(rootModel, closer, settings?)`** — shows
+  `rootModel` via a fresh `WindowManager`, closes it by invoking `closer`,
+  and returns both the resolved `bool?` and the hosting `Window`.
+- **`ShowDialogAndCloseAsync(rootModel, closeWith, settings?)`** — the common
+  case, built directly on `ShowDialogInvokingAsync` with `closer =
+  () => rootModel.TryCloseAsync(closeWith)`.
 
 The whole test assembly runs serially
 (`[assembly: CollectionBehavior(DisableTestParallelization = true)]`) because
@@ -190,10 +214,10 @@ reason of its own is this, not a bug in that exercise.
 `tests/_harness/HarnessSmokeTests.cs` proves the harness itself: `HarnessCoreSmokeTests`
 (3 `[Fact]`) exercises the core context with no view at all — including that a
 `NameTransformer.AddRule` in one test cannot survive into another — and `HarnessSmokeTests`
-(4 `[WpfFact]`) exercises `Show`, convention binding, guard gating and action
-invocation end to end. Neither is a catalog exercise — they exist so the
-harness is proven green in the real tree from the first commit, rather than
-first getting exercised eleven rows later at ex012.
+(5 `[WpfFact]`) exercises `Show`, convention binding, guard gating, action
+invocation and (added for ex046–ex050) `ShowDialogAndCloseAsync` end to end. Neither is a
+catalog exercise — they exist so the harness is proven green in the real tree from the
+first commit, rather than first getting exercised eleven rows later at ex012.
 
 ## What the harness cannot do
 
@@ -226,6 +250,7 @@ not attempt:
 | "`Xunit.StaFact` 4.x is just a newer version — bump it" | Do **not** — pin stays at 3.0.13 deliberately, not because 4.x cannot work. `Xunit.StaFact` 4.0.23 depends on `xunit.v3.extensibility.core` 4.0.0, which dropped the VSTest bridge that `Microsoft.NET.Test.Sdk` + `xunit.runner.visualstudio` rely on; on .NET 10 SDK the build dies with `Testing with VSTest target is no longer supported by Microsoft.Testing.Platform on .NET 10 SDK and later.` Neither the `TestingPlatformDotnetTestSupport` MSBuild property nor a `dotnet.config` naming that runner fixed it here. The mechanism that **does** work is a track-root `global.json` containing `{"test":{"runner":"Microsoft.Testing.Platform"}}` — the sibling `wpf/` track runs `Xunit.StaFact` 4.0.23 on xunit.v3 4.0.0 exactly that way. `caliburn/` stays on 3.0.13 to keep the VSTest path and xunit.v3 3.2.2 generation `avalonia/` runs; anyone bumping it must add that `global.json` too. |
 | A fully qualified `Caliburn.Micro.Action` (or `.View`, `.Message`) reference compiles from a plain console app but not from this track | Every `exercises`/`solutions`/`tests` file lives under `FeWoLearning.Caliburn.*`, so the leading segment `Caliburn` in a fully qualified `Caliburn.Micro.Action.SetTarget(...)` resolves against the enclosing `FeWoLearning.Caliburn` namespace, not the package root — `CS0234: The type or namespace name 'Micro' does not exist in the namespace 'FeWoLearning.Caliburn'`. Identical to the trap `avalonia/` hit with `Avalonia.Media.TextWrapping` (see the root `CLAUDE.md`). `using Caliburn.Micro;` directives are exempt (that is how every exercise already resolves `PropertyChangedBase`, `SimpleContainer`, etc. without incident) — the fix for a type whose bare name collides with something else in scope (`Action` vs `System.Action`, from `ImplicitUsings`) is a `using` alias, e.g. `using CaliburnAction = Caliburn.Micro.Action;`, not the fully qualified name. First hit by ex027/ex028; will recur for ex065, ex068, ex095/ex096. |
 | "A coroutine test that never completes just takes a while to run" | A step whose `IResult`/`IResult<T>.Execute` never raises `Completed` makes `Coroutine.ExecuteAsync`'s returned `Task` wait **forever**, not slowly — the test **hangs** rather than failing, the same sharp edge already documented above for ex010's `CanCloseAsync`. Every ex041–ex045 test that awaits a hand-written `IResult`'s coroutine bounds that await via `CaliburnCoreContext`'s shared `BoundedAsync`/`BoundedExceptionAsync` helpers instead of awaiting unconditionally (`Task.WhenAny` against a short `Task.Delay`, asserting the coroutine's own task actually won the race), so a forgotten `Completed` fails red with a clear timeout message instead of stalling the whole suite — wrapping the bounded call in `Record.ExceptionAsync` defeats this (a swallowed timeout reads as "no exception"), which is why `BoundedExceptionAsync` returns the exception itself rather than being combined with `Record.ExceptionAsync` a second time. Every coroutine await in the batch is bounded this way, including ex043's single-step `TaskExtensions.ExecuteAsync<TResult>(this IResult<TResult>, ...)` call. |
+| "A `Task.WhenAny`/`Task.Delay` race can bound a `ShowDialogAsync` await the same way it bounds a coroutine" | It cannot, and this is sharper than the coroutine trap above: `WindowManager.CreateWindowAsync` completes **synchronously**, so by the time `ShowDialogAsync` would return to the caller, the calling STA thread is already blocked inside `Window.ShowDialog()`'s own managed `Dispatcher.PushFrame` loop. A losing `Task.Delay` in a `Task.WhenAny` race is just another queued continuation on that **same** dispatcher — it can run (that pump keeps pumping, which is exactly why a timeout continuation gets to execute at all), but throwing from it does not unwind the native call stack that has `Window.ShowDialog()` on it; only the **window actually closing** makes that call return. A stub whose close logic throws *before* ever reaching `TryCloseAsync` — precisely what every unfinished ex046–ex050 stub does — therefore hangs the process rather than failing the test, unless something explicitly force-closes the hosting `Window` itself. `CaliburnViewContext`'s `ScheduleFromInsideModalFrame` and `BoundedDialogAsync` both do exactly that (on a closer exception, and on the 8-second bound expiring, respectively) — re-deriving the hosting `Window` fresh via `((IViewAware)rootModel).GetView()` each time, rather than trusting an earlier capture, because a *correct* implementation that merely `await`s something before ever calling `ShowDialogAsync` can make that earlier capture run before the dialog exists at all. Measured, repeatedly, hitting exactly this hang during this batch's own authoring: a `timeout`-bounded shell command was needed to safely recover the first few attempts. |
 
 Pinned package versions, for reference: `Caliburn.Micro` 5.0.258,
 `Xunit.StaFact` 3.0.13, `xunit.v3` 3.2.2, `xunit.runner.visualstudio` 3.1.4,

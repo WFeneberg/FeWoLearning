@@ -9,6 +9,11 @@ public class Ex047_WindowManagerDialogTests : CaliburnViewContext
     // ShowDialogAsync is modal, so the close must be scheduled BEFORE the call that reaches
     // it (here, host.ShowAsync), and the wait bounded, exactly as ShowDialogAndCloseAsync does
     // for the exercises that call ShowDialogAsync directly rather than through their own code.
+    // BoundedDialogAsync always takes the root model too (not just the dialog task): a CORRECT
+    // ShowAsync that awaits something before ever reaching ShowDialogAsync (a log call, a
+    // guard, plain Task.Yield) makes ScheduleTryClose's own capture attempt run before any
+    // window exists - the timeout escape must be able to find the window itself, fresh, rather
+    // than trust that earlier capture.
 
     /// <summary>Wraps a real WindowManager and counts ShowDialogAsync calls, so a test can prove
     /// the INJECTED instance is the one Ex047_DialogHost actually used - a stub that built its
@@ -39,7 +44,7 @@ public class Ex047_WindowManagerDialogTests : CaliburnViewContext
         var host = new Ex047_DialogHost(new SpyWindowManager());
 
         ScheduleTryClose(vm, true);
-        var result = await BoundedDialogAsync(host.ShowAsync(vm, InvisibleDialogSettings));
+        var result = await BoundedDialogAsync(host.ShowAsync(vm, InvisibleDialogSettings()), vm);
 
         Assert.True(result);
     }
@@ -51,7 +56,7 @@ public class Ex047_WindowManagerDialogTests : CaliburnViewContext
         var host = new Ex047_DialogHost(new SpyWindowManager());
 
         ScheduleTryClose(vm, false);
-        var result = await BoundedDialogAsync(host.ShowAsync(vm, InvisibleDialogSettings));
+        var result = await BoundedDialogAsync(host.ShowAsync(vm, InvisibleDialogSettings()), vm);
 
         Assert.False(result);
     }
@@ -64,7 +69,7 @@ public class Ex047_WindowManagerDialogTests : CaliburnViewContext
         var host = new Ex047_DialogHost(spy);
 
         ScheduleTryClose(vm, true);
-        await BoundedDialogAsync(host.ShowAsync(vm, InvisibleDialogSettings));
+        await BoundedDialogAsync(host.ShowAsync(vm, InvisibleDialogSettings()), vm);
 
         // A stub that built its own `new WindowManager()` inside ShowAsync would still make the
         // previous two tests pass (the dialog really would show and close) but never touch spy.
@@ -78,11 +83,11 @@ public class Ex047_WindowManagerDialogTests : CaliburnViewContext
 
         var vm1 = new Screen();
         ScheduleTryClose(vm1, true);
-        await BoundedDialogAsync(host.ShowAsync(vm1, InvisibleDialogSettings));
+        await BoundedDialogAsync(host.ShowAsync(vm1, InvisibleDialogSettings()), vm1);
 
         var vm2 = new Screen();
         ScheduleTryClose(vm2, false);
-        await BoundedDialogAsync(host.ShowAsync(vm2, InvisibleDialogSettings));
+        await BoundedDialogAsync(host.ShowAsync(vm2, InvisibleDialogSettings()), vm2);
 
         Assert.Equal(2, host.TimesShown);
     }
@@ -97,7 +102,7 @@ public class Ex047_WindowManagerDialogTests : CaliburnViewContext
 
         var vm = new Screen();
         ScheduleTryClose(vm, true);
-        await BoundedDialogAsync(host1.ShowAsync(vm, InvisibleDialogSettings));
+        await BoundedDialogAsync(host1.ShowAsync(vm, InvisibleDialogSettings()), vm);
 
         // Only host1 (and therefore only spy1) was ever used.
         Assert.Equal(1, spy1.ShowDialogCalls);

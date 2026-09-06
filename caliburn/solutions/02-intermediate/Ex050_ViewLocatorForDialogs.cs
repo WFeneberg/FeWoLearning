@@ -4,7 +4,8 @@
 //         (a UserControl, in every exercise so far) gets WRAPPED in a bare System.Windows.Window
 //         Caliburn creates for it. ViewLocator.LocateForModelType(Type, DependencyObject, object)
 //         is the lookup WindowManager itself uses to find that view, given only the root model's
-//         TYPE - a different overload from ex013's instance-based LocateForModel.
+//         TYPE - a separate static delegate FIELD from ex013's instance-based LocateForModel, not
+//         an overload of it.
 // Drills: calling ViewLocator.LocateForModelType and checking whether what it found IS a Window,
 //         rather than merely resembling one (a stub that instead checks `is FrameworkElement`
 //         would be true for BOTH shapes and never distinguish them at all).

@@ -11,6 +11,55 @@ public class Ex048_DialogResultTests : CaliburnViewContext
     // instead of calling TryCloseAsync directly, since here the exercise IS which bool? gets
     // passed to TryCloseAsync.
 
+    /// <summary>Overrides the virtual TryCloseAsync to record exactly what argument it was
+    /// called with, BEFORE Caliburn's own dialog plumbing collapses null into false on the way
+    /// out through ShowDialogAsync. Needed because DismissAsync => TryCloseAsync(false) (a
+    /// plausible copy-paste from DeclineAsync) resolves ShowDialogAsync to false exactly like a
+    /// correct TryCloseAsync(null) does - the only place the two are still distinguishable.</summary>
+    class RecordingDialogVm : Ex048_ConfirmableDialogVm
+    {
+        public bool? LastCloseArgument { get; private set; }
+
+        public override Task TryCloseAsync(bool? dialogResult = null)
+        {
+            LastCloseArgument = dialogResult;
+            return base.TryCloseAsync(dialogResult);
+        }
+    }
+
+    [WpfFact]
+    public async Task ConfirmAsync_Calls_TryCloseAsync_With_True_Specifically()
+    {
+        var vm = new RecordingDialogVm();
+
+        await ShowDialogInvokingAsync(vm, vm.ConfirmAsync);
+
+        Assert.True(vm.LastCloseArgument);
+    }
+
+    [WpfFact]
+    public async Task DeclineAsync_Calls_TryCloseAsync_With_False_Specifically()
+    {
+        var vm = new RecordingDialogVm();
+
+        await ShowDialogInvokingAsync(vm, vm.DeclineAsync);
+
+        Assert.False(vm.LastCloseArgument);
+    }
+
+    [WpfFact]
+    public async Task DismissAsync_Calls_TryCloseAsync_With_Null_Specifically_Not_False()
+    {
+        // The discriminating test: without this, a DismissAsync that hardcodes TryCloseAsync(false)
+        // would pass every OTHER test in this file, because false is exactly what ShowDialogAsync
+        // resolves BOTH a correct TryCloseAsync(null) and this wrong TryCloseAsync(false) to.
+        var vm = new RecordingDialogVm();
+
+        await ShowDialogInvokingAsync(vm, vm.DismissAsync);
+
+        Assert.Null(vm.LastCloseArgument);
+    }
+
     [WpfFact]
     public async Task ConfirmAsync_Resolves_ShowDialogAsync_To_True()
     {
