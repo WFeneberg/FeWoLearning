@@ -563,3 +563,43 @@ surprise the next batch pays for again.
   which **3 are container-gated**. Red run 219 failed / 5 passed / 3 skipped; green run
   224 passed / 3 skipped; green with `-p:Containers=true` **227 passed / 0 skipped**.
   0 warnings in both modes.
+
+**2026-09-06, rows 046–050 — and a defect found in already-shipped work:**
+
+- **There is exactly one way to force a root activity, and it is not the obvious one.**
+  Measured, under an ambient span:
+  - `StartActivity(name, kind, parentContext: default)` → **inherits** the ambient
+    parent. Not a root.
+  - `StartActivity(name, kind, parentId: null)` → **inherits** too. Not a root.
+  - clearing `Activity.Current` around the call → a genuine root
+    (`ParentSpanId == default`).
+
+  Both of the first two read as though they should work, and on a bare thread they do -
+  which is why this survived review. **Row 019 shipped with the wrong mechanism and a
+  header claiming "a ROOT, whatever happens to be ambient".** It has been corrected, and
+  its adversarial fact now runs *inside* an ambient span so the row grades what it
+  claims. Row 049 was written correctly from the start only because the probe caught it
+  first.
+- **How it was caught is the point.** Ex049's wrong-implementation probe - dropping the
+  explicit `parentContext: default` - changed *nothing*, because the test ran on a bare
+  thread where both forms produce roots. A probe that catches nothing is not a passing
+  probe; it means the fact is not measuring the mechanism. Chasing that produced the
+  measurement above and the fix to row 019.
+- **The exported order of ASP.NET Core server spans is NOT request order.** Measured:
+  `GetAsync` returns once the response headers arrive while the server span ends a moment
+  later, so two sequential requests can interleave in the export list. A test that
+  indexes into that list is flaky in the direction that passes locally - look spans up by
+  `url.path` instead.
+- **`AddAspNetCoreInstrumentation`'s `Filter` runs before the activity exists**, so a
+  filtered request costs a predicate rather than a span that is built, serialised and
+  discarded downstream. That is the cheapest performance win in this track: a liveness
+  probe at fifty replicas is a million spans a day describing nothing that ever varies.
+- Row 047 is deliberately a **hand-written `DelegatingHandler`** rather than
+  `AddHttpClientInstrumentation`, for the reason row 041 measured - and writing it out is
+  also the only way to see *which* context gets injected. Injecting the ambient one
+  instead of the client span's own makes the client and server spans siblings, and the
+  network hop vanishes from the waterfall.
+- Batch baseline after rows 001–050: **257 facts total** (251 exercise + 6 harness), of
+  which 3 are container-gated. Red run 249 failed / 5 passed / 3 skipped; green run 254
+  passed / 3 skipped; green with `-p:Containers=true` 257 passed / 0 skipped. 0 warnings
+  in both modes.

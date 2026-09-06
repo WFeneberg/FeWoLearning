@@ -17,7 +17,7 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 `tests/<block>/ExNNN_<Slug>Tests.cs`, and reference implementations in
 `solutions/<block>/` at the same relative path.
 
-**Status: 45 ✅ / 25 ⬜**
+**Status: 50 ✅ / 20 ⬜**
 
 ## logging (001–014) — `ILogger` and the structured-logging contract
 
@@ -83,11 +83,11 @@ Stubs live in `exercises/<block>/ExNNN_<Slug>.cs`, their xUnit tests in
 | # | Slug | Concepts | Status |
 |---|------|----------|--------|
 | 045 | AspNetCoreServerSpan | a server span per request via `TestHost`; the **route template**, not the raw path, as the span name | ✅ |
-| 046 | SpanEnrichmentAndFiltering | enriching the server span; suppressing `/health` noise at the source | ⬜ |
-| 047 | HttpClientPropagation | the outgoing `traceparent`, parent/child across the process boundary, a `DelegatingHandler` | ⬜ |
-| 048 | QueuePropagationProducerConsumer | inject into message headers, extract on the consumer, Producer/Consumer kinds and a link | ⬜ |
-| 049 | BackgroundServiceInstrumentation | one root activity **per iteration**, not one per service lifetime | ⬜ |
-| 050 | RedMetricsAndCardinality | rate/errors/duration by `http.route`; a tag cardinality budget | ⬜ |
+| 046 | SpanEnrichmentAndFiltering | enriching the server span; suppressing `/health` noise at the source | ✅ |
+| 047 | HttpClientPropagation | the outgoing `traceparent`, parent/child across the process boundary, a `DelegatingHandler` | ✅ |
+| 048 | QueuePropagationProducerConsumer | inject into message headers, extract on the consumer, Producer/Consumer kinds and a link | ✅ |
+| 049 | BackgroundServiceInstrumentation | one root activity **per iteration**, not one per service lifetime | ✅ |
+| 050 | RedMetricsAndCardinality | rate/errors/duration by `http.route`; a tag cardinality budget | ✅ |
 | 051 | DatabaseInstrumentation | `db.system`/`db.query.text`, and why parameter values must never reach the span | 🐳 ⬜ |
 | 052 | HealthChecksAndProbes | composition, tag-filtered liveness vs readiness, check results as metrics | ⬜ |
 | 053 | ResilienceTelemetry | Polly retries visible as events and metrics; the retry-hides-the-failure bug | ⬜ |

@@ -23,6 +23,12 @@ namespace FeWoLearning.Telemetry.Exercises.Diagnostics;
 // point back at twenty producers, so every one of those traces can find where its
 // message went without any of them owning the batch.
 //
+// Making it a root is harder than it looks, and this row originally got it wrong.
+// Measured 2026-09-06: passing `parentContext: default` does NOT produce a root when
+// something is ambient - the activity inherits Activity.Current anyway - and neither
+// does `parentId: null`. Both read as if they should. The only thing that works is to
+// clear Activity.Current around the call and put it back.
+//
 // Kind matters for the same reason it is not decoration: a backend uses Producer and
 // Consumer to recognise a queue hop and to stop counting the queue's latency as the
 // service's own. Get the kind wrong and the shape of every latency chart is wrong.

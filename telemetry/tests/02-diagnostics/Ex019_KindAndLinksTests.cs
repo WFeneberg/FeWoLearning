@@ -59,11 +59,24 @@ public class Ex019_KindAndLinksTests
         // parent is not a simplification, it is a false statement - it grafts the batch
         // onto one customer's trace, and the other nineteen end at the queue with no
         // visible continuation.
+        // Run under an AMBIENT span deliberately. Measured 2026-09-06 and originally got
+        // wrong here: `parentContext: default` does NOT make a root when something is
+        // ambient - the activity inherits Activity.Current anyway - and neither does
+        // `parentId: null`. On a bare thread both look correct, so a test that does not
+        // open an ambient span cannot tell a real root from an accidental one.
         using var ctx = new TelemetryContext();
         using var probe = Probe();
         var incoming = PublishThree();
 
-        var batch = Ex019_KindAndLinks.ProcessBatch(incoming);
+        Activity? batch;
+        using (var ambient = Ex019_KindAndLinks.Source.StartActivity("consumer-loop"))
+        {
+            Assert.NotNull(ambient);
+            batch = Ex019_KindAndLinks.ProcessBatch(incoming);
+
+            // And the caller's own context is handed back untouched.
+            Assert.Same(ambient, Activity.Current);
+        }
 
         Assert.NotNull(batch);
         Assert.Equal(default, batch.ParentSpanId);

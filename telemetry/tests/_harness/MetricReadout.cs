@@ -6,6 +6,7 @@ namespace FeWoLearning.Telemetry.Tests.Harness;
 /// One metric point, copied out of the SDK at the moment of collection.
 /// </summary>
 /// <param name="Instrument">The instrument's name, after any view has renamed it.</param>
+/// <param name="Unit">The unit it declared, or null.</param>
 /// <param name="Tags">The dimensions that survived to this point.</param>
 /// <param name="Sum">The sum, or a gauge's last value, whichever the type carries.</param>
 /// <param name="Count">The number of measurements, for histograms; 0 otherwise.</param>
@@ -13,6 +14,7 @@ namespace FeWoLearning.Telemetry.Tests.Harness;
 /// <param name="Exemplars">Trace ids and values of any exemplars attached.</param>
 public sealed record MetricPointSnapshot(
     string Instrument,
+    string? Unit,
     IReadOnlyList<KeyValuePair<string, object?>> Tags,
     double Sum,
     long Count,
@@ -105,7 +107,7 @@ public static class MetricReadout
                 }
             }
 
-            points.Add(new MetricPointSnapshot(metric.Name, tags, sum, count, bounds, exemplars));
+            points.Add(new MetricPointSnapshot(metric.Name, metric.Unit, tags, sum, count, bounds, exemplars));
         }
 
         return points;
