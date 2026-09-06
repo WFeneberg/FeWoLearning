@@ -63,6 +63,7 @@ tests there — do not add `solutions/` to a project/module.
 | `MicroServices/`| — (restore on first `dotnet test`)| `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 | `security/`| — (restore on first `dotnet test`)      | `dotnet test --solution FeWoLearning.Security.slnx` | `dotnet test --project tests/FeWoLearning.Security.Tests.csproj --filter-class "*Ex001*"` |
 | `Architecture/`| — (restore on first `dotnet test`) | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
+| `telemetry/`| — (restore on first `dotnet test`)     | `dotnet test`            | `dotnet test --filter FullyQualifiedName~Ex001_` |
 
 Run every command **from inside the track folder**, not the repo root.
 
@@ -644,6 +645,65 @@ the same `global.json` opt-in.
   Windows-only, and block `04-desktop-wpf` additionally needs an
   **interactive desktop session**, because WPF is. `Ex055_ClipboardHygiene`
   briefly disturbs the real system clipboard while the suite runs.
+- **Telemetry** — 70 rows across five **subject-area blocks** (`01-logging`,
+  `02-diagnostics`, `03-otel-sdk`, `04-web-services`, `05-desktop-ops`), not
+  100 rows in four difficulty tiers, for the same reason `security/` and
+  `Architecture/` depart: "beginner telemetry" is not a meaningful axis. The
+  solution is `FeWoLearning.Telemetry.slnx`, three projects sharing the
+  `UseSolutions` mechanism with `wpf/`, `blazor/`, `uno/`, `caliburn/`,
+  `avalonia/`, `security/` and `Architecture/`. Namespaces are pinned per
+  **block**: `FeWoLearning.Telemetry.Exercises.Logging` / `.Diagnostics` /
+  `.Otel` / `.WebServices` / `.DesktopOps`.
+
+  **Block 03 is `.Otel` and must never be renamed to `.OpenTelemetry`.** Inside
+  a namespace ending in `OpenTelemetry`, a fully qualified
+  `OpenTelemetry.Trace.Sampler` binds its leading segment to the enclosing
+  namespace and fails `CS0234` — the shadowing trap this file already records
+  for `avalonia/` and `caliburn/`, here avoided rather than documented.
+
+  `net10.0-windows` with `UseWPF`, so block `05-desktop-ops` can drill real
+  `Dispatcher`, `DispatcherUnhandledException` and `PresentationTraceSources`
+  mechanisms. Windows-only as a result. Measured 2026-09-06: `[WpfFact]` from
+  `Xunit.StaFact` 3.0.13 gives an STA thread and a live
+  `Dispatcher.CurrentDispatcher` **without** an interactive desktop session,
+  unlike `caliburn/`, which needs one because it opens a real `Window` — no row
+  here is supposed to open one.
+
+  **Pinned to `Xunit.StaFact` 3.0.13 + xunit.v3 3.2.2 +
+  `xunit.runner.visualstudio` 3.1.5 + `Microsoft.NET.Test.Sdk` 17.14.1, with no
+  `global.json`** — `caliburn/`'s measured VSTest pairing, deliberately *not*
+  `security/`'s xunit.v3 4.0.0 + `Microsoft.Testing.Platform` `global.json`,
+  which is the combination that exits 5 with zero tests discovered here.
+  `OpenTelemetry` and its family sit at **1.18.0**, except
+  `OpenTelemetry.Exporter.Prometheus.AspNetCore`, which has **no stable release
+  at all** and is pinned at `1.18.0-beta.1`.
+
+  **The recurring bug class is that a telemetry test which asserts the rendered
+  result instead of the structure grades nothing.** `$"user {id} failed"`
+  renders byte-identically to `"user {UserId} failed", id` and carries no named
+  field; "a span exists" is satisfied by automatic instrumentation the learner
+  never wrote and by a span with the wrong parent; an exporter in the DI
+  container proves nothing without the in-memory exporter's contents; and a
+  single `Collect` cannot tell Delta from Cumulative. `telemetry/README.md`'s
+  "How a telemetry test lies" is the long form, with all six.
+
+  **Diagnostics state is process-global**, so `tests/_harness/AssemblyInfo.cs`
+  carries `[assembly: CollectionBehavior(DisableTestParallelization = true)]`
+  *and* `TelemetryContext` resets `Activity.Current`,
+  `Activity.DefaultIdFormat`, `Activity.ForceDefaultIdFormat`,
+  `Sdk.SetDefaultTextMapPropagator` and `Baggage.Current` per test — its
+  snapshot taken in an **explicit static constructor**, never a field
+  initializer, for the `beforefieldinit` reason recorded under `caliburn/`.
+  Every exercise additionally owns a uniquely named
+  `ActivitySource`/`Meter` (`fewolearning.telemetry.exNNN`).
+
+  Three small traps measured while scaffolding: `FakeLogger`'s accessor is
+  `logger.Collector.LatestRecord`, not `logger.Latest`; `FakeLogger` captures
+  scopes with no `IncludeScopes` opt-in and does **not** flatten them, so
+  `FakeLogRecord.Scopes` holds the raw scope object; and **a literal double
+  hyphen is illegal in an XML comment**, so a `.csproj` comment naming a CLI
+  flag fails `MSB4025` — the rule this file records for `.axaml` applies to
+  project files too.
 
 ## Adding or completing exercises
 
@@ -715,6 +775,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `MicroServices/`| 5 / 100 (verified) | 95 |
 | `security/`| 60 / 60 (verified) | —         |
 | `Architecture/`| 60 / 60 (verified) | —         |
+| `telemetry/`| 0 / 70 (scaffolded, verified harness) | 70 |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/` and `MicroServices/`, all four still being built out — see the table above
