@@ -1,4 +1,5 @@
 using FeWoLearning.Avalonia.Gallery.Pages.Beginner;
+using FeWoLearning.Avalonia.Gallery.Pages.Expert;
 using FeWoLearning.Avalonia.Gallery.Pages.Intermediate;
 
 namespace FeWoLearning.Avalonia.Gallery;
@@ -7,7 +8,8 @@ public static class GalleryCatalog
 {
     /// <summary>
     /// One entry per exercise whose result is visual. View-model-only exercises
-    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex090) deliberately
+    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex093, ex095)
+    /// deliberately
     /// have no page -
     /// ex050's ViewModelViewHost and ex052/ex053's RoutedViewHost both only
     /// resolve their content on attach-to-visual-tree (via IViewLocator.ResolveView,
@@ -45,6 +47,9 @@ public static class GalleryCatalog
     /// nothing a reader could look at, so it is left out on its own merits.
     /// ex086-ex090 are static builder methods rather than views - there is no
     /// ExNNN_-named Control to construct, so there is nothing for a page to host.
+    /// ex091-ex093 and ex095 are shells, locators and containers with no view
+    /// either; ex094 is the expert tier's one view so far and does get a page,
+    /// since its stub throws from the constructor.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [
@@ -94,5 +99,6 @@ public static class GalleryCatalog
         new("065", "RenderTransformAnimation", () => new Ex065()),
         new("066", "MultiValueConverter", () => new Ex066()),
         new("067", "MarkupExtensionBasics", () => new Ex067()),
+        new("094", "CompiledBindingPerformance", () => new Ex094()),
     ];
 }

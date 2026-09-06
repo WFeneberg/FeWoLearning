@@ -1,0 +1,54 @@
+<!-- Exercise 094 - CompiledBindingPerformance (expert).
+     Goal:   Put a compiled binding and a reflection binding side by side over the
+     same property and see that the difference is not speed you can feel - it is
+     WHEN a mistake is found and whether anyone is told.
+     Drills: CompiledBinding, ReflectionBinding, x:DataType, FallbackValue,
+     silent binding failure.
+     Passes: dotnet test, filtered to Ex094_ (see
+     Ex094_CompiledBindingPerformance.axaml.cs for the exact command, because an
+     XML comment may not hold two hyphens in a row).
+
+     WHAT THIS EXERCISE DOES NOT ASSERT: how long a binding takes. This track does
+     not make wall-clock claims anywhere, for the reason the animation rows already
+     record - a timing assertion in a headless suite measures the machine, not the
+     code. So there is no benchmark here, and the row's real content is the
+     trade-off underneath the cost.
+
+     WHAT IS MEASURED, AND IS THE POINT. For a CORRECT path the two are
+     indistinguishable: both rendered "real" and both followed the property
+     changing to "changed". For a WRONG path they could not differ more. A
+     reflection binding to a misspelt property renders NOTHING, silently: no
+     exception, no crash, an empty TextBlock and a shrug. The same misspelling in a
+     compiled binding is a BUILD error - the compiler knows the type from
+     x:DataType and refuses the name, so the mistake never reaches a user.
+
+     That is why this view can contain a misspelt reflection binding at all, and
+     why it cannot contain a misspelt compiled one: the second would not compile,
+     which is the whole argument. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:e="clr-namespace:FeWoLearning.Avalonia.Exercises.Expert"
+             x:Class="FeWoLearning.Avalonia.Exercises.Expert.Ex094_CompiledBindingPerformance"
+             x:DataType="e:Ex094_ReportViewModel">
+  <!-- TODO: replace the placeholder with four TextBlocks over the same view model:
+
+         <StackPanel>
+           <TextBlock Name="Compiled" Text="{CompiledBinding Title}" />
+           <TextBlock Name="Reflection" Text="{ReflectionBinding Title}" />
+           <TextBlock Name="Misspelt" Text="{ReflectionBinding Titel}" />
+           <TextBlock Name="Guarded" Text="{ReflectionBinding Titel, FallbackValue=unavailable}" />
+         </StackPanel>
+
+       Compiled and Reflection both read the real property, so the test can show
+       they behave the same when they are right. Misspelt is the silent failure -
+       note the deliberate "Titel", which is not a property of the view model.
+       Guarded is the same mistake with the only safety net a reflection binding
+       has: a FallbackValue, which turns silence into something a reader can see.
+
+       x:DataType on the root is already set above and is not optional: without it
+       a CompiledBinding is AVLN2100, "cannot parse a compiled binding without an
+       explicit x:DataType directive". -->
+  <StackPanel>
+    <TextBlock Text="TODO" />
+  </StackPanel>
+</UserControl>

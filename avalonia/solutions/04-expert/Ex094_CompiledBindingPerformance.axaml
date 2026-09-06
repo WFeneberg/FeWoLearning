@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:e="clr-namespace:FeWoLearning.Avalonia.Exercises.Expert"
+             x:Class="FeWoLearning.Avalonia.Exercises.Expert.Ex094_CompiledBindingPerformance"
+             x:DataType="e:Ex094_ReportViewModel">
+  <StackPanel>
+    <TextBlock Name="Compiled" Text="{CompiledBinding Title}" />
+    <TextBlock Name="Reflection" Text="{ReflectionBinding Title}" />
+    <TextBlock Name="Misspelt" Text="{ReflectionBinding Titel}" />
+    <TextBlock Name="Guarded" Text="{ReflectionBinding Titel, FallbackValue=unavailable}" />
+  </StackPanel>
+</UserControl>

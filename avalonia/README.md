@@ -494,6 +494,78 @@ an explicit value on a child outranks the inherited one.
 in exercise code and in tests alike, must be passed an explicit `CultureInfo`, or
 it passes here and fails on a machine set up differently.
 
+## View location and dependency injection in ReactiveUI 24
+
+**`ViewLocator.Current` is read-only.** There is no way to install a custom
+locator globally at run time — only at builder time, which a test cannot reach.
+What *is* settable is **`ViewModelViewHost.ViewLocator`**, an ordinary property,
+so a host can be given a locator per instance. That is how ex092 gets a real
+locator into a real host without touching global state.
+
+**`IViewLocator` has four members**, not one: `ResolveView(object?)`,
+`ResolveView(object?, string?)` and two generic overloads. Hosts call the
+non-generic pair; returning `null` from the generic ones is what ReactiveUI's own
+locator effectively does here, but they have to exist or the class will not
+compile.
+
+**ReactiveUI's resolver is Splat's**, reached through `Splat.Locator` — and
+`Locator.Current` is process-global, so a serial suite must not mutate it.
+`Splat.ModernDependencyResolver` is public with a parameterless constructor, so
+exercises build an **isolated** resolver instead and nothing leaks. Wire it into
+`Locator` with `Locator.SetLocator` in a real application; not here.
+
+`ReactiveUI.DependencyResolverRegistrar` is the seam ReactiveUI itself registers
+through. Measured lifetimes:
+
+| method | instances | factory runs |
+|---|---|---|
+| `Register` | a new one per resolve | every resolve |
+| `RegisterLazySingleton` | one | once, on first resolve |
+| `RegisterConstant` | one | at registration |
+
+An unregistered type resolves to **`null`**, not an exception.
+
+**`DefaultViewLocator` + `ViewMappingBuilder`** is the framework's own explicit
+registration API, and it is the trim-safe one: `Map<TViewModel, TView>(Func<TView>)`
+records a *factory*. Measured — an unmapped view model resolves to `null`, each
+resolve calls the factory again so views are never shared, and the locator
+assigns `IViewFor.ViewModel` for you.
+
+**`Disposable.Create`/`DisposeWith` are not in any obvious ReactiveUI 24
+namespace.** The established pattern in this track is the one ex048 set:
+`this.WhenActivated((Action<IDisposable> register) => { …; register(scope); })`
+with a small hand-rolled `IDisposable`. Don't go hunting for
+`ReactiveUI.Disposables` — the assembly exists, the namespace does not.
+
+## Compiled versus reflection bindings
+
+For a **correct** path the two are indistinguishable: measured, both rendered the
+value and both followed the property changing. The difference is entirely about
+mistakes, and it is stark:
+
+- `{ReflectionBinding Titel}` — a misspelt path — renders **nothing**, silently.
+  No exception, no crash: an empty control that looks like missing data rather
+  than a bug. A `FallbackValue` is the only safety net it has, and it is opt-in
+  per binding.
+- The same misspelling as `{CompiledBinding Titel}` is a **build error**. The
+  compiler knows the type from `x:DataType` and refuses the name, so the mistake
+  never ships. This is also why an exercise can contain a misspelt *reflection*
+  binding and cannot contain a misspelt compiled one.
+
+`x:DataType` on the root is not optional for compiled bindings — without it you
+get AVLN2100, "cannot parse a compiled binding without an explicit x:DataType
+directive".
+
+**This track makes no wall-clock claims about binding cost**, here or anywhere:
+a timing assertion in a headless suite measures the machine. ex094's row is
+graded on the trade-off above instead.
+
+**`Activator.CreateInstance` throws rather than degrading.** Measured: for a view
+whose constructor takes arguments it raises `MissingMethodException`, so a
+name-based locator does not quietly return `null` — it crashes. Together with the
+fact that such a locator happily resolves types *nobody registered*, that is the
+trimming failure in miniature, and it is what ex095 grades.
+
 ## Non-goals
 
 Not in this catalog, because they cannot be tested honestly under a headless

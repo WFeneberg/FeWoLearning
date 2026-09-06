@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:e="using:FeWoLearning.Avalonia.Exercises.Expert"
+             x:Class="FeWoLearning.Avalonia.Gallery.Pages.Expert.Ex094">
+  <StackPanel Spacing="12">
+    <TextBlock Text="Exercise 094 — CompiledBindingPerformance" FontSize="18" FontWeight="Bold" />
+    <e:Ex094_CompiledBindingPerformance />
+  </StackPanel>
+</UserControl>

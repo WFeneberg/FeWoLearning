@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 90 ✅ / 10 ⬜**
+**Status: 95 ✅ / 5 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -133,11 +133,11 @@ not a valid C# identifier.
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 091 | AppShellArchitecture | routing, DI and activation composed together | ⬜ |
-| 092 | CustomViewLocator | an `IViewLocator` implementation | ⬜ |
-| 093 | DependencyInjectionWiring | a DI container behind the ReactiveUI resolver | ⬜ |
-| 094 | CompiledBindingPerformance | compiled versus reflection binding cost | ⬜ |
-| 095 | TrimmingFriendlyBindings | AOT- and trim-safe binding patterns | ⬜ |
+| 091 | AppShellArchitecture | routing, DI and activation composed together | ✅ |
+| 092 | CustomViewLocator | an `IViewLocator` implementation | ✅ |
+| 093 | DependencyInjectionWiring | a DI container behind the ReactiveUI resolver | ✅ |
+| 094 | CompiledBindingPerformance | compiled versus reflection binding cost | ✅ |
+| 095 | TrimmingFriendlyBindings | AOT- and trim-safe binding patterns | ✅ |
 | 096 | MultiWindowLifetime | `IClassicDesktopStyleApplicationLifetime`, extra windows | ⬜ |
 | 097 | PluginLoadedViews | views from a dynamically loaded assembly | ⬜ |
 | 098 | RenderedFrameCapture | `CaptureRenderedFrame` pixel assertions | ⬜ |

@@ -416,6 +416,34 @@ the same `global.json` opt-in.
   pixel assertions**, so the Skia harness switch that ex071 documents as a gap
   is not optional for the last tier: it is that row's whole subject, and it wants
   doing as its own pass with a full re-verification before ex091–ex100 start.
+
+  **ex091–ex095 are done (95 / 100)**, verified at 446 facts — 439 red / 7 green
+  untouched, 446 / 0 under `-p:UseSolutions=true`. What the expert tier turned up
+  about ReactiveUI 24's own plumbing: **`ViewLocator.Current` is read-only** (no
+  runtime global swap; `ViewModelViewHost.ViewLocator` *is* settable per host, and
+  that is how ex092 gets a locator into a host); **`IViewLocator` has four
+  members**, and the two generic overloads may return null but must exist;
+  **the resolver is Splat's**, and since `Locator.Current` is process-global the
+  exercises use an isolated `ModernDependencyResolver` (public, parameterless
+  ctor) instead of mutating it. `DependencyResolverRegistrar` lifetimes measured:
+  `Register` transient with the factory run every time, `RegisterLazySingleton`
+  once on first resolve, `RegisterConstant` at registration, and an unregistered
+  type resolves to **null** rather than throwing. `DefaultViewLocator` plus
+  `ViewMappingBuilder.Map<TViewModel,TView>(Func<TView>)` is the framework's
+  explicit, factory-based registration — unmapped resolves to null, each resolve
+  re-runs the factory, and `IViewFor.ViewModel` is assigned for you.
+  **`Disposable.Create`/`DisposeWith` are in no obvious ReactiveUI 24 namespace** —
+  `ReactiveUI.Disposables` is an assembly, not a namespace; use the
+  `WhenActivated((Action<IDisposable> register) => …)` form ex048 established.
+  On bindings: a correct path makes compiled and reflection bindings
+  indistinguishable, a misspelt **reflection** path renders nothing *silently*
+  (a `FallbackValue` is its only net), and the same misspelling compiled is a
+  build error — which is why ex094 grades that trade-off and not wall-clock cost,
+  since this track makes no timing claims. Finally,
+  **`Activator.CreateInstance` throws `MissingMethodException`** for a view whose
+  constructor takes arguments, so a name-based locator crashes rather than
+  degrading — that, plus its willingness to resolve types nobody registered, is
+  what ex095 grades as the trimming failure in miniature.
 - **Caliburn** — The solution is `FeWoLearning.Caliburn.slnx`; three projects
   (`exercises/`, `solutions/`, `tests/`). `solutions/` is deliberately **in**
   the build, the same waiver `avalonia/`, `blazor/` and `uno/` take, so
@@ -898,7 +926,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `flutter/`| 100 / 100 (seeded, **unverified** — see below) | —  |
-| `avalonia/`| 90 / 100 (verified) | 10 |
+| `avalonia/`| 95 / 100 (verified) | 5 |
 | `blazor/` | 100 / 100 (verified) | —         |
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 50 / 100 (verified) | 50 |
