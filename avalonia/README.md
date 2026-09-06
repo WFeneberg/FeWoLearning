@@ -442,6 +442,58 @@ Assert the relationships rather than those exact counts — a row's height depen
 on font metrics — but the gap between "a handful" and "all 500" is not
 measurement noise.
 
+## Resources, themes and right-to-left
+
+**`TryGetResource` does not walk up the tree.** This is the finding most likely
+to waste your afternoon, and it is measured: a `Border` inside a panel returned
+`false` for every one of that panel's keys, and the panel in turn returned
+`false` for its window's. Each host answers only for its own dictionary and the
+ones merged into it. Tree-wide inheritance is a property of the **binding**
+mechanism, not of the lookup — the same `Border` reading the same key through a
+`DynamicResource` binding resolved it correctly. The same applies to theme
+dictionaries: `TryGetResource(key, variant)` on a control inside a
+`ThemeVariantScope` found nothing, while a `DynamicResource` binding tracked
+every switch. So a consumer in an exercise binds; it does not look up.
+
+**Merged-dictionary precedence**, measured: a host's own entries beat every
+merged dictionary, and among the merged ones the **last added wins**. Merging is
+a layering in registration order, which is the opposite of the "first one
+registered" intuition.
+
+**Finding the FluentTheme's own `ControlTheme`**, so a `BasedOn` can extend it
+rather than replace it: a styled `Button`'s `Theme` property reads **null** — the
+default is resolved internally and never assigned there — and asking the button
+*or its window* for `typeof(Button)` as a resource fails too. The one host that
+answers is the application:
+`Application.Current.TryGetResource(typeof(Button), null, out var theme)`
+returns true and hands back the `ControlTheme`.
+
+An **implicit** control theme is a resource keyed by the type it applies to, so
+putting it in a host's `Resources` scopes it to that host's subtree and leaves
+everything outside alone. One timing trap: assigning it **after** the host is
+already shown does not take effect — build the host with its resources in place.
+
+**Right-to-left mirrors text, and nothing else you can see.** Measured: two
+`Border`s in a horizontal `StackPanel` reported *identical* `Bounds` under
+`LeftToRight` and `RightToLeft`; a left-aligned child stayed at x=0;
+`RenderTransform` stayed null; `TransformToVisual` was the identity both ways;
+and the internal `HasMirrorTransform` read false either way. Avalonia mirrors
+non-text visuals on the render side, which this harness discards — so **never
+assert `Bounds` for flow direction.**
+
+Text layout, by contrast, mirrors exactly and is fully observable through
+`TextBlock.TextLayout`. A 120-wide `TextBlock` holding `"abc"` laid its line out
+at `TextLines[0].Start == 0` under `LeftToRight` and `78` under `RightToLeft` —
+120 minus the 42-unit text width — and `HitTestTextPosition(0)` moved with it.
+Assert the relationship (`Width - TextLayout.Width`), not the numbers: the text
+width depends on font metrics. `FlowDirection` itself inherits down the tree, and
+an explicit value on a child outranks the inherited one.
+
+**The ambient culture on this machine is not English** — measured `de-CH` for
+`CurrentCulture` and `de-DE` for `CurrentUICulture`. Anything culture-dependent,
+in exercise code and in tests alike, must be passed an explicit `CultureInfo`, or
+it passes here and fails on a machine set up differently.
+
 ## Non-goals
 
 Not in this catalog, because they cannot be tested honestly under a headless

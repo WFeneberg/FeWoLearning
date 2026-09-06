@@ -7,7 +7,7 @@ public static class GalleryCatalog
 {
     /// <summary>
     /// One entry per exercise whose result is visual. View-model-only exercises
-    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex085) deliberately
+    /// (ex008, ex009, ex036-ex048, ex050, ex051, ex062, ex068-ex090) deliberately
     /// have no page -
     /// ex050's ViewModelViewHost and ex052/ex053's RoutedViewHost both only
     /// resolve their content on attach-to-visual-tree (via IViewLocator.ResolveView,
@@ -43,6 +43,8 @@ public static class GalleryCatalog
     /// build against the untouched stub - the ex060 trap. ex081 does throw on
     /// construction and could be registered, but a transparent drop target renders
     /// nothing a reader could look at, so it is left out on its own merits.
+    /// ex086-ex090 are static builder methods rather than views - there is no
+    /// ExNNN_-named Control to construct, so there is nothing for a page to host.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> Entries { get; } =
     [

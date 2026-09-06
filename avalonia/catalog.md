@@ -22,7 +22,7 @@ result is visual. Tier namespaces are pinned
 (`FeWoLearning.Avalonia.Exercises.Beginner` and friends), because `01-beginner` is
 not a valid C# identifier.
 
-**Status: 85 ✅ / 15 ⬜**
+**Status: 90 ✅ / 10 ⬜**
 
 ## Beginner (001–035) — Avalonia fundamentals, ReactiveUI declarative
 
@@ -123,11 +123,11 @@ not a valid C# identifier.
 | 083 | ChangeSetFilterPipeline | ReactiveUI change sets, reactive filtering | ✅ |
 | 084 | ChangeSetSortAndCount | change-set sorting and count projection | ✅ |
 | 085 | VirtualizationBudget | realized item count under virtualization | ✅ |
-| 086 | ControlThemeOverride | overriding a FluentTheme `ControlTheme` | ⬜ |
-| 087 | ResourceDictionaryMerging | merged dictionaries, resource lookup order | ⬜ |
-| 088 | ThemeVariantSwitching | `ThemeVariant` light and dark | ⬜ |
-| 089 | LocalizationResources | culture-driven strings | ⬜ |
-| 090 | FlowDirectionMirroring | right-to-left layout mirroring | ⬜ |
+| 086 | ControlThemeOverride | overriding a FluentTheme `ControlTheme` | ✅ |
+| 087 | ResourceDictionaryMerging | merged dictionaries, resource lookup order | ✅ |
+| 088 | ThemeVariantSwitching | `ThemeVariant` light and dark | ✅ |
+| 089 | LocalizationResources | culture-driven strings | ✅ |
+| 090 | FlowDirectionMirroring | right-to-left layout mirroring | ✅ |
 
 ## Expert (091–100) — architecture, performance, harness
 
