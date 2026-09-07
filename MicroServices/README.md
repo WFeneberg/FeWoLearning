@@ -63,31 +63,46 @@ There is no separate install step — `dotnet test` restores on first run.
 
 **Current measured state** (2026-09-07; `catalog.md` at 40 ✅ / 60 ⬜). Counted on
 disk: **126 exercise facts** across the forty delivered rows, of which three are 🐳,
-plus **10 harness facts** in `tests/_support/` — **136** in total.
+plus **13 harness facts** in `tests/_support/` — **139** in total.
 
 ```
-dotnet test                                         → 123 failed,   8 passed, 5 skipped (136 total),   20 s
-dotnet test -p:UseSolutions=true                    →   0 failed, 131 passed, 5 skipped (136 total), 1 m 24 s
-dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 136 passed, 0 skipped (136 total), 5 m 26 s
+dotnet test                                         → 123 failed,   9 passed, 7 skipped (139 total),      5 s
+dotnet test -p:UseSolutions=true                    →   0 failed, 132 passed, 7 skipped (139 total),     10 s
+dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 139 passed, 0 skipped (139 total), 2 m 43 s
 ```
 
-**The five skips are not all harness facts, and the distinction matters.** Three are
+**Those numbers moved a long way on 2026-09-07, and the two harness changes behind them
+are §6's business, not a mystery to re-derive.** Before them the same suite read 20 s,
+1 m 24 s and 5 m 26 s. In short: an in-process publish no longer probes for a container
+runtime (~5.1 s → ~0.1 s, sixteen facts), and the 🐳 rows share one database server per
+flavour instead of starting one each.
+
+**The seven skips are not all harness facts, and the distinction matters.** Three are
 real exercise facts — ex034's, ex038's and ex040's 🐳 rows, gated like every 🐳 row
-will be. The other two are harness facts that are *deliberately* gated shut in the
-default run: the container-gate canary that proves `Require()` still closes, and the
-teardown canary that needs a started application. `-p:Containers=true` unskips all
-five. The 8 that pass in the red run are the remaining harness facts, which pass in
-*both* modes because they grade the harness rather than an exercise.
+will be. The other four are harness facts that are *deliberately* gated shut in the
+default run: the container-gate canary that proves `Require()` still closes, the
+teardown canary that needs a started application, and the two shared-server canaries
+(isolation, and surviving a failing test). `-p:Containers=true` unskips all seven. The
+9 that pass in the red run are the remaining harness facts, which pass in *both* modes
+because they grade the harness rather than an exercise.
 
-The container lane costs the difference between the last two lines, **~4 m 02 s**,
-up from ~79 s at ex034. It is now dominated by **SQL Server**: ex038 and ex040 each
-start `mcr.microsoft.com/mssql/server:2022-latest` and each cost **~1 m 25 s** measured
-five times, against ~51 s for ex034's Postgres and ~28 s for the two applications the
-teardown canary starts (it starts no containers — see §4). Budget SQL Server at roughly
-**1.5x a Postgres row**, and remember the assembly runs serially: the lane grows by the
-sum, never by the maximum. A worked-out example of why the offline/🐳 split in
-`catalog.md` is worth defending — rows 037 and 039 are *about* SQL Server and Postgres
-schemas and cost 0 s of it, because a generated script needs no server.
+The container lane costs the difference between the last two lines, **~2 m 33 s**.
+It is dominated by **server start-ups**, and since 2026-09-07 there are only two:
+ex034 starts its own Postgres (~51 s, because that row grades the learner's own resource
+graph and must), and everything else on SQL Server — ex038, ex040 and the two
+shared-server canaries — shares **one** `mcr.microsoft.com/mssql/server:2022-latest`
+(~55 s for the first caller, then milliseconds each). Before that change ex038 and
+ex040 started a server each and cost ~1 m 25 s apiece; measured after, the two rows'
+six facts together run in **1 m 4 s**. The remaining ~28 s is the two applications the
+teardown canary starts, which start no containers — see §4.
+
+The rule that follows, and the reason the change was made at 3 🐳 rows rather than at
+25: the lane grows with the number of **servers**, not the number of rows, and the
+assembly runs serially so it grows by the sum. A new 🐳 row on a flavour that already
+has a shared server is nearly free. A worked-out example of why the offline/🐳 split in
+`catalog.md` is worth defending is next door — rows 037 and 039 are *about* SQL Server
+and Postgres schemas and cost 0 s of the lane, because a generated script needs no
+server.
 
 **A correct default run is red, and that is not a broken checkout.** A hundred and
 twenty-three failures is exactly what an untouched tree gives: one `NotImplementedException` per
@@ -222,10 +237,13 @@ the failure shapes the next twenty-four rows inherit.
 - **A warm Postgres row costs ~57 s wall clock**, of which about ten is teardown.
   ex034's L3 fact was measured at **55 s, 57 s and 60 s** across five runs with
   `postgres:18.3` already local; `dotnet test -p:UseSolutions=true` goes from
-  **1 m 27 s to 2 m 18 s** when `-p:Containers=true` adds that single row. Budget
-  roughly a minute per 🐳 row, and remember the assembly runs serially (§6), so
-  twenty-five of them will be a twenty-five-minute lane, not a parallel one. That is
-  the reason 🐳 is opt-in and the reason the fast loop is where everything else lives.
+  **1 m 27 s to 2 m 18 s** when `-p:Containers=true` adds that single row.
+  **Superseded in part on 2026-09-07**: that arithmetic — "budget a minute per 🐳 row,
+  so twenty-five of them is a twenty-five-minute lane" — was the reason
+  `ContainerHarness.DatabaseAsync` exists. The lane now grows with the number of
+  **servers**, not of rows: a 🐳 row on a flavour that already has a shared server costs
+  its own work and nothing else. Budget a minute for the first row of each flavour and
+  seconds for the rest, and read the entry-point table below before writing one.
 - **With the switch ON and Docker unreachable, a 🐳 row FAILS — it does not skip, and
   it does not hang to the deadline.** Measured by poisoning `DOCKER_HOST`: the test
   failed after **28 s** with
@@ -287,6 +305,67 @@ the failure shapes the next twenty-four rows inherit.
   Postgres passwords from a character set that includes `{`, so a run in ten produces a
   perfectly resolved string containing one. Assert that the named placeholders are gone
   (`{pg.`, `.connectionString}`), never that no brace remains.
+
+### Which container entry point a 🐳 row should use — read this before writing one
+
+`ContainerHarness` has **two** ways in, and the default is the second one.
+
+| | `RunAsync(configure, body)` | `DatabaseAsync(flavour, purpose)` |
+|---|---|---|
+| starts | a whole application, per test | nothing, after the first caller |
+| gives you | a `Session`: the model's resources, `WaitForHealthyAsync`, `ConnectionStringAsync` | a fresh, empty database on the assembly's shared server for that flavour |
+| costs | ~55-85 s | ~55 s once, then milliseconds |
+| use it when | the row grades the LEARNER's resource graph | the row grades what happens inside a database |
+
+**Use `DatabaseAsync` unless the row's subject is the model itself.** ex034 is the one
+delivered row that must use `RunAsync`: its whole point is that the connection string
+*Aspire resolved from the learner's own `AddDatabase`* reaches a client, and a
+harness-supplied string would grade nothing. ex038 and ex040 want "a real SQL Server and
+a database nobody has touched", which is what `DatabaseAsync` is for; their L1 facts
+grade the model.
+
+**A database, not a server, is the isolation boundary.** `DatabaseAsync` issues
+`CREATE DATABASE` with a GUID-suffixed name and hands back a connection string pointing
+at it, so each test gets its own catalogue, its own tables and its own
+`__EFMigrationsHistory`. That claim is *proved*, not asserted:
+`SharedServer_hands_out_ISOLATED_databases_on_ONE_server` takes two databases, creates
+**the same table name** in both with different sentinel rows, and requires each to see
+only its own — the `CREATE TABLE` alone would fail with "there is already an object
+named 'probe'" if the boundary were cosmetic — while also asserting that both connection
+strings name the same host and port, i.e. that this really is one container.
+
+**The teardown contract is unchanged, and unchanged by construction rather than by
+resemblance.** Both paths build their application through the same private
+`CreateBuilder()` (so the two DCP configuration keys cannot drift) and tear it down
+through the same private `TearDownAsync` (so the independent 2-minute budget, "attempt
+both `StopAsync` and `DisposeAsync`", and "keep the first failure" are literally the
+same lines). Two differences are deliberate:
+
+- The shared server's start is bounded by **its own** deadline and never by the calling
+  test's cancellation token. The server outlives the test that happened to trigger it,
+  so letting that test's token cancel a half-started server would leave the next test to
+  find a broken one. A start that fails is torn down immediately and **not cached**, so
+  the next 🐳 test retries rather than inheriting wreckage.
+- The stop happens **after the last test in the assembly**, from
+  `tests/_support/HarnessLifetime.cs` — an `[assembly: AssemblyFixture(...)]` whose
+  `InitializeAsync` deliberately does nothing, because an assembly fixture that started
+  a container would start it in the default `dotnet test` too. Everything is lazy; that
+  type only closes.
+
+What a shared server changed, and therefore what the existing teardown canary no longer
+covers on its own: with one application per test, a failing test tore down its own
+server. Now it must leave the server **running and usable** —
+`SharedServer_survives_a_failing_test_without_starting_a_second_server` pins that, and
+also that no second server was started to service the next request. Both canaries are
+🐳-gated; the gate canary itself was extended to grade `DatabaseAsync`'s guard as well
+as `RunAsync`'s, because the shared path is a second way into Docker.
+
+**Leaks were re-counted for the new path, not assumed.** `docker ps -a` /
+`network ls` / `volume ls` came back to the same **82 / 4 / 46** after: the full
+container lane, a deliberately failing container test (ex040's transfer mutated to never
+commit — 1 failed, 5 passed, counts unchanged), and a forced timeout (the shared server's
+budget dialled down to 8 s, which threw *"The shared SqlServer server exceeded 8 s (it
+had NOT finished starting after 00:00:18.12)"* and returned the tree to 82 / 4 / 46).
 
 ## 5. How an exercise works
 
@@ -1043,7 +1122,10 @@ Each of these cost real time. None is a guess.
   all. The fix is EF's own hook — `ReplaceService<IModelCacheKeyFactory, …>` returning a
   key that includes the varying value — and it belongs in the exercise as declared
   scaffolding, not as part of the TODO. Any future row that varies a model at runtime
-  needs it or grades nothing.
+  needs it. Note what removing it from ex037 would *not* be: silent. Facts 3 and 4 sit in
+  one class and share one process-wide model cache, so whichever ran second would read
+  the other's script and go red on a string comparison. It is a self-announcing
+  dependency, which is why it needs a comment and not a guard.
 - **The two providers escape their own delimiter and leave the other's alone, and that
   is the sharpest anti-hardcode hook this batch found.** Measured on EF Core 10.0.11 and
   `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3: a default schema named `a]b"c` comes
@@ -1100,6 +1182,69 @@ Each of these cost real time. None is a guess.
   `Ex0NN_Something` makes that free, costs nothing at the call site
   (`using static …Ex0NN_Something;` in the test), and keeps a row self-contained the way
   every other row in the track is.
+
+- **An in-process publish spent 99% of its time asking Docker whether it existed.**
+  The single biggest measurement in this track so far, and it was hiding in plain sight
+  behind "a publish costs ~5 s". Traced with a logging provider attached to the publish
+  builder: `ManifestPublisher` writes `aspire-manifest.json` at **36 ms**, and the
+  remaining **~4.5 s** is `Aspire.Hosting.ContainerRuntime` auto-detection — probing
+  `podman` (~140 ms, not on PATH), then `docker version` (~2.4 s) and
+  `docker container ls -n 1` (~1 s). It is unconditional: an **empty** model costs the
+  same 5 s as one with five databases, so the cost is per *publish*, never per resource.
+  Setting `builder.Configuration["ASPIRE_CONTAINER_RUNTIME"]` to a name that is not a
+  real runtime skips detection entirely. Measured, same model, back to back:
+  `<none>` 5262/5020 ms · `"docker"` 951/1094 ms · `"podman"` 141/333 ms ·
+  `"none"` 86/129 ms — and the manifest is identical in every case.
+  `ManifestHarness.NoContainerRuntime` is now the default for `GenerateAsync`,
+  `SharedPublishAsync` and `PublishAsync`; the green run went from **1 m 24 s to 10 s**
+  and the red run from 20 s to 5 s. Two things a later author must know: the key is set
+  on **that builder's configuration**, never on the process environment, so it cannot
+  reach `ContainerHarness`, which runs in *run* mode and needs a real Docker; and a
+  future row that genuinely needs image building can pass `containerRuntime: "docker"`
+  and pay the ~1 s probe. It also makes §2's promise — "the default `dotnet test` needs
+  no daemon at all" — true rather than nearly true: before this, the fast loop shelled
+  out to `docker` sixteen times.
+- **Because a publish costs a flat rate, the only L2 quantity worth managing is how many
+  happen.** `ManifestHarness.SharedPublishAsync` publishes once per distinct model and
+  hands the same output to every fact that asks; `GenerateAsync` sits on top of it and
+  still returns a **fresh `JsonDocument` per call**, which is what keeps every existing
+  `using var manifest = await GenerateAsync(...)` correct — the caller disposes its own
+  document, never the shared output. The cache keys on the delegate's **identity**
+  (method plus target) plus the container-runtime choice, so a method group such as
+  `Ex013_X.Configure` shares across facts and classes while two separately-created
+  closures never do, even when they would build the same model. That is the conservative
+  direction on purpose: the contract is that a model is a pure function of the delegate,
+  and a closure over mutable state simply misses the cache instead of being handed
+  somebody else's manifest. `ManifestHarness_publishes_ONCE_per_model_however_many_facts_ask`
+  watches the publish counter directly, because a cache that quietly stopped caching
+  would show up nowhere until someone profiled the suite again. Shared outputs are
+  deleted by `HarnessLifetime` after the last test; the hourly sweep in the static
+  constructor remains the backstop.
+- **`[assembly: AssemblyFixture(...)]` is the only hook in this suite that runs after the
+  last test, and it runs even under `--filter`.** Measured on xunit.v3 3.2.2 with
+  `xunit.runner.visualstudio` 3.1.5 by having a probe fixture append to a file:
+  `InitializeAsync` ran before the (single, filtered) test and `DisposeAsync` after it.
+  That is what the shared container servers and the shared publish outputs are torn down
+  by. The corollary is the trap: the fixture is constructed **eagerly**, so anything it
+  does in `InitializeAsync` happens in the default `dotnet test` as well —
+  `HarnessLifetime.InitializeAsync` is therefore empty on purpose, and must stay that
+  way. `Xunit.v3.ITestPipelineStartup` also exists in 3.2.2 and would work; the fixture
+  was chosen because it is core xunit rather than runner-adjacent.
+- **`AddProject` contributes SEVEN environment variables before anything is referenced,
+  so `Assert.NotEmpty(...OfType<EnvironmentCallbackAnnotation>())` grades nothing.**
+  Measured while fixing ex038's first fact, which shipped with exactly that assertion and
+  passed against a migrator carrying `WaitFor` and no `WithReference` at all. A bare
+  project resource already carries `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT`,
+  `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_RESOURCE_ATTRIBUTES`,
+  `OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY`, `LOGGING__CONSOLE__FORMATTERNAME` and
+  `DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION`. Grade the **variable**, not the
+  annotation: run the callbacks through an `EnvironmentCallbackContext` (ex007's
+  technique) and read `ConnectionStrings__<name>` out of the dictionary. One more
+  measured detail decides how to assert it — at model time the value is **not a string**
+  but a deferred `IManifestExpressionProvider` whose `ValueExpression` is
+  `{catalog.connectionString}`, so `.ToString()` gives you a type name, and a
+  hand-written `WithEnvironment("ConnectionStrings__catalog", "Server=…")` lands a plain
+  `System.String` there and fails the cast. Both mutants were built and run.
 
 ## 7. Pinned versions
 
@@ -1287,6 +1432,19 @@ green-check with `-p:UseSolutions=true`, register each in `playground/ExerciseRe
 flip exactly those five catalog rows and the `**Status:**` line, commit as
 `MicroServices: exNNN–exNNN`. Full-suite runs happen once per completed tier, not per
 batch.
+
+**Use the fast paths, and know why they are fast.** Two harness decisions from
+2026-09-07 are the difference between a ten-second inner loop and a ninety-second one,
+and both are easy to undo by accident:
+
+- L2 goes through `ManifestHarness.GenerateAsync` / `SharedPublishAsync`, which set
+  `ASPIRE_CONTAINER_RUNTIME` to a non-runtime so the publish does not probe Docker
+  (~5.1 s → ~0.1 s per fact) and publish once per distinct model rather than once per
+  fact. Do not call `DistributedApplication.CreateBuilder` with `--operation publish` by
+  hand in a test; you will silently pay both costs back.
+- L3 goes through `ContainerHarness.DatabaseAsync`, which hands out a fresh database on
+  one shared server per flavour. Reach for `RunAsync` only when the row grades the
+  learner's own resource graph, as ex034 does. §4 has the table.
 
 Three rules are specific to this track.
 

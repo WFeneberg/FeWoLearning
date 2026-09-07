@@ -2,6 +2,7 @@ using FeWoLearning.MicroServices.Exercises.Beginner;
 using Xunit.Sdk;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -158,6 +159,21 @@ public class HarnessMechanicsTests
 
         Assert.IsType<InvalidOperationException>(thrown);
         Assert.Contains("ContainerGate.Require()", thrown.Message);
+
+        // The shared-server path added on 2026-09-07 is a SECOND way into Docker, so it
+        // carries the same guard and this canary grades both. Without this half, a
+        // container row that used DatabaseAsync and forgot Require() would start a real
+        // SQL Server in the default `dotnet test` and nothing would have noticed.
+        // Whether a shared server is already up depends on which tests ran first, so the
+        // claim is that the closed gate changed NOTHING - not that nothing exists.
+        var serverBefore = ContainerHarness.HasSharedServer(ContainerHarness.DatabaseFlavour.SqlServer);
+
+        var shared = await Record.ExceptionAsync(() => ContainerHarness.DatabaseAsync(
+            ContainerHarness.DatabaseFlavour.SqlServer, "gate", TestContext.Current.CancellationToken));
+
+        Assert.IsType<InvalidOperationException>(shared);
+        Assert.Contains("ContainerGate.Require()", shared.Message);
+        Assert.Equal(serverBefore, ContainerHarness.HasSharedServer(ContainerHarness.DatabaseFlavour.SqlServer));
     }
 
     // --- ContainerHarness's teardown contract ----------------------------------
@@ -218,4 +234,170 @@ public class HarnessMechanicsTests
         public Task StopAsync(CancellationToken cancellationToken)
             => throw new InvalidOperationException("TEARDOWN BLEW UP");
     }
+
+    // --- the shared per-flavour server -----------------------------------------
+
+    /// <summary>
+    /// The isolation claim, PROVED rather than asserted. One SQL Server serves every
+    /// container row in the assembly, so "a fresh database per test" has to be a real
+    /// boundary and not a naming convention.
+    ///
+    /// Two databases are taken from the same flavour, the SAME table name is created in
+    /// each with a different sentinel row, and neither may see the other's. The second
+    /// half is the part that would be missing from an assertion-free claim: both
+    /// connection strings must name the same host and port - i.e. the same container -
+    /// so this is genuinely two databases on one server rather than two servers that
+    /// happen to work.
+    /// </summary>
+    [Fact]
+    public async Task SharedServer_hands_out_ISOLATED_databases_on_ONE_server()
+    {
+        ContainerGate.Require();
+        var token = TestContext.Current.CancellationToken;
+
+        var first = await ContainerHarness.DatabaseAsync(
+            ContainerHarness.DatabaseFlavour.SqlServer, "canaryA", token);
+        var second = await ContainerHarness.DatabaseAsync(
+            ContainerHarness.DatabaseFlavour.SqlServer, "canaryB", token);
+
+        // One server, two catalogues.
+        Assert.NotEqual(first.Name, second.Name);
+        Assert.Equal(first.ServerConnectionString, second.ServerConnectionString);
+        Assert.Equal(
+            new SqlConnectionStringBuilder(first.ConnectionString).DataSource,
+            new SqlConnectionStringBuilder(second.ConnectionString).DataSource);
+        Assert.Equal(first.Name, new SqlConnectionStringBuilder(first.ConnectionString).InitialCatalog);
+
+        // ...and that server is a real container on a DCP-allocated port, not 1433 and
+        // not a placeholder. The one place in the track where this is now worth
+        // asserting: it grades the harness, which is what hands every row its string.
+        var dataSource = new SqlConnectionStringBuilder(first.ConnectionString).DataSource;
+        Assert.DoesNotContain("{", first.ConnectionString);
+        Assert.Contains(",", dataSource);
+        Assert.NotEqual(1433, int.Parse(dataSource.Split(',')[1]));
+
+        // The same table name in both, with values invented microseconds ago.
+        var a = $"A-{Guid.NewGuid():N}";
+        var b = $"B-{Guid.NewGuid():N}";
+        await ExecuteAsync(first.ConnectionString,
+            $"CREATE TABLE [probe] ([value] nvarchar(64) NOT NULL); INSERT INTO [probe] VALUES (N'{a}')", token);
+        await ExecuteAsync(second.ConnectionString,
+            $"CREATE TABLE [probe] ([value] nvarchar(64) NOT NULL); INSERT INTO [probe] VALUES (N'{b}')", token);
+
+        // Neither sees the other. If the databases were not real boundaries, the CREATE
+        // TABLE above would already have failed with "there is already an object named
+        // 'probe'" - so this fact grades the boundary twice over.
+        Assert.Equal(a, await ScalarTextAsync(first.ConnectionString, "SELECT [value] FROM [probe]", token));
+        Assert.Equal(b, await ScalarTextAsync(second.ConnectionString, "SELECT [value] FROM [probe]", token));
+        Assert.Equal(1L, await ScalarAsync(first.ConnectionString, "SELECT COUNT_BIG(*) FROM [probe]", token));
+    }
+
+    /// <summary>
+    /// What sharing a server CHANGED, and therefore what the teardown canary above no
+    /// longer covers on its own.
+    ///
+    /// With one application per test, a failing test tore its own server down and the
+    /// next test got a clean one; that is the property
+    /// <see cref="ContainerHarness_teardown_never_replaces_the_real_failure"/> is about.
+    /// With a shared server, a failing test must leave the server RUNNING and usable -
+    /// the failure is the test's, not the session's. So: fail inside a shared database,
+    /// then take another one and use it.
+    ///
+    /// It also pins the thing that would otherwise be invisible: no second server was
+    /// started to service the second request.
+    /// </summary>
+    [Fact]
+    public async Task SharedServer_survives_a_failing_test_without_starting_a_second_server()
+    {
+        ContainerGate.Require();
+        var token = TestContext.Current.CancellationToken;
+
+        var doomed = await ContainerHarness.DatabaseAsync(
+            ContainerHarness.DatabaseFlavour.SqlServer, "canaryFail", token);
+
+        var failure = await Record.ExceptionAsync(async () =>
+        {
+            await ExecuteAsync(doomed.ConnectionString, "CREATE TABLE [half] ([x] int)", token);
+            throw new XunitException("A TEST FAILED HERE");
+        });
+        Assert.IsType<XunitException>(failure);
+        Assert.True(ContainerHarness.HasSharedServer(ContainerHarness.DatabaseFlavour.SqlServer));
+
+        // The next row gets a working, empty database on the very same server.
+        var next = await ContainerHarness.DatabaseAsync(
+            ContainerHarness.DatabaseFlavour.SqlServer, "canaryNext", token);
+        Assert.Equal(doomed.ServerConnectionString, next.ServerConnectionString);
+        Assert.Equal(0L, await ScalarAsync(next.ConnectionString,
+            "SELECT COUNT_BIG(*) FROM sys.tables WHERE name = N'half'", token));
+    }
+
+    private static async Task ExecuteAsync(string connectionString, string sql, CancellationToken ct)
+    {
+        await using var connection = new SqlConnection(connectionString);
+        await connection.OpenAsync(ct);
+        await using var command = new SqlCommand(sql, connection);
+        await command.ExecuteNonQueryAsync(ct);
+    }
+
+    private static async Task<object?> ScalarAsync(string connectionString, string sql, CancellationToken ct)
+    {
+        await using var connection = new SqlConnection(connectionString);
+        await connection.OpenAsync(ct);
+        await using var command = new SqlCommand(sql, connection);
+        return await command.ExecuteScalarAsync(ct);
+    }
+
+    private static async Task<string?> ScalarTextAsync(string connectionString, string sql, CancellationToken ct)
+        => (await ScalarAsync(connectionString, sql, ct)) as string;
+
+    // --- ManifestHarness's shared publish ---------------------------------------
+
+    /// <summary>
+    /// One publish per distinct model, however many facts ask for it.
+    ///
+    /// The number this protects is measured in README section 6: a publish costs a fixed
+    /// amount whatever the model contains, so the only thing worth managing at L2 is how
+    /// many happen. This fact watches the counter directly - three calls for two distinct
+    /// models must cost exactly two publishes - because a cache that silently stopped
+    /// caching would show up nowhere else until someone profiled the suite again.
+    ///
+    /// It also pins the property that keeps every existing call site correct: the
+    /// JsonDocument handed back is the CALLER's, so disposing it must not damage the
+    /// shared output behind it.
+    /// </summary>
+    [Fact]
+    public async Task ManifestHarness_publishes_ONCE_per_model_however_many_facts_ask()
+    {
+        var token = TestContext.Current.CancellationToken;
+        var before = ManifestHarness.PublishCount;
+
+        using (var first = await ManifestHarness.GenerateAsync(SharedProbeModel, token))
+        {
+            Assert.Equal("container.v0",
+                first.RootElement.GetProperty("resources").GetProperty("probe").GetProperty("type").GetString());
+        }
+
+        // ...and the caller disposed that document. A second ask must still work, and
+        // must not have paid for another publish.
+        using var second = await ManifestHarness.GenerateAsync(SharedProbeModel, token);
+        Assert.Equal("container.v0",
+            second.RootElement.GetProperty("resources").GetProperty("probe").GetProperty("type").GetString());
+
+        var afterSameModel = ManifestHarness.PublishCount;
+        Assert.Equal(before + 1, afterSameModel);
+
+        // A DIFFERENT model must still cost one - the cache keys on the delegate, and a
+        // cache that returned this manifest for that model would be far worse than a
+        // slow one.
+        using var other = await ManifestHarness.GenerateAsync(OtherProbeModel, token);
+        Assert.True(other.RootElement.GetProperty("resources").TryGetProperty("elsewhere", out _));
+        Assert.False(other.RootElement.GetProperty("resources").TryGetProperty("probe", out _));
+        Assert.Equal(afterSameModel + 1, ManifestHarness.PublishCount);
+    }
+
+    private static void SharedProbeModel(IDistributedApplicationBuilder builder)
+        => builder.AddContainer("probe", "busybox");
+
+    private static void OtherProbeModel(IDistributedApplicationBuilder builder)
+        => builder.AddContainer("elsewhere", "busybox");
 }

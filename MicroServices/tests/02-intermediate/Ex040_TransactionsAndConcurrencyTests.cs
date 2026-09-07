@@ -65,101 +65,98 @@ public class Ex040_TransactionsAndConcurrencyTests
 
         var token = TestContext.Current.CancellationToken;
 
-        await ContainerHarness.RunAsync(
-            builder => builder.AddSqlServer("sqldata").AddDatabase(DatabaseResourceName),
-            async session =>
+        // A fresh, empty database on the assembly's SHARED SQL Server - the same server
+        // ex038 uses, a different database. Isolation is the database boundary, which
+        // HarnessSmokeTests proves rather than assumes. See README section 4.
+        var database = await ContainerHarness.DatabaseAsync(
+            ContainerHarness.DatabaseFlavour.SqlServer, "ex040", token);
+        var connectionString = database.ConnectionString;
+
+        // The schema comes from the learner's own model and options, so a missing
+        // IsRowVersion() produces a table with an ordinary varbinary column and
+        // the concurrency half below goes red for the right reason.
+        int source, destination, contended;
+        await using (var setup = new CatalogContext(CreateOptions(connectionString)))
+        {
+            await setup.Database.EnsureCreatedAsync(token);
+
+            // Ids are left to the database rather than assigned here: Account.Id
+            // is an IDENTITY column, and inserting an explicit value into one
+            // needs SET IDENTITY_INSERT - measured, it fails otherwise.
+            var rows = new[]
             {
-                await session.WaitForHealthyAsync(DatabaseResourceName);
-                var connectionString = await session.ConnectionStringAsync(DatabaseResourceName);
-                Assert.DoesNotContain("{sqldata.", connectionString);
+                new Account { Name = "source", Balance = 100m },
+                new Account { Name = "destination", Balance = 0m },
+                new Account { Name = "contended", Balance = 100m }
+            };
+            setup.Accounts.AddRange(rows);
+            await setup.SaveChangesAsync(token);
+            (source, destination, contended) = (rows[0].Id, rows[1].Id, rows[2].Id);
 
-                // The schema comes from the learner's own model and options, so a missing
-                // IsRowVersion() produces a table with an ordinary varbinary column and
-                // the concurrency half below goes red for the right reason.
-                int source, destination, contended;
-                await using (var setup = new CatalogContext(CreateOptions(connectionString)))
-                {
-                    await setup.Database.EnsureCreatedAsync(token);
+            // The server really did generate the token on INSERT, before any
+            // UPDATE has happened - the "OnAdd" half of OnAddOrUpdate.
+            Assert.All(rows, row => Assert.NotEmpty(row.RowVersion));
+        }
 
-                    // Ids are left to the database rather than assigned here: Account.Id
-                    // is an IDENTITY column, and inserting an explicit value into one
-                    // needs SET IDENTITY_INSERT - measured, it fails otherwise.
-                    var rows = new[]
-                    {
-                        new Account { Name = "source", Balance = 100m },
-                        new Account { Name = "destination", Balance = 0m },
-                        new Account { Name = "contended", Balance = 100m }
-                    };
-                    setup.Accounts.AddRange(rows);
-                    await setup.SaveChangesAsync(token);
-                    (source, destination, contended) = (rows[0].Id, rows[1].Id, rows[2].Id);
+        // ---- 1. the happy path ---------------------------------------------
+        // Rejects the mutant that opens an explicit transaction WITHOUT the
+        // execution strategy: with retries enabled, BeginTransactionAsync throws
+        // "does not support user-initiated transactions" and this line fails. No
+        // extra assertion needed - EF refuses to let the wrong shape run at all.
+        await TransferAsync(connectionString, source, destination, 30m, betweenSaves: null, token);
+        Assert.Equal(70m, await BalanceAsync(connectionString, source, token));
+        Assert.Equal(30m, await BalanceAsync(connectionString, destination, token));
 
-                    // The server really did generate the token on INSERT, before any
-                    // UPDATE has happened - the "OnAdd" half of OnAddOrUpdate.
-                    Assert.All(rows, row => Assert.NotEmpty(row.RowVersion));
-                }
-
-                // ---- 1. the happy path ---------------------------------------------
-                // Rejects the mutant that opens an explicit transaction WITHOUT the
-                // execution strategy: with retries enabled, BeginTransactionAsync throws
-                // "does not support user-initiated transactions" and this line fails. No
-                // extra assertion needed - EF refuses to let the wrong shape run at all.
-                await TransferAsync(connectionString, source, destination, 30m, betweenSaves: null, token);
-                Assert.Equal(70m, await BalanceAsync(connectionString, source, token));
-                Assert.Equal(30m, await BalanceAsync(connectionString, destination, token));
-
-                // ---- 2. the transaction is real ------------------------------------
-                // Injected deterministically: the seam runs between the two saves, so
-                // there is no sleep and no second thread anywhere in this fact.
-                decimal? dirtyRead = null;
-                var failure = await Record.ExceptionAsync(() => TransferAsync(
-                    connectionString, source, destination, 25m,
-                    betweenSaves: async () =>
-                    {
-                        // A dirty read from a SEPARATE connection, taken while the
-                        // transfer's transaction is still open. This is what separates
-                        // "the debit was saved and then rolled back" from "the debit
-                        // never happened" - and it is what rejects an implementation that
-                        // does one SaveChanges and calls the seam before it.
-                        dirtyRead = await DirtyBalanceAsync(connectionString, source, token);
-                        throw new InterleaveFailure();
-                    },
-                    token));
-
-                Assert.IsType<InterleaveFailure>(failure);
-                Assert.Equal(45m, dirtyRead);
-
-                // ...and nothing survived. Rejects the mutant with two SaveChanges and no
-                // transaction, under which the debit above is already committed and the
-                // source is left at 45.
-                Assert.Equal(70m, await BalanceAsync(connectionString, source, token));
-                Assert.Equal(30m, await BalanceAsync(connectionString, destination, token));
-
-                // ---- 3. a genuine concurrency conflict -----------------------------
-                // The interleave is an ordering, not a race: the inner update runs to
-                // completion inside the outer one's afterLoad window, so the outer is
-                // guaranteed to be saving against a row version that no longer exists.
-                var inner = 0m;
-                var conflict = await Record.ExceptionAsync(() => AddToBalanceAsync(
-                    connectionString, contended, 10m,
-                    afterLoad: async () =>
-                        inner = await AddToBalanceAsync(connectionString, contended, 5m, null, token),
-                    token));
-
-                // Rejects a model with no concurrency token: without one the outer save
-                // succeeds, writes 110, and the inner writer's +5 is silently lost - the
-                // exact bug this row is about, and one that no assertion on the happy
-                // path can see.
-                Assert.IsType<DbUpdateConcurrencyException>(conflict);
-
-                Assert.Equal(105m, inner);
-                Assert.Equal(105m, await BalanceAsync(connectionString, contended, token));
-
-                // ...and the loser really did not write: 115 would mean the outer update
-                // landed after all, and 110 would mean it overwrote the inner one.
-                Assert.NotEqual(110m, await BalanceAsync(connectionString, contended, token));
+        // ---- 2. the transaction is real ------------------------------------
+        // Injected deterministically: the seam runs between the two saves, so
+        // there is no sleep and no second thread anywhere in this fact.
+        decimal? dirtyRead = null;
+        var failure = await Record.ExceptionAsync(() => TransferAsync(
+            connectionString, source, destination, 25m,
+            betweenSaves: async () =>
+            {
+                // A dirty read from a SEPARATE connection, taken while the
+                // transfer's transaction is still open. This is what separates
+                // "the debit was saved and then rolled back" from "the debit
+                // never happened" - and it is what rejects an implementation that
+                // does one SaveChanges and calls the seam before it.
+                dirtyRead = await DirtyBalanceAsync(connectionString, source, token);
+                throw new InterleaveFailure();
             },
-            token);
+            token));
+
+        Assert.IsType<InterleaveFailure>(failure);
+        Assert.Equal(45m, dirtyRead);
+
+        // ...and nothing survived. Rejects the mutant with two SaveChanges and no
+        // transaction, under which the debit above is already committed and the
+        // source is left at 45.
+        Assert.Equal(70m, await BalanceAsync(connectionString, source, token));
+        Assert.Equal(30m, await BalanceAsync(connectionString, destination, token));
+
+        // ---- 3. a genuine concurrency conflict -----------------------------
+        // The interleave is an ordering, not a race: the inner update runs to
+        // completion inside the outer one's afterLoad window, so the outer is
+        // guaranteed to be saving against a row version that no longer exists.
+        var inner = 0m;
+        var conflict = await Record.ExceptionAsync(() => AddToBalanceAsync(
+            connectionString, contended, 10m,
+            afterLoad: async () =>
+                inner = await AddToBalanceAsync(connectionString, contended, 5m, null, token),
+            token));
+
+        // Rejects a model with no concurrency token: without one the outer save
+        // succeeds, writes 110, and the inner writer's +5 is silently lost - the
+        // exact bug this row is about, and one that no assertion on the happy
+        // path can see.
+        Assert.IsType<DbUpdateConcurrencyException>(conflict);
+
+        Assert.Equal(105m, inner);
+        Assert.Equal(105m, await BalanceAsync(connectionString, contended, token));
+
+        // ...and the loser really did not write: 115 would mean the outer update landed
+        // after all, and 110 would mean it overwrote the inner one.
+        Assert.NotEqual(110m, await BalanceAsync(connectionString, contended, token));
     }
 
     private static async Task<decimal> BalanceAsync(

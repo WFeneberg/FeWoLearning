@@ -3,7 +3,9 @@ using System.Runtime.ExceptionServices;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace FeWoLearning.MicroServices.Tests;
 
@@ -137,16 +139,7 @@ public static class ContainerHarness
                 + "missing call cannot make the default `dotnet test` start Docker containers.");
         }
 
-        var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
-        {
-            Args = [],
-            DisableDashboard = true
-        });
-
-        // See point 3 in the type comment: required even with the dashboard disabled.
-        builder.Configuration["DcpPublisher:DashboardPath"] = "not-used-the-dashboard-is-disabled";
-        // See point 4: without this the per-session Docker network outlives the run.
-        builder.Configuration["DcpPublisher:WaitForResourceCleanup"] = "true";
+        var builder = CreateBuilder();
 
         configure(builder);
         var resources = builder.Resources.ToList();
@@ -206,6 +199,28 @@ public static class ContainerHarness
     }
 
     /// <summary>
+    /// The one builder shape this harness ever constructs - used by
+    /// <see cref="RunAsync"/> and by the shared per-flavour servers alike, so that the
+    /// two DCP configuration keys documented in points 3 and 4 of the type comment
+    /// cannot drift apart between the two paths.
+    /// </summary>
+    private static IDistributedApplicationBuilder CreateBuilder()
+    {
+        var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
+        {
+            Args = [],
+            DisableDashboard = true
+        });
+
+        // See point 3 in the type comment: required even with the dashboard disabled.
+        builder.Configuration["DcpPublisher:DashboardPath"] = "not-used-the-dashboard-is-disabled";
+        // See point 4: without this the per-session Docker network outlives the run.
+        builder.Configuration["DcpPublisher:WaitForResourceCleanup"] = "true";
+
+        return builder;
+    }
+
+    /// <summary>
     /// Stops and disposes the application on <see cref="CleanupTimeout"/>, swallowing
     /// nothing and throwing nothing: the first failure is handed back to the caller,
     /// which decides whether it is allowed to surface.
@@ -255,4 +270,324 @@ public static class ContainerHarness
 
         return failure;
     }
+
+    // ---------------------------------------------------------------------------------
+    // The shared per-flavour server. Added 2026-09-07, measured; see README section 6.
+    //
+    // RunAsync above starts a WHOLE APPLICATION per test, which is what a row like ex034
+    // needs, because that row grades the learner's own resource graph. Most container
+    // rows do not: ex038 and ex040 only want "a real SQL Server with an empty database
+    // on it", and paying ~1 m 25 s each for two SQL Server instances that differ in
+    // nothing is the difference between a four-minute container lane and a
+    // half-hour one at 25 rows.
+    //
+    // So: ONE server per flavour for the whole assembly, and a fresh DATABASE per test.
+    // A database is the isolation boundary that matters - its own catalogue, its own
+    // tables, its own __EFMigrationsHistory - and creating one costs milliseconds where
+    // creating a server costs a minute. HarnessSmokeTests proves the isolation rather
+    // than assuming it: two databases from the SAME server, the same table name in both,
+    // and neither can see the other's rows.
+    //
+    // Three properties this path shares with RunAsync, deliberately and by using the
+    // same code rather than by resembling it:
+    //   * the builder comes from CreateBuilder(), so the two DCP keys cannot drift;
+    //   * teardown goes through TearDownAsync, so the independent cleanup budget, the
+    //     "attempt both StopAsync and DisposeAsync" rule and the "keep the first
+    //     failure" rule are literally the same lines of code;
+    //   * the gate is checked before anything is built.
+    //
+    // What is NOT shared with RunAsync, on purpose: the server's start is bounded by its
+    // OWN deadline and never by the calling test's cancellation token. The server
+    // outlives the test that happened to trigger it, so letting that test's token cancel
+    // a half-started server would leave the next test to find a broken one.
+    // ---------------------------------------------------------------------------------
+
+    /// <summary>
+    /// The database flavours the shared-server path knows how to create a database on.
+    /// Adding one means teaching <see cref="StartServerAsync"/> how to add the resource
+    /// and <see cref="CreateDatabaseAsync"/> how to say CREATE DATABASE in its dialect;
+    /// nothing else changes.
+    /// </summary>
+    public enum DatabaseFlavour
+    {
+        SqlServer,
+        Postgres
+    }
+
+    /// <summary>A fresh, empty database on the assembly's shared server for its flavour.</summary>
+    public sealed class SharedDatabase
+    {
+        internal SharedDatabase(DatabaseFlavour flavour, string name, string connectionString, string serverConnectionString)
+        {
+            Flavour = flavour;
+            Name = name;
+            ConnectionString = connectionString;
+            ServerConnectionString = serverConnectionString;
+        }
+
+        public DatabaseFlavour Flavour { get; }
+
+        /// <summary>The database's own name - unique per call, so two tests never collide.</summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// The RESOLVED connection string for this database: a real host, the port DCP
+        /// allocated for the shared server, the password Aspire generated, and
+        /// <see cref="Name"/> as the catalogue.
+        /// </summary>
+        public string ConnectionString { get; }
+
+        /// <summary>
+        /// The shared server's own connection string, without a catalogue. Two
+        /// SharedDatabase instances of one flavour carry the SAME value here and
+        /// different <see cref="ConnectionString"/>s - which is what "one server, many
+        /// databases" means, and what the isolation canary asserts.
+        /// </summary>
+        public string ServerConnectionString { get; }
+    }
+
+    private sealed class ServerSession
+    {
+        internal required DistributedApplication Application { get; init; }
+        internal required string ConnectionString { get; init; }
+    }
+
+    /// <summary>
+    /// How long the FIRST caller of a flavour waits for that flavour's server. Its own
+    /// budget rather than the test's token - see the block comment above.
+    /// </summary>
+    private static readonly TimeSpan ServerStartTimeout = TimeSpan.FromMinutes(5);
+
+    private static readonly SemaphoreSlim ServerLock = new(1, 1);
+    private static readonly Dictionary<DatabaseFlavour, ServerSession> Servers = [];
+
+    /// <summary>
+    /// Hands back a fresh, empty database on the assembly's shared <paramref name="flavour"/>
+    /// server, starting that server on first use.
+    /// </summary>
+    /// <param name="purpose">
+    /// A short identifier that ends up in the database name, so that a stray connection
+    /// in a log or in <c>sys.databases</c> says which row created it. Non-identifier
+    /// characters are stripped.
+    /// </param>
+    public static async Task<SharedDatabase> DatabaseAsync(
+        DatabaseFlavour flavour, string purpose, CancellationToken cancellationToken = default)
+    {
+        // The same guard RunAsync carries, for the same reason: a 🐳 row that forgot
+        // ContainerGate.Require() must not be able to pull an image in the default run.
+        if (!ContainerGate.Enabled)
+        {
+            throw new InvalidOperationException(
+                "ContainerHarness.DatabaseAsync was reached with container tests OFF. Every L3 test "
+                + "must call ContainerGate.Require() as its first line; this guard exists so a "
+                + "missing call cannot make the default `dotnet test` start Docker containers.");
+        }
+
+        var server = await ServerAsync(flavour);
+        var name = DatabaseName(purpose);
+        var connectionString = await CreateDatabaseAsync(flavour, server.ConnectionString, name, cancellationToken);
+
+        return new SharedDatabase(flavour, name, connectionString, server.ConnectionString);
+    }
+
+    private static async Task<ServerSession> ServerAsync(DatabaseFlavour flavour)
+    {
+        // The assembly runs serially (TestParallelism.cs), so this lock is never
+        // contended in practice. It is here so that the invariant "at most one server per
+        // flavour ever starts" is a property of this method rather than of the test
+        // runner's configuration.
+        await ServerLock.WaitAsync();
+        try
+        {
+            if (Servers.TryGetValue(flavour, out var existing))
+            {
+                return existing;
+            }
+
+            var session = await StartServerAsync(flavour);
+
+            // Cached only on success. A failed start leaves nothing behind, so the next
+            // 🐳 test retries rather than inheriting a half-built server - and fails
+            // loudly on its own terms if Docker is genuinely unreachable.
+            Servers[flavour] = session;
+            return session;
+        }
+        finally
+        {
+            ServerLock.Release();
+        }
+    }
+
+    private static async Task<ServerSession> StartServerAsync(DatabaseFlavour flavour)
+    {
+        var builder = CreateBuilder();
+        var resourceName = flavour switch
+        {
+            DatabaseFlavour.SqlServer => AddSqlServerServer(builder),
+            DatabaseFlavour.Postgres => AddPostgresServer(builder),
+            _ => throw new ArgumentOutOfRangeException(nameof(flavour), flavour, null)
+        };
+
+        var app = builder.Build();
+        var started = false;
+        var stopwatch = Stopwatch.StartNew();
+
+        // Its OWN deadline, not the caller's token. See the block comment above.
+        using var deadline = new CancellationTokenSource(ServerStartTimeout);
+
+        try
+        {
+            await app.StartAsync(deadline.Token);
+            started = true;
+
+            await app.Services.GetRequiredService<ResourceNotificationService>()
+                     .WaitForResourceHealthyAsync(resourceName, deadline.Token);
+
+            var connectionString = await app.GetConnectionStringAsync(resourceName, deadline.Token)
+                ?? throw new InvalidOperationException(
+                    $"The shared {flavour} server produced no connection string.");
+
+            return new ServerSession { Application = app, ConnectionString = connectionString };
+        }
+        catch (Exception failure)
+        {
+            // Nothing is cached, so this application is now unreachable: tear it down
+            // here or it leaks. Same contract as everywhere else - the ORIGINAL failure
+            // wins, and a teardown failure never replaces it.
+            var teardownFailure = await TearDownAsync(app, started);
+
+            if (failure is OperationCanceledException && deadline.IsCancellationRequested)
+            {
+                throw new TimeoutException(
+                    $"The shared {flavour} server exceeded {ServerStartTimeout.TotalSeconds:0} s "
+                    + $"(it had {(started ? "started" : "NOT finished starting")} after {stopwatch.Elapsed}). "
+                    + "Is Docker running, and is the image already pulled?", teardownFailure);
+            }
+
+            ExceptionDispatchInfo.Capture(failure).Throw();
+            throw; // unreachable; keeps the compiler happy
+        }
+    }
+
+    private static string AddSqlServerServer(IDistributedApplicationBuilder builder)
+    {
+        // No AddDatabase child on purpose. The shared server hands out databases through
+        // CREATE DATABASE at test time; an Aspire database child would be one fixed
+        // database for the whole assembly, which is the thing this path exists to avoid.
+        builder.AddSqlServer("shared-sqlserver");
+        return "shared-sqlserver";
+    }
+
+    private static string AddPostgresServer(IDistributedApplicationBuilder builder)
+    {
+        builder.AddPostgres("shared-postgres");
+        return "shared-postgres";
+    }
+
+    private static string DatabaseName(string purpose)
+    {
+        var cleaned = new string(purpose.Where(char.IsLetterOrDigit).ToArray());
+        if (cleaned.Length == 0) cleaned = "db";
+        if (cleaned.Length > 20) cleaned = cleaned[..20];
+
+        // A GUID suffix rather than a counter: a counter would make two runs of the same
+        // row collide on a persistent server, and would tempt a future author into
+        // "reusing" a database. Sixteen hex characters keeps the whole name inside
+        // PostgreSQL's 63-byte identifier limit with room to spare.
+        return $"{cleaned}_{Guid.NewGuid():N}"[..(cleaned.Length + 17)];
+    }
+
+    private static async Task<string> CreateDatabaseAsync(
+        DatabaseFlavour flavour, string serverConnectionString, string name, CancellationToken cancellationToken)
+    {
+        switch (flavour)
+        {
+            case DatabaseFlavour.SqlServer:
+            {
+                // The server connection string carries no Initial Catalog, so this lands
+                // in master, which is where CREATE DATABASE has to run.
+                await using var connection = new SqlConnection(serverConnectionString);
+                await connection.OpenAsync(cancellationToken);
+                await using var command = new SqlCommand($"CREATE DATABASE [{name}]", connection);
+                await command.ExecuteNonQueryAsync(cancellationToken);
+
+                return new SqlConnectionStringBuilder(serverConnectionString)
+                {
+                    InitialCatalog = name
+                }.ConnectionString;
+            }
+
+            case DatabaseFlavour.Postgres:
+            {
+                await using var connection = new NpgsqlConnection(serverConnectionString);
+                await connection.OpenAsync(cancellationToken);
+                await using var command = new NpgsqlCommand($"CREATE DATABASE \"{name}\"", connection);
+                await command.ExecuteNonQueryAsync(cancellationToken);
+
+                return new NpgsqlConnectionStringBuilder(serverConnectionString)
+                {
+                    Database = name
+                }.ConnectionString;
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(flavour), flavour, null);
+        }
+    }
+
+    /// <summary>
+    /// Stops every shared server. Called once, after the last test in the assembly, by
+    /// <see cref="HarnessLifetime"/> - there is no other hook that runs late enough, and
+    /// a per-test <c>finally</c> is exactly what this path exists to avoid.
+    ///
+    /// Teardown goes through the same <see cref="TearDownAsync"/> every RunAsync session
+    /// uses, so the contract is identical rather than merely similar. Failures are
+    /// collected and rethrown together: a server that would not stop is a leak, and a
+    /// leak must be loud.
+    /// </summary>
+    public static async Task ShutdownSharedServersAsync()
+    {
+        List<Exception>? failures = null;
+
+        // Snapshot and clear first, so that a failure here cannot leave a stopped server
+        // in the dictionary for some later caller to hand out databases on.
+        await ServerLock.WaitAsync();
+        List<KeyValuePair<DatabaseFlavour, ServerSession>> sessions;
+        try
+        {
+            sessions = Servers.ToList();
+            Servers.Clear();
+        }
+        finally
+        {
+            ServerLock.Release();
+        }
+
+        foreach (var (flavour, session) in sessions)
+        {
+            var failure = await TearDownAsync(session.Application, started: true);
+            if (failure is not null)
+            {
+                failures ??= [];
+                failures.Add(new InvalidOperationException(
+                    $"The shared {flavour} server did not tear down. Check `docker ps -a`, "
+                    + "`docker network ls` and `docker volume ls` for leftovers.", failure));
+            }
+        }
+
+        if (failures is not null)
+        {
+            throw failures.Count == 1 ? failures[0] : new AggregateException(failures);
+        }
+    }
+
+    /// <summary>
+    /// Harness-only. Whether a shared server for <paramref name="flavour"/> is currently
+    /// running - the canary facts use it to assert that the second caller did NOT start
+    /// a second one.
+    /// </summary>
+    internal static bool HasSharedServer(DatabaseFlavour flavour)
+        // Unsynchronised on purpose: the assembly runs serially (TestParallelism.cs), so
+        // no test can be mutating this dictionary while a canary reads it.
+        => Servers.ContainsKey(flavour);
 }

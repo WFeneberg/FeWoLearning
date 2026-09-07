@@ -12,9 +12,10 @@ namespace FeWoLearning.MicroServices.Tests.Intermediate;
 public class Ex038_MigrationsOnStartupTests
 {
     [Fact]
-    public void The_migrator_WAITS_for_the_database_rather_than_merely_referencing_it()
+    public async Task The_migrator_WAITS_for_the_database_rather_than_merely_referencing_it()
     {
         var model = ModelHarness.Build(Configure);
+        var token = TestContext.Current.CancellationToken;
 
         var server = Assert.IsType<SqlServerServerResource>(model.Resource("sqldata"));
         var database = Assert.IsType<SqlServerDatabaseResource>(model.Resource(DatabaseResourceName));
@@ -22,10 +23,36 @@ public class Ex038_MigrationsOnStartupTests
 
         var migrator = Assert.IsType<ProjectResource>(model.Resource("migrator"));
 
-        // WithReference alone is the mutant: the migrator gets ConnectionStrings__catalog
-        // and starts immediately, well before SQL Server accepts logins. Both annotations
-        // must be there, and they are different annotations - ex002's subject.
-        Assert.NotEmpty(migrator.Annotations.OfType<EnvironmentCallbackAnnotation>());
+        // Both annotations must be there, and they are DIFFERENT annotations - ex002's
+        // subject. Counting EnvironmentCallbackAnnotations would grade nothing here:
+        // measured and recorded in README section 5, AddProject arrives carrying FOUR of
+        // them before anything is referenced, so "not empty" is true of a migrator that
+        // was never told where its database is. Run the callbacks instead and read the
+        // variable out - ex007's technique, and the only thing WithReference actually
+        // promises.
+        var environment = new Dictionary<string, object>();
+        var callbackContext = new EnvironmentCallbackContext(
+            new DistributedApplicationExecutionContext(DistributedApplicationOperation.Run),
+            migrator, environment, token);
+        foreach (var annotation in migrator.Annotations.OfType<EnvironmentCallbackAnnotation>())
+        {
+            await annotation.Callback(callbackContext);
+        }
+
+        // The key is the RESOURCE name, which is why ex036 named the database resource
+        // "catalog" in the first place - and the value is still an expression, because
+        // nothing has been allocated at model time.
+        Assert.True(
+            environment.ContainsKey($"ConnectionStrings__{DatabaseResourceName}"),
+            "the migrator was never told where the database is; variables present: "
+            + string.Join(", ", environment.Keys.Order()));
+        // At model time the value is not a string: WithReference stores a deferred
+        // reference, and only its manifest expression says which resource it points at.
+        // A hand-written WithEnvironment("ConnectionStrings__catalog", "Server=...")
+        // would land a plain System.String here and fail this cast.
+        var reference = Assert.IsAssignableFrom<IManifestExpressionProvider>(
+            environment[$"ConnectionStrings__{DatabaseResourceName}"]);
+        Assert.Equal($"{{{DatabaseResourceName}.connectionString}}", reference.ValueExpression);
 
         // Filter by name. Measured (README section 6): WaitFor on a database CHILD leaves
         // a WaitAnnotation for the parent server too, so an unfiltered assertion is
@@ -76,67 +103,63 @@ public class Ex038_MigrationsOnStartupTests
 
         var token = TestContext.Current.CancellationToken;
 
-        // The container fact starts a store of its own rather than the learner's
-        // Configure: Configure names a project resource so that WaitFor has something to
-        // gate, and building plus running it would cost a minute per container run to
-        // prove what the first fact already grades at L1.
-        await ContainerHarness.RunAsync(
-            builder => builder.AddSqlServer("sqldata").AddDatabase(DatabaseResourceName),
-            async session =>
-            {
-                await session.WaitForHealthyAsync(DatabaseResourceName);
-                var connectionString = await session.ConnectionStringAsync(DatabaseResourceName);
+        // A fresh, empty database on the assembly's SHARED SQL Server. The learner's
+        // Configure is graded at L1 by the first fact - it names a project resource so
+        // that WaitFor has something to gate, and building plus running that project
+        // would add a minute to every container run for a claim already graded. What
+        // this fact needs is a real server and a database nobody else has touched, and
+        // that is exactly what DatabaseAsync is: milliseconds, on a server the rest of
+        // the assembly shares. See MicroServices/README.md section 4.
+        var database = await ContainerHarness.DatabaseAsync(
+            ContainerHarness.DatabaseFlavour.SqlServer, "ex038", token);
+        var connectionString = database.ConnectionString;
 
-                // The expression really is gone - ex034's proof, repeated here because
-                // this is the first SQL Server row that runs. DCP publishes on an
-                // ephemeral host port, never 1433, and SQL Server spells host and port
-                // "Server=host,port".
-                Assert.DoesNotContain("{sqldata.", connectionString);
-                Assert.DoesNotContain(".connectionString}", connectionString);
-                var dataSource = new SqlConnectionStringBuilder(connectionString).DataSource;
-                Assert.Contains(",", dataSource);
-                Assert.NotEqual(1433, int.Parse(dataSource.Split(',')[1]));
+        // Empty to begin with: no tables, and in particular no __EFMigrationsHistory.
+        // If that were not true, the "applied both" assertion below would be reading
+        // some earlier test's leftovers instead of this exercise's work.
+        Assert.False(await TableExistsAsync(connectionString, "__EFMigrationsHistory", token));
 
-                // ---- first start -------------------------------------------------
-                var firstRun = await RunOneStartAsync(connectionString, token);
+        // ---- first start -----------------------------------------------------------
+        var firstRun = await RunOneStartAsync(connectionString, token);
 
-                // Both, in EF's order. Rejects EnsureCreatedAsync(), which creates the
-                // schema and reports nothing, and rejects a migrator that applies only
-                // the first migration.
-                Assert.Equal(MigrationIds, firstRun);
+        // Both, in EF's order. Rejects EnsureCreatedAsync(), which creates the schema and
+        // reports nothing, and rejects a migrator that applies only the first migration.
+        Assert.Equal(MigrationIds, firstRun);
 
-                // ...and the history table exists and names both. This is the assertion
-                // EnsureCreated can never satisfy: it writes no history at all, so the
-                // very same schema comes back with no such table.
-                Assert.Equal(MigrationIds, await HistoryAsync(connectionString, token));
+        // ...and the history table exists and names both. This is the assertion
+        // EnsureCreated can never satisfy: it writes no history at all, so the very same
+        // schema comes back with no such table.
+        Assert.Equal(MigrationIds, await HistoryAsync(connectionString, token));
 
-                // The second migration really ran against the first one's table.
-                Assert.True(await ColumnExistsAsync(connectionString, "Products", "Sku", token));
+        // The second migration really ran against the first one's table.
+        Assert.True(await ColumnExistsAsync(connectionString, "Products", "Sku", token));
 
-                // ---- second start, same database ---------------------------------
-                var secondRun = await RunOneStartAsync(connectionString, token);
+        // ---- second start, same database -------------------------------------------
+        var secondRun = await RunOneStartAsync(connectionString, token);
 
-                // The point of the row. Rejects the near-miss that reports
-                // GetAppliedMigrationsAsync() - correct on the first start, "2" here.
-                Assert.Empty(secondRun);
+        // The point of the row. Rejects the near-miss that reports
+        // GetAppliedMigrationsAsync() - correct on the first start, "2" here.
+        Assert.Empty(secondRun);
 
-                // ...and nothing was re-applied behind the report's back: the history is
-                // still exactly two rows, so no migration ran twice.
-                Assert.Equal(MigrationIds, await HistoryAsync(connectionString, token));
+        // ...and nothing was re-applied behind the report's back: the history is still
+        // exactly two rows, so no migration ran twice.
+        Assert.Equal(MigrationIds, await HistoryAsync(connectionString, token));
 
-                // A row written between two starts must survive the next one, which
-                // rejects a "migrator" that drops and recreates the database to make
-                // itself idempotent.
-                var sku = $"ex038-{Guid.NewGuid():N}";
-                await ExecuteAsync(connectionString,
-                    $"INSERT INTO [Products] ([Name], [Sku]) VALUES (N'probe', N'{sku}')", token);
-                var thirdRun = await RunOneStartAsync(connectionString, token);
-                Assert.Empty(thirdRun);
-                Assert.Equal(1L, await ScalarAsync(connectionString,
-                    $"SELECT COUNT_BIG(*) FROM [Products] WHERE [Sku] = N'{sku}'", token));
-            },
-            token);
+        // A row written between two starts must survive the next one, which rejects a
+        // "migrator" that drops and recreates the database to make itself idempotent.
+        var sku = $"ex038-{Guid.NewGuid():N}";
+        await ExecuteAsync(connectionString,
+            $"INSERT INTO [Products] ([Name], [Sku]) VALUES (N'probe', N'{sku}')", token);
+        var thirdRun = await RunOneStartAsync(connectionString, token);
+        Assert.Empty(thirdRun);
+        Assert.Equal(1L, await ScalarAsync(connectionString,
+            $"SELECT COUNT_BIG(*) FROM [Products] WHERE [Sku] = N'{sku}'", token));
     }
+
+    private static async Task<bool> TableExistsAsync(
+        string connectionString, string table, CancellationToken cancellationToken)
+        => await ScalarAsync(connectionString,
+            $"SELECT COUNT_BIG(*) FROM sys.tables WHERE name = N'{table}'", cancellationToken) is 1L;
 
     /// <summary>
     /// One complete start of the learner's registration, from a fresh host, and what it

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using Aspire.Hosting;
 
@@ -42,27 +43,131 @@ public static class ManifestHarness
     static ManifestHarness() => SweepStaleOutputs();
 
     /// <summary>
-    /// Publishes in-process and returns only the parsed aspire-manifest.json. The output
-    /// directory is deleted before this returns; the JsonDocument outlives it.
+    /// The value this harness puts in <c>ASPIRE_CONTAINER_RUNTIME</c>, and the single
+    /// biggest thing about it.
+    ///
+    /// It names no real runtime, so Aspire's publish pipeline skips container-runtime
+    /// detection entirely instead of shelling out to <c>podman</c>, <c>docker version</c>
+    /// and <c>docker container ls</c>. Measured on 13.5.3: one publish drops from ~5.1 s
+    /// to ~0.1 s and the manifest is identical, because the manifest is written at ~36 ms
+    /// and everything after it was the probe. Nothing at L2 needs a container runtime -
+    /// L2 asserts on generated ARTIFACTS - so this is the correct default rather than a
+    /// shortcut, and it is also what makes the claim "the default `dotnet test` needs no
+    /// daemon" true rather than nearly true. A future row that genuinely needs image
+    /// building can pass <c>containerRuntime: "docker"</c> and pay the ~1 s probe.
+    /// </summary>
+    public const string NoContainerRuntime = "none";
+
+    /// <summary>
+    /// Publishes in-process and returns the parsed aspire-manifest.json. The caller owns
+    /// the returned <see cref="JsonDocument"/> and should <c>using</c> it; the publish
+    /// output behind it is SHARED (see <see cref="SharedPublishAsync"/>) and is deleted
+    /// once, after the last test in the assembly.
     /// </summary>
     public static async Task<JsonDocument> GenerateAsync(
         Action<IDistributedApplicationBuilder> configure,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        string? containerRuntime = NoContainerRuntime)
     {
-        using var output = await PublishAsync(configure, cancellationToken);
+        var output = await SharedPublishAsync(configure, cancellationToken, containerRuntime);
+
+        // A FRESH document per call, parsed from the shared directory's text. That is
+        // what keeps the existing `using var manifest = await GenerateAsync(...)` at
+        // every call site correct: the caller disposes its own document, and the shared
+        // publish behind it is untouched.
         return JsonDocument.Parse(output.ReadText(PublishOutput.ManifestFileName));
     }
 
     /// <summary>
-    /// Publishes in-process and returns the generated artifacts. ALWAYS dispose the
-    /// result (`using var output = await ...`) - Dispose deletes the output directory.
+    /// ONE publish per distinct model, shared by every fact that asks for it.
+    ///
+    /// A publish costs a fixed amount regardless of how big the model is - measured: an
+    /// empty model and a five-database one cost the same - so the only quantity worth
+    /// managing at L2 is the NUMBER of publishes. This makes that number the number of
+    /// distinct models rather than the number of facts, which matters most for the rows
+    /// that assert on several generated files from one graph.
+    ///
+    /// The key is the delegate's identity - its method and its target - plus the
+    /// container-runtime choice. A method group such as <c>Ex013_X.Configure</c>
+    /// therefore shares across facts and across classes; two separately-created closures
+    /// never do, even when they would build the same model, because their targets differ.
+    /// That is the conservative direction. The contract is that a model must be a pure
+    /// function of the delegate, and a closure over mutable state simply misses the cache
+    /// instead of silently handing back somebody else's manifest.
+    ///
+    /// The returned object is owned by the HARNESS, not by the caller. Do NOT dispose it;
+    /// <see cref="HarnessLifetime"/> deletes every shared output after the last test. Use
+    /// <see cref="PublishAsync"/> when a test needs an output of its very own -
+    /// <see cref="PublishOutput.Dispose"/> is precisely what a shared output must never
+    /// have called on it.
+    /// </summary>
+    public static async Task<PublishOutput> SharedPublishAsync(
+        Action<IDistributedApplicationBuilder> configure,
+        CancellationToken cancellationToken = default,
+        string? containerRuntime = NoContainerRuntime)
+    {
+        var key = (configure.Method, configure.Target, containerRuntime);
+
+        // The assembly runs serially (TestParallelism.cs), so this lock is never
+        // contended. It is here so the "at most one publish per model" invariant belongs
+        // to this method rather than to the runner's configuration.
+        await SharedLock.WaitAsync(cancellationToken);
+        try
+        {
+            if (Shared.TryGetValue(key, out var existing))
+            {
+                return existing;
+            }
+
+            var output = await PublishAsync(configure, cancellationToken, containerRuntime);
+            Shared[key] = output;
+            return output;
+        }
+        finally
+        {
+            SharedLock.Release();
+        }
+    }
+
+    private static readonly SemaphoreSlim SharedLock = new(1, 1);
+
+    private static readonly Dictionary<(MethodInfo, object?, string?), PublishOutput> Shared = [];
+
+    /// <summary>
+    /// How many publishes this assembly has actually paid for. The smoke tests use it to
+    /// prove that a second fact on the same model costs none.
+    /// </summary>
+    internal static int PublishCount { get; private set; }
+
+    /// <summary>
+    /// Deletes every shared publish output. Called once, after the last test in the
+    /// assembly, by <see cref="HarnessLifetime"/>. The hourly sweep in the static
+    /// constructor remains the backstop for a process that never gets here.
+    /// </summary>
+    public static void DisposeSharedPublishes()
+    {
+        foreach (var output in Shared.Values)
+        {
+            output.Dispose();
+        }
+
+        Shared.Clear();
+    }
+
+    /// <summary>
+    /// Publishes in-process, UNSHARED, and returns the generated artifacts. ALWAYS
+    /// dispose the result (`using var output = await ...`) - Dispose deletes the output
+    /// directory. Prefer <see cref="SharedPublishAsync"/> unless a test needs an output
+    /// nobody else can see.
     /// </summary>
     public static async Task<PublishOutput> PublishAsync(
         Action<IDistributedApplicationBuilder> configure,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        string? containerRuntime = NoContainerRuntime)
     {
         Directory.CreateDirectory(Root);
         var dir = Path.Combine(Root, Guid.NewGuid().ToString("N")[..12]);
+        PublishCount++;
         try
         {
             var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
@@ -70,6 +175,15 @@ public static class ManifestHarness
                 Args = ["--operation", "publish", "--output-path", dir],
                 DisableDashboard = true
             });
+
+            // Set on THIS builder's configuration, never on the process environment, so
+            // it cannot reach ContainerHarness - which runs in RUN mode and needs a real
+            // Docker. See NoContainerRuntime for what it buys.
+            if (containerRuntime is not null)
+            {
+                builder.Configuration["ASPIRE_CONTAINER_RUNTIME"] = containerRuntime;
+            }
+
             configure(builder);
             using var app = builder.Build();
 
