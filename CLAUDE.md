@@ -138,13 +138,15 @@ the same `global.json` opt-in.
   `%USERPROFILE%\.cargo\bin` before invoking them from a plain shell.
 - `go test` needs `GOTMPDIR` outside `%TEMP%`, or on-access scanning deletes test
   binaries before exec (`fork/exec …: file not found`).
-- **`MicroServices/`** is verified as of 2026-09-06 on **Aspire 13.5.3 with
+- **`MicroServices/`** is verified as of 2026-09-07 on **Aspire 13.5.3 with
   .NET 10.0.400**, **Docker 29.7.2**, **devcontainer CLI 0.89.0**, and
   **xunit.v3 3.2.2** (`xunit.runner.visualstudio` 3.1.5,
   `Microsoft.NET.Test.Sdk` 17.14.1) pinned on the classic VSTest path:
-  `dotnet test` gives 95 exercise facts red, 7 harness facts passed, 1 skipped
-  (103 total); `dotnet test -p:UseSolutions=true` gives 102 passed, 1 skipped,
-  0 failed; `dotnet test -p:Containers=true` gives 95 red, 8 passed, 0 skipped. `Aspire.Hosting.Elasticsearch` is deliberately pinned at 13.3.0 —
+  `dotnet test` gives 142 failed, 10 passed, 12 skipped, 164 total, in about 5 s;
+  `dotnet test -p:UseSolutions=true` gives 0 failed, 152 passed, 12 skipped,
+  164 total, in about 13 s; `dotnet test -p:UseSolutions=true -p:Containers=true`
+  gives 164 passed, 0 skipped, measured three times at 3 m 03 s, 3 m 06 s and
+  3 m 12 s — budget about 3 m 10 s. `Aspire.Hosting.Elasticsearch` is deliberately pinned at 13.3.0 —
   its own latest stable — while every other Aspire package on the track is
   13.5.3. This also surfaced a problem elsewhere in the repo: `wpf/` sits on
   xunit.v3 4.0.0 plus a `Microsoft.Testing.Platform` `global.json`, and on
@@ -791,14 +793,55 @@ the same `global.json` opt-in.
   the model renders the raw password placeholder while the manifest renders
   a URI-encoded one. Any later Mongo row must decide which it is grading.
 
-  Two catalog rows were corrected after being written, because the catalog
+  **Each in-process Aspire publish spent about 4.5 seconds probing for a
+  container runtime**, unconditionally and flat — an empty model cost the
+  same as five databases — while writing the manifest itself takes 36 ms.
+  Setting `ASPIRE_CONTAINER_RUNTIME` on that builder's own configuration
+  (never the process environment, so the container lane is untouched)
+  removes it. That single change, plus sharing one publish per model and one
+  database container per flavour, took the suite from 20 s / 1 m 24 s / 5 m
+  26 s to about 5 s / 13 s / 3 m 10 s — while the container lane grew from
+  one container-backed exercise to eight.
+
+  **`ContainerHarness.DatabaseAsync(flavour, purpose)`** is now the entry
+  point for container-backed rows: one server per database flavour for the
+  whole assembly, a fresh database per test. `RunAsync` remains for a row
+  that grades the learner's own graph. Its teardown attempts both stop and
+  dispose on a budget independent of the test's, and preserves the original
+  failure — a bug found here was a throwing teardown *replacing* the real
+  assertion failure.
+
+  **`ManifestHarness.GenerateAsync` shares one publish per model**, guarded
+  by a fingerprint that refuses to serve a stale manifest. The rule the
+  guard cannot enforce: a static `Configure` that reads static mutable state
+  must call `PublishAsync` instead, because its cache key is stable. The
+  guard catches structural changes and value changes reachable through plain
+  properties, but not values hidden behind callbacks.
+
+  **Two flakiness traps, both found by running rather than reviewing.**
+  Aspire's generated SQL Server SA password can contain `{`, so an assertion
+  like `DoesNotContain("{", connectionString)` fails about one lane in ten —
+  assert the named placeholders instead. And a `dotnet test` that exceeds a
+  120-second foreground tool limit leaves its test host alive; the next
+  build then dies with `MSB3027` and `taskkill /F` cannot kill the process.
+  Deleting the locked files under `artifacts-solutions/` clears it.
+
+  **Pomelo's MySQL provider is unusable on EF Core 10** — a hard
+  `[9.0.0, 9.0.999]` dependency cap. `MySql.EntityFrameworkCore` is used
+  instead, and it stores index prefix lengths without emitting them into the
+  generated DDL, so the exercise that drills them grades the model rather
+  than the SQL.
+
+  Three catalog rows were corrected after being written, because the catalog
   is this track's spec and a wrong row propagates: row 018 claimed a fixed
   host port and replicas are contradictory, which is measurably false
   (Aspire polices neither; a proxied endpoint puts one listener in front of
   N instances); row 027 was a near-duplicate of ex001 and ex014 and was
-  re-scoped onto `AddDatabase(name, databaseName)`. The general lesson: when
-  a row turns out to misstate behaviour, fix the row itself, not just the
-  exercise header.
+  re-scoped onto `AddDatabase(name, databaseName)`; row 041 described grading
+  index prefix lengths off the generated DDL, which — per the Pomelo trap
+  above — the provider in use never emits, so it now grades the model
+  instead. The general lesson: when a row turns out to misstate behaviour,
+  fix the row itself, not just the exercise header.
 
   The devcontainer does **not** use the `docker-outside-of-docker` or `node`
   devcontainer features — they fail on this network with `NO_PUBKEY
@@ -1052,7 +1095,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `uno/`    | 100 / 100 (verified) | —         |
 | `caliburn/`| 65 / 100 (verified) | 35 |
 | `wpf/`    | 70 / 100 (verified) | 30 |
-| `MicroServices/`| 30 / 100 (verified) | 70 |
+| `MicroServices/`| 45 / 100 (verified) | 55 |
 | `security/`| 60 / 60 (verified) | —         |
 | `Architecture/`| 100 / 100 (verified) | —         |
 | `telemetry/`| 70 / 70 (verified) | —         |
