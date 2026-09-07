@@ -61,15 +61,23 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-07; `catalog.md` at 40 ✅ / 60 ⬜). Counted on
-disk: **126 exercise facts** across the forty delivered rows, of which three are 🐳,
-plus **14 harness facts** in `tests/_support/` — **140** in total.
+**Current measured state** (2026-09-07; `catalog.md` at 45 ✅ / 55 ⬜). Counted on
+disk: **150 exercise facts** across the forty-five delivered rows, of which eight are
+🐳, plus **14 harness facts** in `tests/_support/` — **164** in total.
 
 ```
-dotnet test                                         → 123 failed,  10 passed, 7 skipped (140 total),      5 s
-dotnet test -p:UseSolutions=true                    →   0 failed, 133 passed, 7 skipped (140 total),     10 s
-dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 140 passed, 0 skipped (140 total), 2 m 31 s
+dotnet test                                         → 142 failed,  10 passed, 12 skipped (164 total),      4 s
+dotnet test -p:UseSolutions=true                    →   0 failed, 152 passed, 12 skipped (164 total),     10 s
+dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 164 passed,  0 skipped (164 total), 3 m 03 s
 ```
+
+Rows 041-045 added 24 facts and **~34 s** to the container lane (2 m 31 s → 3 m 03 s,
+re-measured twice at 3 m 03 s and 3 m 06 s). Five of the 24 are 🐳 and all five run on
+ONE shared `library/mongo:8.3` — which is the shared-server rule from §4 paying out for
+the first time: a third flavour cost one start-up, not five. The other 19 are offline,
+and none of them is publish-shaped, so the green run did not move at all. Rows 041 and
+042 are *about* MySQL and Oracle and cost **0 s** of the lane, the same trick rows 037
+and 039 play with generated scripts.
 
 **Those numbers moved a long way on 2026-09-07, and the two harness changes behind them
 are §6's business, not a mystery to re-derive.** Before them the same suite read 20 s,
@@ -77,21 +85,26 @@ are §6's business, not a mystery to re-derive.** Before them the same suite rea
 runtime (~5.1 s → ~0.1 s, sixteen facts), and the 🐳 rows share one database server per
 flavour instead of starting one each.
 
-**The seven skips are not all harness facts, and the distinction matters.** Three are
-real exercise facts — ex034's, ex038's and ex040's 🐳 rows, gated like every 🐳 row
-will be. The other four are harness facts that are *deliberately* gated shut in the
-default run: the container-gate canary that proves `Require()` still closes, the
-teardown canary that needs a started application, and the two shared-server canaries
-(isolation, and surviving a failing test). `-p:Containers=true` unskips all seven. The
-10 that pass in the red run are the remaining harness facts, which pass in *both* modes
-because they grade the harness rather than an exercise.
+**The twelve skips are not all harness facts, and the distinction matters.** Eight are
+real exercise facts — ex034's, ex038's and ex040's 🐳 rows plus ex044's three and
+ex045's two, gated like every 🐳 row will be. The other four are harness facts that are
+*deliberately* gated shut in the default run: the container-gate canary that proves
+`Require()` still closes, the teardown canary that needs a started application, and the
+two shared-server canaries (isolation, and surviving a failing test).
+`-p:Containers=true` unskips all twelve. The 10 that pass in the red run are the
+remaining harness facts, which pass in *both* modes because they grade the harness
+rather than an exercise.
 
-The container lane costs the difference between the last two lines, **~2 m 33 s**.
-It is dominated by **server start-ups**, and since 2026-09-07 there are only two:
+The container lane costs the difference between the last two lines, **~2 m 53 s**.
+It is dominated by **server start-ups**, and since 2026-09-07 there are only three:
 ex034 starts its own Postgres (~51 s, because that row grades the learner's own resource
-graph and must), and everything else on SQL Server — ex038, ex040 and the two
+graph and must), everything on SQL Server — ex038, ex040 and the two
 shared-server canaries — shares **one** `mcr.microsoft.com/mssql/server:2022-latest`
-(~55 s for the first caller, then milliseconds each). Before that change ex038 and
+(~55 s for the first caller, then milliseconds each), and rows 044 and 045 share **one**
+`library/mongo:8.3`. Mongo is the cheap one: measured on its own, ex044's and ex045's
+nine facts together — server start-up, five databases, 2 400 seeded documents and four
+`explain` commands included — run in **35 s**, of which the five 🐳 facts are about
+32 s and 30 of those are the container. Before that change ex038 and
 ex040 started a server each and cost ~1 m 25 s apiece; measured after, the two rows'
 six facts together run in **1 m 4 s**. The remaining ~28 s is the two applications the
 teardown canary starts, which start no containers — see §4.
@@ -332,8 +345,21 @@ harness-supplied string would grade nothing. ex038 and ex040 want "a real SQL Se
 a database nobody has touched", which is what `DatabaseAsync` is for; their L1 facts
 grade the model.
 
+**Three flavours as of rows 044/045: `SqlServer`, `Postgres` and `MongoDb`.** Adding one
+is `StartServerAsync` plus `CreateDatabaseAsync` and nothing else, exactly as the enum's
+comment claims - but Mongo needed the second of those to grow a concept: **Mongo has no
+`CREATE DATABASE`**. A database exists once something has been written to it, so that
+path creates a probe collection (`ContainerHarness.ProbeCollectionName`,
+`_harness_probe`) instead, which is both what brings the database into being and the
+cheap liveness check the two relational flavours get from `CREATE DATABASE`. The URI is
+built with `MongoUrlBuilder`, never by concatenation: the database name is a path segment
+in the middle of a URI, and Aspire's generated password may need percent-encoding
+(measured - a password containing `}` comes back as `%7D`). A row asserting over
+`ListCollectionNames` must expect that probe collection.
+
 **A database, not a server, is the isolation boundary.** `DatabaseAsync` issues
-`CREATE DATABASE` with a GUID-suffixed name and hands back a connection string pointing
+`CREATE DATABASE` with a GUID-suffixed name (or, on Mongo, creates the probe collection
+in a GUID-suffixed database) and hands back a connection string pointing
 at it, so each test gets its own catalogue, its own tables and its own
 `__EFMigrationsHistory`. That claim is *proved*, not asserted:
 `SharedServer_hands_out_ISOLATED_databases_on_ONE_server` takes two databases, creates
@@ -608,6 +634,64 @@ Two consequences for a later author, the same shape as the ASP.NET Core set's:
   generated DDL, and 039 reads INSERTs out of a generated script and re-runs a seed
   against SQLite. None of the three needs a server, and each would have cost ~1 m 25 s
   if it had been allowed to start one.
+
+### MySQL, Oracle and MongoDB join the same library pair — rows 041-045
+
+The third structural extension, on exactly the terms rows 021-023 and 036-040 set: both
+content libraries, identically, one commit, because `tests/` references exactly one of
+them and `UseSolutions` must stay a single switch over a single pair.
+
+```xml
+Aspire.Hosting.MySql                            13.5.3
+Aspire.Hosting.Oracle                           13.5.3
+MySql.EntityFrameworkCore                       10.0.9
+Oracle.EntityFrameworkCore                      10.23.26300
+MongoDB.Driver                                   3.9.0
+```
+
+Five notes, each of which decided something:
+
+- **Pomelo cannot be used here, and that is not a preference.**
+  `Pomelo.EntityFrameworkCore.MySql` is the provider every MySQL/EF tutorial names, and
+  its newest stable — 9.0.0 — pins `Microsoft.EntityFrameworkCore.Relational` at
+  **`[9.0.0, 9.0.999]`**, a hard upper bound. Rows 036-040 sit on EF Core 10.0.11, so the
+  two cannot coexist in one library. `MySql.EntityFrameworkCore` (Oracle's own, versioned
+  to match the runtime: 10.0.9's `net10.0` group asks for EF Core 10.0.9) is the only EF
+  Core 10 MySQL provider there is. Anyone who "fixes" this back to Pomelo gets an
+  `NU1605` downgrade error, not a better provider.
+- **`Oracle.EntityFrameworkCore` 10.23.26300** is the EF Core 10 line (`Relational
+  [10.0.0, 11.0.0)`) and brings `Oracle.ManagedDataAccess.Core`. Its
+  `OracleSQLCompatibility` enum offers only `DatabaseVersion19` / `21` / `23`, all of
+  which report a 128-character identifier limit — there is no way to ask this provider
+  for the 30-character 12.1 behaviour, which is why ex042 caps identifiers in the
+  exercise's own code instead.
+- **`MongoDB.Driver` is pinned to 3.9.0, not to the latest 3.11.1.** 3.9.0 is what
+  `Aspire.MongoDB.Driver` 13.5.3 resolves on `net10.0`. Rows 043-045 use the driver
+  directly — class maps, index models, aggregation pipelines — rather than the Aspire
+  client integration, but pinning to the integration's version means a later row that
+  does call `AddMongoDBClient` needs no bump and cannot land the assembly on two
+  drivers. `tests/` pins the same 3.9.0, for the reason its `Npgsql` pin exists: ex044
+  and ex045 seed and read documents through the test's own client, and
+  `ContainerHarness`'s Mongo flavour builds its per-test URI with `MongoUrlBuilder`.
+- **Four relational providers in one library make extension methods ambiguous.**
+  Measured: `UseSequence` and `UseHiLo` are published into namespace
+  `Microsoft.EntityFrameworkCore` by `SqlServerPropertyBuilderExtensions`,
+  `NpgsqlPropertyBuilderExtensions` **and** `OraclePropertyBuilderExtensions`, so an
+  unqualified `property.UseSequence(...)` is `CS0121`. ex042's solution calls
+  `Microsoft.EntityFrameworkCore.OraclePropertyBuilderExtensions.UseSequence(...)` by
+  name. Nothing already written broke — rows 036-040 use `UseSqlServer`, `UseNpgsql`,
+  `IsRowVersion` and `HasData`, none of which collides — but the next row reaching for a
+  provider-specific builder extension should expect this. MySQL's own extensions are in
+  `MySql.EntityFrameworkCore.Extensions`, a namespace of their own, and are therefore
+  invisible until imported: `modelBuilder.UseCollation(...)` binds to the RELATIONAL one
+  unless that namespace is in scope, and the two do completely different things.
+- **Two of these five rows would have been the whole container budget, and are offline
+  instead.** Oracle's image (`container-registry.oracle.com/database/free:23.26.1.0`) is
+  measured in gigabytes and MySQL's in hundreds of megabytes;
+  `DatabaseFacade.GenerateCreateScript()` reads the model and the provider's SQL
+  generator and opens nothing, so rows 041 and 042 cost **0 s** of the container lane —
+  the same trick rows 037 and 039 play. Only 044 and 045 are 🐳, and both share one
+  `library/mongo:8.3`.
 
 ### `solutions/` is in the build here — deliberately
 
@@ -1295,6 +1379,106 @@ Each of these cost real time. None is a guess.
   hand-written `WithEnvironment("ConnectionStrings__catalog", "Server=…")` lands a plain
   `System.String` there and fails the cast. Both mutants were built and run.
 
+- **A schema is a USER, and Oracle's provider says so in the DDL.** Measured on
+  `Oracle.EntityFrameworkCore` 10.23.26300 while writing ex042. Asked for a default
+  schema, it does not emit `CREATE SCHEMA` — there is no such statement in Oracle. It
+  emits a PL/SQL block that does `SELECT COUNT(*) INTO USEREXIST FROM ALL_USERS WHERE
+  USERNAME='<name>'` and `RAISE`s a `USER_NOT_EXIST` exception (`PRAGMA EXCEPTION_INIT`,
+  ORA-01435) when the count is zero. Compare SQL Server's `IF SCHEMA_ID(N'…') IS NULL
+  EXEC(N'CREATE SCHEMA …');` and Npgsql's `DO $EF$ … CREATE SCHEMA … END $EF$;`. It also
+  does **not fold the name**: `HasDefaultSchema("orders_app")` emits
+  `USERNAME='orders_app'`, which matches nothing on a server where `CREATE USER` stored
+  it as `ORDERS_APP` — and since every identifier the provider writes is double-quoted,
+  Oracle's own folding is switched off everywhere else too. Folding is the caller's job,
+  which is why ex042 makes it a function the test drives with names it invented. Two more
+  spellings from the same probe: statements terminate with **`/`** (not `;`, not SQL
+  Server's `GO`), and `CREATE TABLE` is wrapped in `BEGIN EXECUTE IMMEDIATE '…'; END;/`.
+- **Oracle's identifier limit is 128 here and cannot be dialled down.**
+  `IModel.GetMaxIdentifierLength()` reports 128 (Oracle 12.2+), and the provider's
+  `UseOracleSQLCompatibility` accepts only `DatabaseVersion19`, `21` and `23` — all 128.
+  A 55-character index name goes through untouched. So ex042 grades a **30-character cap
+  the exercise applies itself**: the 12.1 limit, still the limit over a database link,
+  and the number every Oracle naming convention in the wild is built around. Four
+  measured values worth having beside each other: MySQL **64**, PostgreSQL **63**, SQL
+  Server **128**, Oracle **128** — so `GetMaxIdentifierLength()` does not discriminate
+  Oracle from SQL Server and is not a grading hook.
+- **`NVARCHAR2` stops at 2000 characters, so `HasMaxLength(4000)` silently becomes
+  `NCLOB`.** Measured. The same property is `nvarchar(4000)` on SQL Server. An
+  out-of-line lob has different locking and different query behaviour, and nothing warns.
+- **Each provider escapes only its OWN delimiter, and MySQL's is a backtick.** The trick
+  ex037 uses for `]` and `"` extends cleanly to a third engine: given a table name
+  containing a backtick, a double quote and a closing bracket, MySQL DOUBLES the backtick
+  and leaves the other two alone, while SQL Server doubles the bracket and leaves the
+  backtick alone. Oracle is the outlier — the same name throws **`ORA-50131: Invalid identifier or
+  literal`** from inside `GenerateCreateScript()`. ex041 uses the MySQL half as its
+  anti-hardcode hook, with a mixed-case name the test invents per run so that the
+  lower-casing is provably a transformation rather than a literal.
+- **MySQL charset and collation are only visible per COLUMN.**
+  `MySQLModelBuilderExtensions.HasCharSet` / `.UseCollation` describe `CREATE DATABASE`,
+  which `GenerateCreateScript()` never emits — measured: they leave **no trace at all** in
+  the script, so a fact built on them grades nothing. `ForMySQLHasCharset` +
+  `ForMySQLHasCollation` on a property produce a column declared
+  `varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin`. Reading either back off the
+  runtime model throws
+  *"The requested configuration is not stored in the read-optimized model, please use
+  'DbContext.GetService&lt;IDesignTimeModel&gt;().Model'"* — so assert the script, not the
+  model. (Separately: MySQL identifier case sensitivity is not a collation question and
+  not a version question. It is `lower_case_table_names`, which defaults to 0 on Linux —
+  case-SENSITIVE, because each table is a file — and 1 on Windows and macOS. Column names
+  are case-insensitive everywhere, which is why ex041 grades the table name.)
+- **`HasPrefixLength` is stored and NOT emitted by `MySql.EntityFrameworkCore` 10.0.9.**
+  Measured: `MySQLIndexExtensions.PrefixLength(index)` returns `[32]` from the ordinary
+  runtime model, and the generated `CREATE INDEX` names the column with no `(32)` after
+  it at all. InnoDB cannot index a `TEXT` column without a
+  prefix, so that script would fail on a real server. ex041 therefore reads the prefix off
+  the model and says so in its header; a later reader should not spend the afternoon
+  hunting for the call they got wrong. The same class's `IsFullText` is stored and not
+  emitted either.
+- **Mongo's default id convention is exactly `Id` / `id` / `_id`, which makes an `_id`
+  assertion worthless on a property called `Id`.** Found by building the mutant: ex043's
+  "`_id` is an ObjectId and there is no CLR-named element" fact was first written against
+  `Order.Id`, and a bare `AutoMap()` — the laziest mapping there is — passed it, because
+  the convention had already done the work. Renaming the property to `OrderId` took that
+  mutant from 3 facts rejected to 4: `AutoMap()` now stores `OrderId` and leaves the
+  collection with no `_id` at all. Any row grading a Mongo class map should first ask what
+  `AutoMap()` alone already gives. Two more measured defaults from the same row: a
+  `decimal` left alone serialises as a **string** (so `"9.00"` sorts after `"10.00"`), and
+  `AutoMap()` happily EMBEDS a navigation property — `UnmapMember` is the only thing that
+  stops a whole customer being copied into every order they place.
+- **`explain` is a database command, and only `queryPlanner.winningPlan` is safe to
+  assert on.** The driver's fluent `Find` does not expose it, so ex044's test renders the
+  learner's `FilterDefinition`/`SortDefinition` into
+  `{ explain: { find, filter, sort, limit }, verbosity: "queryPlanner" }` and runs it
+  through `RunCommandAsync<BsonDocument>` — which is why that row's query is a *pair of
+  definitions* rather than a method returning documents. `rejectedPlans` may legitimately
+  describe a `COLLSCAN` the planner considered, so a `DoesNotContain("COLLSCAN")` over the
+  whole reply fails against a correct answer.
+  **The discriminating assertion is not `IXSCAN` — it is the ABSENCE of a `SORT` stage.**
+  A single-field index on the equality column still yields `IXSCAN`, and then
+  `"stage" : "SORT"` beside it; both mutants were built and run, and only the SORT
+  assertion rejected the single-field one. ex044's plan fact also generates the same query
+  on the same data with **no index at all** first and requires COLLSCAN there, so the
+  positive half cannot quietly stop discriminating.
+- **`$unwind` DROPS a document whose array is empty**, where the obvious client-side
+  `SelectMany().GroupBy()` keeps it with a total of zero. That is the one behavioural
+  difference between "run it on the server" and "download it and group it" that shows up
+  in the ANSWER rather than only in the plan, and ex045 seeds an order with no lines for
+  exactly that reason — the in-memory mutant was written out in full and it is what
+  rejected it. Its second hook is the `$lookup` output: the test inserts the customers as
+  raw `BsonDocument`s carrying a field no C# type in the exercise declares, and the joined
+  document comes back with it, which nothing grouping mapped POCOs can reproduce. A third
+  mutant — `$match` moved AFTER the `$unwind` — returns the identical documents and is
+  caught only by the rendered-stage-order fact, which is why that row asserts both.
+- **A `dotnet test` this tool times out on leaves its test host RUNNING, and the next
+  build then dies `MSB3027`.** Measured while writing this batch, and it cost twenty
+  minutes: a filtered run that was moved to the background left
+  `FeWoLearning.MicroServices.Tests.exe` alive holding
+  `artifacts-solutions/bin/.../FeWoLearning.MicroServices.Tests.exe`, and every later
+  build retried ten times over six minutes before failing. `taskkill /F` reported *"no
+  instance of this task is running"* while the process was plainly still there and still
+  holding the handle; `(Get-Process -Id <pid>).Kill()` from PowerShell worked. Check for
+  a stray test host before concluding the build is broken.
+
 ## 7. Pinned versions
 
 | Package | Version | Where |
@@ -1307,6 +1491,9 @@ Each of these cost real time. None is a guess.
 | `Aspire.Npgsql` | 13.5.3 | `exercises/` + `solutions/` |
 | `Microsoft.EntityFrameworkCore.SqlServer` | 10.0.11 | `exercises/` + `solutions/` |
 | `Npgsql.EntityFrameworkCore.PostgreSQL` | 10.0.3 | `exercises/` + `solutions/` |
+| `MySql.EntityFrameworkCore` | 10.0.9 | `exercises/` + `solutions/` |
+| `Oracle.EntityFrameworkCore` | 10.23.26300 | `exercises/` + `solutions/` |
+| `MongoDB.Driver` | 3.9.0 | `exercises/` + `solutions/` **and** `tests/` |
 | `Aspire.Hosting.Testing` | 13.5.3 | `tests/` |
 | `Aspire.Hosting.AppHost` + `Aspire.Hosting.Orchestration.$(NETCoreSdkRuntimeIdentifier)` | 13.5.3 | `tests/`, **only** under `Condition="'$(Containers)' == 'true'"` |
 | `Npgsql` | 10.0.3 | `tests/` |
@@ -1319,8 +1506,9 @@ Each of these cost real time. None is a guess.
 
 This table is the **pinning policy**, not an inventory: a package is added to the two
 content libraries when the first row needing it is written. Referenced today:
-`Aspire.Hosting`, `.PostgreSQL`, `.SqlServer`, `.MongoDB`, `.Redis`,
-`.Azure.AppContainers`, `.Azure.Storage` and the client-side `Aspire.Npgsql` — the last two because the harness's Bicep
+`Aspire.Hosting`, `.PostgreSQL`, `.SqlServer`, `.MongoDB`, `.MySql`, `.Oracle`,
+`.Redis`, `.Azure.AppContainers`, `.Azure.Storage` and the client-side `Aspire.Npgsql` —
+the two Azure ones because the harness's Bicep
 fact needs them and the Azure rows will — plus the non-Aspire service-side set rows
 021-023 added, and a `FrameworkReference` to `Microsoft.AspNetCore.App` (see §5).
 `Aspire.Npgsql` arrived with ex033/ex034 — the first rows that cross from the AppHost
@@ -1334,6 +1522,18 @@ moving with it. The **two EF Core providers** are the second structural extensio
 content libraries have taken (§5), on the same terms as the ASP.NET Core set: both
 `.csproj` files, identically, one commit. `Microsoft.EntityFrameworkCore.Sqlite` is
 test equipment for ex039's offline re-run check and lives in `tests/` alone.
+
+The **third** structural extension is rows 041-045's: `Aspire.Hosting.MySql` and
+`Aspire.Hosting.Oracle` at 13.5.3 like every other Aspire package, plus three non-Aspire
+pins whose reasons are in §5 and are not free choices —
+`MySql.EntityFrameworkCore` **10.0.9** because Pomelo's newest stable hard-caps EF Core
+at `[9.0.0, 9.0.999]` and cannot sit beside 10.0.11, `Oracle.EntityFrameworkCore`
+**10.23.26300** because the 10.x line is the EF Core 10 one, and `MongoDB.Driver`
+**3.9.0** — not the newer 3.11.1 — because that is what `Aspire.MongoDB.Driver` 13.5.3
+resolves, so a later row adding the Aspire client integration needs no bump. `tests/`
+carries the same `MongoDB.Driver` 3.9.0 under the rule its `Npgsql` pin already follows:
+ex044 and ex045 seed through the test's own client, and `ContainerHarness`'s Mongo
+flavour builds its per-test URI with `MongoUrlBuilder`.
 
 The two DCP packages are the track's only **conditional** references. They exist because
 starting a real `DistributedApplication` needs the orchestrator that `Aspire.AppHost.Sdk`

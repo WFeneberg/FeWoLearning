@@ -57,7 +57,7 @@ as oversights:
   and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
   093/094/099/100 assert on the generated Bicep for real.
 
-**Status: 40 ✅ / 60 ⬜**
+**Status: 45 ✅ / 55 ⬜**
 
 ## Beginner (001–035) — Aspire model and first persistence
 
@@ -110,11 +110,11 @@ as oversights:
 | 038 | MigrationsOnStartup | `Database.MigrateAsync` from a hosted service, gated on `WaitFor`; the second start must apply **zero** migrations, which is the assertion that catches a naive `EnsureCreated` | 🐳 ✅ |
 | 039 | SeedDataInTheModel | `HasData` in `OnModelCreating` vs an upsert at startup; grade the `INSERT`s in the generated migration and the seed's re-run safety, not the row count after one start | ✅ |
 | 040 | TransactionsAndConcurrency | `IExecutionStrategy` wrapping an explicit transaction, a `rowversion`/`xmin` concurrency token, and a genuine `DbUpdateConcurrencyException` from two interleaved updates | 🐳 ✅ |
-| 041 | MySqlIdentifiersAndCollation | `AddMySql`, `MySqlDatabaseResource` and its own expression; then the schema differences — `utf8mb4` collation, identifier case sensitivity, index prefix lengths — read off the generated DDL | ⬜ |
-| 042 | OracleSchemaSemantics | `AddOracle`, `OracleDatabaseResource`; a *schema is a user*, identifiers are folded and length-capped, and keys come from sequences — the relational habits from 036 do not transfer | ⬜ |
-| 043 | MongoDocumentModel | embedding vs referencing, `_id`/`ObjectId`, `BsonDocument` against a mapped POCO; the row is graded on the stored **document shape**, so a normalised set of collections fails | ⬜ |
-| 044 | MongoIndexesAndExplain | `CreateIndexModel`, a compound index, and `explain()` reporting `IXSCAN` rather than `COLLSCAN` — the query must prove the index was *used*, since a correct result proves nothing | 🐳 ⬜ |
-| 045 | MongoAggregationPipeline | `$match`/`$unwind`/`$group`/`$lookup` executed server-side; assert the emitted pipeline stages **and** the documents, because an in-memory LINQ `GroupBy` returns the same answer | 🐳 ⬜ |
+| 041 | MySqlIdentifiersAndCollation | `AddMySql`, `MySqlDatabaseResource` and its own expression; then the schema differences — `utf8mb4` collation, identifier case sensitivity, index prefix lengths — read off the generated DDL | ✅ |
+| 042 | OracleSchemaSemantics | `AddOracle`, `OracleDatabaseResource`; a *schema is a user*, identifiers are folded and length-capped, and keys come from sequences — the relational habits from 036 do not transfer | ✅ |
+| 043 | MongoDocumentModel | embedding vs referencing, `_id`/`ObjectId`, `BsonDocument` against a mapped POCO; the row is graded on the stored **document shape**, so a normalised set of collections fails | ✅ |
+| 044 | MongoIndexesAndExplain | `CreateIndexModel`, a compound index, and `explain()` reporting `IXSCAN` rather than `COLLSCAN` — the query must prove the index was *used*, since a correct result proves nothing | 🐳 ✅ |
+| 045 | MongoAggregationPipeline | `$match`/`$unwind`/`$group`/`$lookup` executed server-side; assert the emitted pipeline stages **and** the documents, because an in-memory LINQ `GroupBy` returns the same answer | 🐳 ✅ |
 | 046 | RedisExpiryAndEviction | `SET … EX`, `TTL`, a key that genuinely disappears, and `maxmemory-policy` deciding what is dropped under pressure; the subject is what Redis *forgets* | 🐳 ⬜ |
 | 047 | CacheAsideAndStampede | read-through cache-aside with negative caching for misses and a jittered TTL, plus a `SET NX PX` lock so N **concurrent** misses invoke the loader exactly once and the lock is released; assert the loader's invocation count — naive cache-aside calls it N times | 🐳 ⬜ |
 | 048 | ValkeyAndGarnetForks | `AddValkey` → `ValkeyResource` on `valkey/valkey` and `AddGarnet` → `GarnetResource` on Microsoft's image: one `AddRedis` fails the type assertion and the connection expressions cannot tell them apart, so the row also drives both with one client to find where Garnet's command coverage stops short | 🐳 ⬜ |

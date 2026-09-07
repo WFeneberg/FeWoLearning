@@ -43,10 +43,17 @@
        that needs a real relational store with real primary keys - which SQLite gives in
        memory, offline, in milliseconds. The exercise itself never names a provider: its
        SeedAsync takes a DbContext, so the same code runs on SQL Server. Pinned to the
-       same 10.0.11 the two content libraries put EF Core on. -->
+       same 10.0.11 the two content libraries put EF Core on.
+
+       MongoDB.Driver follows the Npgsql rule exactly: rows 044 and 045 seed and read
+       documents through the test's OWN client before asking the learner's code to touch
+       them, and ContainerHarness's Mongo flavour builds its per-test database URI with
+       MongoUrlBuilder, so the test and the exercise must never run two different
+       drivers. Pinned to the 3.9.0 the two content libraries resolve. -->
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+    <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
   </ItemGroup>
 
   <ItemGroup>

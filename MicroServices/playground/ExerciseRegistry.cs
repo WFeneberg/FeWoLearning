@@ -47,6 +47,11 @@ public static class ExerciseRegistry
         ["ex038"] = Ex038_MigrationsOnStartup.Configure,
         ["ex039"] = Ex039_SeedDataInTheModel.Configure,
         ["ex040"] = Ex040_TransactionsAndConcurrency.Configure,
+        ["ex041"] = Ex041_MySqlIdentifiersAndCollation.Configure,
+        ["ex042"] = Ex042_OracleSchemaSemantics.Configure,
+        ["ex043"] = Ex043_MongoDocumentModel.Configure,
+        ["ex044"] = Ex044_MongoIndexesAndExplain.Configure,
+        ["ex045"] = Ex045_MongoAggregationPipeline.Configure,
     };
 
     /// <summary>

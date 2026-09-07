@@ -5,6 +5,8 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Npgsql;
 
 namespace FeWoLearning.MicroServices.Tests;
@@ -305,13 +307,24 @@ public static class ContainerHarness
     /// <summary>
     /// The database flavours the shared-server path knows how to create a database on.
     /// Adding one means teaching <see cref="StartServerAsync"/> how to add the resource
-    /// and <see cref="CreateDatabaseAsync"/> how to say CREATE DATABASE in its dialect;
-    /// nothing else changes.
+    /// and <see cref="CreateDatabaseAsync"/> how to bring a fresh database into being in
+    /// its dialect - CREATE DATABASE for the two relational ones, a first collection for
+    /// Mongo, which has no such statement; nothing else changes.
     /// </summary>
     public enum DatabaseFlavour
     {
         SqlServer,
-        Postgres
+        Postgres,
+
+        /// <summary>
+        /// MongoDB. The odd one out, and deliberately so: Mongo has no CREATE DATABASE -
+        /// a database springs into existence the first time something is written to it -
+        /// so <see cref="CreateDatabaseAsync"/> creates a probe COLLECTION instead. That
+        /// keeps the two properties the other two flavours get from CREATE DATABASE: the
+        /// database really exists before the test sees it, and the round trip is the
+        /// cheapest possible liveness check on a server that may have died mid-suite.
+        /// </summary>
+        MongoDb
     }
 
     /// <summary>A fresh, empty database on the assembly's shared server for its flavour.</summary>
@@ -402,7 +415,7 @@ public static class ContainerHarness
             // the caller's token is the one that fired, the cancellation propagates
             // untouched and the server stays up for the next row.
             //
-            // CREATE DATABASE is the liveness check. It is the first thing every caller
+            // Creating the database is the liveness check. It is the first thing every caller
             // does and it is the cheapest possible probe, so a server that died mid-suite
             // - OOM-killed, docker restarted, the daemon bounced - surfaces HERE rather
             // than as an unexplained failure three rows later.
@@ -420,7 +433,7 @@ public static class ContainerHarness
             await EvictAsync(flavour);
 
             throw new InvalidOperationException(
-                $"The shared {flavour} server did not accept CREATE DATABASE [{name}], so it has "
+                $"The shared {flavour} server did not hand out a fresh database [{name}], so it has "
                 + "been evicted and the next container test will start a fresh one. This usually "
                 + "means the container died mid-suite - check `docker ps -a` for an exited "
                 + $"'shared-{flavour.ToString().ToLowerInvariant()}'.", failure);
@@ -487,6 +500,7 @@ public static class ContainerHarness
         {
             DatabaseFlavour.SqlServer => AddSqlServerServer(builder),
             DatabaseFlavour.Postgres => AddPostgresServer(builder),
+            DatabaseFlavour.MongoDb => AddMongoDbServer(builder),
             _ => throw new ArgumentOutOfRangeException(nameof(flavour), flavour, null)
         };
 
@@ -546,6 +560,17 @@ public static class ContainerHarness
         return "shared-postgres";
     }
 
+    private static string AddMongoDbServer(IDistributedApplicationBuilder builder)
+    {
+        // No AddDatabase child, for the same reason the other two have none: an Aspire
+        // database child would be ONE fixed database for the whole assembly. The server
+        // resource's connection string carries no database path segment at all, which is
+        // exactly what CreateDatabaseAsync needs in order to point MongoUrlBuilder at a
+        // fresh name per test.
+        builder.AddMongoDB("shared-mongodb");
+        return "shared-mongodb";
+    }
+
     private static string DatabaseName(string purpose)
     {
         var cleaned = new string(purpose.Where(char.IsLetterOrDigit).ToArray());
@@ -592,10 +617,44 @@ public static class ContainerHarness
                 }.ConnectionString;
             }
 
+            case DatabaseFlavour.MongoDb:
+            {
+                // Mongo has no CREATE DATABASE. Creating a collection is what actually
+                // brings a database into being, so the probe collection is not decoration:
+                // without it the database does not exist until the learner's code writes,
+                // and a dead server would not surface here.
+                //
+                // MongoUrlBuilder, not string surgery. The database name is a PATH SEGMENT
+                // in the middle of a URI (README section 6 says so about the model's
+                // connection expression, and it is just as true of the resolved one), and
+                // Aspire's generated password can contain characters that need
+                // percent-encoding - measured: a password containing '}' comes back as
+                // %7D. Both are reasons not to concatenate.
+                var url = new MongoUrlBuilder(serverConnectionString) { DatabaseName = name }
+                          .ToMongoUrl();
+
+                var client = new MongoClient(url);
+                var database = client.GetDatabase(name);
+                await database.CreateCollectionAsync(ProbeCollectionName, cancellationToken: cancellationToken);
+
+                // The round trip, so that a server that accepted the create but cannot be
+                // read from fails HERE rather than three rows later.
+                _ = await database.ListCollectionNames().ToListAsync(cancellationToken);
+
+                return url.ToString();
+            }
+
             default:
                 throw new ArgumentOutOfRangeException(nameof(flavour), flavour, null);
         }
     }
+
+    /// <summary>
+    /// The collection <see cref="CreateDatabaseAsync"/> creates to bring a Mongo database
+    /// into existence. Named so that a row asserting on <c>ListCollectionNames</c> can
+    /// exclude it knowingly rather than be surprised by it.
+    /// </summary>
+    public const string ProbeCollectionName = "_harness_probe";
 
     /// <summary>
     /// Stops every shared server. Called once, after the last test in the assembly, by

@@ -11,6 +11,11 @@ using Xunit;
 //          other test class anywhere has a provider listening to "*".
 //   ex023  two static flags that select which of the three probe scenarios is being run.
 //   ex025  a static, ordered hook log that each test resets before building its model.
+//   ex043  BsonClassMap registrations, which live in MongoDB.Driver's process-wide
+//          serializer registry and are ONE-SHOT: registering a type twice throws, and
+//          serialising it before registering freezes an auto-map that can then never be
+//          replaced. The row's ConfigureMapping() is idempotent for that reason, but the
+//          registry it writes to is shared with every other test in the process.
 //
 // Under the default class-level parallelism those three are safe only while no other
 // class happens to touch the same statics - an assembly-wide invariant that nothing

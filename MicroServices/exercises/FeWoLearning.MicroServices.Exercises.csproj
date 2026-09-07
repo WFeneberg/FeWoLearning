@@ -17,6 +17,8 @@
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.5.3" />
     <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.5.3" />
     <PackageReference Include="Aspire.Hosting.MongoDB" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.MySql" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.Oracle" Version="13.5.3" />
     <PackageReference Include="Aspire.Hosting.Redis" Version="13.5.3" />
     <PackageReference Include="Aspire.Hosting.Azure.AppContainers" Version="13.5.3" />
     <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="13.5.3" />
@@ -76,6 +78,41 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.11" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
+
+  <!-- Rows 041-045: MySQL, Oracle and MongoDB. Same terms as every structural extension
+       before it (README section 5) - both content libraries, identically, one commit,
+       because tests/ references exactly ONE of them and UseSolutions must stay a single
+       switch over a single pair.
+
+         * MySql.EntityFrameworkCore 10.0.9 - Oracle's official MySQL provider, and the
+           ONLY option on EF Core 10: Pomelo.EntityFrameworkCore.MySql's newest stable
+           (9.0.0) hard-caps Microsoft.EntityFrameworkCore.Relational at [9.0.0, 9.0.999]
+           and cannot be used beside the 10.0.11 the other four rows sit on. 10.0.9's
+           net10.0 group asks for EF Core 10.0.9, which 10.0.11 satisfies.
+         * Oracle.EntityFrameworkCore 10.23.26300 - the 10.x line is the EF Core 10 one;
+           its Relational floor is [10.0.0, 11.0.0). It brings Oracle.ManagedDataAccess.Core.
+         * MongoDB.Driver 3.9.0 - the version Aspire.MongoDB.Driver 13.5.3 pins on
+           net10.0. Rows 043-045 use the driver directly (class maps, index models,
+           aggregation pipelines) rather than the Aspire client integration, but pinning
+           the driver to what that integration resolves means a later row adding
+           AddMongoDBClient needs no version bump and cannot end up on two drivers - the
+           same rule tests/'s Npgsql pin follows.
+
+       Neither MySQL nor Oracle needs a CONTAINER: rows 041 and 042 read
+       DatabaseFacade.GenerateCreateScript(), which opens nothing. Oracle's image is
+       ~9 GB and MySQL's ~600 MB; keeping both rows offline is deliberate.
+
+       One measured consequence of four relational providers in one library: extension
+       methods with the same name now collide. UseSequence and UseHiLo exist on
+       SqlServerPropertyBuilderExtensions, NpgsqlPropertyBuilderExtensions AND
+       OraclePropertyBuilderExtensions, all in namespace Microsoft.EntityFrameworkCore,
+       so an unqualified call fails CS0121. Call the provider's class by name. -->
+  <ItemGroup>
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="10.23.26300" />
+    <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
   </ItemGroup>
 
 </Project>
