@@ -66,9 +66,9 @@ disk: **126 exercise facts** across the forty delivered rows, of which three are
 plus **14 harness facts** in `tests/_support/` — **140** in total.
 
 ```
-dotnet test                                         → 123 failed,  10 passed, 7 skipped (140 total),      4 s
-dotnet test -p:UseSolutions=true                    →   0 failed, 133 passed, 7 skipped (140 total),     11 s
-dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 140 passed, 0 skipped (140 total), 2 m 35 s
+dotnet test                                         → 123 failed,  10 passed, 7 skipped (140 total),      5 s
+dotnet test -p:UseSolutions=true                    →   0 failed, 133 passed, 7 skipped (140 total),     10 s
+dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 140 passed, 0 skipped (140 total), 2 m 31 s
 ```
 
 **Those numbers moved a long way on 2026-09-07, and the two harness changes behind them
@@ -157,12 +157,16 @@ must not be able to masquerade as a green run by silently skipping.
 
 | Level | Asserts | Cost | Runs |
 |---|---|---|---|
-| **L1 model** | the resource graph: types, `ConnectionStringExpression`, annotations | ~1.4 s | always |
+| **L1 model** | the resource graph: types, `ConnectionStringExpression`, annotations | ~1.4 s cold, ~10 ms warm | always |
 | **L2 artifact** | `aspire-manifest.json` **and the generated Bicep**, both in-process | ~3.7 s (~7.5 s with Azure resources), no container | always |
 | **L3 container** | a real database starts and a real query, message or expiry happens | minutes | opt-in |
 
 **What L1 can prove.** `DistributedApplication.CreateBuilder(...)` + `Build()` produces
-the complete model in ~1.4 s with **zero containers started**, and that model is rich
+the complete model with **zero containers started** — **~1.4 s on the first call in a
+process, and ~10 ms on every one after it** (measured 2026-09-07, four consecutive calls:
+961, 15, 9, 9 ms; the cold figure is JIT and assembly loading, not model building). Quote
+whichever number the question is about: a single L1 fact costs the cold one, a hundred of
+them do not. That model is rich
 enough to grade against: resource types, per-resource annotations (`WaitAnnotation`,
 `HealthCheckAnnotation`, `ContainerImageAnnotation`, `EndpointAnnotation`,
 `EnvironmentCallbackAnnotation`, `ContainerMountAnnotation`), and
@@ -301,8 +305,12 @@ the failure shapes the next twenty-four rows inherit.
   flavour's default — ex034 asserts `Port != 5432` for exactly that reason, and it is
   the most legible single proof that a hard-coded connection string could not have
   reached the database.
-- **Do not assume the resolved connection string is free of braces.** Aspire generates
-  Postgres passwords from a character set that includes `{`, so a run in ten produces a
+- **Do not assume the resolved connection string is free of braces.** It bit twice: once
+  on ex034 while this bullet was being written, and again on 2026-09-07 in the harness's
+  own shared-server isolation canary, which asserted `DoesNotContain("{")` on a **SQL
+  Server** string and failed roughly one container lane in ten. The rule is not
+  flavour-specific and it is not about Postgres. Aspire generates passwords from a
+  character set that includes `{`, so a run in ten produces a
   perfectly resolved string containing one. Assert that the named placeholders are gone
   (`{pg.`, `.connectionString}`), never that no brace remains.
 
@@ -1228,19 +1236,39 @@ Each of these cost real time. None is a guess.
   to be written against the same freedom. **The rule: a static `Configure` reading static
   mutable state must call `PublishAsync`, which shares nothing, not `GenerateAsync` or
   `SharedPublishAsync`.**
-  It is **enforced, not just written down**. Every cache *hit* rebuilds the model — in
-  publish mode, so a `Configure` branching on `IsPublishMode` is compared like for like —
-  and fingerprints it (per resource: name, runtime type, sorted annotation types,
-  connection-string expression, which is exactly the surface L1 grades) against what was
-  published. A model that changed throws an `InvalidOperationException` naming the
-  delegate and pointing at `PublishAsync`. Two properties worth knowing: the rebuild costs
-  a model build, ~10 ms warm against a ~100 ms publish; and `configure` is invoked exactly
-  **once per call** either way — the publish captures its fingerprint from its own builder
-  rather than from a second one — which is the count it had before the cache existed, so
-  nothing that was safe before became unsafe. `ManifestHarness_REFUSES_to_share_a_stale_publish_with_a_changed_model`
-  is the mutant made permanent: a static `Configure` over a static flag, called twice with
-  the flag flipped. Measured with the guard commented out, it returns the stale manifest
-  and the fact fails on a null exception — so the canary is not decorative.
+  It is **enforced, not just written down** — for the part that can be enforced cheaply.
+  Every cache *hit* rebuilds the model (in publish mode, and under the same
+  `ASPIRE_CONTAINER_RUNTIME`, so a `Configure` branching on either is compared like for
+  like) and fingerprints it against what was published; a model that changed throws an
+  `InvalidOperationException` naming the delegate and pointing at `PublishAsync`.
+  **What the fingerprint covers, precisely:** the set of resources and their runtime
+  types, their connection-string expressions, which annotations each carries, and every
+  annotation property whose type is a string, a primitive, an enum or an `IResource` —
+  so `WithImageTag`/`WithImageRegistry`/`WithImageSHA256`, endpoint ports and schemes and
+  `IsExternal`/`IsProxied`, mount source/target/type/read-only, `WithReplicas`,
+  `WithLifetime`, `WaitAnnotation`'s type and exit code, health-check keys. It is a
+  whitelist of value *kinds*, not of annotation *types*, so it covers annotations nobody
+  has written yet.
+  **What it does NOT cover, stated because the first version of this paragraph
+  overclaimed:** a value computed inside a **callback**. Measured —
+  `WithEnvironment("MODE", flag ? "a" : "b")` writes an internal `EnvironmentAnnotation`
+  whose only public member is a `Func<>`, and `WithArgs` is the same shape — so two models
+  differing only there fingerprint identically and the stale manifest comes back. Closing
+  that would mean the guard **invoking learner-authored callbacks**, which is a side
+  effect a safety net has no business causing: an ex007-shaped row that counted callback
+  invocations would be corrupted by the very thing protecting it. **So the RULE above is
+  the protection, and the guard is a net under its structural half.**
+  Two properties worth knowing: the rebuild costs a model build — ~26 ms warm against a
+  ~100 ms publish, of which the fingerprint itself is ~0.18 ms, so the value half is free
+  — and `configure` is invoked exactly **once per call** either way, because the publish
+  captures its fingerprint from its own builder rather than from a second one. That is the
+  count it had before the cache existed, so nothing that was safe before became unsafe.
+  `ManifestHarness_REFUSES_to_share_a_stale_publish_with_a_changed_model` is the mutant
+  made permanent, twice: a static `Configure` over a static flag with a **structural**
+  difference, then one with a **value-only** difference (an image tag). Both were measured
+  slipping through before they were closed — with the guard commented out, and then with
+  the fingerprint reverted to annotation type names only, the fact fails on a null
+  exception because the stale manifest came back. The canary is not decorative.
 - **`[assembly: AssemblyFixture(...)]` is the only hook in this suite that runs after the
   last test, and it runs even under `--filter`.** Measured on xunit.v3 3.2.2 with
   `xunit.runner.visualstudio` 3.1.5 by having a probe fixture append to a file:

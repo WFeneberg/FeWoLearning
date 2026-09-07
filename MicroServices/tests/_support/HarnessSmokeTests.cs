@@ -272,7 +272,13 @@ public class HarnessMechanicsTests
         // not a placeholder. The one place in the track where this is now worth
         // asserting: it grades the harness, which is what hands every row its string.
         var dataSource = new SqlConnectionStringBuilder(first.ConnectionString).DataSource;
-        Assert.DoesNotContain("{", first.ConnectionString);
+
+        // NAMED placeholders, never "no brace at all" - README section 4 documents this
+        // for Postgres and it caught this canary too, intermittently: Aspire generates the
+        // SA password from a character set that includes "{", so roughly one run in ten
+        // produces a perfectly resolved connection string with a brace in the password.
+        Assert.DoesNotContain("{shared-sqlserver", first.ConnectionString);
+        Assert.DoesNotContain(".connectionString}", first.ConnectionString);
         Assert.Contains(",", dataSource);
         Assert.NotEqual(1433, int.Parse(dataSource.Split(',')[1]));
 
@@ -405,10 +411,17 @@ public class HarnessMechanicsTests
     /// assembly - TestParallelism.cs names ex023's scenario flags and ex025's hook log -
     /// so this is a trap the next sixty rows can walk into, not a hypothetical.
     ///
-    /// This fact IS the mutant: a static Configure whose model depends on a static flag,
-    /// called twice with the flag flipped. It must throw rather than answer, and the
-    /// message must point at the escape hatch - which the third part then exercises,
+    /// This fact IS the mutant, twice over: a static Configure whose model depends on a
+    /// static flag, called twice with the flag flipped, first with a STRUCTURAL
+    /// difference and then with a VALUE-ONLY one. Both must throw rather than answer, and
+    /// the message must point at the escape hatch - which the middle part exercises,
     /// because a guard that only forbids is half a fix.
+    ///
+    /// What this fact does NOT cover, deliberately, is documented on
+    /// ManifestHarness.VerifyUnchanged: a value computed inside a CALLBACK
+    /// (`WithEnvironment`, `WithArgs`) is invisible to the fingerprint, because catching
+    /// it would mean the guard invoking learner-authored callbacks. The RULE is the
+    /// protection there; this is a net under the rest.
     /// </summary>
     [Fact]
     public async Task ManifestHarness_REFUSES_to_share_a_stale_publish_with_a_changed_model()
@@ -435,6 +448,29 @@ public class HarnessMechanicsTests
             // it sees the model as it is now.
             using var output = await ManifestHarness.PublishAsync(StaleProbeModel, token);
             Assert.True(output.Manifest.RootElement.GetProperty("resources").TryGetProperty("flagged", out _));
+
+            // ---- and the harder half: a VALUE-only change ---------------------------
+            // Same resources, same types, same annotation kinds - only an image tag
+            // differs. The first version of the fingerprint recorded annotation TYPE
+            // names only and this slipped straight through; measured by reverting to it,
+            // the second call below returns the stale manifest and this fact fails on a
+            // null exception. It is caught now because the fingerprint renders every
+            // annotation property whose type is a string, primitive, enum or IResource.
+            StaleProbeFlag = false;
+            using (var beforeChange = await ManifestHarness.GenerateAsync(StaleValueProbeModel, token))
+            {
+                Assert.Equal("busybox:one",
+                    beforeChange.RootElement.GetProperty("resources").GetProperty("tagged")
+                                .GetProperty("image").GetString());
+            }
+
+            StaleProbeFlag = true;
+            var valueChange = await Record.ExceptionAsync(
+                () => ManifestHarness.GenerateAsync(StaleValueProbeModel, token));
+
+            var refusedValue = Assert.IsType<InvalidOperationException>(valueChange);
+            Assert.Contains("StaleValueProbeModel", refusedValue.Message);
+            Assert.Contains("PublishAsync", refusedValue.Message);
         }
         finally
         {
@@ -448,6 +484,15 @@ public class HarnessMechanicsTests
     /// <summary>A static Configure over static mutable state - the hazard, deliberately.</summary>
     private static void StaleProbeModel(IDistributedApplicationBuilder builder)
         => builder.AddContainer(StaleProbeFlag ? "flagged" : "plain", "busybox");
+
+    /// <summary>
+    /// The same hazard, but structurally IDENTICAL between the two states: same resource,
+    /// same type, same annotations, only a tag differs. This is what a fingerprint over
+    /// annotation type names cannot see.
+    /// </summary>
+    private static void StaleValueProbeModel(IDistributedApplicationBuilder builder)
+        => builder.AddContainer("tagged", "busybox")
+                  .WithImageTag(StaleProbeFlag ? "two" : "one");
 
     private static void SharedProbeModel(IDistributedApplicationBuilder builder)
         => builder.AddContainer("probe", "busybox");

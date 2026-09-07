@@ -4,9 +4,15 @@ using Aspire.Hosting.ApplicationModel;
 namespace FeWoLearning.MicroServices.Tests;
 
 /// <summary>
-/// Builds an Aspire application model in-process and hands back its resources.
-/// Measured at ~1.4 s and starts NO containers - this is the workhorse of the
-/// track's L1 assertions.
+/// Builds an Aspire application model in-process and hands back its resources. Starts
+/// NO containers - this is the workhorse of the track's L1 assertions.
+///
+/// Cost, and the two numbers are not in conflict: **~1 s on the first call in a process**
+/// (JIT and assembly loading) and **~10 ms warm** thereafter. Measured 2026-09-07, four
+/// consecutive calls in one test: 961, 15, 9, 9 ms; BuildForPublish on a larger model
+/// averages ~26 ms warm. The older "~1.4 s" figure in README section 4 is the cold one,
+/// and it is the number that matters when a lane runs one L1 fact - but it is not what a
+/// hundred of them cost.
 /// </summary>
 public static class ModelHarness
 {
@@ -59,7 +65,8 @@ public static class ModelHarness
     /// root it is swept with everything else; under a fixed path of its own it would
     /// not be.
     /// </summary>
-    public static Result BuildForPublish(Action<IDistributedApplicationBuilder> configure)
+    public static Result BuildForPublish(
+        Action<IDistributedApplicationBuilder> configure, string? containerRuntime = null)
     {
         var outputPath = Path.Combine(ManifestHarness.Root, Guid.NewGuid().ToString("N")[..12]);
         var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
@@ -67,6 +74,17 @@ public static class ModelHarness
             Args = ["--operation", "publish", "--output-path", outputPath],
             DisableDashboard = true
         });
+
+        // Nothing here runs a pipeline, so this never changes what is probed - it exists
+        // so that ManifestHarness's stale-share guard can rebuild a model under the SAME
+        // ASPIRE_CONTAINER_RUNTIME the publish it compares against was given. A Configure
+        // that branched on the key would otherwise be compared against a different model
+        // than the one that was published.
+        if (containerRuntime is not null)
+        {
+            builder.Configuration["ASPIRE_CONTAINER_RUNTIME"] = containerRuntime;
+        }
+
         configure(builder);
         using var app = builder.Build();
         return new Result(builder.Resources.ToList());

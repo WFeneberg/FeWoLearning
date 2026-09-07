@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using Aspire.Hosting;
@@ -135,7 +136,7 @@ public static class ManifestHarness
         {
             if (Shared.TryGetValue(key, out var existing))
             {
-                VerifyUnchanged(configure, existing);
+                VerifyUnchanged(configure, existing, containerRuntime);
                 return existing;
             }
 
@@ -153,15 +154,40 @@ public static class ManifestHarness
     /// The guard behind <see cref="SharedPublishAsync"/>'s contract: rebuild the model
     /// and refuse to hand back a manifest that no longer describes it.
     ///
-    /// Fingerprinting rather than deep-comparing, because the fingerprint only has to be
-    /// sensitive, not descriptive - per resource, the name, the runtime type, the sorted
-    /// annotation types and the connection-string expression. That is exactly the surface
-    /// L1 grades, so anything a test could notice is in it.
+    /// <para><b>What it catches, exactly.</b> Everything an annotation stores
+    /// declaratively: the set of resources and their runtime types, their
+    /// connection-string expressions, which annotations each carries, and every
+    /// annotation property whose type is a string, a primitive, an enum or an
+    /// <see cref="IResource"/>. In practice that is `WithImageTag` / `WithImageRegistry` /
+    /// `WithImageSHA256`, endpoint ports and schemes and `IsExternal` / `IsProxied`, mount
+    /// source / target / type / read-only, `WithReplicas`, `WithLifetime`,
+    /// `WaitAnnotation`'s type and exit code, health-check keys.</para>
+    ///
+    /// <para><b>What it does NOT catch, and this is stated because the first version of
+    /// this comment overclaimed.</b> A value computed inside a <b>callback</b>.
+    /// `WithEnvironment("MODE", flag ? "a" : "b")` writes an internal
+    /// <c>EnvironmentAnnotation</c> whose only public member is a <c>Func&lt;&gt;</c> -
+    /// measured - and `WithArgs` is the same shape. Two models differing only there have
+    /// identical fingerprints and the stale manifest comes back. Closing that would mean
+    /// the guard <b>invoking learner-authored callbacks</b>, which is a side effect a
+    /// safety net has no business causing: an ex007-shaped row that counted callback
+    /// invocations would be corrupted by the very thing protecting it.</para>
+    ///
+    /// <para>So: <b>the RULE in <see cref="SharedPublishAsync"/> is the protection; this
+    /// is a net under the structural half of it.</b> A static <c>Configure</c> reading
+    /// static mutable state must call <see cref="PublishAsync"/> whether or not the guard
+    /// would happen to notice.</para>
     /// </summary>
     private static void VerifyUnchanged(
-        Action<IDistributedApplicationBuilder> configure, PublishOutput published)
+        Action<IDistributedApplicationBuilder> configure,
+        PublishOutput published,
+        string? containerRuntime)
     {
-        var current = Fingerprint(ModelHarness.BuildForPublish(configure).Resources);
+        // The rebuild is handed the same ASPIRE_CONTAINER_RUNTIME the publish got. It runs
+        // no pipeline so it never probes either way; this exists so that a Configure which
+        // ever branched on the key would be compared like for like, the same reason the
+        // rebuild is in publish mode.
+        var current = Fingerprint(ModelHarness.BuildForPublish(configure, containerRuntime).Resources);
         if (current == published.ModelFingerprint)
         {
             return;
@@ -177,10 +203,18 @@ public static class ManifestHarness
     }
 
     /// <summary>
-    /// A model's observable shape, flattened. Deterministic within a process for a given
-    /// model: the generated volume names and conditional-resource hashes Aspire derives
-    /// from the AppHost are stable per name (README section 6), and secrets appear as
-    /// unresolved <c>{x.value}</c> placeholders rather than as values.
+    /// A model's observable shape, flattened - see <see cref="VerifyUnchanged"/> for what
+    /// that does and does not include.
+    ///
+    /// Deterministic within a process for a given model: the generated volume names and
+    /// conditional-resource hashes Aspire derives from the AppHost are stable per name
+    /// (README section 6), secrets appear as unresolved <c>{x.value}</c> placeholders
+    /// rather than as values, and the property whitelist below deliberately excludes the
+    /// endpoint annotation's allocation-time members (<c>AllocatedEndpoint</c> and the two
+    /// snapshot collections), whose <c>ToString()</c> is a type name at model time.
+    ///
+    /// Measured cost: ~0.18 ms for a model of two servers, a database and a container -
+    /// against ~26 ms for the rebuild that produces it, so the value half of this is free.
     /// </summary>
     internal static string Fingerprint(IEnumerable<IResource> resources)
         => string.Join(
@@ -188,12 +222,75 @@ public static class ManifestHarness
             resources.Select(resource =>
             {
                 var annotations = string.Join(
-                    ",", resource.Annotations.Select(a => a.GetType().FullName).Order());
+                    ",", resource.Annotations.Select(Describe).Order());
                 var connectionString = resource is IResourceWithConnectionString withConnectionString
                     ? withConnectionString.ConnectionStringExpression.ValueExpression
                     : string.Empty;
                 return $"{resource.Name}|{resource.GetType().FullName}|{annotations}|{connectionString}";
             }).Order());
+
+    /// <summary>
+    /// One annotation's type plus every value it stores declaratively. Generic on purpose:
+    /// a whitelist of annotation TYPES would have to be extended by every future row and
+    /// would silently go blind when it was not, whereas a whitelist of value KINDS covers
+    /// annotations nobody has written yet.
+    /// </summary>
+    private static string Describe(object annotation)
+    {
+        var type = annotation.GetType();
+        if (!ValueProperties.TryGetValue(type, out var properties))
+        {
+            properties = type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(property => property.CanRead
+                                   && property.GetIndexParameters().Length == 0
+                                   && IsValueKind(property.PropertyType))
+                .OrderBy(property => property.Name, StringComparer.Ordinal)
+                .ToArray();
+            ValueProperties[type] = properties;
+        }
+
+        var values = properties.Select(property => $"{property.Name}={Render(property, annotation)}");
+        return $"{type.FullName}({string.Join(";", values)})";
+    }
+
+    private static readonly Dictionary<Type, PropertyInfo[]> ValueProperties = [];
+
+    /// <summary>
+    /// Whether a property's type is something whose value is stable, cheap and meaningful
+    /// to render at model time. Everything else - delegates above all, but also
+    /// allocation-time objects and collections - is excluded, because rendering it would
+    /// be either nondeterministic or a type name, and both are worse than absent.
+    /// </summary>
+    private static bool IsValueKind(Type type)
+    {
+        var underlying = Nullable.GetUnderlyingType(type) ?? type;
+        return underlying == typeof(string)
+               || underlying.IsPrimitive
+               || underlying.IsEnum
+               || underlying == typeof(decimal)
+               || typeof(IResource).IsAssignableFrom(underlying);
+    }
+
+    private static string Render(PropertyInfo property, object annotation)
+    {
+        try
+        {
+            return property.GetValue(annotation) switch
+            {
+                null => "<null>",
+                IResource resource => resource.Name,
+                IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+                var other => other.ToString() ?? "<null>"
+            };
+        }
+        catch (Exception failure)
+        {
+            // A getter that throws must not be able to fail a test that was only asking
+            // for a manifest. Recording the failure keeps it deterministic and visible.
+            return $"<unreadable:{failure.GetType().Name}>";
+        }
+    }
 
     private static readonly SemaphoreSlim SharedLock = new(1, 1);
 

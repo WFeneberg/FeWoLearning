@@ -393,8 +393,15 @@ public static class ContainerHarness
 
             return new SharedDatabase(flavour, name, connectionString, server.ConnectionString);
         }
-        catch (Exception failure)
+        catch (Exception failure) when (!cancellationToken.IsCancellationRequested)
         {
+            // The filter matters as much as the body. Without it, a test that was
+            // CANCELLED - its own token, or the session deadline - would tear down a
+            // perfectly healthy shared server and report "the container died mid-suite",
+            // sending the next author to hunt a Docker problem that does not exist. When
+            // the caller's token is the one that fired, the cancellation propagates
+            // untouched and the server stays up for the next row.
+            //
             // CREATE DATABASE is the liveness check. It is the first thing every caller
             // does and it is the cheapest possible probe, so a server that died mid-suite
             // - OOM-killed, docker restarted, the daemon bounced - surfaces HERE rather
