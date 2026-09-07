@@ -25,11 +25,12 @@ public class Ex038_MigrationsOnStartupTests
 
         // Both annotations must be there, and they are DIFFERENT annotations - ex002's
         // subject. Counting EnvironmentCallbackAnnotations would grade nothing here:
-        // measured and recorded in README section 5, AddProject arrives carrying FOUR of
-        // them before anything is referenced, so "not empty" is true of a migrator that
-        // was never told where its database is. Run the callbacks instead and read the
-        // variable out - ex007's technique, and the only thing WithReference actually
-        // promises.
+        // measured and recorded in README section 6, a bare AddProject already
+        // contributes SEVEN environment variables before anything is referenced, so
+        // "not empty" is true of a migrator that was never told where its database is -
+        // and this fact shipped that way until it was caught. Run the callbacks instead
+        // and read the variable out: ex007's technique, and the only thing WithReference
+        // actually promises.
         var environment = new Dictionary<string, object>();
         var callbackContext = new EnvironmentCallbackContext(
             new DistributedApplicationExecutionContext(DistributedApplicationOperation.Run),

@@ -35,10 +35,19 @@ public sealed class HarnessLifetime : IAsyncLifetime, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        // Manifest outputs first: deleting directories cannot fail in a way that should
-        // stop the container teardown, and the container teardown is the one that can
-        // leave something behind on Docker.
-        ManifestHarness.DisposeSharedPublishes();
-        await ContainerHarness.ShutdownSharedServersAsync();
+        // Manifest outputs first, containers second - but in a try/finally, because the
+        // ORDER is a preference and the container teardown is the obligation. Deleting a
+        // directory is not supposed to throw (ManifestHarness swallows IOException and
+        // UnauthorizedAccessException itself), and that is exactly the kind of "not
+        // supposed to" that leaves a SQL Server running for the rest of the day if it is
+        // ever wrong. The finally is one line and buys the guarantee outright.
+        try
+        {
+            ManifestHarness.DisposeSharedPublishes();
+        }
+        finally
+        {
+            await ContainerHarness.ShutdownSharedServersAsync();
+        }
     }
 }

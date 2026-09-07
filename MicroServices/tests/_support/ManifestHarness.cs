@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
 
 namespace FeWoLearning.MicroServices.Tests;
 
@@ -89,11 +90,29 @@ public static class ManifestHarness
     ///
     /// The key is the delegate's identity - its method and its target - plus the
     /// container-runtime choice. A method group such as <c>Ex013_X.Configure</c>
-    /// therefore shares across facts and across classes; two separately-created closures
-    /// never do, even when they would build the same model, because their targets differ.
-    /// That is the conservative direction. The contract is that a model must be a pure
-    /// function of the delegate, and a closure over mutable state simply misses the cache
-    /// instead of silently handing back somebody else's manifest.
+    /// therefore shares across facts and across classes.
+    ///
+    /// <para><b>THE CONTRACT, and it is sharper than "closures are safe".</b> The model
+    /// must be a pure function of the delegate. A <i>closure</i> over mutable state
+    /// happens to be harmless - each closure instance is a different <c>Target</c>, so it
+    /// misses the cache - but a <b>static</b> <c>Configure</c> that reads <b>static
+    /// mutable state</b> is NOT: its key is a stable <c>(MethodInfo, null)</c>, so the
+    /// second call HITS and would be handed the first call's manifest. That pattern is
+    /// live in this assembly, not hypothetical - <c>tests/_support/TestParallelism.cs</c>
+    /// names ex023's two static scenario flags and ex025's static hook log, and there are
+    /// sixty rows still to be written against the same freedom.
+    /// <b>A static <c>Configure</c> that reads static mutable state must call
+    /// <see cref="PublishAsync"/>, which shares nothing, not
+    /// <see cref="GenerateAsync"/>.</b></para>
+    ///
+    /// <para>That rule is <b>enforced</b>, not merely documented. Every cache HIT rebuilds
+    /// the model - in publish mode, so that a <c>Configure</c> branching on
+    /// <c>IsPublishMode</c> is compared like for like - and fingerprints it against what
+    /// was published. A model that changed throws an <see cref="InvalidOperationException"/>
+    /// naming the delegate and pointing at <see cref="PublishAsync"/>. The rebuild costs a
+    /// model build (~10 ms warm against a ~100 ms publish), and it invokes
+    /// <paramref name="configure"/> exactly ONCE per call - which is what it did before
+    /// this cache existed, so nothing that was safe before became unsafe.</para>
     ///
     /// The returned object is owned by the HARNESS, not by the caller. Do NOT dispose it;
     /// <see cref="HarnessLifetime"/> deletes every shared output after the last test. Use
@@ -116,6 +135,7 @@ public static class ManifestHarness
         {
             if (Shared.TryGetValue(key, out var existing))
             {
+                VerifyUnchanged(configure, existing);
                 return existing;
             }
 
@@ -128,6 +148,52 @@ public static class ManifestHarness
             SharedLock.Release();
         }
     }
+
+    /// <summary>
+    /// The guard behind <see cref="SharedPublishAsync"/>'s contract: rebuild the model
+    /// and refuse to hand back a manifest that no longer describes it.
+    ///
+    /// Fingerprinting rather than deep-comparing, because the fingerprint only has to be
+    /// sensitive, not descriptive - per resource, the name, the runtime type, the sorted
+    /// annotation types and the connection-string expression. That is exactly the surface
+    /// L1 grades, so anything a test could notice is in it.
+    /// </summary>
+    private static void VerifyUnchanged(
+        Action<IDistributedApplicationBuilder> configure, PublishOutput published)
+    {
+        var current = Fingerprint(ModelHarness.BuildForPublish(configure).Resources);
+        if (current == published.ModelFingerprint)
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"'{configure.Method.DeclaringType?.Name}.{configure.Method.Name}' built a DIFFERENT "
+            + "model this time, so the shared publish held for it is stale and would have been "
+            + "handed back silently. This is what happens when a STATIC Configure reads STATIC "
+            + "MUTABLE state: its cache key is a stable (MethodInfo, null), so it hits. Call "
+            + "ManifestHarness.PublishAsync, which shares nothing, instead of GenerateAsync or "
+            + "SharedPublishAsync. See MicroServices/README.md sections 6 and 9.");
+    }
+
+    /// <summary>
+    /// A model's observable shape, flattened. Deterministic within a process for a given
+    /// model: the generated volume names and conditional-resource hashes Aspire derives
+    /// from the AppHost are stable per name (README section 6), and secrets appear as
+    /// unresolved <c>{x.value}</c> placeholders rather than as values.
+    /// </summary>
+    internal static string Fingerprint(IEnumerable<IResource> resources)
+        => string.Join(
+            "\n",
+            resources.Select(resource =>
+            {
+                var annotations = string.Join(
+                    ",", resource.Annotations.Select(a => a.GetType().FullName).Order());
+                var connectionString = resource is IResourceWithConnectionString withConnectionString
+                    ? withConnectionString.ConnectionStringExpression.ValueExpression
+                    : string.Empty;
+                return $"{resource.Name}|{resource.GetType().FullName}|{annotations}|{connectionString}";
+            }).Order());
 
     private static readonly SemaphoreSlim SharedLock = new(1, 1);
 
@@ -187,6 +253,12 @@ public static class ManifestHarness
             configure(builder);
             using var app = builder.Build();
 
+            // Captured from THIS builder rather than from a second one, so that a publish
+            // invokes configure exactly once - the count it had before the shared cache
+            // existed. Taken after Build(), because that is where ModelHarness.BuildForPublish
+            // takes its snapshot too, and the two have to be comparable.
+            var fingerprint = Fingerprint(builder.Resources);
+
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeout.CancelAfter(TimeSpan.FromSeconds(120));
             await app.RunAsync(timeout.Token);
@@ -200,7 +272,7 @@ public static class ManifestHarness
                         : "<no directory>"));
             }
 
-            return new PublishOutput(dir);
+            return new PublishOutput(dir, fingerprint);
         }
         catch
         {
@@ -255,7 +327,18 @@ public sealed class PublishOutput : IDisposable
     private JsonDocument? _manifest;
     private bool _disposed;
 
-    internal PublishOutput(string directory) => Directory = directory;
+    internal PublishOutput(string directory, string modelFingerprint)
+    {
+        Directory = directory;
+        ModelFingerprint = modelFingerprint;
+    }
+
+    /// <summary>
+    /// The shape of the model this output was published from, as
+    /// <see cref="ManifestHarness.Fingerprint"/> renders it. Read only by
+    /// ManifestHarness's stale-share guard.
+    /// </summary>
+    internal string ModelFingerprint { get; }
 
     /// <summary>The publish output directory. Valid until this object is disposed.</summary>
     public string Directory { get; }

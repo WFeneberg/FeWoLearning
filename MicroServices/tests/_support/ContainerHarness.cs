@@ -385,9 +385,64 @@ public static class ContainerHarness
 
         var server = await ServerAsync(flavour);
         var name = DatabaseName(purpose);
-        var connectionString = await CreateDatabaseAsync(flavour, server.ConnectionString, name, cancellationToken);
 
-        return new SharedDatabase(flavour, name, connectionString, server.ConnectionString);
+        try
+        {
+            var connectionString = await CreateDatabaseAsync(
+                flavour, server.ConnectionString, name, cancellationToken);
+
+            return new SharedDatabase(flavour, name, connectionString, server.ConnectionString);
+        }
+        catch (Exception failure)
+        {
+            // CREATE DATABASE is the liveness check. It is the first thing every caller
+            // does and it is the cheapest possible probe, so a server that died mid-suite
+            // - OOM-killed, docker restarted, the daemon bounced - surfaces HERE rather
+            // than as an unexplained failure three rows later.
+            //
+            // Without this the session would stay cached forever and every later
+            // container row would fail with a raw SqlException out of CREATE DATABASE,
+            // naming a host and a port and nothing about why. Evicting it means the next
+            // row starts a fresh server instead, which is the behaviour a per-test
+            // application had for free.
+            //
+            // This method still THROWS rather than retrying: a genuinely broken Docker
+            // must not be able to buy itself a five-minute restart per row, and the
+            // caller's own failure is the honest signal. Retrying is the elaborate
+            // version of this and was deliberately not written.
+            await EvictAsync(flavour);
+
+            throw new InvalidOperationException(
+                $"The shared {flavour} server did not accept CREATE DATABASE [{name}], so it has "
+                + "been evicted and the next container test will start a fresh one. This usually "
+                + "means the container died mid-suite - check `docker ps -a` for an exited "
+                + $"'shared-{flavour.ToString().ToLowerInvariant()}'.", failure);
+        }
+    }
+
+    /// <summary>
+    /// Drops one flavour's server from the cache and tears it down, so that the next
+    /// caller starts a new one. Teardown goes through <see cref="TearDownAsync"/> like
+    /// everything else, and its failure is deliberately swallowed: this method only ever
+    /// runs while a REAL failure is already on its way up, and that failure must win.
+    /// </summary>
+    private static async Task EvictAsync(DatabaseFlavour flavour)
+    {
+        ServerSession? session;
+        await ServerLock.WaitAsync();
+        try
+        {
+            Servers.Remove(flavour, out session);
+        }
+        finally
+        {
+            ServerLock.Release();
+        }
+
+        if (session is not null)
+        {
+            await TearDownAsync(session.Application, started: true);
+        }
     }
 
     private static async Task<ServerSession> ServerAsync(DatabaseFlavour flavour)

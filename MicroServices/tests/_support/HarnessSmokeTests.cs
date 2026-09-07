@@ -395,6 +395,60 @@ public class HarnessMechanicsTests
         Assert.Equal(afterSameModel + 1, ManifestHarness.PublishCount);
     }
 
+    /// <summary>
+    /// The other half of the sharing contract, and the dangerous half.
+    ///
+    /// A CLOSURE over mutable state is harmless - each instance is a different Target, so
+    /// it misses the cache. A **static** Configure reading **static mutable state** is
+    /// not: its key is a stable (MethodInfo, null), so the second call HITS and would be
+    /// handed the first call's manifest with nothing said. That pattern is live in this
+    /// assembly - TestParallelism.cs names ex023's scenario flags and ex025's hook log -
+    /// so this is a trap the next sixty rows can walk into, not a hypothetical.
+    ///
+    /// This fact IS the mutant: a static Configure whose model depends on a static flag,
+    /// called twice with the flag flipped. It must throw rather than answer, and the
+    /// message must point at the escape hatch - which the third part then exercises,
+    /// because a guard that only forbids is half a fix.
+    /// </summary>
+    [Fact]
+    public async Task ManifestHarness_REFUSES_to_share_a_stale_publish_with_a_changed_model()
+    {
+        var token = TestContext.Current.CancellationToken;
+        try
+        {
+            StaleProbeFlag = false;
+            using (var first = await ManifestHarness.GenerateAsync(StaleProbeModel, token))
+            {
+                Assert.True(first.RootElement.GetProperty("resources").TryGetProperty("plain", out _));
+            }
+
+            // Same delegate, different model. Without the guard this returns the manifest
+            // above and every assertion about "flagged" fails somewhere far away.
+            StaleProbeFlag = true;
+            var thrown = await Record.ExceptionAsync(() => ManifestHarness.GenerateAsync(StaleProbeModel, token));
+
+            var refused = Assert.IsType<InvalidOperationException>(thrown);
+            Assert.Contains("StaleProbeModel", refused.Message);
+            Assert.Contains("PublishAsync", refused.Message);
+
+            // ...and the documented way out really works: PublishAsync shares nothing, so
+            // it sees the model as it is now.
+            using var output = await ManifestHarness.PublishAsync(StaleProbeModel, token);
+            Assert.True(output.Manifest.RootElement.GetProperty("resources").TryGetProperty("flagged", out _));
+        }
+        finally
+        {
+            // Static state in a serial assembly is still static state.
+            StaleProbeFlag = false;
+        }
+    }
+
+    private static bool StaleProbeFlag;
+
+    /// <summary>A static Configure over static mutable state - the hazard, deliberately.</summary>
+    private static void StaleProbeModel(IDistributedApplicationBuilder builder)
+        => builder.AddContainer(StaleProbeFlag ? "flagged" : "plain", "busybox");
+
     private static void SharedProbeModel(IDistributedApplicationBuilder builder)
         => builder.AddContainer("probe", "busybox");
 

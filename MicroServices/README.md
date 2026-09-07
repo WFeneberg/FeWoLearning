@@ -63,12 +63,12 @@ There is no separate install step — `dotnet test` restores on first run.
 
 **Current measured state** (2026-09-07; `catalog.md` at 40 ✅ / 60 ⬜). Counted on
 disk: **126 exercise facts** across the forty delivered rows, of which three are 🐳,
-plus **13 harness facts** in `tests/_support/` — **139** in total.
+plus **14 harness facts** in `tests/_support/` — **140** in total.
 
 ```
-dotnet test                                         → 123 failed,   9 passed, 7 skipped (139 total),      5 s
-dotnet test -p:UseSolutions=true                    →   0 failed, 132 passed, 7 skipped (139 total),     10 s
-dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 139 passed, 0 skipped (139 total), 2 m 43 s
+dotnet test                                         → 123 failed,  10 passed, 7 skipped (140 total),      4 s
+dotnet test -p:UseSolutions=true                    →   0 failed, 133 passed, 7 skipped (140 total),     11 s
+dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 140 passed, 0 skipped (140 total), 2 m 35 s
 ```
 
 **Those numbers moved a long way on 2026-09-07, and the two harness changes behind them
@@ -83,7 +83,7 @@ will be. The other four are harness facts that are *deliberately* gated shut in 
 default run: the container-gate canary that proves `Require()` still closes, the
 teardown canary that needs a started application, and the two shared-server canaries
 (isolation, and surviving a failing test). `-p:Containers=true` unskips all seven. The
-9 that pass in the red run are the remaining harness facts, which pass in *both* modes
+10 that pass in the red run are the remaining harness facts, which pass in *both* modes
 because they grade the harness rather than an exercise.
 
 The container lane costs the difference between the last two lines, **~2 m 33 s**.
@@ -1211,15 +1211,36 @@ Each of these cost real time. None is a guess.
   `using var manifest = await GenerateAsync(...)` correct — the caller disposes its own
   document, never the shared output. The cache keys on the delegate's **identity**
   (method plus target) plus the container-runtime choice, so a method group such as
-  `Ex013_X.Configure` shares across facts and classes while two separately-created
-  closures never do, even when they would build the same model. That is the conservative
-  direction on purpose: the contract is that a model is a pure function of the delegate,
-  and a closure over mutable state simply misses the cache instead of being handed
-  somebody else's manifest. `ManifestHarness_publishes_ONCE_per_model_however_many_facts_ask`
-  watches the publish counter directly, because a cache that quietly stopped caching
-  would show up nowhere until someone profiled the suite again. Shared outputs are
-  deleted by `HarnessLifetime` after the last test; the hourly sweep in the static
-  constructor remains the backstop.
+  `Ex013_X.Configure` shares across facts and classes.
+  `ManifestHarness_publishes_ONCE_per_model_however_many_facts_ask` watches the publish
+  counter directly, because a cache that quietly stopped caching would show up nowhere
+  until someone profiled the suite again. Shared outputs are deleted by `HarnessLifetime`
+  after the last test; the hourly sweep in the static constructor remains the backstop.
+- **The sharing rule is NOT "closures are the dangerous ones" — it is the opposite, and
+  the first wording of it here was wrong in the dangerous direction.** A *closure* over
+  mutable state is harmless: each closure instance is a different `Target`, so it misses
+  the cache and pays for its own publish. What is **not** harmless is a **static
+  `Configure` that reads static mutable state** — its key is a stable
+  `(MethodInfo, null)`, so the second call **hits** and would be handed the first call's
+  manifest with nothing said. That is not a hypothetical pattern in this assembly:
+  `tests/_support/TestParallelism.cs` names ex023's two static scenario flags and ex025's
+  static hook log as the reason the whole assembly runs serially, and sixty rows are still
+  to be written against the same freedom. **The rule: a static `Configure` reading static
+  mutable state must call `PublishAsync`, which shares nothing, not `GenerateAsync` or
+  `SharedPublishAsync`.**
+  It is **enforced, not just written down**. Every cache *hit* rebuilds the model — in
+  publish mode, so a `Configure` branching on `IsPublishMode` is compared like for like —
+  and fingerprints it (per resource: name, runtime type, sorted annotation types,
+  connection-string expression, which is exactly the surface L1 grades) against what was
+  published. A model that changed throws an `InvalidOperationException` naming the
+  delegate and pointing at `PublishAsync`. Two properties worth knowing: the rebuild costs
+  a model build, ~10 ms warm against a ~100 ms publish; and `configure` is invoked exactly
+  **once per call** either way — the publish captures its fingerprint from its own builder
+  rather than from a second one — which is the count it had before the cache existed, so
+  nothing that was safe before became unsafe. `ManifestHarness_REFUSES_to_share_a_stale_publish_with_a_changed_model`
+  is the mutant made permanent: a static `Configure` over a static flag, called twice with
+  the flag flipped. Measured with the guard commented out, it returns the stale manifest
+  and the fact fails on a null exception — so the canary is not decorative.
 - **`[assembly: AssemblyFixture(...)]` is the only hook in this suite that runs after the
   last test, and it runs even under `--filter`.** Measured on xunit.v3 3.2.2 with
   `xunit.runner.visualstudio` 3.1.5 by having a probe fixture append to a file:
@@ -1442,6 +1463,12 @@ and both are easy to undo by accident:
   (~5.1 s → ~0.1 s per fact) and publish once per distinct model rather than once per
   fact. Do not call `DistributedApplication.CreateBuilder` with `--operation publish` by
   hand in a test; you will silently pay both costs back.
+  **The one exception, and know it before you write a row like ex023 or ex025: if your
+  `Configure` is static and reads static mutable state — a scenario flag, a counter, a
+  log — its cache key is a stable `(MethodInfo, null)` and it will HIT.** Call
+  `PublishAsync`, which shares nothing. The harness detects the mistake and throws rather
+  than handing back a stale manifest (§6), but the throw is a safety net, not the
+  instruction.
 - L3 goes through `ContainerHarness.DatabaseAsync`, which hands out a fresh database on
   one shared server per flavour. Reach for `RunAsync` only when the row grades the
   learner's own resource graph, as ex034 does. §4 has the table.
