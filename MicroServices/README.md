@@ -71,8 +71,9 @@ dotnet test -p:UseSolutions=true                    →   0 failed, 152 passed, 
 dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 164 passed,  0 skipped (164 total), 3 m 03 s
 ```
 
-Rows 041-045 added 24 facts and **~34 s** to the container lane (2 m 31 s → 3 m 03 s,
-re-measured twice at 3 m 03 s and 3 m 06 s). Five of the 24 are 🐳 and all five run on
+Rows 041-045 added 24 facts and **~34 s** to the container lane (2 m 31 s → 3 m 03 s;
+the lane was measured three times at 3 m 03 s, 3 m 06 s and 3 m 12 s, so treat ~3 m 10 s
+as the honest budget). Five of the 24 are 🐳 and all five run on
 ONE shared `library/mongo:8.3` — which is the shared-server rule from §4 paying out for
 the first time: a third flavour cost one start-up, not five. The other 19 are offline,
 and none of them is publish-shaped, so the green run did not move at all. Rows 041 and
@@ -1433,7 +1434,9 @@ Each of these cost real time. None is a guess.
   prefix, so that script would fail on a real server. ex041 therefore reads the prefix off
   the model and says so in its header; a later reader should not spend the afternoon
   hunting for the call they got wrong. The same class's `IsFullText` is stored and not
-  emitted either.
+  emitted either. **`catalog.md` row 041 was amended to say this**, because that file is
+  the spec and a row claiming a prefix length is read "off the generated DDL" when it is
+  read off the model is the same kind of drift rows 018 and 027 had to be corrected for.
 - **Mongo's default id convention is exactly `Id` / `id` / `_id`, which makes an `_id`
   assertion worthless on a property called `Id`.** Found by building the mutant: ex043's
   "`_id` is an ObjectId and there is no CLR-named element" fact was first written against
@@ -1459,6 +1462,14 @@ Each of these cost real time. None is a guess.
   assertion rejected the single-field one. ex044's plan fact also generates the same query
   on the same data with **no index at all** first and requires COLLSCAN there, so the
   positive half cannot quietly stop discriminating.
+- **`$unwind` has two spellings and `preserveNullAndEmptyArrays` is the real
+  discriminator.** ex045's stage fact accepts both `{ $unwind: "$lines" }` and
+  `{ $unwind: { path: "$lines" } }` — both are correct Mongo and the graded claim is
+  which field is exploded — and loosening it lost nothing, measured: the document form
+  carrying `preserveNullAndEmptyArrays: true` passes the stage fact and is then caught by
+  the empty-lines fact below, while unwinding the wrong field still fails the stage fact
+  (`Expected: "$lines" / Actual: "$customerId"`). So the flag that would undo the next
+  bullet is graded by behaviour rather than by spelling.
 - **`$unwind` DROPS a document whose array is empty**, where the obvious client-side
   `SelectMany().GroupBy()` keeps it with a total of zero. That is the one behavioural
   difference between "run it on the server" and "download it and group it" that shows up
@@ -1494,6 +1505,7 @@ Each of these cost real time. None is a guess.
 | `MySql.EntityFrameworkCore` | 10.0.9 | `exercises/` + `solutions/` |
 | `Oracle.EntityFrameworkCore` | 10.23.26300 | `exercises/` + `solutions/` |
 | `MongoDB.Driver` | 3.9.0 | `exercises/` + `solutions/` **and** `tests/` |
+| `MySql.EntityFrameworkCore` (test-side pin) | 10.0.9 | `tests/`, mirroring the content libraries |
 | `Aspire.Hosting.Testing` | 13.5.3 | `tests/` |
 | `Aspire.Hosting.AppHost` + `Aspire.Hosting.Orchestration.$(NETCoreSdkRuntimeIdentifier)` | 13.5.3 | `tests/`, **only** under `Condition="'$(Containers)' == 'true'"` |
 | `Npgsql` | 10.0.3 | `tests/` |
@@ -1533,7 +1545,12 @@ at `[9.0.0, 9.0.999]` and cannot sit beside 10.0.11, `Oracle.EntityFrameworkCore
 resolves, so a later row adding the Aspire client integration needs no bump. `tests/`
 carries the same `MongoDB.Driver` 3.9.0 under the rule its `Npgsql` pin already follows:
 ex044 and ex045 seed through the test's own client, and `ContainerHarness`'s Mongo
-flavour builds its per-test URI with `MongoUrlBuilder`.
+flavour builds its per-test URI with `MongoUrlBuilder`. `tests/` pins
+`MySql.EntityFrameworkCore` 10.0.9 under the same rule — ex041's prefix-length fact calls
+`MySQLIndexExtensions.PrefixLength` directly, and a test that names a provider's API
+should pin that provider rather than inherit it transitively from whichever content
+library this run referenced. `Oracle.EntityFrameworkCore` is deliberately NOT pinned in
+`tests/`: no test names an Oracle type, because ex042 reads generated SQL as a string.
 
 The two DCP packages are the track's only **conditional** references. They exist because
 starting a real `DistributedApplication` needs the orchestrator that `Aspire.AppHost.Sdk`

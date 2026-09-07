@@ -49,11 +49,23 @@
        documents through the test's OWN client before asking the learner's code to touch
        them, and ContainerHarness's Mongo flavour builds its per-test database URI with
        MongoUrlBuilder, so the test and the exercise must never run two different
-       drivers. Pinned to the 3.9.0 the two content libraries resolve. -->
+       drivers. Pinned to the 3.9.0 the two content libraries resolve.
+
+       MySql.EntityFrameworkCore is pinned here under the same rule, and NOT because the
+       transitive reference through the content library was failing. ex041's prefix-length
+       fact calls MySQLIndexExtensions.PrefixLength directly - the provider stores an
+       index prefix and does not emit it, so the model is the only place to read it - and
+       a test that names a provider's API should pin that provider rather than inherit it
+       from whichever content library happens to be referenced this run. It would break
+       silently the day either content library set PrivateAssets on that package. Same
+       10.0.9 the two content libraries carry; Oracle.EntityFrameworkCore is deliberately
+       NOT pinned here, because no test names an Oracle type - ex042 reads generated SQL
+       as a string. -->
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
     <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>

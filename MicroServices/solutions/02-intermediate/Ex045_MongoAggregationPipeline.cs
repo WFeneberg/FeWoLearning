@@ -34,6 +34,14 @@ namespace FeWoLearning.MicroServices.Exercises.Intermediate;
 ///         (3) `$match` goes FIRST, and not for tidiness. After a `$unwind` the same
 ///         filter has to be evaluated once per line rather than once per order, and an
 ///         index on the matched fields can no longer be used at all.
+///
+///         (4) `$unwind` has two spellings and BOTH are accepted here: the shorthand
+///         `{ $unwind: "$lines" }` and the document form
+///         `{ $unwind: { path: "$lines" } }`, which is the only one that can also carry
+///         `preserveNullAndEmptyArrays`. The graded claim is which field is exploded,
+///         not how it was typed. Note that `preserveNullAndEmptyArrays: true` would
+///         undo note (1) - it is what makes the empty-lines order survive - so leaving
+///         it off is a decision, not an omission.
 /// </summary>
 public static class Ex045_MongoAggregationPipeline
 {

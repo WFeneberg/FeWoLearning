@@ -6,12 +6,12 @@ using MongoDB.Driver;
 namespace FeWoLearning.MicroServices.Exercises.Intermediate;
 
 /// <summary>
-/// Goal:   Prove an index was USED. A query over 500 documents returns the right
+/// Goal:   Prove an index was USED. A query over 600 documents returns the right
 ///         answer whether or not an index exists, so "the test passed" says nothing
 ///         about the thing this row is about.
 /// Drills: `CreateIndexModel` with a COMPOUND key - equality first, then the sort
-///         column descending - `CreateManyAsync`, `ListIndexes`, and the `explain`
-///         command read for its winning plan.
+///         column descending - `IMongoIndexManager.CreateOneAsync`, `ListIndexes`, and
+///         the `explain` command read for its winning plan.
 /// Passes: the model is a real MongoDBDatabaseResource; the index model renders
 ///         `{ customerId: 1, placedAt: -1 }` under the row's name; creating it twice is
 ///         harmless and leaves exactly that one index beside Mongo's own `_id_`; the

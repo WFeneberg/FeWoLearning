@@ -141,9 +141,18 @@ public class Ex045_MongoAggregationPipelineTests
         Assert.Equal(status, match["status"].AsString);
         Assert.Equal(Since, match["placedAt"]["$gte"].ToUniversalTime());
 
-        // The unwound field, and then the path that only means one line's quantity
-        // BECAUSE of the unwind - see note (2).
-        Assert.Equal("$lines", stages[1]["$unwind"].AsString);
+        // The unwound field. BOTH spellings are accepted, because both are correct
+        // Mongo and the row is about which field is exploded, not about how it was
+        // typed: the shorthand `{ $unwind: "$lines" }` and the document form
+        // `{ $unwind: { path: "$lines", ... } }` are the same stage, and the second is
+        // the only one that can carry preserveNullAndEmptyArrays. Whichever is used,
+        // the path is what makes "$lines.quantity" in the $group mean ONE line's
+        // quantity - see the exercise's note (2).
+        var unwind = stages[1]["$unwind"];
+        var unwoundPath = unwind.BsonType == BsonType.String
+            ? unwind.AsString
+            : unwind.AsBsonDocument["path"].AsString;
+        Assert.Equal("$lines", unwoundPath);
 
         var group = stages[2]["$group"].AsBsonDocument;
         Assert.Equal("$customerId", group["_id"].AsString);

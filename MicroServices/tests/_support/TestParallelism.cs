@@ -17,9 +17,9 @@ using Xunit;
 //          replaced. The row's ConfigureMapping() is idempotent for that reason, but the
 //          registry it writes to is shared with every other test in the process.
 //
-// Under the default class-level parallelism those three are safe only while no other
+// Under the default class-level parallelism those four are safe only while no other
 // class happens to touch the same statics - an assembly-wide invariant that nothing
-// states and nothing enforces, with 75 catalog rows still to be written against it.
+// states and nothing enforces, with 55 catalog rows still to be written against it.
 // Serialising the assembly turns that invariant into a property of the test host.
 //
 // The spelling is version-specific. On xunit.v3 3.2.2 this attribute is the supported
