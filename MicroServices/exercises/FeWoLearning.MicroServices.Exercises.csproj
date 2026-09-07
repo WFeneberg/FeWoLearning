@@ -57,4 +57,25 @@
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
   </ItemGroup>
 
+  <!-- EF Core, for rows 036-040. The two providers live in BOTH content libraries,
+       identically and in one commit, for the same reason the ASP.NET Core set does
+       (README section 5): tests/ references exactly ONE of the two, so the UseSolutions
+       switch must stay at a single pair. Versions, and why:
+         * Microsoft.EntityFrameworkCore.SqlServer 10.0.11 - EF Core ships on the .NET
+           10 servicing train, and 10.0.11 is the same band as the installed
+           Microsoft.AspNetCore.App 10.0.11 that tests/ already pins TestHost to.
+         * Npgsql.EntityFrameworkCore.PostgreSQL 10.0.3 - the latest stable; its floor
+           of Microsoft.EntityFrameworkCore.Relational [10.0.4, 11.0.0) is satisfied by
+           10.0.11, so both providers sit on one EF Core. It pins Npgsql 10.0.3, which
+           is why tests/ moved its own Npgsql pin from 10.0.2 to 10.0.3 in the same
+           commit - the test and the exercise must never run two different drivers.
+       Microsoft.EntityFrameworkCore.Design is deliberately NOT here: nothing in this
+       track shells out to `dotnet ef`. The generated-script rows (037, 039) go through
+       DatabaseFacade.GenerateCreateScript(), which is runtime API in .Relational, and
+       row 038 ships hand-written Migration classes. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
 </Project>

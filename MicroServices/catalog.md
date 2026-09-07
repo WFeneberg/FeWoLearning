@@ -57,7 +57,7 @@ as oversights:
   and per-resource `*.bicep` files directly (measured, §L2 in `README.md`), so rows
   093/094/099/100 assert on the generated Bicep for real.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 40 ✅ / 60 ⬜**
 
 ## Beginner (001–035) — Aspire model and first persistence
 
@@ -105,11 +105,11 @@ as oversights:
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | EfCoreAgainstSqlServer | `AddSqlServer` + `AddDatabase` → `SqlServerDatabaseResource` and its `…;Initial Catalog=catalog` expression, wired to `UseSqlServer` over the injected `ConnectionStrings:catalog`; the live SQL Server proof lives in 038 and 040, so this row is the wiring | ⬜ |
-| 037 | EfCoreAgainstPostgres | the same `DbContext` on Npgsql; compare the two providers' **generated migration scripts** offline — `nvarchar`/`datetime2`/`IDENTITY` against `text`/`timestamptz`/`GENERATED … AS IDENTITY` | ⬜ |
-| 038 | MigrationsOnStartup | `Database.MigrateAsync` from a hosted service, gated on `WaitFor`; the second start must apply **zero** migrations, which is the assertion that catches a naive `EnsureCreated` | 🐳 ⬜ |
-| 039 | SeedDataInTheModel | `HasData` in `OnModelCreating` vs an upsert at startup; grade the `INSERT`s in the generated migration and the seed's re-run safety, not the row count after one start | ⬜ |
-| 040 | TransactionsAndConcurrency | `IExecutionStrategy` wrapping an explicit transaction, a `rowversion`/`xmin` concurrency token, and a genuine `DbUpdateConcurrencyException` from two interleaved updates | 🐳 ⬜ |
+| 036 | EfCoreAgainstSqlServer | `AddSqlServer` + `AddDatabase` → `SqlServerDatabaseResource` and its `…;Initial Catalog=catalog` expression, wired to `UseSqlServer` over the injected `ConnectionStrings:catalog`; the live SQL Server proof lives in 038 and 040, so this row is the wiring | ✅ |
+| 037 | EfCoreAgainstPostgres | the same `DbContext` on Npgsql; compare the two providers' **generated migration scripts** offline — `nvarchar`/`datetime2`/`IDENTITY` against `text`/`timestamptz`/`GENERATED … AS IDENTITY` | ✅ |
+| 038 | MigrationsOnStartup | `Database.MigrateAsync` from a hosted service, gated on `WaitFor`; the second start must apply **zero** migrations, which is the assertion that catches a naive `EnsureCreated` | 🐳 ✅ |
+| 039 | SeedDataInTheModel | `HasData` in `OnModelCreating` vs an upsert at startup; grade the `INSERT`s in the generated migration and the seed's re-run safety, not the row count after one start | ✅ |
+| 040 | TransactionsAndConcurrency | `IExecutionStrategy` wrapping an explicit transaction, a `rowversion`/`xmin` concurrency token, and a genuine `DbUpdateConcurrencyException` from two interleaved updates | 🐳 ✅ |
 | 041 | MySqlIdentifiersAndCollation | `AddMySql`, `MySqlDatabaseResource` and its own expression; then the schema differences — `utf8mb4` collation, identifier case sensitivity, index prefix lengths — read off the generated DDL | ⬜ |
 | 042 | OracleSchemaSemantics | `AddOracle`, `OracleDatabaseResource`; a *schema is a user*, identifiers are folded and length-capped, and keys come from sequences — the relational habits from 036 do not transfer | ⬜ |
 | 043 | MongoDocumentModel | embedding vs referencing, `_id`/`ObjectId`, `BsonDocument` against a mapped POCO; the row is graded on the stored **document shape**, so a normalised set of collections fails | ⬜ |

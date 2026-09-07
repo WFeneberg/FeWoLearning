@@ -61,30 +61,36 @@ only**. Neither reaches the playground, and neither is accepted by `aspire run`:
 
 There is no separate install step — `dotnet test` restores on first run.
 
-**Current measured state** (2026-09-07; `catalog.md` at 35 ✅ / 65 ⬜). Counted on
-disk: **110 exercise facts** across the thirty-five delivered rows, of which one is 🐳,
-plus **10 harness facts** in `tests/_support/` — **120** in total.
+**Current measured state** (2026-09-07; `catalog.md` at 40 ✅ / 60 ⬜). Counted on
+disk: **126 exercise facts** across the forty delivered rows, of which three are 🐳,
+plus **10 harness facts** in `tests/_support/` — **136** in total.
 
 ```
-dotnet test                                         → 109 failed,   8 passed, 3 skipped (120 total),   17 s
-dotnet test -p:UseSolutions=true                    →   0 failed, 117 passed, 3 skipped (120 total), 1 m 32 s
-dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 120 passed, 0 skipped (120 total), 2 m 51 s
+dotnet test                                         → 123 failed,   8 passed, 5 skipped (136 total),   20 s
+dotnet test -p:UseSolutions=true                    →   0 failed, 131 passed, 5 skipped (136 total), 1 m 24 s
+dotnet test -p:UseSolutions=true -p:Containers=true →   0 failed, 136 passed, 0 skipped (136 total), 5 m 26 s
 ```
 
-**The three skips are not all harness facts, and the distinction matters.** One is a
-real exercise fact — ex034's 🐳 row, gated like every 🐳 row will be. The other two are
-harness facts that are *deliberately* gated shut in the default run: the container-gate
-canary that proves `Require()` still closes, and the teardown canary that needs a
-started application. `-p:Containers=true` unskips all three. The 8 that pass in the red
-run are the remaining harness facts, which pass in *both* modes because they grade the
-harness rather than an exercise.
+**The five skips are not all harness facts, and the distinction matters.** Three are
+real exercise facts — ex034's, ex038's and ex040's 🐳 rows, gated like every 🐳 row
+will be. The other two are harness facts that are *deliberately* gated shut in the
+default run: the container-gate canary that proves `Require()` still closes, and the
+teardown canary that needs a started application. `-p:Containers=true` unskips all
+five. The 8 that pass in the red run are the remaining harness facts, which pass in
+*both* modes because they grade the harness rather than an exercise.
 
-The container lane costs the difference between the last two lines, **~79 s**: about
-51 s for ex034's Postgres and about 28 s for the two applications the teardown canary
-starts (it starts no containers — see §4).
+The container lane costs the difference between the last two lines, **~4 m 02 s**,
+up from ~79 s at ex034. It is now dominated by **SQL Server**: ex038 and ex040 each
+start `mcr.microsoft.com/mssql/server:2022-latest` and each cost **~1 m 25 s** measured
+five times, against ~51 s for ex034's Postgres and ~28 s for the two applications the
+teardown canary starts (it starts no containers — see §4). Budget SQL Server at roughly
+**1.5x a Postgres row**, and remember the assembly runs serially: the lane grows by the
+sum, never by the maximum. A worked-out example of why the offline/🐳 split in
+`catalog.md` is worth defending — rows 037 and 039 are *about* SQL Server and Postgres
+schemas and cost 0 s of it, because a generated script needs no server.
 
-**A correct default run is red, and that is not a broken checkout.** A hundred and nine
-failures is exactly what an untouched tree gives: one `NotImplementedException` per
+**A correct default run is red, and that is not a broken checkout.** A hundred and
+twenty-three failures is exactly what an untouched tree gives: one `NotImplementedException` per
 unimplemented `Configure`, plus the facts that depend on it. Update these numbers
 whenever a batch lands.
 
@@ -463,6 +469,58 @@ to take a `ProjectReference` on `exercises/` to call the learner's extension, wh
 learner code inside a resource the AppHost launches; and the row's own spec says to
 assert the registrations in the `IServiceCollection` rather than that an app started. A
 `Host.CreateApplicationBuilder()` inside the test is the whole fixture needed.
+
+### EF Core lives in the same library pair too — rows 036-040
+
+Rows 036-040 are the first that need an ORM, and they follow **exactly** the precedent
+rows 021-023 set above: the packages went into `exercises/` **and** `solutions/`,
+identically and in one commit, rather than into a third pair of projects. Same reason,
+and it is the only reason that matters: `tests/` references exactly one content library,
+so `UseSolutions` must stay a single switch over a single pair.
+
+```xml
+Microsoft.EntityFrameworkCore.SqlServer        10.0.11
+Npgsql.EntityFrameworkCore.PostgreSQL          10.0.3
+```
+
+Four notes on that pair, each of which decided something:
+
+- **EF Core is pinned to 10.0.11, the same servicing band as the installed
+  `Microsoft.AspNetCore.App` 10.0.11** that `tests/` already pins `Microsoft.AspNetCore.TestHost`
+  to. EF ships on the .NET 10 train, so this is the coherence rule §7 already applies to
+  OpenTelemetry, not a new one.
+- **The Npgsql provider drags `Npgsql` forward, and `tests/` had to follow.**
+  `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3 pins `Npgsql` **10.0.3** (10.0.2 of the
+  provider pins the same 10.0.3 — checking both was worth the minute), so the content
+  libraries now resolve 10.0.3 and `tests/`'s own `Npgsql` pin moved 10.0.2 → 10.0.3 in
+  the same commit. ex034's L3 fact seeds a row through its own driver before asking the
+  exercise to read it back; the two must never be different drivers. The provider's
+  floor on `Microsoft.EntityFrameworkCore.Relational` is `[10.0.4, 11.0.0)`, which
+  10.0.11 satisfies, so both providers sit on one EF Core.
+- **`Microsoft.EntityFrameworkCore.Design` is deliberately absent.** Nothing here shells
+  out to `dotnet ef`, and nothing can: there is no startup project for it to point at.
+  The two rows about generated SQL (037, 039) use `DatabaseFacade.GenerateCreateScript()`,
+  which is ordinary runtime API in `.Relational`, and row 038 ships **hand-written
+  `Migration` classes** — `[DbContext]`, `[Migration]`, `Up`, and nothing else. Measured:
+  a hand-written migration with no `ModelSnapshot` class anywhere in the assembly applies
+  cleanly and raises no pending-model-changes error.
+- **`Microsoft.EntityFrameworkCore.Sqlite` 10.0.11 is in `tests/` and nowhere else.** It
+  is test equipment: ex039 grades a startup seed's *re-run* safety, which needs a real
+  relational store with real primary keys, and SQLite gives one in memory in
+  milliseconds with no container. The exercise never names a provider — its `SeedAsync`
+  takes a `DbContext` — so the same code is what would run on SQL Server.
+
+Two consequences for a later author, the same shape as the ASP.NET Core set's:
+
+- **Every one of these five rows exposes more than `Configure`.** A `DbContext` and its
+  entities are nested inside the exercise's static class, so five rows can each have a
+  `CatalogContext` without colliding, and the service-side entry points sit beside
+  `Configure` rather than replacing it.
+- **Only 038 and 040 are 🐳, and that was a design constraint, not an accident.** 036 is
+  wiring (a resource graph plus a provider registration), 037 compares two providers'
+  generated DDL, and 039 reads INSERTs out of a generated script and re-runs a seed
+  against SQLite. None of the three needs a server, and each would have cost ~1 m 25 s
+  if it had been allowed to start one.
 
 ### `solutions/` is in the build here — deliberately
 
@@ -930,6 +988,11 @@ Each of these cost real time. None is a guess.
   throws before it reaches the publish. Anyone budgeting a future batch should count its
   L2 facts and ignore everything else; and if this ever does need fixing, the lever is
   sharing one publish across the facts that assert on it, not parallelism.
+  **Confirmed by the next batch.** Rows 036-040 added sixteen facts, of which **zero**
+  are publish-shaped — five build a resource graph, eight build a `DbContext` or a
+  generated script offline, three are 🐳. The green run went from 1 m 30 s to
+  **1 m 24 s**, i.e. nowhere, exactly as the model predicts. The container lane is a
+  separate budget and grew by ~2 m 43 s; see §3.
 - **A count of `HttpMessageHandlerBuilderActions` says how many handlers, never which.**
   Measured while closing a review finding on ex021:
   `ConfigureHttpClientDefaults(h => { h.AddStandardResilienceHandler();
@@ -971,6 +1034,73 @@ Each of these cost real time. None is a guess.
   own built-in `BeforeStartEvent` subscriber is unaffected because everything else still
   resolves from the real provider.
 
+- **EF caches the built model per (context type, provider), so a parameterised model
+  silently returns the first answer forever.** Measured while writing ex037, and it is
+  the reason that row grades anything at all. The row asks for the same `DbContext`'s
+  CREATE script under two providers plus a **schema the test invented**, so that a
+  hand-written pair of SQL strings can be rejected; the first version read the schema
+  from a field, and the second call came back with the *first* call's script, schema and
+  all. The fix is EF's own hook — `ReplaceService<IModelCacheKeyFactory, …>` returning a
+  key that includes the varying value — and it belongs in the exercise as declared
+  scaffolding, not as part of the TODO. Any future row that varies a model at runtime
+  needs it or grades nothing.
+- **The two providers escape their own delimiter and leave the other's alone, and that
+  is the sharpest anti-hardcode hook this batch found.** Measured on EF Core 10.0.11 and
+  `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3: a default schema named `a]b"c` comes
+  out of SQL Server as `[a]]b"c]` (bracket doubled, quote untouched) and out of Npgsql as
+  `"a]b""c"` (quote doubled, bracket untouched). A `$"[{schema}]"` template produces
+  `[a]b"c]` and fails. This matters because the *plausible* mutant for a "compare the
+  generated SQL" row is a pair of hand-written scripts transcribed from a real run —
+  which passes every `nvarchar`/`text`/`datetime2`/`GENERATED … AS IDENTITY` assertion.
+  It was built and run, and only the escaping fact rejected it. Two more measured
+  spellings from the same probe: Npgsql omits the quotes entirely for an
+  all-lowercase schema (`CREATE SCHEMA ex037_plain`) and wraps schema creation in a
+  `DO $EF$ … END $EF$;` block, where SQL Server writes
+  `IF SCHEMA_ID(N'…') IS NULL EXEC(N'CREATE SCHEMA […];');` followed by `GO`. SQL Server
+  batches with `GO`; Npgsql emits none, so `GO` is itself a provider discriminator.
+- **`EnsureCreated()` on an existing but empty database DOES create the tables.**
+  Relevant because Aspire's `AddDatabase` has already created the database by the time a
+  🐳 test connects, and the obvious worry — "EnsureCreated will see the database and do
+  nothing" — is wrong on EF Core 10: it falls through to a `HasTables()` check and
+  creates them. ex040's harness relies on that. What `EnsureCreated` still does *not* do
+  is write `__EFMigrationsHistory`, which is exactly what ex038 grades.
+- **Inserting an explicit value into an `IDENTITY` column fails, so a 🐳 test cannot
+  choose its own primary keys.** Measured in ex040's first container run: seeding
+  `new Account { Id = 1, … }` through EF dies inside `SaveChangesAsync`. Let the database
+  generate the ids and read them back off the tracked entities.
+- **Once `EnableRetryOnFailure` is on, `BeginTransactionAsync` on its own THROWS**, with
+  *"The configured execution strategy 'SqlServerRetryingExecutionStrategy' does not
+  support user-initiated transactions. Use the execution strategy returned by
+  'DbContext.Database.CreateExecutionStrategy()' …"*. Measured. This is a grading gift:
+  "did the learner run the transaction through the execution strategy" needs no clever
+  assertion, because without it the operation cannot start. It also means the *offline*
+  half must assert `CreateExecutionStrategy().RetriesOnFailure` — the default
+  `SqlServerExecutionStrategy` returns false and happily allows the un-wrapped shape, so
+  a learner who skipped `EnableRetryOnFailure` would otherwise sail through the container
+  fact.
+- **A concurrency test needs no threads and no clock — it needs a seam.** ex040 makes the
+  interleaving an *ordering*: `AddToBalanceAsync` takes an `afterLoad` callback invoked
+  while it is holding a stale copy, and the test's callback is a second, complete
+  `AddToBalanceAsync`. The outer save is then guaranteed to be writing against a row
+  version that no longer exists, in a single-threaded program with no `Task.Delay`
+  anywhere. `TransferAsync` takes the same kind of seam (`betweenSaves`) between its two
+  saves. Any future row about ordering — outbox, saga compensation, cache stampede —
+  should buy determinism the same way rather than with a sleep.
+- **A rolled-back write is invisible afterwards, so proving the transaction was real
+  needs a DIRTY read.** The mutant that does one `SaveChanges` for both sides of a
+  transfer is genuinely atomic (EF wraps it implicitly) and passes both "the money moved"
+  and "nothing survived the failure". What separates it from the correct two-save,
+  one-transaction answer is what a *second connection* sees while the transaction is
+  still open: `SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED` inside the seam reads
+  the debited balance from the correct answer and the untouched one from the mutant.
+  Both were built and run.
+- **`DbContext` and its entities nest inside the exercise's static class.** Five rows in
+  this batch each want a `CatalogContext` and a `Product`, in one namespace, in two
+  assemblies that compile the same type names. Nesting them inside
+  `Ex0NN_Something` makes that free, costs nothing at the call site
+  (`using static …Ex0NN_Something;` in the test), and keeps a row self-contained the way
+  every other row in the track is.
+
 ## 7. Pinned versions
 
 | Package | Version | Where |
@@ -981,9 +1111,12 @@ Each of these cost real time. None is a guess.
 | `Microsoft.Extensions.Http.Resilience` | 10.9.0 | `exercises/` + `solutions/` |
 | `OpenTelemetry.*` (`.Extensions.Hosting`, `.Instrumentation.AspNetCore` / `.Http` / `.Runtime`, `.Exporter.OpenTelemetryProtocol`) | 1.18.0 | `exercises/` + `solutions/` |
 | `Aspire.Npgsql` | 13.5.3 | `exercises/` + `solutions/` |
+| `Microsoft.EntityFrameworkCore.SqlServer` | 10.0.11 | `exercises/` + `solutions/` |
+| `Npgsql.EntityFrameworkCore.PostgreSQL` | 10.0.3 | `exercises/` + `solutions/` |
 | `Aspire.Hosting.Testing` | 13.5.3 | `tests/` |
 | `Aspire.Hosting.AppHost` + `Aspire.Hosting.Orchestration.$(NETCoreSdkRuntimeIdentifier)` | 13.5.3 | `tests/`, **only** under `Condition="'$(Containers)' == 'true'"` |
-| `Npgsql` | 10.0.2 | `tests/` |
+| `Npgsql` | 10.0.3 | `tests/` |
+| `Microsoft.EntityFrameworkCore.Sqlite` | 10.0.11 | `tests/` |
 | `OpenTelemetry.Exporter.InMemory` | 1.18.0 | `tests/` |
 | `Microsoft.AspNetCore.TestHost` | 10.0.11 | `tests/` |
 | `xunit.v3` | 3.2.2 | `tests/` |
@@ -998,11 +1131,15 @@ fact needs them and the Azure rows will — plus the non-Aspire service-side set
 021-023 added, and a `FrameworkReference` to `Microsoft.AspNetCore.App` (see §5).
 `Aspire.Npgsql` arrived with ex033/ex034 — the first rows that cross from the AppHost
 into a **service** — and went into both content libraries at 13.5.3 like every other
-Aspire package. `Npgsql` 10.0.2 in `tests/` is not an independent choice: ex034's L3
+Aspire package. `Npgsql` in `tests/` is not an independent choice: ex034's L3
 fact seeds a row through its own connection before asking the learner's code to read it
-back, and 10.0.2 is exactly what `Aspire.Npgsql` 13.5.3 resolves in the two content
-libraries (verified in `project.assets.json`), so the test and the exercise never run
-two different drivers.
+back, so it must be exactly what the two content libraries resolve. That was 10.0.2
+until rows 036-040 added `Npgsql.EntityFrameworkCore.PostgreSQL`, which pins
+`Npgsql` **10.0.3**; the `tests/` pin moved with it in the same commit, and must keep
+moving with it. The **two EF Core providers** are the second structural extension the
+content libraries have taken (§5), on the same terms as the ASP.NET Core set: both
+`.csproj` files, identically, one commit. `Microsoft.EntityFrameworkCore.Sqlite` is
+test equipment for ex039's offline re-run check and lives in `tests/` alone.
 
 The two DCP packages are the track's only **conditional** references. They exist because
 starting a real `DistributedApplication` needs the orchestrator that `Aspire.AppHost.Sdk`

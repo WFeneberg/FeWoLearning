@@ -1,5 +1,6 @@
 using Aspire.Hosting;
 using FeWoLearning.MicroServices.Exercises.Beginner;
+using FeWoLearning.MicroServices.Exercises.Intermediate;
 
 /// <summary>
 /// Maps an exercise id to its Configure method, so one AppHost can run any exercise
@@ -41,6 +42,11 @@ public static class ExerciseRegistry
         ["ex032"] = Ex032_DatabaseInitScripts.Configure,
         ["ex034"] = Ex034_FirstRealQuery.Configure,
         ["ex035"] = Ex035_BeginnerCapstoneModel.Configure,
+        ["ex036"] = Ex036_EfCoreAgainstSqlServer.Configure,
+        ["ex037"] = Ex037_EfCoreAgainstPostgres.Configure,
+        ["ex038"] = Ex038_MigrationsOnStartup.Configure,
+        ["ex039"] = Ex039_SeedDataInTheModel.Configure,
+        ["ex040"] = Ex040_TransactionsAndConcurrency.Configure,
     };
 
     /// <summary>

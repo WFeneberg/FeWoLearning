@@ -33,10 +33,20 @@
 
   <!-- ex034's L3 fact seeds a row through its OWN connection before asking the learner's
        code to read it back, so the test needs a raw Npgsql client of its own. Pinned to
-       the exact version Aspire.Npgsql 13.5.3 resolves in the two content libraries, so
-       the test and the exercise never run two different drivers. -->
+       the exact version the two content libraries resolve, so the test and the
+       exercise never run two different drivers. It moved 10.0.2 -> 10.0.3 with ex037:
+       Npgsql.EntityFrameworkCore.PostgreSQL 10.0.3 pins Npgsql 10.0.3 there, and this
+       pin follows it rather than letting the two diverge.
+
+       Microsoft.EntityFrameworkCore.Sqlite is TEST equipment, not exercise content, so
+       it lives here and nowhere else. ex039 grades a startup seed's RE-RUN safety, and
+       that needs a real relational store with real primary keys - which SQLite gives in
+       memory, offline, in milliseconds. The exercise itself never names a provider: its
+       SeedAsync takes a DbContext, so the same code runs on SQL Server. Pinned to the
+       same 10.0.11 the two content libraries put EF Core on. -->
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="10.0.2" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>
