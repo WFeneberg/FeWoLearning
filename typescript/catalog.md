@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 55 ✅ / 45 ⬜** — `01-beginner` complete.
+**Status: 60 ✅ / 40 ⬜** — `01-beginner` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -85,11 +85,11 @@ green against `any` and must never carry a row on its own — see
 | 053 | in_and_instanceof_narrowing | narrowing with `in` and `instanceof` | ✅ |
 | 054 | typed_reducer | a discriminated-union action reducer | ✅ |
 | 055 | assert_never | two exhaustiveness mechanisms — a `never` default, and a total `Record` that fails at the declaration | ✅ |
-| 056 | promise_combinators | `allSettled`/`race`/`any` semantics and their result types | ⬜ |
-| 057 | aggregate_error | `Promise.any` rejection, `AggregateError` | ⬜ |
-| 058 | abort_signal | cancellation with `AbortController`, cooperative abort | ⬜ |
-| 059 | generators | `function*`, the three type parameters of `Generator` | ⬜ |
-| 060 | async_generators | `for await…of`, async iteration | ⬜ |
+| 056 | promise_combinators | `allSettled`/`race`/`any` semantics and their result types | ✅ |
+| 057 | aggregate_error | `Promise.any` rejection, `AggregateError` | ✅ |
+| 058 | abort_signal | cancellation with `AbortController`, cooperative abort | ✅ |
+| 059 | generators | `function*`, the three type parameters of `Generator` | ✅ |
+| 060 | async_generators | `for await…of`, async iteration | ✅ |
 | 061 | iterator_protocol | implementing `Symbol.iterator` by hand | ⬜ |
 | 062 | this_typing | `this` parameters, `ThisParameterType`, arrow vs function | ⬜ |
 | 063 | bind_call_apply | typed `bind`/`call`/`apply`, `OmitThisParameter` | ⬜ |

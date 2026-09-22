@@ -337,6 +337,13 @@ the same `global.json` opt-in.
   leaves the directive unused, which is itself an error, and the fact then
   fails against correct code. Keep such a call on one line.
 
+  **No async fact waits on a timer.** Where an ordering must be forced the
+  tests use a deferred promise (a promise plus its settle handles), so the
+  sequence is the test's decision rather than the clock's — ex033, ex056,
+  ex058 and ex060 all work this way. A rejected promise a test creates and
+  the stub never consumes surfaces as an unhandled error, so such tests
+  claim it with a no-op `.catch(() => undefined)`.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1243,7 +1250,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 55 / 100 (verified) | 45 |
+| `typescript/`| 60 / 100 (verified) | 40 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1262,7 +1269,7 @@ Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
 scaffolding, a full 100-row catalog, the complete `01-beginner` tier and
-`02-intermediate` through ex055, verified red and green. Nothing else is
+`02-intermediate` through ex060, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

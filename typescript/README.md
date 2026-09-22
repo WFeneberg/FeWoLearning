@@ -226,6 +226,26 @@ Nothing in the harness can prevent that, so the stub header warns about it
 explicitly. Any later row that feeds an unbounded source to learner code
 should do the same.
 
+## Async rows: deterministic by construction, and what they cannot see
+
+No fact in this track waits on a timer. Where an ordering has to be
+forced, the tests use a deferred promise — a promise plus the handles to
+settle it — so the sequence is decided by the test rather than by the
+clock. ex033, ex056, ex058 and ex060 all work this way.
+
+A rejected promise created in a test and never consumed surfaces as an
+unhandled error and muddies the run, and on the untouched tree the stub
+throws before consuming anything. Such tests therefore claim their
+rejections with a no-op `.catch(() => undefined)`, commented as hygiene.
+
+Two things these rows do not grade, said in their headers rather than
+implied: ex058's two signatures are given in full because neither is the
+subject, so that row has no type facts at all; and ex060 cannot see
+laziness — the promises handed to `inOrder` have already started, so
+awaiting them in a loop and awaiting them at once produce identical
+results. Backpressure is why you would write an async generator, and
+nothing here can observe it.
+
 ## Module rows are runtime-graded, necessarily
 
 A missing export is an error at the IMPORT site, so a stub must already
@@ -285,9 +305,9 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 55 / 100 exercises — all of `01-beginner` and
-`02-intermediate` through ex055: 440 facts, 440 red / 0 passed on the
-untouched tree, 440 / 0 green against `solutions/`, 206 expected
+Measured 2026-09-22 at 60 / 100 exercises — all of `01-beginner` and
+`02-intermediate` through ex060: 485 facts, 485 red / 0 passed on the
+untouched tree, 485 / 0 green against `solutions/`, 214 expected
 exercise-side type errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
