@@ -14,7 +14,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -39,11 +39,11 @@ green against `any` and must never carry a row on its own — see
 | 013 | never_exhaustiveness | `never` as the empty type, exhaustive `switch` | ✅ |
 | 014 | type_predicates | user-defined guards, `x is T` | ✅ |
 | 015 | discriminated_unions | tagged unions, switching on the discriminant | ✅ |
-| 016 | generics_and_constraints | first type parameters, `extends` constraints | ⬜ |
-| 017 | generic_array_helpers | `first`/`last`/`chunk` with preserved element types | ⬜ |
-| 018 | keyof_basics | `keyof`, a typed property getter | ⬜ |
-| 019 | typeof_operator | deriving a type from a value with `typeof` | ⬜ |
-| 020 | indexed_access | `T["key"]`, nested indexed access, `T[number]` | ⬜ |
+| 016 | generics_and_constraints | first type parameters, `extends` constraints | ✅ |
+| 017 | generic_array_helpers | `first`/`last`/`chunk` with preserved element types | ✅ |
+| 018 | keyof_basics | `keyof`, a typed property getter | ✅ |
+| 019 | typeof_operator | deriving a type from a value with `typeof` | ✅ |
+| 020 | indexed_access | `T["key"]`, nested indexed access, `T[number]` | ✅ |
 | 021 | class_basics | fields, parameter properties, access modifiers | ⬜ |
 | 022 | implements_is_structural | `implements` checks but does not create nominality | ⬜ |
 | 023 | abstract_classes | `abstract` members, protected contracts | ⬜ |

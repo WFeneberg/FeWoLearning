@@ -238,8 +238,15 @@ the same `global.json` opt-in.
   *out* of an optional property's type. `toEqualTypeOf` tells the two apart, so
   a `Parameters` fact that omits the union is red against a correct solution.
 
-  A structural consequence worth knowing before writing a row: **a test cannot
-  grade a change to a signature it must itself call.** A runtime test that
+  A structural consequence worth knowing before writing a row, and the single
+  most useful rule here: **a stub's signature must be WIDER than the
+  solution's.** Declaring parameters and returns as `unknown` means every call
+  a test makes compiles against the stub as well as the finished code, while
+  the type facts still go red because `unknown` is not what they expect — that
+  is why ex016's `identity(_value: unknown): unknown`, ex017's
+  `readonly unknown[]` and ex018's `key: unknown` look the way they do. The
+  corollary is the failure mode: **a test cannot grade a change to a signature
+  it must itself call.** A runtime test that
   calls `css(4, "em")` cannot compile against a stub whose parameter list does
   not accept that call yet, so the change surfaces as a type error in the test
   file instead of a failing fact. Such a row either hands the learner the
@@ -1160,7 +1167,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 15 / 100 (verified) | 85 |
+| `typescript/`| 20 / 100 (verified) | 80 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1178,7 +1185,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and ex001–ex015, verified red and green. Nothing else is
+scaffolding, a full 100-row catalog and ex001–ex020, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

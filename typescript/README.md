@@ -114,6 +114,25 @@ insist on. It has already earned its keep: returning `JSON.parse`'s result
 unchanged (so `any`) fails ex012's fact, and dropping `as const` fails both
 of ex011's, confirming those facts grade the mechanism rather than the value.
 
+## Writing a stub that can be graded
+
+One rule covers most of it: **a stub's signature must be WIDER than the
+solution's.** Declare parameters and returns as `unknown`, so that
+
+- every call a test makes compiles against the stub as well as the finished
+  code — a narrower stub turns the test's calls into type errors in the test
+  file instead of failing facts (this cost ex009 a rewrite);
+- and the type facts still go red, because `unknown` is not what they expect.
+
+That is why ex016's `identity(_value: unknown): unknown`, ex017's
+`readonly unknown[]` and ex018's `key: unknown` look the way they do. The
+learner's work is to narrow them.
+
+Where widening is impossible — making a parameter optional, turning one into
+a rest — the row either hands the learner that part of the signature and
+grades the body (ex009), reaches the behaviour through a widened local
+reference in the test, or is graded at the type level only.
+
 ## TypeScript 7
 
 New to this repo, and it bites immediately: **TS 7 removed `baseUrl`**
@@ -135,8 +154,8 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 15 / 100 exercises: 105 facts, 105 red / 0 passed on the
-untouched tree, 105 / 0 green against `solutions/`, 33 expected exercise-side
+Measured 2026-09-22 at 20 / 100 exercises: 145 facts, 145 red / 0 passed on the
+untouched tree, 145 / 0 green against `solutions/`, 51 expected exercise-side
 type errors and 0 on the solutions side.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work
