@@ -277,6 +277,19 @@ the same `global.json` opt-in.
   `static { }` both fail TS2540, unlike a readonly instance field in a
   constructor, so a readonly static needs a plain initializer.
 
+  **Module rows are runtime-graded, necessarily.** A missing export is an
+  error at the *import* site, so a stub must already declare every name its
+  tests import — which pre-satisfies any fact about module structure. ex026
+  was written with two type facts, both measured green on the untouched tree,
+  and the file was deleted rather than weakened. Measured too: a wrapper
+  function passes every ex026 fact exactly as the renamed re-export does. The
+  way round it, which ex027 uses, is to load the module with
+  `await import(...)` and read it as a `Record<string, unknown>` — that never
+  errors on a name that is not there, so "the barrel does not expose this yet"
+  becomes a failing fact rather than a type error in the test file. A row may
+  add sibling modules beside its `index.ts`; ex027 has four and a deliberate
+  import cycle.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1183,7 +1196,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 25 / 100 (verified) | 75 |
+| `typescript/`| 30 / 100 (verified) | 70 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1201,7 +1214,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and ex001–ex025, verified red and green. Nothing else is
+scaffolding, a full 100-row catalog and ex001–ex030, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

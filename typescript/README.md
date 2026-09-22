@@ -33,6 +33,9 @@ exercises/<tier>/exNNN_slug/index.ts   # the stub you edit
 solutions/<tier>/exNNN_slug/index.ts   # reference implementation
 tests/<tier>/exNNN_slug.test.ts        # runtime facts
 tests/<tier>/exNNN_slug.test-d.ts      # type-level facts
+
+A row may add sibling modules next to its index.ts when it needs them —
+ex026 has a units.ts, ex027 four files and a deliberate import cycle.
 ```
 
 Tests live **once**, outside both content trees, and import every exercise
@@ -148,6 +151,22 @@ and the fact is green from the start. Two of ex024's facts were written and
 then deleted for exactly that: its `fahrenheit` is a getter with no setter in
 the stub already, so “cannot be assigned” was true on the untouched tree.
 
+## Module rows are runtime-graded, necessarily
+
+A missing export is an error at the IMPORT site, so a stub must already
+declare every name its tests import — which pre-satisfies any fact about the
+module's structure. ex026 was written with two type facts and both were
+measured green on the untouched tree; the file is gone rather than weakened.
+The same reasoning covers the choice between `export { x as y } from "./m"`
+and a wrapper function, and between `export default f` and a separate
+declaration: measured, a wrapper passes every one of ex026's facts, exactly
+as the re-export does.
+
+ex027 is the exception that proves it. Its facts load the barrel with
+`await import(...)` and read it as a `Record<string, unknown>`, which never
+errors on a name that is not there — so "the barrel does not expose this
+yet" becomes a failing fact instead of a type error in the test file.
+
 ## Three things about classes that no test can see
 
 Recorded so a future row does not claim to grade them:
@@ -191,8 +210,8 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 25 / 100 exercises: 191 facts, 191 red / 0 passed on the
-untouched tree, 191 / 0 green against `solutions/`, 63 expected exercise-side
+Measured 2026-09-22 at 30 / 100 exercises: 237 facts, 237 red / 0 passed on the
+untouched tree, 237 / 0 green against `solutions/`, 73 expected exercise-side
 type errors and 0 on the solutions side.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work

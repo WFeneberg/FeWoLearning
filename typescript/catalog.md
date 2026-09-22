@@ -8,13 +8,14 @@ Legend: ✅ seeded (stub + tests + solution present, red and green verified) ·
 
 This table is the track's progress ledger and its work queue: the next five ⬜
 rows are the next batch. Each exercise is `exercises/<tier>/exNNN_<slug>/index.ts`
-with its reference at `solutions/<tier>/exNNN_<slug>/index.ts`; the tests live
+with its reference at `solutions/<tier>/exNNN_<slug>/index.ts` — plus any sibling
+modules the row needs, as ex026 and ex027 have; the tests live
 once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 `exNNN_<slug>.test-d.ts` (type-level facts). Not every row has both kinds — a
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -49,11 +50,11 @@ green against `any` and must never carry a row on its own — see
 | 023 | abstract_classes | `abstract` members, protected contracts | ✅ |
 | 024 | accessors_and_static | getters/setters, `static`, static blocks | ✅ |
 | 025 | private_hash_fields | `#field` vs `private`, the runtime difference | ✅ |
-| 026 | modules_and_type_imports | named vs default exports, `import type`, `isolatedModules` | ⬜ |
-| 027 | module_resolution_barrels | re-exports, barrel files, circular import hazards | ⬜ |
-| 028 | error_subclasses | extending `Error`, `cause`, `instanceof` narrowing | ⬜ |
-| 029 | catch_is_unknown | the catch binding is `unknown`, narrowing it safely | ⬜ |
-| 030 | result_type | a `Result<T, E>` union instead of exceptions | ⬜ |
+| 026 | modules_and_type_imports | named vs default exports, `import type`, module-level state as a singleton | ✅ |
+| 027 | module_resolution_barrels | re-exports, barrel files, circular import hazards | ✅ |
+| 028 | error_subclasses | extending `Error`, `cause`, `instanceof` narrowing | ✅ |
+| 029 | catch_is_unknown | the catch binding is `unknown`, narrowing it safely | ✅ |
+| 030 | result_type | a `Result<T, E>` union instead of exceptions | ✅ |
 | 031 | async_await_basics | `async` return types, awaiting, error propagation | ⬜ |
 | 032 | event_loop_ordering | microtasks before macrotasks; a single thread, not a pool | ⬜ |
 | 033 | promise_all_tuple | `Promise.all` inferring a tuple, not an array | ⬜ |
