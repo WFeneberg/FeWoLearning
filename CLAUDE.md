@@ -359,6 +359,15 @@ the same `global.json` opt-in.
   assignable to `Array<Animal>` — and it means two members that behave
   identically at runtime check differently purely by how they were spelled.
 
+  **A homomorphic mapped type is array-aware**, measured at ex073:
+  `{ readonly [K in keyof T]: F<T[K]> }` turns a tuple into a tuple of the
+  same length, an array into an array and an object into an object, so one
+  arm covers all three. Writing the explicit
+  `T extends readonly (infer E)[] ? readonly F<E>[] : …` branch instead —
+  which looks more careful, and which ex065 does — is what LOSES the
+  arity. Probed: the explicit form fails only the two tuple facts and
+  passes everything else, which is how such a bug survives review.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1265,7 +1274,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 70 / 100 (verified) | 30 |
+| `typescript/`| 75 / 100 (verified) | 25 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1283,8 +1292,9 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and the complete `01-beginner` and
-`02-intermediate` tiers (ex001–ex070), verified red and green. Nothing else is
+scaffolding, a full 100-row catalog, the complete `01-beginner` and
+`02-intermediate` tiers, and `03-advanced` through ex075, verified red
+and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

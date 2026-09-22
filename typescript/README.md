@@ -203,6 +203,21 @@ The same five rows carry the one probe worth keeping: ex045's facts fail
 against a NON-distributive `[T] extends [U]` version (4 of them), so that
 row genuinely grades distribution rather than the answer.
 
+## A homomorphic mapped type is array-aware
+
+Measured at ex073, and it makes a whole branch unnecessary:
+`{ readonly [K in keyof T]: F<T[K]> }` applied to a TUPLE produces a
+tuple of the same length with each position mapped, applied to an array
+produces an array, and applied to an object produces an object. One arm
+covers all three.
+
+Writing the explicit `T extends readonly (infer E)[] ? readonly F<E>[] : …`
+branch instead — which ex065 does, and which looks more careful — is what
+LOSES the arity: `[string, number]` comes out as
+`readonly (string | number)[]`. Probed both ways; the explicit branch
+fails ex073's two tuple facts and passes everything else, which is
+exactly how this kind of bug survives review.
+
 ## Method syntax is still bivariant, measured
 
 `strictFunctionTypes` makes a function type's parameters contravariant, so
@@ -329,10 +344,10 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 70 / 100 exercises — the whole of `01-beginner`
-and `02-intermediate`: 564 facts, 564 red / 0 passed on the untouched
-tree, 564 / 0 green against `solutions/`, 257 expected exercise-side type
-errors and 0 on the solutions side.
+Measured 2026-09-22 at 75 / 100 exercises — all of `01-beginner` and
+`02-intermediate`, plus `03-advanced` through ex075: 612 facts, 612 red /
+0 passed on the untouched tree, 612 / 0 green against `solutions/`, 291
+expected exercise-side type errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
 error per unimplemented type, so `02-intermediate` adds far more of them per
