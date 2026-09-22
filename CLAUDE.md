@@ -344,6 +344,13 @@ the same `global.json` opt-in.
   the stub never consumes surfaces as an unhandled error, so such tests
   claim it with a no-op `.catch(() => undefined)`.
 
+  The pre-satisfied-fact trap has a second form worth naming: **what a type
+  OPERATOR derives from a stub's signature can already be the answer.**
+  Measured at ex062 and ex063 — the `this` parameter is erased from
+  `Parameters<T>` whether declared or not, and `OmitThisParameter<T>` of a
+  function that never had a receiver is already the target signature. Where
+  only half of a pair moves, assert the pair.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1250,7 +1257,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 60 / 100 (verified) | 40 |
+| `typescript/`| 65 / 100 (verified) | 35 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1269,7 +1276,7 @@ Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
 scaffolding, a full 100-row catalog, the complete `01-beginner` tier and
-`02-intermediate` through ex060, verified red and green. Nothing else is
+`02-intermediate` through ex065, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

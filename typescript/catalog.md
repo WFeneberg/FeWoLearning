@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 60 ✅ / 40 ⬜** — `01-beginner` complete.
+**Status: 65 ✅ / 35 ⬜** — `01-beginner` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -90,11 +90,11 @@ green against `any` and must never carry a row on its own — see
 | 058 | abort_signal | cancellation with `AbortController`, cooperative abort | ✅ |
 | 059 | generators | `function*`, the three type parameters of `Generator` | ✅ |
 | 060 | async_generators | `for await…of`, async iteration | ✅ |
-| 061 | iterator_protocol | implementing `Symbol.iterator` by hand | ⬜ |
-| 062 | this_typing | `this` parameters, `ThisParameterType`, arrow vs function | ⬜ |
-| 063 | bind_call_apply | typed `bind`/`call`/`apply`, `OmitThisParameter` | ⬜ |
-| 064 | typed_reduce | generic accumulators, why the seed drives inference | ⬜ |
-| 065 | deep_readonly | a recursive readonly mapped type | ⬜ |
+| 061 | iterator_protocol | implementing `Symbol.iterator` by hand, iterable vs iterator, the `return()` cleanup hook | ✅ |
+| 062 | this_typing | `this` parameters, `ThisParameterType`, arrow vs function | ✅ |
+| 063 | bind_call_apply | typed `bind`/`call`/`apply`, `OmitThisParameter` | ✅ |
+| 064 | typed_reduce | generic accumulators, why the seed drives inference | ✅ |
+| 065 | deep_readonly | a recursive readonly mapped type | ✅ |
 | 066 | function_variance | parameter bivariance vs `strictFunctionTypes` | ⬜ |
 | 067 | index_signatures | index signature vs `Record`, unknown keys | ⬜ |
 | 068 | satisfies_operator | `satisfies` — checking without widening | ⬜ |

@@ -64,6 +64,15 @@ assignability check and `any` is assignable to everything. Grade with
 `unknown`, all three measured. A row whose only assertion is `toMatchTypeOf`
 grades nothing.
 
+**1a. A signature the stub already carries is green, and that includes
+what a type OPERATOR derives from it.** Beyond entry 3's plain case: the
+`this` parameter is erased from `Parameters<T>` whether it is declared or
+not, and `OmitThisParameter<T>` of a function that never had one is
+already the target signature. Both measured, at ex062 and ex063. Where
+only half of a pair moves, **assert the pair** —
+`[ThisParameterType<T>, Parameters<T>]` is red until the receiver exists.
+This is the same medicine as 1b, for a different disease.
+
 **1b. The same hole reopens whenever a fact writes its own `extends`.**
 `unknown` absorbs every assignability check, so a fact of the form
 `X extends StubType ? true : false` is green while the stub is still
@@ -305,9 +314,9 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 60 / 100 exercises — all of `01-beginner` and
-`02-intermediate` through ex060: 485 facts, 485 red / 0 passed on the
-untouched tree, 485 / 0 green against `solutions/`, 214 expected
+Measured 2026-09-22 at 65 / 100 exercises — all of `01-beginner` and
+`02-intermediate` through ex065: 533 facts, 533 red / 0 passed on the
+untouched tree, 533 / 0 green against `solutions/`, 237 expected
 exercise-side type errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
