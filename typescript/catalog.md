@@ -14,7 +14,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 10 ✅ / 90 ⬜**
+**Status: 15 ✅ / 85 ⬜**
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -34,11 +34,11 @@ green against `any` and must never carry a row on its own — see
 | 008 | function_types | call signatures, return typing, `void` vs `undefined` | ✅ |
 | 009 | params_defaults_rest | optional parameters, defaults, typed rest parameters | ✅ |
 | 010 | overloads | overload signatures vs the implementation signature | ✅ |
-| 011 | enum_vs_as_const | numeric `enum` pitfalls, the `as const` object + union idiom | ⬜ |
-| 012 | unknown_vs_any | `unknown` forces narrowing, `any` disables checking | ⬜ |
-| 013 | never_exhaustiveness | `never` as the empty type, exhaustive `switch` | ⬜ |
-| 014 | type_predicates | user-defined guards, `x is T` | ⬜ |
-| 015 | discriminated_unions | tagged unions, switching on the discriminant | ⬜ |
+| 011 | enum_vs_as_const | numeric `enum` pitfalls, the `as const` object + union idiom | ✅ |
+| 012 | unknown_vs_any | `unknown` forces narrowing, `any` disables checking | ✅ |
+| 013 | never_exhaustiveness | `never` as the empty type, exhaustive `switch` | ✅ |
+| 014 | type_predicates | user-defined guards, `x is T` | ✅ |
+| 015 | discriminated_unions | tagged unions, switching on the discriminant | ✅ |
 | 016 | generics_and_constraints | first type parameters, `extends` constraints | ⬜ |
 | 017 | generic_array_helpers | `first`/`last`/`chunk` with preserved element types | ⬜ |
 | 018 | keyof_basics | `keyof`, a typed property getter | ⬜ |

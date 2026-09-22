@@ -51,7 +51,7 @@ type-level stubs are `unknown`.
 
 ## How a type test lies
 
-Every track in this repo carries such a register. These six were measured on
+Every track in this repo carries such a register. These seven were measured on
 this machine against the pinned versions above, not reasoned about.
 
 **1. `toMatchTypeOf` is green against `any`.** Measured:
@@ -97,6 +97,23 @@ literal carrying a property the stub's interface does not yet declare is a
 *type* error in the test file, which muddies the red count with a failure that
 is not the exercise's. Assign to a local first, or keep the literal minimal.
 
+**7. `@ts-expect-error` is how a *rejection* gets graded.** Several rows are
+about something the checker must refuse — an overload set hiding its
+implementation signature (ex010), a parameter narrowed to `never` (ex013).
+A fact cannot assert "this does not compile" directly, but
+`@ts-expect-error` inverts it: the comment is itself an error when the line
+below it compiles, so the fact is red exactly while the stub still accepts
+the call and turns green when the finished code rejects it. Measured working
+in both directions here. It is the only tool in the register that grades an
+absence, and it is worth reaching for whenever a row's subject is what the
+type system *forbids*.
+
+Rows are also checked against a **plausible wrong implementation**, not just
+against the stub — the second probe `Architecture/` and `security/` both
+insist on. It has already earned its keep: returning `JSON.parse`'s result
+unchanged (so `any`) fails ex012's fact, and dropping `as const` fails both
+of ex011's, confirming those facts grade the mechanism rather than the value.
+
 ## TypeScript 7
 
 New to this repo, and it bites immediately: **TS 7 removed `baseUrl`**
@@ -118,8 +135,8 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 10 / 100 exercises: 67 facts, 67 red / 0 passed on the
-untouched tree, 67 / 0 green against `solutions/`, 25 expected exercise-side
+Measured 2026-09-22 at 15 / 100 exercises: 105 facts, 105 red / 0 passed on the
+untouched tree, 105 / 0 green against `solutions/`, 33 expected exercise-side
 type errors and 0 on the solutions side.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work

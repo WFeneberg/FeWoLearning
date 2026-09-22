@@ -247,6 +247,13 @@ the same `global.json` opt-in.
   reason), or reaches the behaviour through a widened local reference, or is
   graded at the type level only.
 
+  **`@ts-expect-error` is how a rejection gets graded here.** A fact cannot
+  assert "this does not compile", but the comment is itself an error when the
+  line below it compiles — so a row whose subject is what the type system
+  *forbids* (ex010's hidden implementation signature, ex013's `never`
+  parameter) is red while the stub still accepts the call and green once the
+  finished code refuses it. Measured working in both directions.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1153,7 +1160,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 10 / 100 (verified) | 90 |
+| `typescript/`| 15 / 100 (verified) | 85 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1171,7 +1178,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and ex001–ex010, verified red and green. Nothing else is
+scaffolding, a full 100-row catalog and ex001–ex015, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.
