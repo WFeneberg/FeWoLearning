@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 40 ✅ / 60 ⬜** — `01-beginner` complete.
+**Status: 45 ✅ / 55 ⬜** — `01-beginner` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -70,11 +70,11 @@ green against `any` and must never carry a row on its own — see
 | 038 | key_remapping | the `as` clause in a mapped type: renaming keys, and filtering by mapping to `never` | ✅ |
 | 039 | conditional_types | `T extends U ? X : Y` | ✅ |
 | 040 | infer_basics | `infer` in a conditional type | ✅ |
-| 041 | rebuild_partial_required | reimplementing `Partial` and `Required` | ⬜ |
-| 042 | rebuild_pick_omit | reimplementing `Pick` and `Omit` | ⬜ |
-| 043 | rebuild_record | reimplementing `Record`, constrained key types | ⬜ |
-| 044 | rebuild_returntype | reimplementing `ReturnType` and `Parameters` | ⬜ |
-| 045 | rebuild_exclude_extract | reimplementing `Exclude`/`Extract` over unions | ⬜ |
+| 041 | rebuild_partial_required | reimplementing `Partial` and `Required` | ✅ |
+| 042 | rebuild_pick_omit | reimplementing `Pick` and `Omit` | ✅ |
+| 043 | rebuild_record | reimplementing `Record`, constrained key types | ✅ |
+| 044 | rebuild_returntype | reimplementing `ReturnType` and `Parameters` | ✅ |
+| 045 | rebuild_exclude_extract | reimplementing `Exclude`/`Extract` over unions | ✅ |
 | 046 | distributive_conditionals | naked type parameters distribute; `[T] extends [U]` stops it | ⬜ |
 | 047 | template_literal_types | building string types by interpolation | ⬜ |
 | 048 | intrinsic_string_types | `Uppercase`/`Capitalize` and friends | ⬜ |

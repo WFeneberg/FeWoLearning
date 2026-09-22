@@ -308,6 +308,16 @@ the same `global.json` opt-in.
   T]: T[K] }` copies `readonly` and `?` across for free, while
   `{ [K in Extract<keyof T, string>]: T[K] }` silently drops both.
 
+  **A row that rebuilds a library type cannot detect delegation.** Measured:
+  `type MyPartial<T> = Partial<T>` passes every one of ex041's facts. The
+  five rebuild rows (ex041–ex045) therefore each also carry a type the
+  standard library has no answer for — `PartialBy`, a `MyOmit` constrained
+  to `keyof T` rather than the built-in's `keyof any`, `MyRecord`'s
+  PropertyKey constraint, `AsyncReturnType`, and a `MyNonNullable` built
+  from the learner's own `MyExclude` — and each header says which part is on
+  trust. ex045 is the one with real mechanism grading: its facts fail
+  against a non-distributive `[T] extends [U]` version.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1214,7 +1224,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 40 / 100 (verified) | 60 |
+| `typescript/`| 45 / 100 (verified) | 55 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1233,7 +1243,7 @@ Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
 scaffolding, a full 100-row catalog, the complete `01-beginner` tier and
-`02-intermediate` through ex040, verified red and green. Nothing else is
+`02-intermediate` through ex045, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

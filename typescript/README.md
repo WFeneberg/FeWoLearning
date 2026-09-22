@@ -151,6 +151,24 @@ and the fact is green from the start. Two of ex024's facts were written and
 then deleted for exactly that: its `fahrenheit` is a getter with no setter in
 the stub already, so “cannot be assigned” was true on the untouched tree.
 
+## A row that rebuilds a library type cannot detect delegation
+
+ex041–ex045 ask the learner to write Partial, Pick, Omit, Record,
+ReturnType, Exclude and friends from scratch. A fact asserts the resulting
+type and cannot see how it was reached, so `type MyPartial<T> = Partial<T>`
+passes — measured, not assumed.
+
+Rather than pretend otherwise, every one of those five rows also carries a
+type the standard library has no answer for: `PartialBy`, a `MyOmit`
+constrained to `keyof T`, `MyRecord`'s PropertyKey constraint, the missing
+`AsyncReturnType`, and `MyNonNullable` built from the learner's own
+`MyExclude`. Those cannot be delegated, and each row's header says plainly
+which part is on trust.
+
+The same five rows carry the one probe worth keeping: ex045's facts fail
+against a NON-distributive `[T] extends [U]` version (4 of them), so that
+row genuinely grades distribution rather than the answer.
+
 ## Two inference traps, measured
 
 Both cost a green run while building `02-intermediate`, and both are the
@@ -242,9 +260,9 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 40 / 100 exercises — all of `01-beginner` and the
-first five of `02-intermediate`: 320 facts, 320 red / 0 passed on the
-untouched tree, 320 / 0 green against `solutions/`, 114 expected
+Measured 2026-09-22 at 45 / 100 exercises — all of `01-beginner` and
+`02-intermediate` through ex045: 357 facts, 357 red / 0 passed on the
+untouched tree, 357 / 0 green against `solutions/`, 147 expected
 exercise-side type errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
