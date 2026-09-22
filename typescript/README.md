@@ -203,6 +203,21 @@ The same five rows carry the one probe worth keeping: ex045's facts fail
 against a NON-distributive `[T] extends [U]` version (4 of them), so that
 row genuinely grades distribution rather than the answer.
 
+## Method syntax is still bivariant, measured
+
+`strictFunctionTypes` makes a function type's parameters contravariant, so
+`(a: Dog) => void` is NOT assignable to `(a: Animal) => void`. It applies
+only to function types written in PROPERTY position. Measured at ex066:
+the same two members written with METHOD syntax — `handle(a: T): void` —
+are assignable in both directions, `[true, true]` where the property form
+gives `[true, false]`.
+
+It is unsound and deliberate: `Array<Dog>` has to stay assignable to
+`Array<Animal>`, and every array method would otherwise block it. Two
+members that behave identically at runtime therefore check differently
+purely because of how they were spelled, which is worth knowing before
+declaring an interface of callbacks.
+
 ## Two inference traps, measured
 
 Both cost a green run while building `02-intermediate`, and both are the
@@ -314,10 +329,10 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 65 / 100 exercises — all of `01-beginner` and
-`02-intermediate` through ex065: 533 facts, 533 red / 0 passed on the
-untouched tree, 533 / 0 green against `solutions/`, 237 expected
-exercise-side type errors and 0 on the solutions side.
+Measured 2026-09-22 at 70 / 100 exercises — the whole of `01-beginner`
+and `02-intermediate`: 564 facts, 564 red / 0 passed on the untouched
+tree, 564 / 0 green against `solutions/`, 257 expected exercise-side type
+errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
 error per unimplemented type, so `02-intermediate` adds far more of them per

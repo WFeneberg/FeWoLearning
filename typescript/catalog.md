@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 65 ✅ / 35 ⬜** — `01-beginner` complete.
+**Status: 70 ✅ / 30 ⬜** — `01-beginner` and `02-intermediate` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -95,11 +95,11 @@ green against `any` and must never carry a row on its own — see
 | 063 | bind_call_apply | typed `bind`/`call`/`apply`, `OmitThisParameter` | ✅ |
 | 064 | typed_reduce | generic accumulators, why the seed drives inference | ✅ |
 | 065 | deep_readonly | a recursive readonly mapped type | ✅ |
-| 066 | function_variance | parameter bivariance vs `strictFunctionTypes` | ⬜ |
-| 067 | index_signatures | index signature vs `Record`, unknown keys | ⬜ |
-| 068 | satisfies_operator | `satisfies` — checking without widening | ⬜ |
-| 069 | const_type_parameters | `const` type parameters and deep literal inference | ⬜ |
-| 070 | awaited_recursive | reimplementing `Awaited`, nested thenables | ⬜ |
+| 066 | function_variance | parameter bivariance vs `strictFunctionTypes` | ✅ |
+| 067 | index_signatures | index signature vs `Record`, unknown keys | ✅ |
+| 068 | satisfies_operator | `satisfies` — checking without widening | ✅ |
+| 069 | const_type_parameters | `const` type parameters and deep literal inference | ✅ |
+| 070 | awaited_recursive | reimplementing `Awaited`, nested thenables | ✅ |
 
 ## Advanced (071–090) — recursion, nominality, runtime metaprogramming
 

@@ -351,6 +351,14 @@ the same `global.json` opt-in.
   function that never had a receiver is already the target signature. Where
   only half of a pair moves, assert the pair.
 
+  **Method syntax is still bivariant**, measured at ex066:
+  `strictFunctionTypes` applies only to function types in PROPERTY
+  position, so `handle(a: Dog): void` and `handle(a: Animal): void` are
+  assignable both ways (`[true, true]`) where the property form gives
+  `[true, false]`. Unsound and deliberate — `Array<Dog>` must stay
+  assignable to `Array<Animal>` — and it means two members that behave
+  identically at runtime check differently purely by how they were spelled.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1257,7 +1265,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 65 / 100 (verified) | 35 |
+| `typescript/`| 70 / 100 (verified) | 30 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1275,8 +1283,8 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog, the complete `01-beginner` tier and
-`02-intermediate` through ex065, verified red and green. Nothing else is
+scaffolding, a full 100-row catalog and the complete `01-beginner` and
+`02-intermediate` tiers (ex001–ex070), verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.
