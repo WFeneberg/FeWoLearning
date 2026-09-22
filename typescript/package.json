@@ -1,0 +1,19 @@
+{
+  "name": "fewolearning-typescript",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:one": "vitest run -t",
+    "test:solutions": "vitest run -c vitest.solutions.config.ts",
+    "typecheck": "tsc -p tsconfig.exercises.json --noEmit",
+    "typecheck:solutions": "tsc -p tsconfig.solutions.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.2",
+    "typescript": "7.0.2",
+    "vitest": "5.0.1"
+  }
+}

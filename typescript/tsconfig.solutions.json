@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "types": ["vitest/globals", "node"],
+    "paths": { "@ex/*": ["./solutions/*"] }
+  },
+  "include": ["solutions/**/*.ts", "tests/**/*.ts", "vitest*.ts"]
+}

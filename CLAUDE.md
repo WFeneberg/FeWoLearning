@@ -50,6 +50,7 @@ tests there — do not add `solutions/` to a project/module.
 | `python/` | `pip install -e ".[dev]"`               | `pytest`                 | `pytest exercises/01-beginner/test_ex001_temperature.py` |
 | `vue/`    | `npm install`                           | `npm test`               | `npm run test:one -- "increments"` |
 | `angular/`| `npm install`                           | `npm test`               | `npm run test:one -- "applies a discount"` |
+| `typescript/`| `npm install`                        | `npm test`               | `npm run test:one -- "narrowing"` |
 | `go/`     | — (deps already downloaded)             | `go test ./...`          | `go test ./exercises/01-beginner/ex001_fizzbuzz/` |
 | `rust/`   | — (`LIB` comes from `.cargo/config.toml`) | `cargo test`           | `cargo test ex001` |
 | `java/`   | planned                                 | planned                  | planned |
@@ -75,6 +76,10 @@ exercise in the Aspire dashboard. `Architecture/` supports `-p:UseSolutions=true
 `-p:Containers=true` for its eight container-backed rows. `security/` supports the same
 `-p:UseSolutions=true` flag for
 its green run: `dotnet test --solution FeWoLearning.Security.slnx -p:UseSolutions=true`.
+
+`typescript/` has the same red/green split without MSBuild: `npm test` is the red run and
+`npm run test:solutions` the green one, the difference being which content tree the `@ex`
+path alias resolves to.
 
 A footnote in the same spirit as the `wpf/`/`MicroServices/` entries below: `security/global.json`
 carries the same `Microsoft.Testing.Platform` opt-in, and a bare, argument-less `dotnet test` here
@@ -180,6 +185,48 @@ the same `global.json` opt-in.
 - **Angular** — Headless testing via **Jest** (`jest-preset-angular`), not
   Karma; tests are `*.spec.ts`. Components are **standalone** and use **signals**.
   Stubs `throw`.
+- **TypeScript** — The language itself, not TS-in-a-framework (`vue/` and
+  `angular/` cover that). **Vitest 5.0.1 + TypeScript 7.0.2, both pinned
+  exactly** — Vitest prints its own warning that the typecheck runner is
+  experimental and does not follow SemVer. Unlike every other track here,
+  tests live **once**, in `tests/<tier>/`, not beside the stub: they import
+  through an `@ex/…` alias that `vitest.shared.ts` points at either
+  `exercises/` or `solutions/`, which is how one suite serves as both the red
+  and the green run and why `solutions/` cannot drift silently. Runtime facts
+  are `*.test.ts`, type-level facts `*.test-d.ts`; not every row has both, and
+  a row graded one way only says so in its stub header. Runtime stubs `throw`,
+  type-level stubs are `unknown`.
+
+  **TypeScript 7 removed `baseUrl`** (`TS5102`) — path aliases are plain
+  `paths` entries now. This is the repo's first TS 7 track; the other Node
+  tracks sit on 5.x and predate it. The configs import `./vitest.shared.ts`
+  by its real extension, so they also set `allowImportingTsExtensions`, legal
+  because everything is `noEmit`. `noUncheckedIndexedAccess` and
+  `exactOptionalPropertyTypes` are both on deliberately — ex005 and ex007
+  exist to drill what they change.
+
+  **A broken typecheck reports green, not red**, and it happened twice while
+  building this track: an `include` matching no files (`TS18003`), then the
+  `baseUrl` removal above. Both times Vitest printed `Type Errors: no errors`
+  and counted every type fact as **passed**. Hence two guards: the separate
+  `npm run typecheck:solutions` gate, since `tsc` exits non-zero on a config
+  error where Vitest swallows it, and `avalonia/`'s rule — **read the count,
+  not just the word `Failed`**. On the untouched tree `npm run typecheck` is
+  expected to exit 1 with exactly one error per unimplemented type-level stub,
+  **all of them inside `.test-d.ts`**; an error anywhere else is a defect.
+
+  The recurring bug class: **`toMatchTypeOf` is green against `any`**
+  (measured), because it is an assignability check. Grade with `toEqualTypeOf`
+  only, which rejects `any`, `never` and `unknown` alike. A close second,
+  caught in the very first batch: ex002's type fact originally asserted
+  `Config["host"] === string`, which the stub already declares, so it passed
+  on the untouched tree — the same "the signature satisfies it before the body
+  runs" trap this file records for `telemetry/` ex008. And because a fresh
+  object literal at a call site is excess-property-checked, a runtime test
+  must pass an inferred local whenever the stub's interface does not yet
+  declare every property, or the red count gains a failure that is not the
+  exercise's.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1086,6 +1133,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
+| `typescript/`| 5 / 100 (verified) | 95 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1101,8 +1149,9 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `telemetry/`| 70 / 70 (verified) | —         |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
-`wpf/` and `MicroServices/`, all four still being built out — see the table above
-for exact counts. Nothing else is
+`wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
+table above for exact counts. `typescript/` is the newest and the least far along:
+scaffolding, a full 100-row catalog and ex001–ex005, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.
