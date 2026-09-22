@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 45 ✅ / 55 ⬜** — `01-beginner` complete.
+**Status: 50 ✅ / 50 ⬜** — `01-beginner` complete, `02-intermediate` half done.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -75,11 +75,11 @@ green against `any` and must never carry a row on its own — see
 | 043 | rebuild_record | reimplementing `Record`, constrained key types | ✅ |
 | 044 | rebuild_returntype | reimplementing `ReturnType` and `Parameters` | ✅ |
 | 045 | rebuild_exclude_extract | reimplementing `Exclude`/`Extract` over unions | ✅ |
-| 046 | distributive_conditionals | naked type parameters distribute; `[T] extends [U]` stops it | ⬜ |
-| 047 | template_literal_types | building string types by interpolation | ⬜ |
-| 048 | intrinsic_string_types | `Uppercase`/`Capitalize` and friends | ⬜ |
-| 049 | constrained_key_generics | `get<T, K extends keyof T>` and its inference | ⬜ |
-| 050 | generic_defaults | default type arguments and when they are picked | ⬜ |
+| 046 | distributive_conditionals | naked type parameters distribute; `[T] extends [U]` stops it | ✅ |
+| 047 | template_literal_types | building string types by interpolation | ✅ |
+| 048 | intrinsic_string_types | `Uppercase`/`Capitalize` and friends | ✅ |
+| 049 | constrained_key_generics | `get<T, K extends keyof T>` and its inference | ✅ |
+| 050 | generic_defaults | default type arguments and when they are picked | ✅ |
 | 051 | inference_sites | contextual typing, where inference succeeds and where it gives up | ⬜ |
 | 052 | assertion_functions | `asserts x is T`, why it needs an explicit annotation | ⬜ |
 | 053 | in_and_instanceof_narrowing | narrowing with `in` and `instanceof` | ⬜ |

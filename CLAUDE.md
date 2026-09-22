@@ -318,6 +318,14 @@ the same `global.json` opt-in.
   trust. ex045 is the one with real mechanism grading: its facts fail
   against a non-distributive `[T] extends [U]` version.
 
+  **`unknown` absorbs every `extends` check**, which reopens the
+  `toMatchTypeOf` hole whenever a fact writes its own conditional: a fact
+  shaped `X extends StubType ? true : false` is green while the stub is
+  still `unknown`. Three rows hit it — ex008, ex047, ex050 — and the fix
+  each time is to **assert the accepted and rejected cases as one tuple**
+  (`[true, true, false, false]`), which nothing that accepts everything can
+  satisfy. A positive and a negative half belong in one fact, not two.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1224,7 +1232,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 45 / 100 (verified) | 55 |
+| `typescript/`| 50 / 100 (verified) | 50 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1243,7 +1251,7 @@ Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
 scaffolding, a full 100-row catalog, the complete `01-beginner` tier and
-`02-intermediate` through ex045, verified red and green. Nothing else is
+`02-intermediate` through ex050, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

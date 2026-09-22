@@ -64,6 +64,15 @@ assignability check and `any` is assignable to everything. Grade with
 `unknown`, all three measured. A row whose only assertion is `toMatchTypeOf`
 grades nothing.
 
+**1b. The same hole reopens whenever a fact writes its own `extends`.**
+`unknown` absorbs every assignability check, so a fact of the form
+`X extends StubType ? true : false` is green while the stub is still
+`unknown`. This has bitten three rows — ex008, ex047, ex050 — and the fix
+each time was to **assert the accepted and the rejected cases as one
+tuple**: `[true, true, false, false]` cannot be satisfied by a type that
+accepts everything. Where a row has a positive and a negative half, they
+belong in one fact, not two.
+
 **2. A broken typecheck reports green, not red.** Hit twice while building
 this track: an `include` glob matching no files (`TS18003`), and then TS 7's
 removed `baseUrl` (`TS5102`). In both cases Vitest printed
@@ -260,9 +269,9 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 45 / 100 exercises — all of `01-beginner` and
-`02-intermediate` through ex045: 357 facts, 357 red / 0 passed on the
-untouched tree, 357 / 0 green against `solutions/`, 147 expected
+Measured 2026-09-22 at 50 / 100 exercises — all of `01-beginner` and
+`02-intermediate` through ex050: 399 facts, 399 red / 0 passed on the
+untouched tree, 399 / 0 green against `solutions/`, 182 expected
 exercise-side type errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
