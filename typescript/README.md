@@ -151,6 +151,24 @@ and the fact is green from the start. Two of ex024's facts were written and
 then deleted for exactly that: its `fahrenheit` is a getter with no setter in
 the stub already, so “cannot be assigned” was true on the untouched tree.
 
+## Two inference traps, measured
+
+Both cost a green run while building `02-intermediate`, and both are the
+kind of thing that reads as correct.
+
+**A zero-parameter function matches a signature that takes parameters.** So
+`T extends (first: infer P, ...rest: never[]) => unknown ? P : never` does
+NOT give `never` for `() => void` — it matches, and `P` infers as `unknown`.
+Infer the whole parameter tuple and destructure it instead. ex040's header
+says so.
+
+**A mapped type is homomorphic only when its source is exactly `keyof T`.**
+`{ [K in keyof T]: T[K] }` copies `readonly` and `?` across for free;
+`{ [K in Extract<keyof T, string>]: T[K] }`, which looks equivalent, drops
+both. Verified by probe: the second form fails ex037's preservation fact.
+This is why `Partial` and `Readonly` can be one line each, and why a helper
+that "just filters the keys a bit" quietly loses modifiers.
+
 ## A crash is worse than a red fact
 
 `Architecture/` has the rule that a fact which HANGS is worse than one that
@@ -224,10 +242,14 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 35 / 100 exercises — the whole `01-beginner` tier:
-284 facts, 284 red / 0 passed on the untouched tree, 284 / 0 green against
-`solutions/`, 80 expected exercise-side type errors and 0 on the solutions
-side.
+Measured 2026-09-22 at 40 / 100 exercises — all of `01-beginner` and the
+first five of `02-intermediate`: 320 facts, 320 red / 0 passed on the
+untouched tree, 320 / 0 green against `solutions/`, 114 expected
+exercise-side type errors and 0 on the solutions side.
+
+The ratio shifts as the tiers go on: a type-level row contributes one type
+error per unimplemented type, so `02-intermediate` adds far more of them per
+exercise than `01-beginner` did. ex040 has no runtime facts at all.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work
 queue.

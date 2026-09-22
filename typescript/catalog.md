@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 35 ✅ / 65 ⬜** — `01-beginner` complete.
+**Status: 40 ✅ / 60 ⬜** — `01-beginner` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -65,11 +65,11 @@ green against `any` and must never carry a row on its own — see
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 036 | mapped_types | `{ [K in keyof T]: … }` | ⬜ |
-| 037 | mapped_modifiers | adding and stripping `readonly` and `?` with `+`/`-` | ⬜ |
-| 038 | key_remapping | the `as` clause in a mapped type, filtering keys to `never` | ⬜ |
-| 039 | conditional_types | `T extends U ? X : Y` | ⬜ |
-| 040 | infer_basics | `infer` in a conditional type | ⬜ |
+| 036 | mapped_types | `{ [K in keyof T]: … }` | ✅ |
+| 037 | mapped_modifiers | adding and stripping `readonly` and `?` with `+`/`-` | ✅ |
+| 038 | key_remapping | the `as` clause in a mapped type: renaming keys, and filtering by mapping to `never` | ✅ |
+| 039 | conditional_types | `T extends U ? X : Y` | ✅ |
+| 040 | infer_basics | `infer` in a conditional type | ✅ |
 | 041 | rebuild_partial_required | reimplementing `Partial` and `Required` | ⬜ |
 | 042 | rebuild_pick_omit | reimplementing `Pick` and `Omit` | ⬜ |
 | 043 | rebuild_record | reimplementing `Record`, constrained key types | ⬜ |
