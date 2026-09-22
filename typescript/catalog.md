@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 50 ✅ / 50 ⬜** — `01-beginner` complete, `02-intermediate` half done.
+**Status: 55 ✅ / 45 ⬜** — `01-beginner` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -80,11 +80,11 @@ green against `any` and must never carry a row on its own — see
 | 048 | intrinsic_string_types | `Uppercase`/`Capitalize` and friends | ✅ |
 | 049 | constrained_key_generics | `get<T, K extends keyof T>` and its inference | ✅ |
 | 050 | generic_defaults | default type arguments and when they are picked | ✅ |
-| 051 | inference_sites | contextual typing, where inference succeeds and where it gives up | ⬜ |
-| 052 | assertion_functions | `asserts x is T`, why it needs an explicit annotation | ⬜ |
-| 053 | in_and_instanceof_narrowing | narrowing with `in` and `instanceof` | ⬜ |
-| 054 | typed_reducer | a discriminated-union action reducer | ⬜ |
-| 055 | assert_never | an exhaustiveness helper that fails the build on a new case | ⬜ |
+| 051 | inference_sites | contextual typing, where inference succeeds and where it gives up | ✅ |
+| 052 | assertion_functions | `asserts x is T`, why it needs an explicit annotation | ✅ |
+| 053 | in_and_instanceof_narrowing | narrowing with `in` and `instanceof` | ✅ |
+| 054 | typed_reducer | a discriminated-union action reducer | ✅ |
+| 055 | assert_never | two exhaustiveness mechanisms — a `never` default, and a total `Record` that fails at the declaration | ✅ |
 | 056 | promise_combinators | `allSettled`/`race`/`any` semantics and their result types | ⬜ |
 | 057 | aggregate_error | `Promise.any` rejection, `AggregateError` | ⬜ |
 | 058 | abort_signal | cancellation with `AbortController`, cooperative abort | ⬜ |

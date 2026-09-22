@@ -326,6 +326,17 @@ the same `global.json` opt-in.
   (`[true, true, false, false]`), which nothing that accepts everything can
   satisfy. A positive and a negative half belong in one fact, not two.
 
+  Two more, both measured at ex051/ex052. **Control-flow analysis narrows an
+  annotated variable by its initializer**, so `const v: string | null |
+  undefined = "x"` is already `string` on the next line and a fact grading
+  an assertion function's narrowing is green on the stub — take the value
+  from a call whose declared return is the union instead (an `unknown`
+  annotation is not narrowed this way). And **`@ts-expect-error` suppresses
+  only the line immediately after it**, while the compiler may report a bad
+  call at one of its arguments rather than at the call: a multi-line call
+  leaves the directive unused, which is itself an error, and the fact then
+  fails against correct code. Keep such a call on one line.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1232,7 +1243,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 50 / 100 (verified) | 50 |
+| `typescript/`| 55 / 100 (verified) | 45 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1251,7 +1262,7 @@ Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
 scaffolding, a full 100-row catalog, the complete `01-beginner` tier and
-`02-intermediate` through ex050, verified red and green. Nothing else is
+`02-intermediate` through ex055, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

@@ -109,6 +109,15 @@ literal carrying a property the stub's interface does not yet declare is a
 *type* error in the test file, which muddies the red count with a failure that
 is not the exercise's. Assign to a local first, or keep the literal minimal.
 
+**6b. Control-flow analysis narrows an annotated variable by its
+initializer.** Measured: `const value: string | null | undefined = "x"` is
+already `string` at the next line, so a fact asserting that an assertion
+function narrowed it is green on the untouched stub. Obtain the value from
+a CALL whose declared return type is the union — the checker has nothing
+to narrow from there. (An `unknown` annotation is not narrowed this way,
+which is why ex052's assertString fact worked and its assertDefined one did
+not.)
+
 **7. `@ts-expect-error` is how a *rejection* gets graded.** Several rows are
 about something the checker must refuse — an overload set hiding its
 implementation signature (ex010), a parameter narrowed to `never` (ex013).
@@ -119,6 +128,13 @@ the call and turns green when the finished code rejects it. Measured working
 in both directions here. It is the only tool in the register that grades an
 absence, and it is worth reaching for whenever a row's subject is what the
 type system *forbids*.
+
+One mechanical trap with it, measured at ex051: it suppresses only the line
+IMMEDIATELY after it, and the compiler does not necessarily report a bad
+call at the line where the call starts — a mismatched `pipe2(f, g)` is
+reported at its first argument. A call broken across several lines
+therefore leaves the directive unused, which is itself an error, and the
+fact fails against correct code. Keep the offending call on one line.
 
 Rows are also checked against a **plausible wrong implementation**, not just
 against the stub — the second probe `Architecture/` and `security/` both
@@ -269,9 +285,9 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 50 / 100 exercises — all of `01-beginner` and
-`02-intermediate` through ex050: 399 facts, 399 red / 0 passed on the
-untouched tree, 399 / 0 green against `solutions/`, 182 expected
+Measured 2026-09-22 at 55 / 100 exercises — all of `01-beginner` and
+`02-intermediate` through ex055: 440 facts, 440 red / 0 passed on the
+untouched tree, 440 / 0 green against `solutions/`, 206 expected
 exercise-side type errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
