@@ -151,6 +151,20 @@ and the fact is green from the start. Two of ex024's facts were written and
 then deleted for exactly that: its `fahrenheit` is a getter with no setter in
 the stub already, so “cannot be assigned” was true on the untouched tree.
 
+## A crash is worse than a red fact
+
+`Architecture/` has the rule that a fact which HANGS is worse than one that
+fails, because the suite stalls and reports nothing. This track has a sharper
+version, measured at ex034: spreading an endless iterable —
+`[...values].slice(0, count)`, the obvious shape for a `take` — does not fail
+that row's fact. It takes the whole test PROCESS down with a V8
+out-of-memory crash, exit 134, with no catchable error and no timeout to
+save it. The learner sees a heap dump instead of a red line.
+
+Nothing in the harness can prevent that, so the stub header warns about it
+explicitly. Any later row that feeds an unbounded source to learner code
+should do the same.
+
 ## Module rows are runtime-graded, necessarily
 
 A missing export is an error at the IMPORT site, so a stub must already
@@ -210,9 +224,10 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 30 / 100 exercises: 237 facts, 237 red / 0 passed on the
-untouched tree, 237 / 0 green against `solutions/`, 73 expected exercise-side
-type errors and 0 on the solutions side.
+Measured 2026-09-22 at 35 / 100 exercises — the whole `01-beginner` tier:
+284 facts, 284 red / 0 passed on the untouched tree, 284 / 0 green against
+`solutions/`, 80 expected exercise-side type errors and 0 on the solutions
+side.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work
 queue.

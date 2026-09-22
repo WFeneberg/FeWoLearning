@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 30 ✅ / 70 ⬜**
+**Status: 35 ✅ / 65 ⬜** — `01-beginner` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -55,11 +55,11 @@ green against `any` and must never carry a row on its own — see
 | 028 | error_subclasses | extending `Error`, `cause`, `instanceof` narrowing | ✅ |
 | 029 | catch_is_unknown | the catch binding is `unknown`, narrowing it safely | ✅ |
 | 030 | result_type | a `Result<T, E>` union instead of exceptions | ✅ |
-| 031 | async_await_basics | `async` return types, awaiting, error propagation | ⬜ |
-| 032 | event_loop_ordering | microtasks before macrotasks; a single thread, not a pool | ⬜ |
-| 033 | promise_all_tuple | `Promise.all` inferring a tuple, not an array | ⬜ |
-| 034 | iterables | `Symbol.iterator`, `for…of`, spreading an iterable | ⬜ |
-| 035 | parsing_unknown_json | `JSON.parse` returns `any`; validating into a real type | ⬜ |
+| 031 | async_await_basics | `async` return types, awaiting, error propagation | ✅ |
+| 032 | event_loop_ordering | microtasks before macrotasks; a single thread, not a pool | ✅ |
+| 033 | promise_all_tuple | `Promise.all` inferring a tuple, not an array | ✅ |
+| 034 | iterables | `Symbol.iterator`, `for…of`, spreading an iterable | ✅ |
+| 035 | parsing_unknown_json | `JSON.parse` returns `any`; validating into a real type | ✅ |
 
 ## Intermediate (036–070) — inference, transformation, the loop
 

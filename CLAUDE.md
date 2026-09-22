@@ -290,6 +290,15 @@ the same `global.json` opt-in.
   add sibling modules beside its `index.ts`; ex027 has four and a deliberate
   import cycle.
 
+  **A crash is worse than a red fact**, which is `Architecture/`'s hang rule
+  one notch sharper. Measured at ex034: spreading an endless iterable —
+  `[...values].slice(0, count)`, the obvious shape for a `take` — does not
+  fail that row's fact but takes the whole test **process** down with a V8
+  out-of-memory crash, exit 134, with no catchable error and no timeout. The
+  learner gets a heap dump instead of a red line, so the stub header warns
+  about it outright; any later row feeding an unbounded source to learner
+  code must do the same.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1196,7 +1205,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 30 / 100 (verified) | 70 |
+| `typescript/`| 35 / 100 (verified) | 65 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1214,7 +1223,8 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and ex001–ex030, verified red and green. Nothing else is
+scaffolding, a full 100-row catalog and the complete `01-beginner` tier
+(ex001–ex035), verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.
