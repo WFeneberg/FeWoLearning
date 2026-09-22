@@ -51,7 +51,7 @@ type-level stubs are `unknown`.
 
 ## How a type test lies
 
-Every track in this repo carries such a register. These four were measured on
+Every track in this repo carries such a register. These six were measured on
 this machine against the pinned versions above, not reasoned about.
 
 **1. `toMatchTypeOf` is green against `any`.** Measured:
@@ -78,7 +78,20 @@ it passed on the untouched tree. It now asserts the whole merged shape, which
 only the completed merge satisfies. Any fact about a declaration the stub
 already carries must be widened until the stub fails it.
 
-**4. A fresh object literal at a call site is excess-property-checked.** This
+**4. Tuple element labels are not graded.** Measured: `[number, number]`
+satisfies a `toEqualTypeOf<[latitude: number, longitude: number]>()` fact
+exactly as the labelled version does, because labels are erased for
+assignability. A row about labelled tuples can assert arity and element types
+and nothing more; write the labels for the reader.
+
+**5. An optional parameter is not an optional property.** Measured:
+`Parameters<typeof css>` for `css(value: number, unit = "px", ...)` is
+`[value: number, unit?: string | undefined, ...extras: string[]]` — the
+`| undefined` is explicit, where `exactOptionalPropertyTypes` keeps it *out*
+of an optional property's type (ex005). `toEqualTypeOf` distinguishes the two,
+so a `Parameters` fact must spell the union out.
+
+**6. A fresh object literal at a call site is excess-property-checked.** This
 is why ex002's runtime test passes an inferred local rather than a literal: a
 literal carrying a property the stub's interface does not yet declare is a
 *type* error in the test file, which muddies the red count with a failure that
@@ -105,8 +118,8 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 5 / 100 exercises: 31 facts, 31 red / 0 passed on the
-untouched tree, 31 / 0 green against `solutions/`, 13 expected exercise-side
+Measured 2026-09-22 at 10 / 100 exercises: 67 facts, 67 red / 0 passed on the
+untouched tree, 67 / 0 green against `solutions/`, 25 expected exercise-side
 type errors and 0 on the solutions side.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work

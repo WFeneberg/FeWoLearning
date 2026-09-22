@@ -227,6 +227,26 @@ the same `global.json` opt-in.
   declare every property, or the red count gains a failure that is not the
   exercise's.
 
+  Two more measured limits on what a type fact can see. **Tuple element labels
+  are not graded**: `[number, number]` satisfies a
+  `toEqualTypeOf<[latitude: number, longitude: number]>()` fact exactly as the
+  labelled version does, because labels are erased for assignability — so a
+  labelled-tuple row grades arity and element types, nothing more. And **an
+  optional parameter is not an optional property**: `Parameters<typeof f>` for
+  `f(value: number, unit = "px")` is `[value: number, unit?: string | undefined]`,
+  spelling the union out, where `exactOptionalPropertyTypes` keeps `| undefined`
+  *out* of an optional property's type. `toEqualTypeOf` tells the two apart, so
+  a `Parameters` fact that omits the union is red against a correct solution.
+
+  A structural consequence worth knowing before writing a row: **a test cannot
+  grade a change to a signature it must itself call.** A runtime test that
+  calls `css(4, "em")` cannot compile against a stub whose parameter list does
+  not accept that call yet, so the change surfaces as a type error in the test
+  file instead of a failing fact. Such a row either hands the learner the
+  signature and grades the body (ex009 gives the rest parameter for this
+  reason), or reaches the behaviour through a widened local reference, or is
+  graded at the type level only.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1133,7 +1153,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 5 / 100 (verified) | 95 |
+| `typescript/`| 10 / 100 (verified) | 90 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1151,7 +1171,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and ex001–ex005, verified red and green. Nothing else is
+scaffolding, a full 100-row catalog and ex001–ex010, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

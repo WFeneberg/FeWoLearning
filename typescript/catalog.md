@@ -14,7 +14,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 10 ✅ / 90 ⬜**
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -29,11 +29,11 @@ green against `any` and must never carry a row on its own — see
 | 003 | literal_types | string/number literal types, widening, `as const` | ✅ |
 | 004 | union_narrowing | `typeof` narrowing, control-flow analysis, narrowing lost across closures | ✅ |
 | 005 | optional_and_readonly | optional properties, `readonly`, `exactOptionalPropertyTypes` vs `undefined` | ✅ |
-| 006 | tuple_basics | fixed-length tuples, labelled elements, rest elements | ⬜ |
-| 007 | safe_indexing | `noUncheckedIndexedAccess`, why `arr[0]` is `T \| undefined` | ⬜ |
-| 008 | function_types | call signatures, return typing, `void` vs `undefined` | ⬜ |
-| 009 | params_defaults_rest | optional parameters, defaults, typed rest parameters | ⬜ |
-| 010 | overloads | overload signatures vs the implementation signature | ⬜ |
+| 006 | tuple_basics | fixed-length tuples, labelled elements, rest elements | ✅ |
+| 007 | safe_indexing | `noUncheckedIndexedAccess`, why `arr[0]` is `T \| undefined` | ✅ |
+| 008 | function_types | call signatures, return typing, `void` vs `undefined` | ✅ |
+| 009 | params_defaults_rest | optional parameters, defaults, typed rest parameters | ✅ |
+| 010 | overloads | overload signatures vs the implementation signature | ✅ |
 | 011 | enum_vs_as_const | numeric `enum` pitfalls, the `as const` object + union idiom | ⬜ |
 | 012 | unknown_vs_any | `unknown` forces narrowing, `any` disables checking | ⬜ |
 | 013 | never_exhaustiveness | `never` as the empty type, exhaustive `switch` | ⬜ |
