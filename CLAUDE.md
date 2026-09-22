@@ -261,6 +261,22 @@ the same `global.json` opt-in.
   parameter) is red while the stub still accepts the call and green once the
   finished code refuses it. Measured working in both directions.
 
+  For a class the widening rule reads: **declare every member with the
+  loosest modifiers and let the learner tighten them** — ex021's stub carries
+  a writable `id: unknown` and a public `balance` so that `readonly` and
+  `private` have somewhere to go, and ex023's Shape is a plain class with
+  public methods for the same reason. This interacts with `@ts-expect-error`:
+  such a fact is red only while the stub still *permits* the thing, so two of
+  ex024's were written and deleted once measured green on the untouched tree.
+  Three class features are **unobservable** and must never be claimed as
+  graded — parameter properties (identical class type to a field plus an
+  assignment), `implements` (adds nothing to the type; ex022's subject is
+  exactly that), and which mechanism set a static. One measured restriction
+  worth knowing before writing such a row: **a `readonly` static cannot be
+  assigned from a static block** — `Cls.X = …` and `this.X = …` inside
+  `static { }` both fail TS2540, unlike a readonly instance field in a
+  constructor, so a readonly static needs a plain initializer.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1167,7 +1183,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 20 / 100 (verified) | 80 |
+| `typescript/`| 25 / 100 (verified) | 75 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1185,7 +1201,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and ex001–ex020, verified red and green. Nothing else is
+scaffolding, a full 100-row catalog and ex001–ex025, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.

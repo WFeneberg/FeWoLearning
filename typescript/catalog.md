@@ -14,7 +14,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 20 ✅ / 80 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -44,11 +44,11 @@ green against `any` and must never carry a row on its own — see
 | 018 | keyof_basics | `keyof`, a typed property getter | ✅ |
 | 019 | typeof_operator | deriving a type from a value with `typeof` | ✅ |
 | 020 | indexed_access | `T["key"]`, nested indexed access, `T[number]` | ✅ |
-| 021 | class_basics | fields, parameter properties, access modifiers | ⬜ |
-| 022 | implements_is_structural | `implements` checks but does not create nominality | ⬜ |
-| 023 | abstract_classes | `abstract` members, protected contracts | ⬜ |
-| 024 | accessors_and_static | getters/setters, `static`, static blocks | ⬜ |
-| 025 | private_hash_fields | `#field` vs `private`, the runtime difference | ⬜ |
+| 021 | class_basics | fields, parameter properties, access modifiers | ✅ |
+| 022 | implements_is_structural | `implements` checks but does not create nominality | ✅ |
+| 023 | abstract_classes | `abstract` members, protected contracts | ✅ |
+| 024 | accessors_and_static | getters/setters, `static`, static blocks | ✅ |
+| 025 | private_hash_fields | `#field` vs `private`, the runtime difference | ✅ |
 | 026 | modules_and_type_imports | named vs default exports, `import type`, `isolatedModules` | ⬜ |
 | 027 | module_resolution_barrels | re-exports, barrel files, circular import hazards | ⬜ |
 | 028 | error_subclasses | extending `Error`, `cause`, `instanceof` narrowing | ⬜ |

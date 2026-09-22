@@ -133,6 +133,43 @@ a rest — the row either hands the learner that part of the signature and
 grades the body (ex009), reaches the behaviour through a widened local
 reference in the test, or is graded at the type level only.
 
+**For a class, the same rule reads: declare every member with the LOOSEST
+modifiers and let the learner tighten them.** ex021's stub carries
+`id: unknown = undefined` and a public `balance`, so making `id` a readonly
+string and `balance` private is what turns the facts green. Declaring them
+correctly and leaving only the bodies to write would pre-satisfy every one of
+them. The same applies to ex023, whose stub Shape is a plain class with public
+methods precisely so that `abstract` and `protected` have somewhere to go.
+
+Note the asymmetry with `@ts-expect-error` this creates. A fact that grades a
+refusal is red while the stub still *permits* the thing — so a stub member
+must be permissive, or the expect-error is satisfied before any work is done
+and the fact is green from the start. Two of ex024's facts were written and
+then deleted for exactly that: its `fahrenheit` is a getter with no setter in
+the stub already, so “cannot be assigned” was true on the untouched tree.
+
+## Three things about classes that no test can see
+
+Recorded so a future row does not claim to grade them:
+
+- **Parameter properties.** `constructor(public readonly id: string)` and a
+  field declaration plus an assignment produce an identical class type. ex021
+  asks for the former and grades the field's type and modifiers.
+- **`implements`.** It checks the class at its declaration and adds nothing to
+  its type, so deleting it from a correct class changes neither types nor
+  behaviour. ex022's subject is precisely that, and its facts grade the
+  consequence — who is assignable to the interface — with a class that never
+  declares it as the control.
+- **Which mechanism set a static.** A `static { }` block and a field
+  initializer leave identical evidence, so ex024 grades the value.
+
+And one that *is* worth knowing before writing such a row, measured here:
+**a `readonly` static cannot be assigned from a static block.** Both
+`Cls.X = …` and `this.X = …` inside `static { }` fail with TS2540, unlike a
+readonly instance field, which a constructor may assign. A readonly static
+needs a plain initializer; a static block is for the mutable ones. The green
+run caught this — the first draft of ex024's solution did not compile.
+
 ## TypeScript 7
 
 New to this repo, and it bites immediately: **TS 7 removed `baseUrl`**
@@ -154,8 +191,8 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 20 / 100 exercises: 145 facts, 145 red / 0 passed on the
-untouched tree, 145 / 0 green against `solutions/`, 51 expected exercise-side
+Measured 2026-09-22 at 25 / 100 exercises: 191 facts, 191 red / 0 passed on the
+untouched tree, 191 / 0 green against `solutions/`, 63 expected exercise-side
 type errors and 0 on the solutions side.
 
 See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work
