@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 95 ✅ / 5 ⬜** — `01-beginner`, `02-intermediate` and `03-advanced` complete.
+**Status: 100 ✅ / 0 ⬜** — complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -135,8 +135,8 @@ green against `any` and must never carry a row on its own — see
 | 093 | tuple_arithmetic | addition and subtraction via tuple length | ✅ |
 | 094 | tail_recursive_types | tail-recursive accumulation and why it survives depth | ✅ |
 | 095 | recursion_depth_limits | where "excessively deep" starts, and how to go past it | ✅ |
-| 096 | typed_query_builder | a mini query builder inferring its row shape | ⬜ |
-| 097 | state_machine_types | illegal transitions rejected at compile time | ⬜ |
-| 098 | dts_authoring | a hand-written `.d.ts` for an untyped JS module | ⬜ |
-| 099 | json_serializable | a `Json<T>` type that rejects non-serializable members | ⬜ |
-| 100 | schema_inference | a hand-rolled schema whose output type is inferred from it | ⬜ |
+| 096 | typed_query_builder | a mini query builder inferring its row shape | ✅ |
+| 097 | state_machine_types | illegal transitions rejected at compile time | ✅ |
+| 098 | dts_authoring | a hand-written `.d.ts` for an untyped JS module | ✅ |
+| 099 | json_serializable | a `Json<T>` type that rejects non-serializable members | ✅ |
+| 100 | schema_inference | a hand-rolled schema whose output type is inferred from it | ✅ |

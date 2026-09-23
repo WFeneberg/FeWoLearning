@@ -203,6 +203,22 @@ The same five rows carry the one probe worth keeping: ex045's facts fail
 against a NON-distributive `[T] extends [U]` version (4 of them), so that
 row genuinely grades distribution rather than the answer.
 
+## The depth limit shows up in ordinary code
+
+ex095 measures the ceiling in the abstract; ex100 walked into it while
+doing something unremarkable. Casting a value to `Infer<S>` inside a
+function generic over `S extends Schema` makes the checker compare
+against a RECURSIVE conditional instantiated on a generic, and that is
+enough: "Type instantiation is excessively deep", at the cast, in a
+forty-line schema validator.
+
+Measured while fixing it: casting through `unknown` does NOT help,
+because the comparison still happens against the return annotation.
+`as never` does — `never` is assignable to everything, so nothing is
+compared. That is the escape hatch worth remembering, and the reason
+ex095 ends by saying a type one edit away from TS2589 is a liability
+whatever it computes.
+
 ## The recursion depth limits, measured
 
 On TypeScript 7.0.2, with the compiler this track pins:
@@ -437,11 +453,10 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-23 at 95 / 100 exercises — all of `01-beginner`,
-`02-intermediate` and `03-advanced`, plus `04-expert` through ex095: 783
-facts, 783 red / 0 passed on the untouched tree, 783 / 0 green against
-`solutions/`, 385 expected exercise-side type errors and 0 on the
-solutions side.
+Measured 2026-09-23 at **100 / 100 exercises — the track is complete**:
+846 facts, 846 red / 0 passed on the untouched tree, 846 / 0 green
+against `solutions/`, 428 expected exercise-side type errors and 0 on
+the solutions side.
 
 **The two runs must report the SAME TOTAL**, not merely all-red and
 all-green. A throw while a test file is being evaluated takes that file
@@ -452,5 +467,4 @@ The ratio shifts as the tiers go on: a type-level row contributes one type
 error per unimplemented type, so `02-intermediate` adds far more of them per
 exercise than `01-beginner` did. ex040 has no runtime facts at all.
 
-See [`catalog.md`](catalog.md) — the 100-row progress ledger and the work
-queue.
+See [`catalog.md`](catalog.md) — the 100-row ledger, now all ✅.

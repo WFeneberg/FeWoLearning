@@ -1327,7 +1327,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 95 / 100 (verified) | 5 |
+| `typescript/`| 100 / 100 (verified) | —         |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1343,17 +1343,14 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `telemetry/`| 70 / 70 (verified) | —         |
 
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
-`wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
-table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog, the complete `01-beginner`,
-`02-intermediate` and `03-advanced` tiers, and `04-expert` through
-ex095, verified red and green. Nothing else is
+`wpf/` and `MicroServices/`, all four still being built out — see the
+table above for exact counts. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.
 
-`dotnet/`, `go/`, `vue/`, `python/`, `angular/`, `rust/`, `uno/` and `blazor/`
-are content-complete **and verified** (every stub confirmed red, every solution confirmed green,
+`dotnet/`, `go/`, `vue/`, `python/`, `angular/`, `rust/`, `uno/`, `blazor/`
+and `typescript/` are content-complete **and verified** (every stub confirmed red, every solution confirmed green,
 by actually running that track's test command). `java/` and `kotlin/` are also
 content-complete — Gradle scaffolds, all 100 stubs' sibling JUnit tests, and
 all 100 reference solutions exist for each — **but nothing in either has ever
@@ -1438,6 +1435,18 @@ so `ComponentBase`-style render coalescing has nothing to coalesce under bUnit
 and ex093 is scoped without it; and the `ASP0006` analyzer rejects any
 sequence-number argument that is not an integer literal — even a named
 constant, which is worth knowing before writing a `BuildRenderTree` by hand.
+
+`typescript/` is content-complete and verified end-to-end: 100/100
+exercises across the four standard tiers, **846 test facts** (runtime facts
+in `*.test.ts`, type-level facts in `*.test-d.ts`). Measured 2026-09-23:
+`npm test` reports 846 failed / 0 passed on the untouched tree and
+`npm run test:solutions` 846 passed / 0 failed — **the two runs must
+report the same TOTAL**, since a throw during a test file's evaluation
+reports 0 tests rather than N failures. `npm run typecheck:solutions`
+exits 0 with zero errors; `npm run typecheck` exits 1 with 428 errors,
+**all of them inside `.test-d.ts`**, one per unimplemented type-level
+stub. An error anywhere else is a defect. Node 26 / npm 11; no Windows
+desktop session and no Docker needed.
 
 `security/` is content-complete and verified end-to-end: 60/60 exercises
 across four attack-surface blocks (not tiers — see its own entry in
