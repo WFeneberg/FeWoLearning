@@ -399,6 +399,15 @@ the same `global.json` opt-in.
   stop compiling, and you cannot fix a file you do not own. An
   augmentation meant to be safe adds optional members only.
 
+  A subtle relative of the pre-satisfied fact, met at ex089: **a stub
+  placeholder that happens to have one of the graded variances makes that
+  row's fact green.** Where a row grades covariance, contravariance and
+  invariance side by side, the stubs need a BIVARIANT placeholder —
+  `placeholder?(value: T): void`, method syntax per ex066 and returning
+  void so no covariance sneaks in through the result. It answers
+  `[true, true]`, which none of the three expected answers is. Measured:
+  returning `T` leaves the result covariant and the producer fact green.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1305,7 +1314,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 85 / 100 (verified) | 15 |
+| `typescript/`| 90 / 100 (verified) | 10 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1323,8 +1332,8 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog, the complete `01-beginner` and
-`02-intermediate` tiers, and `03-advanced` through ex085, verified red
+scaffolding, a full 100-row catalog and the complete `01-beginner`,
+`02-intermediate` and `03-advanced` tiers (ex001–ex090), verified red
 and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before

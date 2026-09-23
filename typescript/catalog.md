@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 85 ✅ / 15 ⬜** — `01-beginner` and `02-intermediate` complete.
+**Status: 90 ✅ / 10 ⬜** — `01-beginner`, `02-intermediate` and `03-advanced` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -120,11 +120,11 @@ green against `any` and must never carry a row on its own — see
 | 083 | well_known_symbols | `Symbol.hasInstance`, `Symbol.toPrimitive`, `Symbol.toStringTag` — *was* method decorators, see README | ✅ |
 | 084 | proxy_traps | `Proxy` with typed `get`/`set`/`has` traps | ✅ |
 | 085 | tiny_di_container | a metadata-free DI container, typed by token | ✅ |
-| 086 | async_pipeline | composing async generators into a pipeline | ⬜ |
-| 087 | task_group | structured concurrency: fail-fast, cancel siblings | ⬜ |
-| 088 | bounded_queue | an async queue with backpressure | ⬜ |
-| 089 | variance_annotations | `in`/`out` on type parameters | ⬜ |
-| 090 | pipe_and_compose | variadic `pipe`/`compose` typed through the chain | ⬜ |
+| 086 | async_pipeline | composing async generators into a pipeline | ✅ |
+| 087 | task_group | structured concurrency: fail-fast, cancel siblings | ✅ |
+| 088 | bounded_queue | an async queue with backpressure | ✅ |
+| 089 | variance_annotations | `in`/`out` on type parameters | ✅ |
+| 090 | pipe_and_compose | variadic `pipe`/`compose` typed through the chain | ✅ |
 
 ## Expert (091–100) — the type level as a language
 

@@ -203,6 +203,21 @@ The same five rows carry the one probe worth keeping: ex045's facts fail
 against a NON-distributive `[T] extends [U]` version (4 of them), so that
 row genuinely grades distribution rather than the answer.
 
+## A stub whose placeholder has the right variance grades nothing
+
+A subtle relative of the pre-satisfied fact, met at ex089. That row asks
+for a covariant, a contravariant and an invariant interface, and grades
+each by assignability in both directions. Whatever shape the three stubs
+share, one of the three answers matches it: a covariant placeholder makes
+the Producer fact green, an invariant one makes the Box fact green.
+
+The way out is a BIVARIANT placeholder — `placeholder?(value: T): void`,
+method syntax for the reason ex066 measured, returning void so that no
+covariance sneaks in through the result. It answers `[true, true]`, which
+none of the three expected answers is, so all three start red. Measured:
+returning `T` instead leaves the result covariant and the Producer fact
+green again.
+
 ## Standard decorators do not work in this toolchain
 
 Catalog rows 082 and 083 were planned as class and method decorators.
@@ -391,10 +406,10 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-23 at 85 / 100 exercises — all of `01-beginner` and
-`02-intermediate`, plus `03-advanced` through ex085: 698 facts, 698 red /
-0 passed on the untouched tree, 698 / 0 green against `solutions/`, 319
-expected exercise-side type errors and 0 on the solutions side.
+Measured 2026-09-23 at 90 / 100 exercises — the whole of `01-beginner`,
+`02-intermediate` and `03-advanced`: 742 facts, 742 red / 0 passed on the
+untouched tree, 742 / 0 green against `solutions/`, 332 expected
+exercise-side type errors and 0 on the solutions side.
 
 **The two runs must report the SAME TOTAL**, not merely all-red and
 all-green. A throw while a test file is being evaluated takes that file
