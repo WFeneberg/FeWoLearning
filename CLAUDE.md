@@ -377,6 +377,28 @@ the same `global.json` opt-in.
   T in a plain covariant position and makes the comparison bite. Caught by
   the green run, not by review.
 
+  **Standard TC39 decorators do not work here.** Measured 2026-09-23:
+  Vite 8's Rolldown/oxc transform leaves the `@` syntax in its output and
+  the module dies with `SyntaxError: Invalid or unexpected token`, while
+  `tsc` accepts the same code. Three configurations were tried (the
+  `esbuild` key, which Vite 8 has no esbuild for, and two shapes of
+  `oxc.transform`) and none helped. Catalog rows 082 and 083 were
+  therefore re-scoped to the mixin pattern and the well-known symbols —
+  what TypeScript codebases use for the same jobs — and the rows say so.
+
+  **The red and green runs must report the SAME TOTAL.** A throw while a
+  test file is being evaluated — a stub called at module level to build a
+  fixture — takes that file down and reports 0 tests rather than N
+  failures, which is indistinguishable from a clean red run unless the
+  total is read. Two files in ex081–ex085 did this. Anything a stub can
+  throw from belongs inside a test or behind a factory.
+
+  One more measured constraint, at ex081: **an augmentation that adds a
+  REQUIRED member breaks the augmented module's own code** — declaring
+  `startedAt: number` on someone else's interface makes their own factory
+  stop compiling, and you cannot fix a file you do not own. An
+  augmentation meant to be safe adds optional members only.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1283,7 +1305,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 80 / 100 (verified) | 20 |
+| `typescript/`| 85 / 100 (verified) | 15 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1302,7 +1324,7 @@ Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
 scaffolding, a full 100-row catalog, the complete `01-beginner` and
-`02-intermediate` tiers, and `03-advanced` through ex080, verified red
+`02-intermediate` tiers, and `03-advanced` through ex085, verified red
 and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before

@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 80 ✅ / 20 ⬜** — `01-beginner` and `02-intermediate` complete.
+**Status: 85 ✅ / 15 ⬜** — `01-beginner` and `02-intermediate` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -115,11 +115,11 @@ green against `any` and must never carry a row on its own — see
 | 078 | generic_builder | a fluent builder accumulating known keys in its type | ✅ |
 | 079 | typed_event_emitter | an event map, payloads inferred per event name | ✅ |
 | 080 | declaration_merging | merging interfaces, and merging into a function | ✅ |
-| 081 | module_augmentation | augmenting another module's declarations | ⬜ |
-| 082 | class_decorators | standard (TC39) class decorators | ⬜ |
-| 083 | method_decorators | method decorators and the decorator context object | ⬜ |
-| 084 | proxy_traps | `Proxy` with typed `get`/`set`/`has` traps | ⬜ |
-| 085 | tiny_di_container | a metadata-free DI container, typed by token | ⬜ |
+| 081 | module_augmentation | augmenting another module's declarations | ✅ |
+| 082 | class_mixins | the mixin pattern: a constructor constraint, a class expression, inferred composition — *was* class decorators, see README | ✅ |
+| 083 | well_known_symbols | `Symbol.hasInstance`, `Symbol.toPrimitive`, `Symbol.toStringTag` — *was* method decorators, see README | ✅ |
+| 084 | proxy_traps | `Proxy` with typed `get`/`set`/`has` traps | ✅ |
+| 085 | tiny_di_container | a metadata-free DI container, typed by token | ✅ |
 | 086 | async_pipeline | composing async generators into a pipeline | ⬜ |
 | 087 | task_group | structured concurrency: fail-fast, cancel siblings | ⬜ |
 | 088 | bounded_queue | an async queue with backpressure | ⬜ |

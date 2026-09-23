@@ -203,6 +203,35 @@ The same five rows carry the one probe worth keeping: ex045's facts fail
 against a NON-distributive `[T] extends [U]` version (4 of them), so that
 row genuinely grades distribution rather than the answer.
 
+## Standard decorators do not work in this toolchain
+
+Catalog rows 082 and 083 were planned as class and method decorators.
+Measured 2026-09-23: **Vite 8's Rolldown/oxc transform leaves the `@`
+syntax in its output**, and the module fails to load with
+`SyntaxError: Invalid or unexpected token`. `tsc` accepts the code; the
+runtime never sees valid JavaScript. Three configurations were tried —
+the `esbuild` key (ignored; there is no esbuild in Vite 8), and two
+shapes of `oxc.transform` — and none changed it.
+
+Rather than ship a row that cannot run, both were re-scoped to what
+TypeScript codebases use for the same jobs: **ex082 is the mixin
+pattern** and **ex083 the well-known symbols**. The catalog rows say so.
+A future session whose toolchain gains decorator support can add them
+back; nothing else in the track depends on them.
+
+## A module-level throw takes the whole test file down
+
+Two files in this batch called a stub at module level — applying a mixin,
+building a token — and the untouched stub's throw was evaluated while the
+file was loading. Vitest then reports that file as failed **with 0
+tests**, which looks identical to a clean red run unless the total is
+read.
+
+So the verification step is now: **the red and green runs must report the
+same TOTAL.** 698 red and 698 green is the check; 690 red against 698
+green is a file that never ran. Anything a stub can throw from belongs
+inside a test or behind a factory.
+
 ## A `this` precondition needs a comparable type parameter
 
 Declaring `build(this: Builder<Config>): Config` is the elegant way to say
@@ -362,10 +391,15 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-23 at 80 / 100 exercises — all of `01-beginner` and
-`02-intermediate`, plus `03-advanced` through ex080: 655 facts, 655 red /
-0 passed on the untouched tree, 655 / 0 green against `solutions/`, 308
+Measured 2026-09-23 at 85 / 100 exercises — all of `01-beginner` and
+`02-intermediate`, plus `03-advanced` through ex085: 698 facts, 698 red /
+0 passed on the untouched tree, 698 / 0 green against `solutions/`, 319
 expected exercise-side type errors and 0 on the solutions side.
+
+**The two runs must report the SAME TOTAL**, not merely all-red and
+all-green. A throw while a test file is being evaluated takes that file
+down and reports 0 tests rather than N failures, so the red run can look
+perfect while silently grading nothing — see the note below.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
 error per unimplemented type, so `02-intermediate` adds far more of them per
