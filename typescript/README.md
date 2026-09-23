@@ -203,6 +203,37 @@ The same five rows carry the one probe worth keeping: ex045's facts fail
 against a NON-distributive `[T] extends [U]` version (4 of them), so that
 row genuinely grades distribution rather than the answer.
 
+## The recursion depth limits, measured
+
+On TypeScript 7.0.2, with the compiler this track pins:
+
+| recursion shape | last depth that works | first that fails |
+|---|---|---|
+| non-tail (the call wrapped in a tuple) | 47 | 48 |
+| tail (the call IS the branch) | 999 | 1000 |
+
+Roughly a factor of twenty-one for one structural change, and both are
+hard walls rather than slowdowns. The error —
+`Type instantiation is excessively deep and possibly infinite` — appears
+at the USE, not at the declaration, so a type that is fine in its own
+file breaks in the one that instantiates it deeply enough.
+
+Do not treat the numbers as a specification; they have moved between
+versions. The SHAPE is what is stable, and ex095 grades both sides of
+it with `@ts-expect-error`.
+
+One mechanical trap found while building that row: reading the result
+with a direct `Builder<N>["length"]` fails at the DECLARATION of the
+tail-recursive version with "Excessive stack depth comparing types" —
+the unrolling loses track of the result being an array. Deferring the
+read into a conditional, `T extends { length: infer L } ? L : never`,
+sidesteps it. The nested version has no such problem, which makes it
+that much harder to place when it appears.
+
+And a smaller one, at ex094: **a string literal type has no literal
+`length`**, only `number`. A depth fact measured that way proves
+nothing; assert that the result is still a literal instead.
+
 ## A stub whose placeholder has the right variance grades nothing
 
 A subtle relative of the pre-satisfied fact, met at ex089. That row asks
@@ -406,10 +437,11 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-23 at 90 / 100 exercises — the whole of `01-beginner`,
-`02-intermediate` and `03-advanced`: 742 facts, 742 red / 0 passed on the
-untouched tree, 742 / 0 green against `solutions/`, 332 expected
-exercise-side type errors and 0 on the solutions side.
+Measured 2026-09-23 at 95 / 100 exercises — all of `01-beginner`,
+`02-intermediate` and `03-advanced`, plus `04-expert` through ex095: 783
+facts, 783 red / 0 passed on the untouched tree, 783 / 0 green against
+`solutions/`, 385 expected exercise-side type errors and 0 on the
+solutions side.
 
 **The two runs must report the SAME TOTAL**, not merely all-red and
 all-green. A throw while a test file is being evaluated takes that file

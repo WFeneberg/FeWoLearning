@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 90 ✅ / 10 ⬜** — `01-beginner`, `02-intermediate` and `03-advanced` complete.
+**Status: 95 ✅ / 5 ⬜** — `01-beginner`, `02-intermediate` and `03-advanced` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -130,11 +130,11 @@ green against `any` and must never carry a row on its own — see
 
 | #   | Slug | Concepts | Status |
 |-----|------|----------|--------|
-| 091 | split_string_type | `Split<S, D>` by recursive template-literal matching | ⬜ |
-| 092 | route_params | extracting `:id` parameters from a route literal | ⬜ |
-| 093 | tuple_arithmetic | addition and subtraction via tuple length | ⬜ |
-| 094 | tail_recursive_types | tail-recursive accumulation and why it survives depth | ⬜ |
-| 095 | recursion_depth_limits | where "excessively deep" starts, and how to go past it | ⬜ |
+| 091 | split_string_type | `Split<S, D>` by recursive template-literal matching | ✅ |
+| 092 | route_params | extracting `:id` parameters from a route literal | ✅ |
+| 093 | tuple_arithmetic | addition and subtraction via tuple length | ✅ |
+| 094 | tail_recursive_types | tail-recursive accumulation and why it survives depth | ✅ |
+| 095 | recursion_depth_limits | where "excessively deep" starts, and how to go past it | ✅ |
 | 096 | typed_query_builder | a mini query builder inferring its row shape | ⬜ |
 | 097 | state_machine_types | illegal transitions rejected at compile time | ⬜ |
 | 098 | dts_authoring | a hand-written `.d.ts` for an untyped JS module | ⬜ |

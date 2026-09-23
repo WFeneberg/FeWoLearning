@@ -408,6 +408,19 @@ the same `global.json` opt-in.
   `[true, true]`, which none of the three expected answers is. Measured:
   returning `T` leaves the result covariant and the producer fact green.
 
+  **The recursion depth limits, measured on TypeScript 7.0.2:**
+  non-tail-recursive works at 47 and fails at 48; tail-recursive works at
+  999 and fails at 1000 — a factor of twenty-one for one structural
+  change, and both hard walls rather than slowdowns. `Type instantiation
+  is excessively deep` appears at the USE, not the declaration. The
+  numbers move between versions; the shape does not, and ex095 grades
+  both sides with `@ts-expect-error`. Two traps from that row: reading the
+  result with a direct `Builder<N>["length"]` fails at the DECLARATION of
+  the tail-recursive version ("Excessive stack depth comparing types"),
+  so defer it into `T extends { length: infer L } ? L : never`; and **a
+  string literal type has no literal `length`**, only `number`, so a
+  depth fact measured that way proves nothing.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1314,7 +1327,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 90 / 100 (verified) | 10 |
+| `typescript/`| 95 / 100 (verified) | 5 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1332,9 +1345,9 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
-scaffolding, a full 100-row catalog and the complete `01-beginner`,
-`02-intermediate` and `03-advanced` tiers (ex001–ex090), verified red
-and green. Nothing else is
+scaffolding, a full 100-row catalog, the complete `01-beginner`,
+`02-intermediate` and `03-advanced` tiers, and `04-expert` through
+ex095, verified red and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.
