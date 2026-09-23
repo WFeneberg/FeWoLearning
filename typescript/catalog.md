@@ -15,7 +15,7 @@ once under `tests/<tier>/` as `exNNN_<slug>.test.ts` (runtime facts) and
 row about `infer` has no runtime to speak of, and a row about microtask
 ordering has no interesting type.
 
-**Status: 75 ✅ / 25 ⬜** — `01-beginner` and `02-intermediate` complete.
+**Status: 80 ✅ / 20 ⬜** — `01-beginner` and `02-intermediate` complete.
 
 Type-level facts are graded with `toEqualTypeOf` only. `toMatchTypeOf` is
 green against `any` and must never carry a row on its own — see
@@ -110,11 +110,11 @@ green against `any` and must never carry a row on its own — see
 | 073 | deep_readonly_arrays | recursion through arrays and tuples without losing arity | ✅ |
 | 074 | dotted_paths | deriving `"a.b.c"` path strings from an object type | ✅ |
 | 075 | get_by_path | the value type at a dotted path, and the runtime getter | ✅ |
-| 076 | branded_types | emulating nominal typing with a brand | ⬜ |
-| 077 | validated_ids | smart constructors, an id that cannot be forged | ⬜ |
-| 078 | generic_builder | a fluent builder accumulating known keys in its type | ⬜ |
-| 079 | typed_event_emitter | an event map, payloads inferred per event name | ⬜ |
-| 080 | declaration_merging | merging interfaces, and merging into a function | ⬜ |
+| 076 | branded_types | emulating nominal typing with a brand | ✅ |
+| 077 | validated_ids | smart constructors, an id that cannot be forged | ✅ |
+| 078 | generic_builder | a fluent builder accumulating known keys in its type | ✅ |
+| 079 | typed_event_emitter | an event map, payloads inferred per event name | ✅ |
+| 080 | declaration_merging | merging interfaces, and merging into a function | ✅ |
 | 081 | module_augmentation | augmenting another module's declarations | ⬜ |
 | 082 | class_decorators | standard (TC39) class decorators | ⬜ |
 | 083 | method_decorators | method decorators and the decorator context object | ⬜ |

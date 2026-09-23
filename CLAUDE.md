@@ -368,6 +368,15 @@ the same `global.json` opt-in.
   arity. Probed: the explicit form fails only the two tuple facts and
   passes everything else, which is how such a bug survives review.
 
+  **A `this`-parameter precondition needs a COMPARABLE type parameter.**
+  Measured at ex078: `build(this: Builder<Config>)` is the elegant way to
+  say "only available once complete", and it does nothing while T appears
+  solely inside `set`'s return type — `Builder<{host, port}>` and
+  `Builder<Config>` are then structurally identical and every incomplete
+  builder passes. A phantom `readonly supplied?: T`, never assigned, puts
+  T in a plain covariant position and makes the comparison bite. Caught by
+  the green run, not by review.
+
 - **Java** — Gradle (`java/build.gradle`), no wrapper committed (none could be
   generated without a JDK/Gradle on this machine — install both, or run
   `gradle wrapper` once you have Gradle, before first use). One package folder
@@ -1274,7 +1283,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `vue/`    | 100 / 100  | —         |
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
-| `typescript/`| 75 / 100 (verified) | 25 |
+| `typescript/`| 80 / 100 (verified) | 20 |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1293,7 +1302,7 @@ Every 100-exercise ledger is fully seeded except `avalonia/`, `caliburn/`,
 `wpf/`, `MicroServices/` and `typescript/`, all five still being built out — see the
 table above for exact counts. `typescript/` is the newest and the least far along:
 scaffolding, a full 100-row catalog, the complete `01-beginner` and
-`02-intermediate` tiers, and `03-advanced` through ex075, verified red
+`02-intermediate` tiers, and `03-advanced` through ex080, verified red
 and green. Nothing else is
 "remaining" in the sense of unwritten content; `java/`, `kotlin/`, and
 `flutter/` still need their first real compile/test run (see below) before

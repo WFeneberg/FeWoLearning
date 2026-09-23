@@ -203,6 +203,24 @@ The same five rows carry the one probe worth keeping: ex045's facts fail
 against a NON-distributive `[T] extends [U]` version (4 of them), so that
 row genuinely grades distribution rather than the answer.
 
+## A `this` precondition needs a comparable type parameter
+
+Declaring `build(this: Builder<Config>): Config` is the elegant way to say
+"this method is only available once the builder is complete" — and
+measured at ex078, it does NOTHING unless T appears somewhere the checker
+can compare.
+
+With T used only inside `set`'s return type, `Builder<{host, port}>` and
+`Builder<Config>` are structurally identical, so every incomplete builder
+satisfies the `this` check and both rejection facts stay green. Adding a
+phantom `readonly supplied?: T` — never assigned, present only to put T in
+a plain covariant position — is what makes the comparison bite. The green
+run caught it: the facts were red on the stub for the wrong reason and
+then failed against a correct-looking solution.
+
+Same trick as ex076's brand, used for a different purpose: a property that
+exists only so two types stop being the same.
+
 ## A homomorphic mapped type is array-aware
 
 Measured at ex073, and it makes a whole branch unnecessary:
@@ -344,9 +362,9 @@ precisely to drill what they change, starting at ex005 and ex007.
 | `npm run typecheck:solutions` | exit 0, zero errors |
 | `npm run typecheck` | exit 1, one error per unimplemented type-level stub, **all of them in `.test-d.ts` files** — an error anywhere else is a defect |
 
-Measured 2026-09-22 at 75 / 100 exercises — all of `01-beginner` and
-`02-intermediate`, plus `03-advanced` through ex075: 612 facts, 612 red /
-0 passed on the untouched tree, 612 / 0 green against `solutions/`, 291
+Measured 2026-09-23 at 80 / 100 exercises — all of `01-beginner` and
+`02-intermediate`, plus `03-advanced` through ex080: 655 facts, 655 red /
+0 passed on the untouched tree, 655 / 0 green against `solutions/`, 308
 expected exercise-side type errors and 0 on the solutions side.
 
 The ratio shifts as the tiers go on: a type-level row contributes one type
