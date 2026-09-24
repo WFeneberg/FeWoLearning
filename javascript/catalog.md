@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 5 ✅ / 95 ⬜**
+**Status: 10 ✅ / 90 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -30,11 +30,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 003 | truthiness | the eight falsy values, `??` vs `||`, `??=` | ✅ |
 | 004 | number_precision | binary floating point, `Number.EPSILON`, `toFixed`, integer checks | ✅ |
 | 005 | string_methods | `trim`/`padStart`/`replaceAll`/`at`, immutability of strings | ✅ |
-| 006 | template_literals | interpolation, multiline, expression nesting | ⬜ |
-| 007 | array_mutation | `push`/`splice`/`slice`, mutating vs copying, `toSpliced` | ⬜ |
-| 008 | array_pipeline | `map`/`filter`/`reduce` | ⬜ |
-| 009 | array_search | `find`/`findLast`/`some`/`every`/`includes` vs `indexOf` | ⬜ |
-| 010 | array_sort | comparator contract, sort stability, `toSorted` | ⬜ |
+| 006 | template_literals | interpolation, multiline, expression nesting | ✅ |
+| 007 | array_mutation | `push`/`splice`/`slice`, mutating vs copying, `toSpliced` | ✅ |
+| 008 | array_pipeline | `map`/`filter`/`reduce` | ✅ |
+| 009 | array_search | `find`/`findLast`/`some`/`every`/`includes` vs `indexOf` | ✅ |
+| 010 | array_sort | comparator contract, sort stability, `toSorted` | ✅ |
 | 011 | object_literals | shorthand, computed keys, key ordering rules | ⬜ |
 | 012 | destructuring | object/array patterns, defaults, renaming, swapping | ⬜ |
 | 013 | rest_and_spread | rest parameters, spread in calls and literals, shallow copy | ⬜ |
