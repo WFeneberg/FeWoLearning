@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 55 ✅ / 45 ⬜**
+**Status: 60 ✅ / 40 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -85,11 +85,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 053 | composition | `compose`/`pipe`, `reduceRight`, point-free plumbing | ✅ |
 | 054 | memoize | `Map`-backed memoization, key derivation, cache invalidation | ✅ |
 | 055 | debounce_throttle | trailing debounce and leading throttle on fake timers | ✅ |
-| 056 | deep_equal | recursive structural comparison, `NaN`, `Date`, arrays, cycles | ⬜ |
-| 057 | deep_clone | recursive clone by hand, cycle handling with a seen-map | ⬜ |
-| 058 | group_by | `Object.groupBy` / `Map.groupBy`, and doing it with `reduce` | ⬜ |
-| 059 | flat_and_flatmap | `flat(depth)`, `flatMap`, flattening recursively | ⬜ |
-| 060 | array_from | `Array.from` with an iterable plus a map fn, `Array.of`, holes | ⬜ |
+| 056 | deep_equal | recursive structural comparison, `NaN`, `Date`, arrays, cycles | ✅ |
+| 057 | deep_clone | recursive clone by hand, cycle handling with a seen-map | ✅ |
+| 058 | group_by | `Object.groupBy` / `Map.groupBy`, and doing it with `reduce` | ✅ |
+| 059 | flat_and_flatmap | `flat(depth)`, `flatMap`, flattening recursively | ✅ |
+| 060 | array_from | `Array.from` with an iterable plus a map fn, `Array.of`, holes | ✅ |
 | 061 | manual_iterator | a hand-written iterator object, `return()` on early exit | ⬜ |
 | 062 | generator_delegation | `yield*`, two-way `gen.next(value)` | ⬜ |
 | 063 | generator_state_machine | a generator as a coroutine driving a state machine | ⬜ |
