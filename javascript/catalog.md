@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 80 ✅ / 20 ⬜**
+**Status: 85 ✅ / 15 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -115,11 +115,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 078 | retry_backoff | retry with backoff, deterministic via an injected sleep | ✅ |
 | 079 | event_emitter | a Node-style emitter: `on`/`once`/`off`/`emit`, listener errors | ✅ |
 | 080 | observable_lite | a push stream with teardown on unsubscribe | ✅ |
-| 081 | web_streams | `ReadableStream`, `TransformStream`, piping | ⬜ |
-| 082 | disposables | `Symbol.dispose`, `DisposableStack`, LIFO teardown | ⬜ |
-| 083 | generator_cancellation | `gen.return()`/`gen.throw()`, `finally` in a generator | ⬜ |
-| 084 | super_lookup | home objects: `super` in an object literal, accessor inheritance | ⬜ |
-| 085 | immutable_updates | nested updates with structural sharing, no mutation | ⬜ |
+| 081 | web_streams | `ReadableStream`, `TransformStream`, piping | ✅ |
+| 082 | disposables | `Symbol.dispose`, `DisposableStack`, LIFO teardown | ✅ |
+| 083 | generator_cancellation | `gen.return()`/`gen.throw()`, `finally` in a generator | ✅ |
+| 084 | super_lookup | home objects: `super` in an object literal, accessor inheritance | ✅ |
+| 085 | immutable_updates | nested updates with structural sharing, no mutation | ✅ |
 | 086 | dynamic_import | `import()`, import cycles, module singleton state | ⬜ |
 | 087 | async_local_storage | `node:async_hooks` context propagation across awaits | ⬜ |
 | 088 | lru_cache | `Map` insertion order as the recency list | ⬜ |
