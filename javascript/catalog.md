@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 45 ✅ / 55 ⬜**
+**Status: 50 ✅ / 50 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -75,11 +75,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 043 | event_target | `EventTarget`, `CustomEvent`, `once`, removing a listener | ✅ |
 | 044 | error_cause | the `cause` option, chained diagnosis, `AggregateError` | ✅ |
 | 045 | prototype_chain | `Object.create`, `getPrototypeOf`, shadowing, `hasOwn` | ✅ |
-| 046 | constructor_functions | the pre-`class` model, `prototype`, `new.target` | ⬜ |
-| 047 | property_descriptors | `defineProperty`, `writable`/`enumerable`/`configurable` | ⬜ |
-| 048 | freeze_and_seal | `freeze`/`seal`/`preventExtensions`, shallow immutability | ⬜ |
-| 049 | structured_clone | `structuredClone` vs JSON: cycles, `Map`, `Date`, functions | ⬜ |
-| 050 | weak_collections | `WeakMap` for private data, `WeakSet`, `WeakRef` | ⬜ |
+| 046 | constructor_functions | the pre-`class` model, `prototype`, `new.target` | ✅ |
+| 047 | property_descriptors | `defineProperty`, `writable`/`enumerable`/`configurable` | ✅ |
+| 048 | freeze_and_seal | `freeze`/`seal`/`preventExtensions`, shallow immutability | ✅ |
+| 049 | structured_clone | `structuredClone` vs JSON: cycles, `Map`, `Date`, functions | ✅ |
+| 050 | weak_collections | `WeakMap` for private data, `WeakSet`, `WeakRef` | ✅ |
 | 051 | symbols | unique keys, `Symbol.for`, `toStringTag`, `toPrimitive` | ⬜ |
 | 052 | currying | closures for currying, `bind` for partial application | ⬜ |
 | 053 | composition | `compose`/`pipe`, `reduceRight`, point-free plumbing | ⬜ |
