@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 15 ✅ / 85 ⬜**
+**Status: 20 ✅ / 80 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -40,11 +40,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 013 | rest_and_spread | rest parameters, spread in calls and literals, shallow copy | ✅ |
 | 014 | default_parameters | evaluated per call, earlier parameters in scope | ✅ |
 | 015 | arrow_functions | concise bodies, no own `this`/`arguments`, returning an object | ✅ |
-| 016 | closures | a counter factory, shared vs fresh captures, the loop-var trap | ⬜ |
-| 017 | scope_and_hoisting | `var` vs `let`/`const`, the temporal dead zone | ⬜ |
-| 018 | this_binding | `call`/`apply`/`bind`, a method losing its receiver | ⬜ |
-| 019 | optional_chaining | `?.`, `?.()`, `?.[]`, short-circuit semantics | ⬜ |
-| 020 | json_roundtrip | `stringify`/`parse`, replacer and reviver, what JSON drops | ⬜ |
+| 016 | closures | a counter factory, shared vs fresh captures, the loop-var trap | ✅ |
+| 017 | scope_and_hoisting | `var` vs `let`/`const`, the temporal dead zone | ✅ |
+| 018 | this_binding | `call`/`apply`/`bind`, a method losing its receiver | ✅ |
+| 019 | optional_chaining | `?.`, `?.()`, `?.[]`, short-circuit semantics | ✅ |
+| 020 | json_roundtrip | `stringify`/`parse`, replacer and reviver, what JSON drops | ✅ |
 | 021 | dates | `Date`, ISO strings, UTC vs local, date arithmetic | ⬜ |
 | 022 | map_and_set | `Map`/`Set` over plain objects, insertion order, key identity | ⬜ |
 | 023 | object_statics | `keys`/`values`/`entries`/`fromEntries`/`assign` | ⬜ |
