@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 70 ✅ / 30 ⬜**
+**Status: 75 ✅ / 25 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -105,11 +105,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 
 | #   | Slug | Concepts | State |
 |-----|------|----------|-------|
-| 071 | proxy_basics | `get`/`set`/`has`/`deleteProperty` traps | ⬜ |
-| 072 | reflect_and_receiver | `Reflect.*`, why a trap must forward the receiver | ⬜ |
-| 073 | proxy_invariants | traps a non-configurable property will not let you lie about | ⬜ |
-| 074 | revocable_proxy | `Proxy.revocable`, capability revocation | ⬜ |
-| 075 | well_known_symbols | `Symbol.hasInstance`, `toPrimitive`, `species` | ⬜ |
+| 071 | proxy_basics | `get`/`set`/`has`/`deleteProperty` traps | ✅ |
+| 072 | reflect_and_receiver | `Reflect.*`, why a trap must forward the receiver | ✅ |
+| 073 | proxy_invariants | traps a non-configurable property will not let you lie about | ✅ |
+| 074 | revocable_proxy | `Proxy.revocable`, capability revocation | ✅ |
+| 075 | well_known_symbols | `Symbol.hasInstance`, `toPrimitive`, `species` | ✅ |
 | 076 | iterator_helpers | `.map`/`.filter`/`.take`/`.drop` on iterators, laziness | ⬜ |
 | 077 | concurrency_pool | a task pool with a fixed concurrency limit | ⬜ |
 | 078 | retry_backoff | retry with backoff, deterministic via an injected sleep | ⬜ |

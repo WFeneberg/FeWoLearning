@@ -101,6 +101,18 @@ produce.**
   `DisposableStack`, `.adopt`, `.defer` and `.move` through explicit
   `.dispose()` calls, so the row does not depend on whether the bundler in
   front of Vitest passes `using` through.
+- **A revoked proxy cannot be handed to a Vitest matcher.** Measured at
+  ex074: `expect(revoked).not.toBe(other)` throws `TypeError: Cannot perform
+  'has' on a proxy that has been revoked`, because the matcher probes the
+  value for an asymmetric-matcher marker first. Compare with `Object.is(...)`
+  inside the assertion, which runs no trap.
+- **`JSON.stringify` probes a STRING key**, `toJSON`, before serialising — so
+  a proxy that throws on unknown string keys (ex071) is fine with spread and
+  template literals and dies inside a logger. The symbol exemption such a
+  proxy needs does not cover it.
+- **`toEqual` compares symbol-keyed properties**, so an array carrying
+  `Symbol.isConcatSpreadable` is not `toEqual` a plain literal with the same
+  elements (ex075). Spread it first.
 - **`SharedArrayBuffer` needs no flag in Node** (ex099) and `Atomics.wait` is
   forbidden on the main thread — the ring buffer row is graded
   single-threaded with `Atomics.load`/`store`, and ex098 is the row that
