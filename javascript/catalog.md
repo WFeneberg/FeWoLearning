@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 65 ✅ / 35 ⬜**
+**Status: 70 ✅ / 30 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -95,11 +95,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 063 | generator_state_machine | a generator as a coroutine driving a state machine | ✅ |
 | 064 | tagged_templates | tag functions, `strings.raw`, interleaving values | ✅ |
 | 065 | lazy_properties | a getter that replaces itself on first read | ✅ |
-| 066 | mixins | `Object.assign` mixins vs the class-factory pattern | ⬜ |
-| 067 | intl | `Intl.NumberFormat`/`DateTimeFormat`/`RelativeTimeFormat`, explicit locales | ⬜ |
-| 068 | text_encoding | `TextEncoder`/`TextDecoder`, code units vs code points | ⬜ |
-| 069 | typed_arrays | `Uint8Array`, `DataView`, endianness, views over one buffer | ⬜ |
-| 070 | bigint | arbitrary precision, no mixing with `Number`, conversions | ⬜ |
+| 066 | mixins | `Object.assign` mixins vs the class-factory pattern | ✅ |
+| 067 | intl | `Intl.NumberFormat`/`DateTimeFormat`/`RelativeTimeFormat`, explicit locales | ✅ |
+| 068 | text_encoding | `TextEncoder`/`TextDecoder`, code units vs code points | ✅ |
+| 069 | typed_arrays | `Uint8Array`, `DataView`, endianness, views over one buffer | ✅ |
+| 070 | bigint | arbitrary precision, no mixing with `Number`, conversions | ✅ |
 
 ## 03-advanced (071–090)
 
