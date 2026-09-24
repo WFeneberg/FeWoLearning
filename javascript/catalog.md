@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 90 ✅ / 10 ⬜**
+**Status: 95 ✅ / 5 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -130,11 +130,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 
 | #   | Slug | Concepts | State |
 |-----|------|----------|-------|
-| 091 | template_dsl | a tagged-template query builder that cannot be injected into | ⬜ |
-| 092 | deep_reactive_proxy | nested proxies, change paths, arrays, identity caching | ⬜ |
-| 093 | effects_runtime | a generator-driven effect interpreter (yield a request, resume) | ⬜ |
-| 094 | structured_concurrency | a task group: first failure cancels the siblings | ⬜ |
-| 095 | async_pipeline | async-generator stages, early exit, `finally` cleanup order | ⬜ |
+| 091 | template_dsl | a tagged-template query builder that cannot be injected into | ✅ |
+| 092 | deep_reactive_proxy | nested proxies, change paths, arrays, identity caching | ✅ |
+| 093 | effects_runtime | a generator-driven effect interpreter (yield a request, resume) | ✅ |
+| 094 | structured_concurrency | a task group: first failure cancels the siblings | ✅ |
+| 095 | async_pipeline | async-generator stages, early exit, `finally` cleanup order | ✅ |
 | 096 | signals | dependency tracking, computed values, batched notification | ⬜ |
 | 097 | transducers | composable reducers, one pass, early termination | ⬜ |
 | 098 | worker_threads | `node:worker_threads`, message passing, transferables | ⬜ |
