@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 50 ✅ / 50 ⬜**
+**Status: 55 ✅ / 45 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -80,11 +80,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 048 | freeze_and_seal | `freeze`/`seal`/`preventExtensions`, shallow immutability | ✅ |
 | 049 | structured_clone | `structuredClone` vs JSON: cycles, `Map`, `Date`, functions | ✅ |
 | 050 | weak_collections | `WeakMap` for private data, `WeakSet`, `WeakRef` | ✅ |
-| 051 | symbols | unique keys, `Symbol.for`, `toStringTag`, `toPrimitive` | ⬜ |
-| 052 | currying | closures for currying, `bind` for partial application | ⬜ |
-| 053 | composition | `compose`/`pipe`, `reduceRight`, point-free plumbing | ⬜ |
-| 054 | memoize | `Map`-backed memoization, key derivation, cache invalidation | ⬜ |
-| 055 | debounce_throttle | trailing debounce and leading throttle on fake timers | ⬜ |
+| 051 | symbols | unique keys, `Symbol.for`, `toStringTag`, `toPrimitive` | ✅ |
+| 052 | currying | closures for currying, `bind` for partial application | ✅ |
+| 053 | composition | `compose`/`pipe`, `reduceRight`, point-free plumbing | ✅ |
+| 054 | memoize | `Map`-backed memoization, key derivation, cache invalidation | ✅ |
+| 055 | debounce_throttle | trailing debounce and leading throttle on fake timers | ✅ |
 | 056 | deep_equal | recursive structural comparison, `NaN`, `Date`, arrays, cycles | ⬜ |
 | 057 | deep_clone | recursive clone by hand, cycle handling with a seen-map | ⬜ |
 | 058 | group_by | `Object.groupBy` / `Map.groupBy`, and doing it with `reduce` | ⬜ |
