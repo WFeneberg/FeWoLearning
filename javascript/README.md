@@ -101,6 +101,13 @@ produce.**
   `DisposableStack`, `.adopt`, `.defer` and `.move` through explicit
   `.dispose()` calls, so the row does not depend on whether the bundler in
   front of Vitest passes `using` through.
+- **Vitest's module runner is not plain Node ESM**, and ex086 measures two
+  differences. Reading a not-yet-initialised `const` across an import cycle
+  is a `ReferenceError` on `node file.mjs` and plain `undefined` here, since
+  Vite rewrites modules into its own runtime; and the object `await import()`
+  resolves to is extensible here, where a real module namespace is sealed.
+  A row about module semantics must therefore assert what holds in both, or
+  it grades the bundler.
 - **A revoked proxy cannot be handed to a Vitest matcher.** Measured at
   ex074: `expect(revoked).not.toBe(other)` throws `TypeError: Cannot perform
   'has' on a proxy that has been revoked`, because the matcher probes the
