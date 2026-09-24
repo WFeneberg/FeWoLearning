@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 25 ✅ / 75 ⬜**
+**Status: 30 ✅ / 70 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -50,11 +50,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 023 | object_statics | `keys`/`values`/`entries`/`fromEntries`/`assign` | ✅ |
 | 024 | getters_and_setters | accessor properties in a literal, computed on read | ✅ |
 | 025 | classes | `class`, constructor, methods, `instanceof` | ✅ |
-| 026 | inheritance | `extends`, `super`, overriding, `super` in a method | ⬜ |
-| 027 | static_and_private | `static` members, `#private` fields, `#x in obj` | ⬜ |
-| 028 | errors | `throw`, `try`/`catch`/`finally`, a custom `Error` subclass | ⬜ |
-| 029 | regex_basics | `test`/`match`/`replace`, groups, flags | ⬜ |
-| 030 | named_groups | named capture groups, `matchAll`, `/g` statefulness | ⬜ |
+| 026 | inheritance | `extends`, `super`, overriding, `super` in a method | ✅ |
+| 027 | static_and_private | `static` members, `#private` fields, `#x in obj` | ✅ |
+| 028 | errors | `throw`, `try`/`catch`/`finally`, a custom `Error` subclass | ✅ |
+| 029 | regex_basics | `test`/`match`/`replace`, groups, flags | ✅ |
+| 030 | named_groups | named capture groups, `matchAll`, `/g` statefulness | ✅ |
 | 031 | for_of_vs_for_in | iterating values vs keys, why `for..in` walks the prototype | ⬜ |
 | 032 | iterable_protocol | making an object iterable with `Symbol.iterator` | ⬜ |
 | 033 | generators | `function*`, `yield`, spreading a generator, laziness | ⬜ |
