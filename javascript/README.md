@@ -18,6 +18,11 @@ npm install
 
 Node 26 / npm 11. No Docker, no Windows desktop session, no global tooling.
 
+**Verified end-to-end 2026-09-24**: 1176 facts. `npm test` reports
+100 files / 1176 failed / 0 passed on the untouched tree in about 10 s;
+`npm run test:solutions` reports 1176 passed / 0 failed in about 3 s. The
+two runs must report the same TOTAL — see lie #2 below.
+
 ## Commands
 
 | What | Command |
@@ -120,6 +125,14 @@ produce.**
 - **`toEqual` compares symbol-keyed properties**, so an array carrying
   `Symbol.isConcatSpreadable` is not `toEqual` a plain literal with the same
   elements (ex075). Spread it first.
+- **A worker's entry file is loaded by Node, not by Vitest.** Measured at
+  ex098: `new Worker(new URL("@ex/…", import.meta.url))` fails, because the
+  alias is a bundler concept with no meaning at runtime. Build the URL
+  inside the exercise module from its own `import.meta.url`, and keep
+  `worker.js` plain ESM with `node:` imports only — it gets no transform,
+  no alias and no test globals. Running such a module under
+  `node --input-type=module -e …` also fails: the worker inherits the flag
+  and refuses it.
 - **`SharedArrayBuffer` needs no flag in Node** (ex099) and `Atomics.wait` is
   forbidden on the main thread — the ring buffer row is graded
   single-threaded with `Atomics.load`/`store`, and ex098 is the row that

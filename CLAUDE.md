@@ -51,6 +51,7 @@ tests there — do not add `solutions/` to a project/module.
 | `vue/`    | `npm install`                           | `npm test`               | `npm run test:one -- "increments"` |
 | `angular/`| `npm install`                           | `npm test`               | `npm run test:one -- "applies a discount"` |
 | `typescript/`| `npm install`                        | `npm test`               | `npm run test:one -- "narrowing"` |
+| `javascript/`| `npm install`                        | `npm test`               | `npm run test:one -- "ex001"` |
 | `go/`     | — (deps already downloaded)             | `go test ./...`          | `go test ./exercises/01-beginner/ex001_fizzbuzz/` |
 | `rust/`   | — (`LIB` comes from `.cargo/config.toml`) | `cargo test`           | `cargo test ex001` |
 | `java/`   | planned                                 | planned                  | planned |
@@ -79,7 +80,8 @@ its green run: `dotnet test --solution FeWoLearning.Security.slnx -p:UseSolution
 
 `typescript/` has the same red/green split without MSBuild: `npm test` is the red run and
 `npm run test:solutions` the green one, the difference being which content tree the `@ex`
-path alias resolves to.
+path alias resolves to. **`javascript/` copies that mechanism exactly** — same alias, same two
+thin configs, no typecheck half.
 
 A footnote in the same spirit as the `wpf/`/`MicroServices/` entries below: `security/global.json`
 carries the same `Microsoft.Testing.Platform` opt-in, and a bare, argument-less `dotnet test` here
@@ -185,6 +187,46 @@ the same `global.json` opt-in.
 - **Angular** — Headless testing via **Jest** (`jest-preset-angular`), not
   Karma; tests are `*.spec.ts`. Components are **standalone** and use **signals**.
   Stubs `throw`.
+- **JavaScript** — The language itself on plain Node: the object model,
+  coercion, closures, prototypes, the job queue, iterators, proxies,
+  workers. Types are `typescript/`'s subject and frameworks are `vue/`'s
+  and `angular/`'s; nothing here imports a UI library or a DOM. Vitest
+  5.0.1, ESM, Node 26 — one dependency, no TypeScript. The red/green
+  mechanism is `typescript/`'s: tests live **once** under `tests/<tier>/`
+  and import through an `@ex` alias that `vitest.shared.js` points at
+  `exercises/` or `solutions/`, so one suite grades both trees and
+  `solutions/` cannot drift. Stubs `throw new Error("TODO: …")` from the
+  function body.
+
+  **The recurring bug class is that a stub's own throw satisfies a lazy
+  assertion.** A bare `expect(fn).toThrow()` — and even
+  `toThrow(Error)` — is green against every unimplemented stub, so a row
+  about throwing must name a custom class or match the message. Its
+  siblings: `toEqual` cannot see identity and `toBe` cannot see content,
+  so a copying row asserts both plus the untouched input; and laziness is
+  invisible in a result, so a generator or iterator-helper row counts the
+  pulls or uses an endless source. `javascript/README.md`'s "How a
+  JavaScript test lies" has all six.
+
+  **Five facts passed on the untouched tree before being anchored** to a
+  real call in the same test, all of them properties of the stub's own
+  signature: `sum.length` (a rest parameter is already declared),
+  `double.prototype` (an arrow is already an arrow), `Stack()` throwing
+  without `new` (a class already refuses), the prototype links `extends`
+  already made, and `fromPromises` already being async-iterable. This is
+  the repo-wide "facts the signature satisfies" rule in JavaScript form.
+
+  **Vitest's module runner is not plain Node ESM**, measured at ex086:
+  reading a not-yet-initialised `const` across an import cycle is
+  `undefined` here and a `ReferenceError` under `node`, and the object
+  `await import()` resolves to is extensible here where a real namespace
+  is sealed. A row about module semantics must assert what holds in both.
+  Two more measured limits worth knowing before writing a row: a **revoked
+  proxy cannot be passed to a Vitest matcher** (the matcher performs a
+  `has` on it and dies), and a **worker's entry file is loaded by Node**,
+  so its URL must be built from the exercise module's own
+  `import.meta.url` — the `@ex` alias means nothing at runtime.
+
 - **TypeScript** — The language itself, not TS-in-a-framework (`vue/` and
   `angular/` cover that). **Vitest 5.0.1 + TypeScript 7.0.2, both pinned
   exactly** — Vitest prints its own warning that the typecheck runner is
@@ -1328,6 +1370,7 @@ source of truth for what is done and what is next; do not re-inventory the disk.
 | `python/` | 100 / 100  | —         |
 | `angular/`| 100 / 100  | —         |
 | `typescript/`| 100 / 100 (verified) | —         |
+| `javascript/`| 100 / 100 (verified) | —         |
 | `rust/`   | 100 / 100  | —         |
 | `java/`   | 100 / 100 (seeded, **unverified** — see below) | —  |
 | `kotlin/` | 100 / 100 (seeded, **unverified** — see below) | —  |
@@ -1349,8 +1392,8 @@ table above for exact counts. Nothing else is
 `flutter/` still need their first real compile/test run (see below) before
 they can be trusted the way the verified tracks are.
 
-`dotnet/`, `go/`, `vue/`, `python/`, `angular/`, `rust/`, `uno/`, `blazor/`
-and `typescript/` are content-complete **and verified** (every stub confirmed red, every solution confirmed green,
+`dotnet/`, `go/`, `vue/`, `python/`, `angular/`, `rust/`, `uno/`, `blazor/`,
+`typescript/` and `javascript/` are content-complete **and verified** (every stub confirmed red, every solution confirmed green,
 by actually running that track's test command). `java/` and `kotlin/` are also
 content-complete — Gradle scaffolds, all 100 stubs' sibling JUnit tests, and
 all 100 reference solutions exist for each — **but nothing in either has ever
@@ -1447,6 +1490,16 @@ exits 0 with zero errors; `npm run typecheck` exits 1 with 428 errors,
 **all of them inside `.test-d.ts`**, one per unimplemented type-level
 stub. An error anywhere else is a defect. Node 26 / npm 11; no Windows
 desktop session and no Docker needed.
+
+`javascript/` is content-complete and verified end-to-end: 100/100
+exercises across the four standard tiers, **1176 test facts** in 100 test
+files. Measured 2026-09-24: `npm test` reports 1176 failed / 0 passed on
+the untouched tree in about 10 s, and `npm run test:solutions` 1176
+passed / 0 failed in about 3 s — **the two runs must report the same
+TOTAL**, for the same reason `typescript/` records. Node 26 / npm 11, one
+dependency (Vitest 5.0.1); no Windows desktop session and no Docker
+needed, and ex098 starts a real `node:worker_threads` worker in the
+default run.
 
 `security/` is content-complete and verified end-to-end: 60/60 exercises
 across four attack-surface blocks (not tiers — see its own entry in

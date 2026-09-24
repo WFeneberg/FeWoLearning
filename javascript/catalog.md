@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 95 ✅ / 5 ⬜**
+**Status: 100 ✅ / 0 ⬜** — complete.
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -135,8 +135,8 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 093 | effects_runtime | a generator-driven effect interpreter (yield a request, resume) | ✅ |
 | 094 | structured_concurrency | a task group: first failure cancels the siblings | ✅ |
 | 095 | async_pipeline | async-generator stages, early exit, `finally` cleanup order | ✅ |
-| 096 | signals | dependency tracking, computed values, batched notification | ⬜ |
-| 097 | transducers | composable reducers, one pass, early termination | ⬜ |
-| 098 | worker_threads | `node:worker_threads`, message passing, transferables | ⬜ |
-| 099 | atomics_ring_buffer | `SharedArrayBuffer` + `Atomics` single-producer ring buffer | ⬜ |
-| 100 | promise_from_scratch | a Promises/A+ `then` with real microtask scheduling | ⬜ |
+| 096 | signals | dependency tracking, computed values, batched notification | ✅ |
+| 097 | transducers | composable reducers, one pass, early termination | ✅ |
+| 098 | worker_threads | `node:worker_threads`, message passing, transferables | ✅ |
+| 099 | atomics_ring_buffer | `SharedArrayBuffer` + `Atomics` single-producer ring buffer | ✅ |
+| 100 | promise_from_scratch | a Promises/A+ `then` with real microtask scheduling | ✅ |
