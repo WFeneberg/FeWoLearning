@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 20 ✅ / 80 ⬜**
+**Status: 25 ✅ / 75 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -45,11 +45,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 | 018 | this_binding | `call`/`apply`/`bind`, a method losing its receiver | ✅ |
 | 019 | optional_chaining | `?.`, `?.()`, `?.[]`, short-circuit semantics | ✅ |
 | 020 | json_roundtrip | `stringify`/`parse`, replacer and reviver, what JSON drops | ✅ |
-| 021 | dates | `Date`, ISO strings, UTC vs local, date arithmetic | ⬜ |
-| 022 | map_and_set | `Map`/`Set` over plain objects, insertion order, key identity | ⬜ |
-| 023 | object_statics | `keys`/`values`/`entries`/`fromEntries`/`assign` | ⬜ |
-| 024 | getters_and_setters | accessor properties in a literal, computed on read | ⬜ |
-| 025 | classes | `class`, constructor, methods, `instanceof` | ⬜ |
+| 021 | dates | `Date`, ISO strings, UTC vs local, date arithmetic | ✅ |
+| 022 | map_and_set | `Map`/`Set` over plain objects, insertion order, key identity | ✅ |
+| 023 | object_statics | `keys`/`values`/`entries`/`fromEntries`/`assign` | ✅ |
+| 024 | getters_and_setters | accessor properties in a literal, computed on read | ✅ |
+| 025 | classes | `class`, constructor, methods, `instanceof` | ✅ |
 | 026 | inheritance | `extends`, `super`, overriding, `super` in a method | ⬜ |
 | 027 | static_and_private | `static` members, `#private` fields, `#x in obj` | ⬜ |
 | 028 | errors | `throw`, `try`/`catch`/`finally`, a custom `Error` subclass | ⬜ |
