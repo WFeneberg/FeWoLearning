@@ -14,7 +14,7 @@ needs. The tests live **once**, under `tests/<tier>/exNNN_<slug>.test.js`, and
 import through the `@ex` alias that `vitest.shared.js` points at either content
 tree: `npm test` is the red run, `npm run test:solutions` the green one.
 
-**Status: 35 ✅ / 65 ⬜**
+**Status: 40 ✅ / 60 ⬜**
 
 This track is **the language itself** — the runtime object model, coercion,
 closures, prototypes, the job queue, iterators, proxies. Types belong to
@@ -65,11 +65,11 @@ imports a UI library. Everything runs on plain Node (ESM).
 
 | #   | Slug | Concepts | State |
 |-----|------|----------|-------|
-| 036 | promise_basics | the constructor, `then`/`catch`/`finally`, settle-once | ⬜ |
-| 037 | async_await | `async` functions, awaiting, how rejections surface | ⬜ |
-| 038 | promise_combinators | `all`/`allSettled`/`race`/`any`, `AggregateError` | ⬜ |
-| 039 | job_queue_ordering | sync vs microtask vs timer, `queueMicrotask` | ⬜ |
-| 040 | sequential_vs_parallel | awaiting in a loop vs starting first and awaiting later | ⬜ |
+| 036 | promise_basics | the constructor, `then`/`catch`/`finally`, settle-once | ✅ |
+| 037 | async_await | `async` functions, awaiting, how rejections surface | ✅ |
+| 038 | promise_combinators | `all`/`allSettled`/`race`/`any`, `AggregateError` | ✅ |
+| 039 | job_queue_ordering | sync vs microtask vs timer, `queueMicrotask` | ✅ |
+| 040 | sequential_vs_parallel | awaiting in a loop vs starting first and awaiting later | ✅ |
 | 041 | async_iteration | `for await..of`, async generators | ⬜ |
 | 042 | abort_controller | `AbortController`/`AbortSignal`, `reason`, `throwIfAborted` | ⬜ |
 | 043 | event_target | `EventTarget`, `CustomEvent`, `once`, removing a listener | ⬜ |
